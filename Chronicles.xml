@@ -1,0 +1,12 @@
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ../../FrameXML/UI.xsd" xmlns="http://www.blizzard.com/wow/ui/">
+	
+	<Include file="Libs\Libs.xml"/>
+    <Include file="Locales\Locales.xml"/>
+	
+    <Script file="Constants.lua"/>
+    
+    <Script file="Core.lua"/>
+
+	<Include file="UI\Elements.xml"/>
+
+</Ui>

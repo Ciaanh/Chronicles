@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+	<Include file="Chronicles_UI.xml" />
+
+	<Script file="Timeline.lua" />
+	<Include file="Timeline.xml" />
+
+	<Script file="EventList.lua" />
+	<Include file="EventList.xml" />
+
+	<Script file="EventDescription.lua" />
+	<Include file="EventDescription.xml" />
+</Ui>

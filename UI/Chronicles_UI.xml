@@ -1,0 +1,144 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+
+    <Frame name="MainFrameTemplate" virtual="true">
+        <Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
+            <EdgeSize>
+                <AbsValue val="26"/>
+            </EdgeSize>
+        </Backdrop>
+        <Size x="220" y="100"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\Collections\CollectionsBackgroundTile" horizTile="true" vertTile="true">
+                    <Size x="256" y="256"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-5"/>
+                        <Anchor point="BOTTOM" x="0" y="5"/>
+                        <Anchor point="LEFT" x="5" y="0"/>
+                        <Anchor point="RIGHT" x="-5" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="ArrowUP" inherits="HelpPlateArrowDOWN" hidden="true">
+                    <Size x="53" y="21"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="3"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="ArrowDOWN" inherits="HelpPlateArrowUP" hidden="true">
+                    <Size x="53" y="21"/>
+                    <Anchors>
+                        <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-3"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="ArrowRIGHT" inherits="HelpPlateArrowDOWN" hidden="true">
+                    <Size x="53" y="21"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativePoint="LEFT" x="3" y="0"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="ArrowLEFT" inherits="HelpPlateArrowDOWN" hidden="true">
+                    <Size x="53" y="21"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativePoint="RIGHT" x="-3" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <Texture parentKey="BGCornerTopLeft" atlas="collections-background-corner" useAtlasSize="false">
+                    <Size x="50" y="50"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="9" y="-8"/>
+                    </Anchors>
+                </Texture>
+
+                <Texture parentKey="BGCornerTopRight" atlas="collections-background-corner" useAtlasSize="false">
+                    <Size x="50" y="50"/>
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="-9" y="-8"/>
+                    </Anchors>
+                    <TexCoords left="1.0" right="0.0" top="0.0" bottom="1.0"/>
+                </Texture>
+
+                <Texture parentKey="BGCornerBottomLeft" atlas="collections-background-corner" useAtlasSize="false">
+                    <Size x="50" y="50"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="9" y="8"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="1.0" bottom="0.0"/>
+                </Texture>
+
+                <Texture parentKey="BGCornerBottomRight" atlas="collections-background-corner" useAtlasSize="false">
+                    <Size x="50" y="50"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" x="-9" y="8"/>
+                    </Anchors>
+                    <TexCoords left="1.0" right="0.0" top="1.0" bottom="0.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad>
+				SetClampedTextureRotation(self.ArrowLEFT, 270);
+				SetClampedTextureRotation(self.ArrowRIGHT, 90);
+            </OnLoad>
+        </Scripts>
+    </Frame>
+
+
+    <Frame name="Chronicles_UI" inherits="MainFrameTemplate" hidden="true" enableMouse="true">
+        <Size x="800" y="600"/>
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        <!-- <Layers>
+            <Layer level="OVERLAY">
+                <FontString parentKey="title" inherits="GameFontNormalLarge" justifyH="CENTER" justifyV="MIDDLE" setAllPoints="true">
+                    <Size x="0" y="30"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-10"/>
+                        <Anchor point="RIGHT" x="-10" y="0"/>
+                        <Anchor point="LEFT" x="10" y="0"/>
+                    </Anchors>
+                    <Color r="0.95" g="0.95" b="0.95" />
+                </FontString>
+
+                <FontString parentKey="display" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" setAllPoints="true">
+                    <Size x="0" y="16"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.title" x="0" y="-40"/>
+                        <Anchor point="RIGHT" x="-10" y="0"/>
+                        <Anchor point="LEFT" x="25" y="0"/>
+                    </Anchors>
+                    <Color r="0.95" g="0.95" b="0.95" />
+                </FontString>
+
+                <FontString parentKey="gameplay" inherits="GameFontNormal" justifyH="LEFT" justifyV="MIDDLE" setAllPoints="true">
+                    <Size x="0" y="16"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.display" x="0" y="-185"/>
+                        <Anchor point="RIGHT" x="-10" y="0"/>
+                        <Anchor point="LEFT" x="25" y="0"/>
+                    </Anchors>
+                    <Color r="0.95" g="0.95" b="0.95" />
+                </FontString>
+            </Layer>
+        </Layers> -->
+
+        <Frames>
+            <Button parentKey="Close" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" x="0" y="0"/>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+						Chronicles_UI:Hide();
+                    </OnClick>
+                </Scripts>
+            </Button>
+        </Frames>
+    </Frame>
+
+</Ui>

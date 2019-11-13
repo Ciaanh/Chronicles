@@ -1,0 +1,96 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+
+    <Frame name="EventListBlockTemplate" virtual="true">
+        <Size x="85" y="50"/>
+        <Scripts>
+            <OnLoad>
+                self:SetBackdrop({
+                    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+                    tile = true,
+                    tileEdge = true,
+                    tileSize = 16,
+                    edgeSize = 16,
+                    insets = { left = 0, right = 0, top = 0, bottom = 0 },
+                });
+
+                self:SetBackdropColor(0, 0, 0, 0.9);
+            </OnLoad>
+        </Scripts>
+    </Frame>
+
+
+
+    <Frame name="EventList" parent="Chronicles_UI">
+        <Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
+            <EdgeSize>
+                <AbsValue val="26"/>
+            </EdgeSize>
+        </Backdrop>
+
+        <Size x="135" y="375"/>
+        <Anchors>
+            <Anchor point="BOTTOMLEFT" x="30" y="30" />
+        </Anchors>
+
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                    <Size x="256" y="256"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-5"/>
+                        <Anchor point="BOTTOM" x="0" y="5"/>
+                        <Anchor point="LEFT" x="5" y="0"/>
+                        <Anchor point="RIGHT" x="-5" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+
+        <Frames>
+            <ScrollFrame name="EventListScrollFrame" parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+                <Anchors>
+                    <Anchor point="CENTER" />
+                </Anchors>
+                <Frames>
+                    <Slider name="EventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate"  enableMouse="true" enableMouseWheel="true">
+                        <Size x="14" y="0"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="0" y="5"/>
+                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5"/>
+                        </Anchors>
+                    </Slider>
+                </Frames>
+
+                <ScrollChild>
+                    <Frame name="$parentScrollChild" parentKey="child">
+                        <Size x="85" y="600"/>
+                        <OnLoad>
+                            self:SetBackdrop({
+                                bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                                tile = true,
+                                tileSize = 16,
+                                insets = { left = 0, right = 0, top = 0, bottom = 0 },
+                            });
+
+                            self:SetBackdropColor(0, 0, 0, 0.9);
+                        </OnLoad>
+                    </Frame>
+                </ScrollChild>
+
+                <OnLoad>
+                    self:SetBackdrop({
+                        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                        tile = true,
+                        tileSize = 16,
+                        insets = { left = 0, right = 0, top = 0, bottom = 0 },
+                    });
+
+                    self:SetBackdropColor(0, 0, 0, 0.9);
+                </OnLoad>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+</Ui>
