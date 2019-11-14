@@ -41,3 +41,7 @@ constants.timeline = {
 	defaultStep = 1000,
 	pageSize = 8
 }
+
+constants.eventList = {
+	pageSize = 4
+}

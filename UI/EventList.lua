@@ -5,15 +5,14 @@ Chronicles.UI.EventList = {}
 
 function tablelength(T)
     local count = 0
-    for _ in pairs(T) do
-        count = count + 1
-    end
+    for _ in pairs(T) do count = count + 1 end
     return count
 end
 
 -- Accept a list of events
 function Chronicles.UI.EventList:DrawEventList(lowerBound, upperBound, eventList)
-    DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventList " .. lowerBound .. " " .. upperBound)
+    DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventList " .. lowerBound ..
+                                      " " .. upperBound)
 
     -- if (eventList ~= nil) then
     --     -- local child = CreateFrame("Frame", "EventListScrollChild", EventListScrollFrame)
@@ -130,17 +129,45 @@ end
 -- Chronicles.SelectedValues.yearEnd,
 -- Chronicles.SelectedValues.timelineStep
 
+function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventList)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Cell " .. "  " .. text)
+    wipe(Chronicles.SelectedValues.eventListData)
+    Chronicles.SelectedValues.eventListData = 
+        {
+            events = eventList, 
+            startDate = lowerBound, 
+            endDate = upperBound
+        }    
+end
 
-
-
-
-
-
-
+function Chronicles.UI.EventList:DisplayEventList()
+    Chronicles.UI.Timeline:DisplayTimelinePage(Chronicles.SelectedValues.currentTimelinePage)
+end
 
 ------------------------------------------------------------------------------------------
 -- Scroll Page ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
+function EventListScrollFrame_OnMouseWheel(self, value)
+    if (value > 0) then
+        EventListPreviousButton_OnClick(self)
+    else
+        EventListNextButton_OnClick(self)
+    end
+end
 
+function EventListPreviousButton_OnClick(self)
+    Chronicles.SelectedValues.currentEventListPage =
+        Chronicles.SelectedValues.currentEventListPage - 1
 
+    Chronicles.UI.EventList:DisplayEventList()
+    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+end
+
+function EventListNextButton_OnClick(self)
+    Chronicles.SelectedValues.currentEventListPage =
+        Chronicles.SelectedValues.currentEventListPage + 1
+
+    Chronicles.UI.EventList:DisplayEventList()
+    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+end
 

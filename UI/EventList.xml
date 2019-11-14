@@ -2,8 +2,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
-    <Frame name="EventListBlockTemplate" virtual="true">
+    <Frame name="EventListBlockTemplate" virtual="true" enableMouse="true">
         <Size x="85" y="50"/>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER" setAllPoints="true" />
+            </Layer>
+        </Layers>
         <Scripts>
             <OnLoad>
                 self:SetBackdrop({
@@ -50,47 +55,95 @@
         </Layers>
 
         <Frames>
-            <ScrollFrame name="EventListScrollFrame" parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+            <Frame name="EventListScrollFrame" parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
+                <Size x="125" y="365"/>
                 <Anchors>
                     <Anchor point="CENTER" />
                 </Anchors>
+
                 <Frames>
-                    <Slider name="EventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate"  enableMouse="true" enableMouseWheel="true">
-                        <Size x="14" y="0"/>
+                     <Frame name="EventListBlock1" inherits="EventListBlockTemplate">
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="0" y="5"/>
-                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5"/>
+                            <Anchor point="TOP"/>
                         </Anchors>
-                    </Slider>
+                    </Frame>
+                    <Frame name="EventListBlock2" inherits="EventListBlockTemplate">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventListBlock1" x="5" y="0"/>
+                        </Anchors>
+                    </Frame>
                 </Frames>
 
-                <ScrollChild>
-                    <Frame name="$parentScrollChild" parentKey="child">
-                        <Size x="85" y="600"/>
-                        <OnLoad>
-                            self:SetBackdrop({
-                                bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                                tile = true,
-                                tileSize = 16,
-                                insets = { left = 0, right = 0, top = 0, bottom = 0 },
-                            });
+                <Scripts>
+                    <OnMouseWheel>
+                        EventListScrollFrame_OnMouseWheel(self, delta)
+                    </OnMouseWheel>
+                </Scripts>
+            </Frame>
 
-                            self:SetBackdropColor(0, 0, 0, 0.9);
-                        </OnLoad>
-                    </Frame>
-                </ScrollChild>
+            <Slider name="EventListScrollBar" parentKey="ScrollBar" orientation="HORIZONTAL" enableMouse="true" enableMouseWheel="true">
+                <Size x="20"/>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="EventListScrollFrame" x="-20" />
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventListScrollFrame" x="-20" />
+                </Anchors>
+                <Frames>
 
-                <OnLoad>
-                    self:SetBackdrop({
-                        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                        tile = true,
-                        tileSize = 16,
-                        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-                    });
+                    <Button name="EventListPreviousButton" parentKey="PreviousButton">
+                        <Size x="32" y="64"/>
+                        <Anchors>
+                            <Anchor point="LEFT" x="-45" y="55" />
+                        </Anchors>
+                        <NormalTexture parentKey="Normal" file="Interface\AddOns\Chronicles\Images\Arrow">
+                            <TexCoords left="0" right="1" top="0" bottom="1"/>
+                        </NormalTexture>
+                        <DisabledTexture parentKey="Disabled" file="Interface\AddOns\Chronicles\Images\Arrow-Disabled">
+                            <TexCoords left="0" right="1" top="0" bottom="1"/>
+                        </DisabledTexture>
+                        <HighlightTexture parentKey="Highlight" file="Interface\AddOns\Chronicles\Images\Arrow-Highlight" alphaMode="ADD">
+                            <TexCoords left="0" right="1" top="0" bottom="1"/>
+                        </HighlightTexture>
+                        <Scripts>
+                            <OnClick function="EventListPreviousButton_OnClick"/>
+                        </Scripts>
+                    </Button>
 
-                    self:SetBackdropColor(0, 0, 0, 0.9);
-                </OnLoad>
-            </ScrollFrame>
+                    <Button name="EventListNextButton" parentKey="NextButton">
+                        <Size x="32" y="64"/>
+                        <Anchors>
+                            <Anchor point="RIGHT" x="45" y="55" />
+                        </Anchors>
+                        <NormalTexture parentKey="Normal" file="Interface\AddOns\Chronicles\Images\Arrow">
+                            <TexCoords left="1" right="0" top="0" bottom="1"/>
+                        </NormalTexture>
+                        <DisabledTexture parentKey="Disabled" file="Interface\AddOns\Chronicles\Images\Arrow-Disabled">
+                            <TexCoords left="1" right="0" top="0" bottom="1"/>
+                        </DisabledTexture>
+                        <HighlightTexture parentKey="Highlight" file="Interface\AddOns\Chronicles\Images\Arrow-Highlight" alphaMode="ADD">
+                            <TexCoords left="1" right="0" top="0" bottom="1"/>
+                        </HighlightTexture>
+                        <Scripts>
+                            <OnClick function="EventListNextButton_OnClick"/>
+                        </Scripts>
+                    </Button>
+                </Frames>
+                <Scripts>
+                    <OnLoad>
+                        self:SetBackdrop({
+                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                            tile = true,
+                            tileSize = 16,
+                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
+                        });
+                        self:SetBackdropColor(0.8, 0.65, 0.39, 1);
+                    </OnLoad>
+                </Scripts>
+                <ThumbTexture name="EventListThumbTexture" parentKey="ThumbTexture" file="Interface\Minimap\MinimapArrow">
+                    <Size x="20" y="20"/>
+                    <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+                </ThumbTexture>
+            </Slider>
+
         </Frames>
     </Frame>
 </Ui>
