@@ -43,5 +43,5 @@ constants.timeline = {
 }
 
 constants.eventList = {
-	pageSize = 4
+	pageSize = 6
 }
