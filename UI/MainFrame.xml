@@ -88,7 +88,7 @@
     </Frame>
 
 
-    <Frame name="Chronicles_UI" inherits="MainFrameTemplate" hidden="true" enableMouse="true">
+    <Frame name="MainFrame" inherits="MainFrameTemplate" hidden="true" enableMouse="true">
         <Size x="800" y="600"/>
         <Anchors>
             <Anchor point="CENTER" />
@@ -134,7 +134,7 @@
                 </Anchors>
                 <Scripts>
                     <OnClick>
-						Chronicles_UI:Hide();
+						MainFrame:Hide();
                     </OnClick>
                 </Scripts>
             </Button>

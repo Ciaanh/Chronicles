@@ -5,7 +5,7 @@
 	
     <Script file="Constants.lua"/>
     
-    <Script file="Core.lua"/>
+    <Script file="Chronicles.lua"/>
 
 	<Include file="UI\Elements.xml"/>
 

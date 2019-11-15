@@ -25,7 +25,7 @@
         </Scripts>
     </Frame>
 
-    <Frame name="TimelineFrame" parent="Chronicles_UI">
+    <Frame name="TimelineFrame" parent="MainFrame">
         <Size x="735" y="150"/>
         <Anchors>
             <Anchor point="TOP" x="0" y="-30" />

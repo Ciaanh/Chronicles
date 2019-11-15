@@ -40,9 +40,9 @@ Chronicles.pluginsDB = {}
 
 function Chronicles.UI:Init() Chronicles.UI.Timeline:DsiplayTimeline() end
 
-function Chronicles.UI:DisplayWindow() Chronicles_UI:Show() end
+function Chronicles.UI:DisplayWindow() MainFrame:Show() end
 
-function Chronicles.UI:HideWindow() Chronicles_UI:Hide() end
+function Chronicles.UI:HideWindow() MainFrame:Hide() end
 
 function Chronicles:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ChroniclesDB", _defaults, true)
@@ -52,7 +52,7 @@ function Chronicles:OnInitialize()
         text = "Chronicles",
         icon = "Interface\\ICONS\\Inv_scroll_04",
         OnClick = function(self, button, down)
-            if (Chronicles_UI:IsVisible()) then
+            if (MainFrame:IsVisible()) then
                 Chronicles.UI:HideWindow()
             else
                 Chronicles.UI:DisplayWindow()

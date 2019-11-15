@@ -28,7 +28,7 @@
 
 
 
-    <Frame name="EventList" parent="Chronicles_UI">
+    <Frame name="EventList" parent="MainFrame">
         <Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
             <EdgeSize>
                 <AbsValue val="26"/>
