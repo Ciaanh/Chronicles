@@ -117,7 +117,7 @@
                 <Frames>
 
                     <Button name="EventListPreviousButton" parentKey="PreviousButton">
-                        <Size x="25" y="20"/>
+                        <Size x="25" y="30"/>
                         <Anchors>
                             <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="EventListScrollBar" y="-3" />
                         </Anchors>
@@ -131,7 +131,7 @@
                     </Button>
 
                     <Button name="EventListNextButton" parentKey="NextButton">
-                        <Size x="25" y="20"/>
+                        <Size x="25" y="30"/>
                         <Anchors>
                             <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventListScrollBar" y="18" />
                         </Anchors>

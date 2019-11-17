@@ -12,11 +12,10 @@ Chronicles.descName = L["Chronicles"]
 Chronicles.description = L["Display Azeroth history as a timeline"]
 
 Chronicles.SelectedValues = {
-    currentEventListPage = 1,
+    currentEventListPage = nil,
     eventListData = nil,
     selectedEvent = nil,
-
-    currentTimelinePage = 1,
+    currentTimelinePage = nil,
     selectedTimelineYear = Chronicles.constants.timeline.yearStart,
     timelineStep = Chronicles.constants.timeline.defaultStep
 }
@@ -29,7 +28,9 @@ local _defaults = {
 
 function tablelength(T)
     local count = 0
-    for _ in pairs(T) do count = count + 1 end
+    for _ in pairs(T) do
+        count = count + 1
+    end
     return count
 end
 
@@ -38,37 +39,52 @@ end
 Chronicles.UI = {}
 Chronicles.pluginsDB = {}
 
-function Chronicles.UI:Init() Chronicles.UI.Timeline:DsiplayTimeline() end
+function Chronicles.UI:Init()
+    Chronicles.UI.Timeline:DisplayTimeline(1)
+    Chronicles.UI.EventList:DisplayEventList(1)
+end
 
-function Chronicles.UI:DisplayWindow() MainFrame:Show() end
+function Chronicles.UI:DisplayWindow()
+    MainFrame:Show()
+end
 
-function Chronicles.UI:HideWindow() MainFrame:Hide() end
+function Chronicles.UI:HideWindow()
+    MainFrame:Hide()
+end
 
 function Chronicles:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ChroniclesDB", _defaults, true)
 
-    self.mapIcon = LibStub("LibDataBroker-1.1"):NewDataObject(FOLDER_NAME, {
-        type = "launcher",
-        text = "Chronicles",
-        icon = "Interface\\ICONS\\Inv_scroll_04",
-        OnClick = function(self, button, down)
-            if (MainFrame:IsVisible()) then
-                Chronicles.UI:HideWindow()
-            else
-                Chronicles.UI:DisplayWindow()
+    self.mapIcon =
+        LibStub("LibDataBroker-1.1"):NewDataObject(
+        FOLDER_NAME,
+        {
+            type = "launcher",
+            text = "Chronicles",
+            icon = "Interface\\ICONS\\Inv_scroll_04",
+            OnClick = function(self, button, down)
+                if (MainFrame:IsVisible()) then
+                    Chronicles.UI:HideWindow()
+                else
+                    Chronicles.UI:DisplayWindow()
+                end
+            end,
+            OnTooltipShow = function(tt)
+                tt:AddLine("Chronicles", 1, 1, 1)
+                tt:AddLine("Click to show the timeline.")
             end
-        end,
-        OnTooltipShow = function(tt)
-            tt:AddLine("Chronicles", 1, 1, 1)
-            tt:AddLine("Click to show the timeline.")
-        end
-    })
+        }
+    )
     I:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
 
     Chronicles.UI:Init()
 
-    self:RegisterChatCommand("chronicles",
-                             function() self.UI:DisplayWindow() end)
+    self:RegisterChatCommand(
+        "chronicles",
+        function()
+            self.UI:DisplayWindow()
+        end
+    )
 end
 
 -- External DB tools -------------------------------------------------------------------
@@ -88,13 +104,11 @@ function Chronicles:SearchEvents(yearStart, yearEnd)
     local foundEvents = {}
     if (yearStart <= yearEnd) then
         for pluginName in pairs(self.pluginsDB) do
-            local pluginEvents = Chronicles:SearchEventsInDB(yearStart, yearEnd,
-                                                             self.pluginsDB[pluginName])
+            local pluginEvents = Chronicles:SearchEventsInDB(yearStart, yearEnd, self.pluginsDB[pluginName])
 
             for eventIndex in pairs(pluginEvents) do
                 local event = pluginEvents[eventIndex]
-                table.insert(foundEvents,
-                             Chronicles:CleanEventObject(event, pluginName))
+                table.insert(foundEvents, Chronicles:CleanEventObject(event, pluginName))
             end
         end
     end
