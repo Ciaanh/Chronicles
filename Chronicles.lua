@@ -12,7 +12,7 @@ private.Core = Chronicles
 -----------------------------------------------------------------------------------------
 
 Chronicles.descName = Locale["Chronicles"]
-Chronicles.description = Locale["Display Azeroth history as a timeline"]
+Chronicles.description = Locale["Description"]
 
 Chronicles.constants = private.constants
 
@@ -43,7 +43,7 @@ function Chronicles:OnInitialize()
         end,
         OnTooltipShow = function(tt)
             tt:AddLine(Locale["Chronicles"], 1, 1, 1)
-            tt:AddLine(Locale["Click to show the timeline."])
+            tt:AddLine(Locale["Icon tooltip"])
         end
     })
     Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)

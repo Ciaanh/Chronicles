@@ -10,6 +10,7 @@ Chronicles.DB.Events = {}
 GlobalEventsDB = {
     --[[ structure:
 		[eventId] = {
+            id=[integer],				-- Id of the event
 			label=[string], 			-- label: text that'll be the label
 			description=table[string], 	-- description: text that give informations about the event
 			icon=[string], 				-- the pre-define icon type which can be found in Constant.lua
@@ -20,14 +21,21 @@ GlobalEventsDB = {
 		},
 	--]]
     [1] = {
-        label = L["Custom Event"],
-        description = {L["Custom Event page 1"], L["Custom Event page 2"]},
+        id = 1
+        label = L["Dark Portal label"],
+        description = {L["Dark Portal page 1"], L["Dark Portal page 2"]},
         icon = "research",
-        yearStart = -7,
-        yearEnd = -15,
+        yearStart = 0,
+        yearEnd = 0,
         eventType = Chronicles.constants.eventType.other
     }
 }
+
+function tablelength(T)
+    local count = 0
+    if (T ~= nil) then for _ in pairs(T) do count = count + 1 end end
+    return count
+end
 
 function Chronicles.DB:InitDB()
 
@@ -37,17 +45,31 @@ function Chronicles.DB:InitDB()
     --     local name = GetName()
     --     -- compare date with current year 
     --     local birth = Chronicles.constants.timeline.yearEnd - age
-
     --     local event = {
     --         label = "Birth of " .. name,
-    --         description = {"Custom Event page 1"},
+    --         description = {"Birth of ".. name .. " imported from TRP"},
     --         icon = "research",
     --         yearStart = birth,
     --         yearEnd = birth,
     --         eventType = Chronicles.constants.eventType.birth
     --     }
+    --     self:AddGlobalEvent(event)
+    -- end
 
-    --     self:AddLocalEvent(event)
+    -- if (MRP) then
+    --     local age = GetAge()
+    --     local name = GetName()
+    --     -- compare date with current year 
+    --     local birth = Chronicles.constants.timeline.yearEnd - age
+    --     local event = {
+    --         label = "Birth of " .. name,
+    --         description = {"Birth of ".. name .. " imported from MRP"},
+    --         icon = "research",
+    --         yearStart = birth,
+    --         yearEnd = birth,
+    --         eventType = Chronicles.constants.eventType.birth
+    --     }
+    --     self:AddGlobalEvent(event)
     -- end
 
     self:RegisterEventDB("Global", GlobalEventsDB)
@@ -57,8 +79,9 @@ end
 -- Events Tools -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-function Chronicles.DB:AddLocalEvent(event)
+function Chronicles.DB:AddGlobalEvent(event)
     -- check max index and set it to event
+    event.id = table.maxn(GlobalEventsDB) + 1
     table.insert(GlobalEventsDB, Chronicles.DB:CleanEventObject(event, "Global"))
 end
 
@@ -70,14 +93,11 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
 
     if (yearStart <= yearEnd) then
         for groupName in pairs(self.DB.Events) do
-            local pluginEvents = Chronicles.DB:SearchEventsInDB(yearStart,
-                                                                yearEnd, self.DB
-                                                                    .Events[groupName])
+            local pluginEvents = Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, self.DB .Events[groupName])
 
             for eventIndex in pairs(pluginEvents) do
                 local event = pluginEvents[eventIndex]
-                table.insert(foundEvents,
-                             Chronicles.DB:CleanEventObject(event, groupName))
+                table.insert(foundEvents, Chronicles.DB:CleanEventObject(event, groupName))
                 nbFoundEvents = nbFoundEvents + 1
             end
         end

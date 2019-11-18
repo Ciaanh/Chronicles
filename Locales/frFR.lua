@@ -5,6 +5,6 @@ if not L then return end
 
 if L then
     L["Chronicles"] = "Chroniques"
-    L["Display Azeroth history as a timeline"] = "Explorez l'histoire d'Azeroth"
-    L["Click to show the timeline."] = "Cliquer pour afficher la frise chronologique."
+    L["Description"] = "Explorez l'histoire d'Azeroth"
+    L["Icon tooltip"] = "Cliquer pour afficher la frise chronologique."
 end
