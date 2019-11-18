@@ -173,10 +173,35 @@
 						</Anchors>
 						<Frames>
 							<SimpleHTML parentKey="HTML" name="EventDescriptionHTML">
+								<Size x="500" y="300"/>
 								<Anchors>
 									<Anchor point="TOPLEFT" x="5" y="-5"/>
 								</Anchors>
-								<FontString inherits="GameFontNormalSmall"/>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString name="EventDescriptionPager" inherits="GameFontNormalSmall" justifyH="RIGHT">
+											<Anchors>
+												<Anchor point="BOTTOMRIGHT" x="-38" y="-15"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+								<!-- <FontString inherits="GameFontNormalSmall"/> -->
+								<FontString inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP" spacing="2">
+									<Color r="1" g="1" b="1"/>
+								</FontString>
+								<Scripts>
+									<OnLoad>
+										self:SetBackdrop({
+											bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+											tile = true,
+											tileSize = 16,
+											insets = { left = 0, right = 0, top = 0, bottom = 0 },
+										});
+
+										self:SetBackdropColor(0, 0, 0, 0.9);
+									</OnLoad>
+								</Scripts>
 							</SimpleHTML>
 						</Frames>
 					</Frame>
@@ -186,22 +211,24 @@
 
 
 			<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate">
-				<Size x="40" y="20"/>
+				<Size x="30" y="20"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-100" y="45"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-120" y="40"/>
 				</Anchors>
 				<Scripts>
 					<OnClick function="EventDescriptionPreviousButton_OnClick"/>
+					<OnLoad function="SetPreviousButtonText"/>
 				</Scripts>
 			</Button>
 
 			<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate">
-				<Size x="40" y="20"/>
+				<Size x="30" y="20"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-50" y="45"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-50" y="40"/>
 				</Anchors>
 				<Scripts>
 					<OnClick function="EventDescriptionNextButton_OnClick"/>
+					<OnLoad function="SetNextButtonText"/>
 				</Scripts>
 			</Button>
 
