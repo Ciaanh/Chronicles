@@ -32,23 +32,23 @@ GlobalEventsDB = {
 function Chronicles.DB:InitDB()
 
     -- Get infos from TRP or MRP
-    if (TRP) then
-        local age = GetAge()
-        local name = GetName()
-        -- compare date with current year 
-        local birth = Chronicles.constants.timeline.yearEnd - age
+    -- if (TRP) then
+    --     local age = GetAge()
+    --     local name = GetName()
+    --     -- compare date with current year 
+    --     local birth = Chronicles.constants.timeline.yearEnd - age
 
-        local event = {
-            label = "Birth of " .. name,
-            description = {"Custom Event page 1"},
-            icon = "research",
-            yearStart = birth,
-            yearEnd = birth,
-            eventType = Chronicles.constants.eventType.birth
-        }
+    --     local event = {
+    --         label = "Birth of " .. name,
+    --         description = {"Custom Event page 1"},
+    --         icon = "research",
+    --         yearStart = birth,
+    --         yearEnd = birth,
+    --         eventType = Chronicles.constants.eventType.birth
+    --     }
 
-        self:AddLocalEvent(event)
-    end
+    --     self:AddLocalEvent(event)
+    -- end
 
     self:RegisterEventDB("Global", GlobalEventsDB)
 end
