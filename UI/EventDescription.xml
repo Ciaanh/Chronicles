@@ -185,7 +185,7 @@
 
 
 
-			<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate" text="<">
+			<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate">
 				<Size x="40" y="20"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-100" y="45"/>
@@ -195,7 +195,7 @@
 				</Scripts>
 			</Button>
 
-			<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate" text=">">
+			<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate">
 				<Size x="40" y="20"/>
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-50" y="45"/>
