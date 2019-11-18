@@ -12,16 +12,8 @@ function Chronicles.UI.EventDescription:DisplayEventDescription()
 end
 
 ------------------------------------------------------------------------------------------
--- Scroll Page ---------------------------------------------------------------------------
+-- Description Paging --------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
-function EventDescriptionScrollFrame_OnMouseWheel(self, value)
-    if (value > 0) then
-        EventDescriptionPreviousButton_OnClick(self)
-    else
-        EventDescriptionNextButton_OnClick(self)
-    end
-end
-
 function EventDescriptionPreviousButton_OnClick(self)
     Chronicles.SelectedValues.currentEventDescriptionPage =
         Chronicles.SelectedValues.currentEventDescriptionPage - 1

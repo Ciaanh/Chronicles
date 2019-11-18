@@ -122,7 +122,7 @@ function SetTextToFrame(blockIndex, frame)
     frame:SetScript(
         "OnMouseDown",
         function()
-            local eventList = Chronicles:SearchEvents(frame.lowerBound, frame.upperBound)
+            local eventList = Chronicles.DB:SearchEvents(frame.lowerBound, frame.upperBound)
             Chronicles.SelectedValues.selectedTimelineYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
             Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
         end

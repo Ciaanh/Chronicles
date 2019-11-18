@@ -143,7 +143,9 @@
 			<Anchor point="BOTTOMRIGHT" x="-25" y="15"/>
 		</Anchors>
 		<Frames>
-			<Frame name="EventDescriptionScrollFrame">
+
+
+			<ScrollFrame parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
 				<Anchors>
 					<Anchor point="TOP" x="0" y="-35"/>
 					<Anchor point="RIGHT" x="-15" y="0"/>
@@ -151,13 +153,26 @@
 					<Anchor point="BOTTOM" x="0" y="35"/>
 				</Anchors>
 				<Frames>
-					<Frame name="EventDescriptionScrollChild">
+					<Slider parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="0" y="-17"/>
+							<Anchor point="BOTTOMRIGHT" x="0" y="17"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+							</OnLoad>
+						</Scripts>
+					</Slider>
+				</Frames>
+				<ScrollChild>
+					<Frame parentKey="ScrollChild">
 						<Size x="10" y="10"/>
 						<Anchors>
 							<Anchor point="TOPLEFT" x="0" y="0"/>
 						</Anchors>
 						<Frames>
-							<SimpleHTML name="EventDescriptionHTML" parentKey="HTML">
+							<SimpleHTML parentKey="HTML" name="EventDescriptionHTML">
 								<Anchors>
 									<Anchor point="TOPLEFT" x="5" y="-5"/>
 								</Anchors>
@@ -165,52 +180,31 @@
 							</SimpleHTML>
 						</Frames>
 					</Frame>
-				</Frames>
-			</Frame>
+				</ScrollChild>
+			</ScrollFrame>
 
 
-			<Slider name="EventDescriptionScrollBar" parentKey="ScrollBar" orientation="VERTICAL" enableMouse="true" enableMouseWheel="true">
-				<Size x="20"/>
+
+			<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate" text="<">
+				<Size x="40" y="20"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventDescriptionScrollFrame" />
-					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescriptionScrollFrame"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-100" y="45"/>
 				</Anchors>
-				<Frames>
-					<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate">
-						<Size x="40" y="20"/>
-						<Anchors>
-							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-100" y="45"/>
-						</Anchors>
-						<Scripts>
-							<OnClick function="EventDescriptionPreviousButton_OnClick"/>
-						</Scripts>
-					</Button>
-					<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate">
-						<Size x="40" y="20"/>
-						<Anchors>
-							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-50" y="45"/>
-						</Anchors>
-						<Scripts>
-							<OnClick function="EventDescriptionNextButton_OnClick"/>
-						</Scripts>
-					</Button>
-				</Frames>
 				<Scripts>
-					<OnLoad>
-						self:SetBackdrop({
-                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                            tile = true,
-                            tileSize = 16,
-                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
-                        });
-                        self:SetBackdropColor(0.8, 0.65, 0.39, 1);
-					</OnLoad>
+					<OnClick function="EventDescriptionPreviousButton_OnClick"/>
 				</Scripts>
-				<ThumbTexture name="TimelineThumbTexture" parentKey="ThumbTexture" file="Interface\Minimap\MinimapArrow">
-					<Size x="20" y="20"/>
-					<TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
-				</ThumbTexture>
-			</Slider>
+			</Button>
+
+			<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate" text=">">
+				<Size x="40" y="20"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-50" y="45"/>
+				</Anchors>
+				<Scripts>
+					<OnClick function="EventDescriptionNextButton_OnClick"/>
+				</Scripts>
+			</Button>
+
 
 		</Frames>
 	</Frame>

@@ -32,7 +32,8 @@ constants.eventType = {
 	war = "War",
 	battle = "Battle",
 	death = "Death",
-	birth = "Birth"
+	birth = "Birth",
+	other = "Other"
 }
 
 constants.timeline = {
