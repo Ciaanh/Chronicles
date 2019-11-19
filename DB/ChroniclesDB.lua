@@ -4,10 +4,8 @@ local Chronicles = private.Core
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.DB = {}
-
 Chronicles.DB.Events = {}
-
-
+Chronicles.DB.RP = {}
 
 function Chronicles.DB:InitDB()
     self:LoadRolePlayProfile()
@@ -15,18 +13,6 @@ function Chronicles.DB:InitDB()
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
 
 -----------------------------------------------------------------------------------------
 -- Events Tools -------------------------------------------------------------------------
@@ -105,16 +91,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
 -----------------------------------------------------------------------------------------
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -128,14 +104,21 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
-
-
-
-
-
 
 
 
@@ -151,95 +134,77 @@ end
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:LoadRolePlayProfile()
--- Get infos from TRP or MRP
-    -- if (TRP) then
-    --     local age = GetAge()
-    --     local name = GetName()
-    --     -- compare date with current year
-    --     local birth = Chronicles.constants.timeline.yearEnd - age
-    --     local event = {
-    --         label = "Birth of " .. name,
-    --         description = {"Birth of ".. name .. " imported from TRP"},
-    --         icon = "research",
-    --         yearStart = birth,
-    --         yearEnd = birth,
-    --         eventType = Chronicles.constants.eventType.birth
-    --     }
-    --     self:AddGlobalEvent(event)
-    -- end
 
-    -- if (MRP) then
-    --     local age = GetAge()
-    --     local name = GetName()
-    --     -- compare date with current year
-    --     local birth = Chronicles.constants.timeline.yearEnd - age
-    --     local event = {
-    --         label = "Birth of " .. name,
-    --         description = {"Birth of ".. name .. " imported from MRP"},
-    --         icon = "research",
-    --         yearStart = birth,
-    --         yearEnd = birth,
-    --         eventType = Chronicles.constants.eventType.birth
-    --     }
-    --     self:AddGlobalEvent(event)
-    -- end
+    -- if _G["TRP3_API"] then state.trp3 = true state.trp3_Version = GetAddOnMetadata("totalRP3", "Version") or "Unknown" end;
+    if (_G["TRP3_API"]) then
+        local age = Chronicles.DB.RP:TRP_GetAge()
+        local name = Chronicles.DB.RP:TRP_GetRoleplayingName()
 
+        if( age ~= nil and name ~= nil) then
+            self.RP:RegisterBirth(age, name)
+        end
+    end
 
+    -- if _G["mrp"] then state.mrp = true state.mrp_Version = GetAddOnMetadata("MyRolePlay", "Version") or "Unknown" end;
+    if (_G["mrp"]) then
+        local age = Chronicles.DB.RP:MRP_GetAge()
+        local name = Chronicles.DB.RP:MRP_GetRoleplayingName()
+        
+        if( age ~= nil and name ~= nil) then
+            self.RP:RegisterBirth(age, name)
+        end
+    end
+end
 
+function Chronicles.DB.RP:RegisterBirth(age, name) 
+    -- compare date with current year
+    local birth = Chronicles.constants.timeline.yearEnd - age
+    local event = {
+        label = "Birth of " .. name,
+        description = {"Birth of " .. name .. " imported from MRP"},
+        icon = "research",
+        yearStart = birth,
+        yearEnd = birth,
+        eventType = Chronicles.constants.eventType.birth
+    }
+    Chronicles.DB:AddGlobalEvent(event)
+end
 
+function Chronicles.DB.RP:MRP_GetRoleplayingName() return msp.my["NA"] end
 
--- if _G["TRP3_API"] then state.trp3  = true table.insert(rpClients,  "trp3" ) state.trp3_Version  = GetAddOnMetadata("totalRP3",   "Version") or "Unknown" end;
+function Chronicles.DB.RP:MRP_GetAge() return msp.my["AG"] end
 
---     function GetCharacteristics()
---         return TRP3_API.profile.getPlayerCurrentProfile();
---     end
+function Chronicles.DB.RP:GetName()
+    local name, realm = UnitName("player")
+    return name
+end
 
---     function GetName()
---         local name, realm = UnitName("player");
---         return name;
---     end
+function Chronicles.DB.RP:TRP_GetCharacteristics()
+    return TRP3_API.profile.getPlayerCurrentProfile()
+end
 
---     function GetFirstName()
---         local characteristics = GetCharacteristics();
---         if characteristics  then
---             return characteristics.FN;
---         end
---     end
+function Chronicles.DB.RP:TRP_GetFirstName()
+    local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
+    if characteristics then return characteristics.FN end
+end
 
---     function GetLastName()
---         local characteristics = GetCharacteristics();
---         if characteristics then
---             return characteristics.LN
---         end
---     end
+function Chronicles.DB.RP:TRP_GetLastName()
+    local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
+    if characteristics then return characteristics.LN end
+end
 
---     function GetRoleplayingName()
---         local name = GetFirstName() or GetName();
---         if GetLastName() then
---             name = name .. " " .. GetLastName();
---         end
---         return name
---     end
+function Chronicles.DB.RP:TRP_GetRoleplayingName()
+    local name = Chronicles.DB.RP:TRP_GetFirstName() or
+                     Chronicles.DB.RP:GetName()
+    if Chronicles.DB.RP:TRP_GetLastName() then
+        name = name .. " " .. Chronicles.DB.RP:TRP_GetLastName()
+    end
+    return name
+end
 
---     function GetAge()
---         local characteristics = GetCharacteristics();
---         if characteristics  then
---             return characteristics.AG;
---         end
---     end
-
--- if _G["mrp"]      then state.mrp   = true table.insert(rpClients,  "mrp"  ) state.mrp_Version   = GetAddOnMetadata("MyRolePlay", "Version") or "Unknown" end;
---         if state.mrp
---         then
---         end
-
---     function GetRoleplayingName()
---         return msp.my["NA"];
---     end
-
---     function GetAge()
---         return msp.my["AG"];
---     end
+function Chronicles.DB.RP:TRP_GetAge()
+    local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
+    if characteristics then return characteristics.AG end
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
