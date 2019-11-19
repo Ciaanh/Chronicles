@@ -13,7 +13,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
 
     EventDescriptionHTML:SetText(event.description[1])
 
-    self:SetDescriptionPager(1, tablelength(event.description))
+    self:SetDescriptionPager(1, Chronicles:GetTableLength(event.description))
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Display description " .. event.description[1])
 end
 
@@ -22,7 +22,7 @@ function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
 
     local event = self.CurrentEvent
     if (event ~= nil and event.description ~= nil) then
-        local numberOfPages = tablelength(event.description)
+        local numberOfPages = Chronicles:GetTableLength(event.description)
 
         if (page < 1) then
             page = 1
@@ -64,16 +64,6 @@ function Chronicles.UI.EventDescription:SetDescriptionPager(currentPage, maxPage
         EventDescriptionNext:Hide()
         EventDescriptionPager:Hide()
     end
-end
-
-function tablelength(T)
-    local count = 0
-    if (T ~= nil) then
-        for _ in pairs(T) do
-            count = count + 1
-        end
-    end
-    return count
 end
 
 ------------------------------------------------------------------------------------------

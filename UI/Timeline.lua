@@ -18,7 +18,7 @@ Chronicles.UI.Timeline.SelectedYear = Chronicles.constants.timeline.yearStart
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(page)
     local pageSize = Chronicles.constants.timeline.pageSize
-    local numberOfCells = GetNumberOfTimelineBlock(self.CurrentStep)
+    local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
     if (page < 1) then
@@ -64,38 +64,38 @@ function Chronicles.UI.Timeline:DisplayTimeline(page)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- Page and Index " .. self.CurrentPage .. "  " .. firstIndex)
 
         -- TimelineBlock1
-        SetTextToFrame(firstIndex, TimelineBlock1)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex, TimelineBlock1)
 
         -- TimelineBlock2
-        SetTextToFrame(firstIndex + 1, TimelineBlock2)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 1, TimelineBlock2)
 
         -- TimelineBlock3
-        SetTextToFrame(firstIndex + 2, TimelineBlock3)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 2, TimelineBlock3)
 
         -- TimelineBlock4
-        SetTextToFrame(firstIndex + 3, TimelineBlock4)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 3, TimelineBlock4)
 
         -- TimelineBlock5
-        SetTextToFrame(firstIndex + 4, TimelineBlock5)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 4, TimelineBlock5)
 
         -- TimelineBlock6
-        SetTextToFrame(firstIndex + 5, TimelineBlock6)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 5, TimelineBlock6)
 
         -- TimelineBlock7
-        SetTextToFrame(firstIndex + 6, TimelineBlock7)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 6, TimelineBlock7)
 
         -- TimelineBlock8
-        SetTextToFrame(firstIndex + 7, TimelineBlock8)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 7, TimelineBlock8)
     end
 end
 
-function GetNumberOfTimelineBlock()
+function Chronicles.UI.Timeline:GetNumberOfTimelineBlock()
     local length = math.abs(Chronicles.constants.timeline.yearStart - Chronicles.constants.timeline.yearEnd)
-    return math.ceil(length / Chronicles.UI.Timeline.CurrentStep)
+    return math.ceil(length / self.CurrentStep)
 end
 
-function GetLowerBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + ((blockIndex - 1) * Chronicles.UI.Timeline.CurrentStep)
+function Chronicles.UI.Timeline:GetLowerBound(blockIndex)
+    local value = Chronicles.constants.timeline.yearStart + ((blockIndex - 1) * self.CurrentStep)
 
     if (value < Chronicles.constants.timeline.yearStart) then
         return Chronicles.constants.timeline.yearStart
@@ -103,17 +103,17 @@ function GetLowerBound(blockIndex)
     return value
 end
 
-function GetUpperBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + (blockIndex * Chronicles.UI.Timeline.CurrentStep) - 1
+function Chronicles.UI.Timeline:GetUpperBound(blockIndex)
+    local value = Chronicles.constants.timeline.yearStart + (blockIndex * self.CurrentStep) - 1
     if (value > Chronicles.constants.timeline.yearEnd) then
         return Chronicles.constants.timeline.yearEnd
     end
     return value
 end
 
-function SetTextToFrame(blockIndex, frame)
-    local lowerBoundBlock = GetLowerBound(blockIndex)
-    local upperBoundBlock = GetUpperBound(blockIndex)
+function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame)
+    local lowerBoundBlock = self:GetLowerBound(blockIndex)
+    local upperBoundBlock = self:GetUpperBound(blockIndex)
 
     local text = "" .. lowerBoundBlock .. "\n" .. upperBoundBlock
     frame.lowerBound = lowerBoundBlock
@@ -126,7 +126,7 @@ function SetTextToFrame(blockIndex, frame)
         "OnMouseDown",
         function()
             local eventList = Chronicles.DB:SearchEvents(frame.lowerBound, frame.upperBound)
-            Chronicles.UI.Timeline.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
+            self.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
             Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
         end
     )
@@ -136,18 +136,25 @@ end
 -- Zoom ----------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function GetStepValueIndex(stepValue)
+function Chronicles.UI.Timeline:GetStepValueIndex(stepValue)
     local index = {}
-    for k, v in pairs(Chronicles.UI.Timeline.StepValues) do
+    for k, v in pairs(self.StepValues) do
         index[v] = k
     end
     return index[stepValue]
 end
 
+function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
+    local length = math.abs(Chronicles.constants.timeline.yearStart - year)
+    local yearIndex = math.floor(length / self.CurrentStep)
+
+    return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
+end
+
 function Timeline_ZoomIn()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
 
-    local curentStepIndex = GetStepValueIndex(currentStepValue)
+    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
 
     if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then
         return
@@ -155,13 +162,13 @@ function Timeline_ZoomIn()
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
-    Chronicles.UI.Timeline:DisplayTimeline(FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
 end
 
 function Timeline_ZoomOut()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
 
-    local curentStepIndex = GetStepValueIndex(currentStepValue)
+    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
 
     if (curentStepIndex == 1) then
         return
@@ -169,15 +176,10 @@ function Timeline_ZoomOut()
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 
-    Chronicles.UI.Timeline:DisplayTimeline(FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
 end
 
-function FindYearIndexOnTimeline(year)
-    local length = math.abs(Chronicles.constants.timeline.yearStart - year)
-    local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStep)
 
-    return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
-end
 
 ------------------------------------------------------------------------------------------
 -- Scroll Page ---------------------------------------------------------------------------

@@ -5,16 +5,6 @@ Chronicles.UI.EventList = {}
 Chronicles.UI.EventList.Data = nil
 Chronicles.UI.EventList.CurrentPage = nil
 
-function tablelength(T)
-    local count = 0
-    if (T ~= nil) then
-        for _ in pairs(T) do
-            count = count + 1
-        end
-    end
-    return count
-end
-
 function Chronicles.UI.EventList:DisplayEventList(page)
     local pageSize = Chronicles.constants.eventList.pageSize
     DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
@@ -22,7 +12,7 @@ function Chronicles.UI.EventList:DisplayEventList(page)
     if (self.Data ~= nil) then
         local eventList = self.Data.events
 
-        local numberOfEvents = tablelength(eventList)
+        local numberOfEvents = Chronicles:GetTableLength(eventList)
         DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
         if (numberOfEvents > 0) then
@@ -153,7 +143,7 @@ function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventL
             endDate = upperBound
         }
 
-        local numberOfEvents = tablelength(eventList)
+        local numberOfEvents = Chronicles:GetTableLength(eventList)
         if (numberOfEvents == 0) then
             self:HideAll()
         else

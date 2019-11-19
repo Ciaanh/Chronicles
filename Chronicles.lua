@@ -42,7 +42,6 @@ function Chronicles:OnInitialize()
     self:RegisterChatCommand("chronicles", function() self.UI:DisplayWindow() end)
 
     Chronicles.DB:InitDB()
-
     Chronicles.UI.Timeline:DisplayTimeline(1)
     Chronicles.UI.EventList:DisplayEventList(1)
 end
@@ -51,6 +50,15 @@ function Chronicles:RegisterPluginDB(pluginName, db)
     Chronicles.DB:RegisterEventDB(pluginName, db)
 end
 
+function Chronicles:GetTableLength(T)
+    local count = 0
+    if (T ~= nil) then
+        for _ in pairs(T) do
+            count = count + 1
+        end
+    end
+    return count
+end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
