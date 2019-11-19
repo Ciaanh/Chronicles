@@ -16,15 +16,6 @@ Chronicles.description = Locale["Description"]
 
 Chronicles.constants = private.constants
 
-Chronicles.SelectedValues = {
-    currentEventListPage = nil,
-    eventListData = nil,
-    selectedEvent = nil,
-    currentTimelinePage = nil,
-    selectedTimelineYear = Chronicles.constants.timeline.yearStart,
-    timelineStep = Chronicles.constants.timeline.defaultStep
-}
-
 function Chronicles:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ChroniclesDB", {
         global = {options = {version = "", minimap = {hide = false}}}

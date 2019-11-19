@@ -2,12 +2,14 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Core
 
 Chronicles.UI.EventDescription = {}
+Chronicles.UI.EventDescription.CurrentPage = nil
+Chronicles.UI.EventDescription.CurrentEvent = nil
 
 function Chronicles.UI.EventDescription:DrawEventDescription(event)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventDescription " .. event.label)
 
-    Chronicles.UI.EventDescription.currentEvent = event
-    Chronicles.SelectedValues.currentEventDescriptionPage = 1
+    self.CurrentEvent = event
+    self.CurrentPage = 1
 
     EventDescriptionHTML:SetText(event.description[1])
 
@@ -18,7 +20,7 @@ end
 function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to ChangeEventDescriptionPage " .. page)
 
-    local event = self.currentEvent
+    local event = self.CurrentEvent
     if (event ~= nil and event.description ~= nil) then
         local numberOfPages = tablelength(event.description)
 
@@ -30,7 +32,7 @@ function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
         end
 
         if (event.description[page] ~= nil) then
-            Chronicles.SelectedValues.currentEventDescriptionPage = page
+            self.CurrentPage = page
             EventDescriptionHTML:SetText(event.description[page])
             self:SetDescriptionPager(page, numberOfPages)
         end
@@ -78,7 +80,7 @@ end
 -- Description Paging --------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function EventDescriptionPreviousButton_OnClick(self)
-    Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.SelectedValues.currentEventDescriptionPage - 1)
+    Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.UI.EventDescription.CurrentPage - 1)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
@@ -87,7 +89,7 @@ function SetPreviousButtonText()
 end
 
 function EventDescriptionNextButton_OnClick(self)
-    Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.SelectedValues.currentEventDescriptionPage + 1)
+    Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.UI.EventDescription.CurrentPage + 1)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 

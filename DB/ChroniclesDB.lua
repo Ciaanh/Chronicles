@@ -110,13 +110,13 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
 end
 
 function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
-    local selectedEvents = {}
+    local foundEvents = {}
     for eventIndex in pairs(db) do
         if Chronicles.DB:IsInRange(db[eventIndex], yearStart, yearEnd) then
-            table.insert(selectedEvents, db[eventIndex])
+            table.insert(foundEvents, db[eventIndex])
         end
     end
-    return selectedEvents
+    return foundEvents
 end
 
 function Chronicles.DB:IsInRange(event, yearStart, yearEnd)
