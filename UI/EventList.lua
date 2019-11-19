@@ -9,7 +9,7 @@ function Chronicles.UI.EventList:DisplayEventList(page)
     local pageSize = Chronicles.constants.eventList.pageSize
     DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
-    if (self.Data ~= nil) then
+    if (self.Data ~= nil and self.Data.events ~= nil) then
         local eventList = self.Data.events
 
         local numberOfEvents = Chronicles:GetTableLength(eventList)
@@ -18,7 +18,7 @@ function Chronicles.UI.EventList:DisplayEventList(page)
         if (numberOfEvents > 0) then
             local maxPageValue = math.ceil(numberOfEvents / pageSize)
             EventListScrollBar:SetMinMaxValues(1, maxPageValue)
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
+            DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
 
             if (page > maxPageValue) then
                 page = maxPageValue
@@ -26,10 +26,10 @@ function Chronicles.UI.EventList:DisplayEventList(page)
             if (page < 1) then
                 page = 1
             end
-           
+
             if (self.CurrentPage ~= page) then
-                self:HideAll()                
-                
+                self:HideAll()
+
                 if (numberOfEvents > pageSize) then
                     EventListPreviousButton:Enable()
                     EventListNextButton:Enable()
@@ -46,12 +46,12 @@ function Chronicles.UI.EventList:DisplayEventList(page)
 
                 if ((firstIndex + 5) >= numberOfEvents) then
                     lastIndex = numberOfEvents
-                    EventListNextButton:Disable()                    
+                    EventListNextButton:Disable()
                 end
 
                 self.CurrentPage = page
                 EventListScrollBar:SetValue(self.CurrentPage)
-                
+
                 if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
                     self:SetTextToFrame(eventList[firstIndex], EventListBlock1)
                 end
@@ -85,13 +85,13 @@ function Chronicles.UI.EventList:DisplayEventList(page)
 end
 
 function Chronicles.UI.EventList:HideAll()
-    EventListBlock1:Hide()    
-    EventListBlock2:Hide()    
-    EventListBlock3:Hide()    
-    EventListBlock4:Hide()    
-    EventListBlock5:Hide()    
+    EventListBlock1:Hide()
+    EventListBlock2:Hide()
+    EventListBlock3:Hide()
+    EventListBlock4:Hide()
+    EventListBlock5:Hide()
     EventListBlock6:Hide()
-    
+
     EventListPreviousButton:Disable()
     EventListNextButton:Disable()
 end
@@ -121,6 +121,9 @@ function Chronicles.UI.EventList:WipeAll()
         wipe(EventListBlock6.event)
     end
 
+    if (self.Data ~= nil) then
+        wipe(self.Data)
+    end
     self.Data = nil
     self.CurrentPage = nil
 end
@@ -133,20 +136,19 @@ function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventL
         self:WipeAll()
     else
         -- DEFAULT_CHAT_FRAME:AddMessage("-- SetEventListData numberOfEvents " .. numberOfEvents)
-        if (self.Data ~= nil) then
-            wipe(self.Data)
-        end
-
-        self.Data = {
-            events = eventList,
-            startDate = lowerBound,
-            endDate = upperBound
-        }
-
         local numberOfEvents = Chronicles:GetTableLength(eventList)
+
         if (numberOfEvents == 0) then
             self:HideAll()
+            self:WipeAll()
         else
+            self:WipeAll()
+
+            self.Data = {
+                events = eventList,
+                startDate = lowerBound,
+                endDate = upperBound
+            }
             self:DisplayEventList(1)
         end
     end
@@ -165,7 +167,9 @@ end
 --]]
 function Chronicles.UI.EventList:SetTextToFrame(event, frame)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Render frame")
-    wipe(frame.event)
+    if (frame.event ~= nil) then
+        wipe(frame.event)
+    end
     frame:Hide()
     if (event ~= nil) then
         -- DEFAULT_CHAT_FRAME:AddMessage("-- event not nil " .. event.label)

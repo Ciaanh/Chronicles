@@ -6,9 +6,8 @@ Chronicles.UI.Timeline = {}
 Chronicles.UI.Timeline.MaxStepIndex = 3
 Chronicles.UI.Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 5, 1}
 Chronicles.UI.Timeline.CurrentStep = Chronicles.constants.timeline.defaultStep
-Chronicles.UI.Timeline.CurrentPage = nil,
+Chronicles.UI.Timeline.CurrentPage = nil
 Chronicles.UI.Timeline.SelectedYear = Chronicles.constants.timeline.yearStart
-
 
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
@@ -162,7 +161,12 @@ function Timeline_ZoomIn()
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
+    Chronicles.UI.Timeline:DisplayTimeline(
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
+            Chronicles.UI.Timeline.SelectedYear,
+            Chronicles.UI.Timeline.CurrentStep
+        )
+    )
 end
 
 function Timeline_ZoomOut()
@@ -176,10 +180,13 @@ function Timeline_ZoomOut()
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear, Chronicles.UI.Timeline.CurrentStep))
+    Chronicles.UI.Timeline:DisplayTimeline(
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
+            Chronicles.UI.Timeline.SelectedYear,
+            Chronicles.UI.Timeline.CurrentStep
+        )
+    )
 end
-
-
 
 ------------------------------------------------------------------------------------------
 -- Scroll Page ---------------------------------------------------------------------------
