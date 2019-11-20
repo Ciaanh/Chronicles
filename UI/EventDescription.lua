@@ -33,6 +33,9 @@ function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
 
         if (event.description[page] ~= nil) then
             self.CurrentPage = page
+            -- https://www.townlong-yak.com/framexml/live
+            -- https://wowwiki.fandom.com/wiki/API_FontInstance_SetFontObject
+            -- https://www.wowinterface.com/downloads/info14177-Fontify.html
             EventDescriptionHTML:SetText(event.description[page])
             self:SetDescriptionPager(page, numberOfPages)
         end
