@@ -33,9 +33,6 @@ function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
 
         if (event.description[page] ~= nil) then
             self.CurrentPage = page
-            -- https://www.townlong-yak.com/framexml/live
-            -- https://wowwiki.fandom.com/wiki/API_FontInstance_SetFontObject
-            -- https://www.wowinterface.com/downloads/info14177-Fontify.html
             EventDescriptionHTML:SetText(event.description[page])
             self:SetDescriptionPager(page, numberOfPages)
         end
@@ -43,6 +40,10 @@ function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
 end
 
 function Chronicles.UI.EventDescription:SetDescriptionPager(currentPage, maxPage)
+    EventDescriptionPrevious:Hide()
+    EventDescriptionNext:Hide()
+    EventDescriptionPager:Hide()
+
     if (maxPage ~= 1) then
         local text = "" .. currentPage .. " / " .. maxPage
         EventDescriptionPager:SetText(text)
@@ -62,10 +63,6 @@ function Chronicles.UI.EventDescription:SetDescriptionPager(currentPage, maxPage
         EventDescriptionPager:Show()
         EventDescriptionPrevious:Show()
         EventDescriptionNext:Show()
-    else
-        EventDescriptionPrevious:Hide()
-        EventDescriptionNext:Hide()
-        EventDescriptionPager:Hide()
     end
 end
 
