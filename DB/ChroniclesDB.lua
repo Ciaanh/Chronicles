@@ -85,12 +85,6 @@ end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
 -----------------------------------------------------------------------------------------
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -105,42 +99,19 @@ end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
 
 -----------------------------------------------------------------------------------------
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:LoadRolePlayProfile()
-
     -- if _G["TRP3_API"] then state.trp3 = true state.trp3_Version = GetAddOnMetadata("totalRP3", "Version") or "Unknown" end;
     if (_G["TRP3_API"]) then
         local age = Chronicles.DB.RP:TRP_GetAge()
         local name = Chronicles.DB.RP:TRP_GetRoleplayingName()
-
-        if( age ~= nil and name ~= nil) then
+        DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
+        if (age ~= nil and name ~= nil) then
             self.RP:RegisterBirth(age, name)
         end
     end
@@ -149,14 +120,15 @@ function Chronicles.DB:LoadRolePlayProfile()
     if (_G["mrp"]) then
         local age = Chronicles.DB.RP:MRP_GetAge()
         local name = Chronicles.DB.RP:MRP_GetRoleplayingName()
-        
-        if( age ~= nil and name ~= nil) then
+
+        if (age ~= nil and name ~= nil) then
+            DEFAULT_CHAT_FRAME:AddMessage("-- mrp " .. age .. " " .. name)
             self.RP:RegisterBirth(age, name)
         end
     end
 end
 
-function Chronicles.DB.RP:RegisterBirth(age, name) 
+function Chronicles.DB.RP:RegisterBirth(age, name)
     -- compare date with current year
     local birth = Chronicles.constants.timeline.yearEnd - age
     local event = {
@@ -170,9 +142,13 @@ function Chronicles.DB.RP:RegisterBirth(age, name)
     Chronicles.DB:AddGlobalEvent(event)
 end
 
-function Chronicles.DB.RP:MRP_GetRoleplayingName() return msp.my["NA"] end
+function Chronicles.DB.RP:MRP_GetRoleplayingName()
+    return msp.my["NA"]
+end
 
-function Chronicles.DB.RP:MRP_GetAge() return msp.my["AG"] end
+function Chronicles.DB.RP:MRP_GetAge()
+    return msp.my["AG"]
+end
 
 function Chronicles.DB.RP:GetName()
     local name, realm = UnitName("player")
@@ -185,17 +161,20 @@ end
 
 function Chronicles.DB.RP:TRP_GetFirstName()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then return characteristics.FN end
+    if characteristics then
+        return characteristics.FN
+    end
 end
 
 function Chronicles.DB.RP:TRP_GetLastName()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then return characteristics.LN end
+    if characteristics then
+        return characteristics.LN
+    end
 end
 
 function Chronicles.DB.RP:TRP_GetRoleplayingName()
-    local name = Chronicles.DB.RP:TRP_GetFirstName() or
-                     Chronicles.DB.RP:GetName()
+    local name = Chronicles.DB.RP:TRP_GetFirstName() or Chronicles.DB.RP:GetName()
     if Chronicles.DB.RP:TRP_GetLastName() then
         name = name .. " " .. Chronicles.DB.RP:TRP_GetLastName()
     end
@@ -204,7 +183,9 @@ end
 
 function Chronicles.DB.RP:TRP_GetAge()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then return characteristics.AG end
+    if characteristics then
+        return characteristics.AG
+    end
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

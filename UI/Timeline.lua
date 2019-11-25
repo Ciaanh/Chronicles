@@ -63,28 +63,28 @@ function Chronicles.UI.Timeline:DisplayTimeline(page)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- Page and Index " .. self.CurrentPage .. "  " .. firstIndex)
 
         -- TimelineBlock1
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex, TimelineBlock1)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex, TimelineBlock1, 1)
 
         -- TimelineBlock2
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 1, TimelineBlock2)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 1, TimelineBlock2, 2)
 
         -- TimelineBlock3
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 2, TimelineBlock3)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 2, TimelineBlock3, 3)
 
         -- TimelineBlock4
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 3, TimelineBlock4)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 3, TimelineBlock4, 4)
 
         -- TimelineBlock5
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 4, TimelineBlock5)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 4, TimelineBlock5, 5)
 
         -- TimelineBlock6
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 5, TimelineBlock6)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 5, TimelineBlock6, 6)
 
         -- TimelineBlock7
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 6, TimelineBlock7)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 6, TimelineBlock7, 7)
 
         -- TimelineBlock8
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 7, TimelineBlock8)
+        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 7, TimelineBlock8, 8)
     end
 end
 
@@ -110,11 +110,11 @@ function Chronicles.UI.Timeline:GetUpperBound(blockIndex)
     return value
 end
 
-function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame)
+function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
     local lowerBoundBlock = self:GetLowerBound(blockIndex)
     local upperBoundBlock = self:GetUpperBound(blockIndex)
 
-    local text = "" .. lowerBoundBlock .. "\n" .. upperBoundBlock
+    local text = "" .. lowerBoundBlock --.. "\n" .. upperBoundBlock
     frame.lowerBound = lowerBoundBlock
     frame.upperBound = upperBoundBlock
 
@@ -129,6 +129,42 @@ function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame)
             Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
         end
     )
+
+    if (position % 2 == 1) then
+        frame:SetBackdrop(
+            {
+                bgFile = "Interface/QuestionFrame/question-background",
+                -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+                tile = true,
+                --tileEdge = true,
+                tileSize = 256,
+                --edgeSize = 16,
+                insets = {left = 0, right = 0, top = 38, bottom = 0}
+            }
+        )
+        --frame:SetBackdropColor(0, 0, 0, 0.9)
+        
+        label:ClearAllPoints();
+        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -40);
+        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0);
+    else
+        frame:SetBackdrop(
+            {
+                bgFile = "Interface/QuestionFrame/question-background",
+                -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+                tile = true,
+                --tileEdge = true,
+                tileSize = 256,
+                --edgeSize = 16,
+                insets = {left = 0, right = 0, top = 0, bottom = 38}
+            }
+        )
+        --frame:SetBackdropColor(1, 1, 1, 0.9)
+
+        label:ClearAllPoints();
+        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, 0);
+        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 40);
+    end
 end
 
 ------------------------------------------------------------------------------------------
@@ -144,10 +180,32 @@ function Chronicles.UI.Timeline:GetStepValueIndex(stepValue)
 end
 
 function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
-    local length = math.abs(Chronicles.constants.timeline.yearStart - year)
-    local yearIndex = math.floor(length / self.CurrentStep)
+    if (year ~= nil) then
+        local length = math.abs(Chronicles.constants.timeline.yearStart - year)
+        local yearIndex = math.floor(length / self.CurrentStep)
 
-    return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
+        return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
+    else
+        local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
+
+        local firstIndex = 1 + ((page - 1) * pageSize)
+        if (firstIndex <= 1) then
+            firstIndex = 1
+        end
+        if ((firstIndex + 7) >= numberOfCells) then
+            firstIndex = numberOfCells - 7
+        end
+
+        local lowerBoundYear = self:GetLowerBound(firstIndex)
+        local upperBoundYear = self:GetUpperBound(firstIndex + 7)
+
+        year = (lowerBoundYear + upperBoundYear) / 2
+
+        local length = math.abs(Chronicles.constants.timeline.yearStart - year)
+        local yearIndex = math.floor(length / self.CurrentStep)
+
+        return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
+    end
 end
 
 function Timeline_ZoomIn()
@@ -162,10 +220,7 @@ function Timeline_ZoomIn()
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
-            Chronicles.UI.Timeline.SelectedYear,
-            Chronicles.UI.Timeline.CurrentStep
-        )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
     )
 end
 
@@ -181,10 +236,7 @@ function Timeline_ZoomOut()
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
-            Chronicles.UI.Timeline.SelectedYear,
-            Chronicles.UI.Timeline.CurrentStep
-        )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
     )
 end
 

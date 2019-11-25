@@ -7,18 +7,18 @@ Chronicles.UI.EventList.CurrentPage = nil
 
 function Chronicles.UI.EventList:DisplayEventList(page)
     local pageSize = Chronicles.constants.eventList.pageSize
-    DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
     if (self.Data ~= nil and self.Data.events ~= nil) then
         local eventList = self.Data.events
 
         local numberOfEvents = Chronicles:GetTableLength(eventList)
-        DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
         if (numberOfEvents > 0) then
             local maxPageValue = math.ceil(numberOfEvents / pageSize)
             EventListScrollBar:SetMinMaxValues(1, maxPageValue)
-            DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
 
             if (page > maxPageValue) then
                 page = maxPageValue
