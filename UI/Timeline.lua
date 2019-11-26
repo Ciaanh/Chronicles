@@ -20,12 +20,8 @@ function Chronicles.UI.Timeline:DisplayTimeline(page)
     local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-    if (page < 1) then
-        page = 1
-    end
-    if (page > maxPageValue) then
-        page = maxPageValue
-    end
+    if (page < 1) then page = 1 end
+    if (page > maxPageValue) then page = maxPageValue end
 
     if (self.CurrentPage ~= page) then
         -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked page " .. page)
@@ -89,12 +85,14 @@ function Chronicles.UI.Timeline:DisplayTimeline(page)
 end
 
 function Chronicles.UI.Timeline:GetNumberOfTimelineBlock()
-    local length = math.abs(Chronicles.constants.timeline.yearStart - Chronicles.constants.timeline.yearEnd)
+    local length = math.abs(Chronicles.constants.timeline.yearStart -
+                                Chronicles.constants.timeline.yearEnd)
     return math.ceil(length / self.CurrentStep)
 end
 
 function Chronicles.UI.Timeline:GetLowerBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + ((blockIndex - 1) * self.CurrentStep)
+    local value = Chronicles.constants.timeline.yearStart +
+                      ((blockIndex - 1) * self.CurrentStep)
 
     if (value < Chronicles.constants.timeline.yearStart) then
         return Chronicles.constants.timeline.yearStart
@@ -103,7 +101,8 @@ function Chronicles.UI.Timeline:GetLowerBound(blockIndex)
 end
 
 function Chronicles.UI.Timeline:GetUpperBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + (blockIndex * self.CurrentStep) - 1
+    local value = Chronicles.constants.timeline.yearStart +
+                      (blockIndex * self.CurrentStep) - 1
     if (value > Chronicles.constants.timeline.yearEnd) then
         return Chronicles.constants.timeline.yearEnd
     end
@@ -114,56 +113,53 @@ function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
     local lowerBoundBlock = self:GetLowerBound(blockIndex)
     local upperBoundBlock = self:GetUpperBound(blockIndex)
 
-    local text = "" .. lowerBoundBlock --.. "\n" .. upperBoundBlock
+    local text = "" .. lowerBoundBlock -- .. "\n" .. upperBoundBlock
     frame.lowerBound = lowerBoundBlock
     frame.upperBound = upperBoundBlock
 
-    local label = _G[frame:GetName() .. "Text"]
+    -- local label = _G[frame:GetName() .. "Text"]
+    local label = frame.Label
     label:SetText(text)
 
-    frame:SetScript(
-        "OnMouseDown",
-        function()
-            local eventList = Chronicles.DB:SearchEvents(frame.lowerBound, frame.upperBound)
-            self.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
-            Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
-        end
-    )
+    frame:SetScript("OnMouseDown", function()
+        local eventList = Chronicles.DB:SearchEvents(frame.lowerBound,
+                                                     frame.upperBound)
+        self.SelectedYear =
+            math.floor((frame.lowerBound + frame.upperBound) / 2)
+        Chronicles.UI.EventList:SetEventListData(frame.lowerBound,
+                                                 frame.upperBound, eventList)
+    end)
 
-    if (position % 2 == 1) then
-        frame:SetBackdrop(
-            {
-                bgFile = "Interface/QuestionFrame/question-background",
-                -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-                tile = true,
-                --tileEdge = true,
-                tileSize = 256,
-                --edgeSize = 16,
-                insets = {left = 0, right = 0, top = 38, bottom = 0}
-            }
-        )
-        --frame:SetBackdropColor(0, 0, 0, 0.9)
-        
-        label:ClearAllPoints();
-        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -40);
-        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0);
+    if (position % 2 == 1 and position ~= 1) then
+        frame:SetBackdrop({
+            bgFile = "Interface/QuestionFrame/question-background",
+            -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+            tile = true,
+            -- tileEdge = true,
+            tileSize = 256,
+            -- edgeSize = 16,
+            insets = {left = 0, right = 0, top = 38, bottom = 0}
+        })
+        -- frame:SetBackdropColor(0, 0, 0, 0.9)
+
+        label:ClearAllPoints()
+        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -40)
+        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0)
     else
-        frame:SetBackdrop(
-            {
-                bgFile = "Interface/QuestionFrame/question-background",
-                -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-                tile = true,
-                --tileEdge = true,
-                tileSize = 256,
-                --edgeSize = 16,
-                insets = {left = 0, right = 0, top = 0, bottom = 38}
-            }
-        )
-        --frame:SetBackdropColor(1, 1, 1, 0.9)
+        frame:SetBackdrop({
+            bgFile = "Interface/QuestionFrame/question-background",
+            -- edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+            tile = true,
+            -- tileEdge = true,
+            tileSize = 256,
+            -- edgeSize = 16,
+            insets = {left = 0, right = 0, top = 0, bottom = 38}
+        })
+        -- frame:SetBackdropColor(1, 1, 1, 0.9)
 
-        label:ClearAllPoints();
-        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, 0);
-        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 40);
+        label:ClearAllPoints()
+        label:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, 0)
+        label:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 40)
     end
 end
 
@@ -173,9 +169,7 @@ end
 
 function Chronicles.UI.Timeline:GetStepValueIndex(stepValue)
     local index = {}
-    for k, v in pairs(self.StepValues) do
-        index[v] = k
-    end
+    for k, v in pairs(self.StepValues) do index[v] = k end
     return index[stepValue]
 end
 
@@ -189,9 +183,7 @@ function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
         local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
 
         local firstIndex = 1 + ((page - 1) * pageSize)
-        if (firstIndex <= 1) then
-            firstIndex = 1
-        end
+        if (firstIndex <= 1) then firstIndex = 1 end
         if ((firstIndex + 7) >= numberOfCells) then
             firstIndex = numberOfCells - 7
         end
@@ -211,33 +203,33 @@ end
 function Timeline_ZoomIn()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
 
-    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
+    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(
+                                currentStepValue)
 
-    if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then
-        return
-    end
+    if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then return end
 
-    Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
+    Chronicles.UI.Timeline.CurrentStep =
+        Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
-    )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
+            Chronicles.UI.Timeline.SelectedYear))
 end
 
 function Timeline_ZoomOut()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
 
-    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
+    local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(
+                                currentStepValue)
 
-    if (curentStepIndex == 1) then
-        return
-    end
+    if (curentStepIndex == 1) then return end
 
-    Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
+    Chronicles.UI.Timeline.CurrentStep =
+        Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
-    )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(
+            Chronicles.UI.Timeline.SelectedYear))
 end
 
 ------------------------------------------------------------------------------------------
@@ -254,11 +246,13 @@ function TimelineScrollFrame_OnMouseWheel(self, value)
 end
 
 function TimelineScrollPreviousButton_OnClick(self)
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage - 1)
+    Chronicles.UI.Timeline:DisplayTimeline(
+        Chronicles.UI.Timeline.CurrentPage - 1)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function TimelineScrollNextButton_OnClick(self)
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage + 1)
+    Chronicles.UI.Timeline:DisplayTimeline(
+        Chronicles.UI.Timeline.CurrentPage + 1)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end

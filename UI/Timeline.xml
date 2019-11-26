@@ -2,27 +2,16 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
     <Font name="TimelineFont" inherits="QuestFont_Shadow_Huge" virtual="true">
-		<Color r="0.30" g="0.18" b="0"/>
-	</Font>
-
-    <Frame name="TimelineBlockTemplate" virtual="true" enableMouse="true">
-        <Size x="85" y="80"/>
-        <Layers>
-            <Layer level="OVERLAY">
-                <FontString name="$parentText" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
-            </Layer>
-        </Layers>        
-    </Frame>
+        <Color r="0.30" g="0.18" b="0"/>
+    </Font>
 
     <Frame name="TimelineFrame" parent="MainFrame">
         <Size x="735" y="150"/>
         <Anchors>
             <Anchor point="TOP" x="0" y="-30" />
         </Anchors>
-
         <Layers>
             <Layer level="ARTWORK">
-
                 <Texture parentKey="TimelineFrameTopRight" file="Interface\QuestionFrame\Question-Main">
                     <Size x="220" y="42"/>
                     <Anchors>
@@ -102,46 +91,218 @@
                     <Anchor point="CENTER" />
                 </Anchors>
                 <Frames>
-                    <Frame name="TimelineBlock1" inherits="TimelineBlockTemplate">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <Frame name="TimelineBlock1" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="LEFT"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <Texture file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                                    <Size x="256" y="256"/>
+                                    <Anchors>
+                                        <Anchor point="TOP" x="0" y="38"/>
+                                        <Anchor point="BOTTOM" x="0" y="0"/>
+                                        <Anchor point="LEFT" x="0" y="0"/>
+                                        <Anchor point="RIGHT" x="0" y="0"/>
+                                    </Anchors>
+                                </Texture>
+                            </Layer>
+                            <Layer level="ARTWORK">
+                                <Texture file="Interface\DialogFrame\UI-DialogBox-Gold-Border">
+                                    <Size x="85" y="10"/>
+                                    <Anchors>
+                                        <Anchor point="TOP" x="0" y="3"/>
+                                    </Anchors>
+                                </Texture>
+                                <!-- <Texture parentKey="ArrowDOWN" file="Interface/QuestionFrame/question-background">
+                                    <Size x="53" y="21"/>
+                                    <Anchors>
+                                        <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-3"/>
+                                    </Anchors>
+                                </Texture> -->
+
+                            </Layer>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" x="10" y="-40"/>
+                                        <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock2" inherits="TimelineBlockTemplate">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <Frame name="TimelineBlock2" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock1"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock3" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock3" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock2"/>
+                            <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlock2"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock4" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock4" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock3"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock5" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock5" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock4"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock6" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock6" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock5"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock7" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock7" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock6"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
-                    <Frame name="TimelineBlock8" inherits="TimelineBlockTemplate">
+
+                    <Frame name="TimelineBlock8" enableMouse="true">
+                        <Size x="85" y="80"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock7"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT" setAllPoints="true" />
+                            </Layer>
+                        </Layers>
                     </Frame>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 </Frames>
                 <Scripts>
                     <OnMouseWheel>
