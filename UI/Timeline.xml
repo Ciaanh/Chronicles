@@ -3,7 +3,7 @@
 
 
 
-    <FontFamily name="QuestFont_Bob" virtual="true">
+    <FontFamily name="TimelineFontFamily" virtual="true">
         <Member alphabet="roman">
             <Font font="Fonts\MORPHEUS.ttf" height="12"/>
         </Member>
@@ -21,7 +21,7 @@
         </Member>
     </FontFamily>
 
-    <Font name="TimelineFont" inherits="QuestFont_Bob" virtual="true">
+    <Font name="TimelineFont" inherits="TimelineFontFamily" virtual="true">
         <Shadow>
             <Offset>
                 <AbsDimension x="1" y="-1"/>
@@ -34,7 +34,7 @@
 
 
 
-
+<!-- https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code -->
 
     <Frame name="TimelineBlockUpTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
@@ -50,21 +50,21 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="20"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="45" y="40"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-7" y="20"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="RIGHT" x="-15" y="20"/>
@@ -96,21 +96,21 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="-20"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="45" y="40"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-7" y="-20"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\DialogFrame\UI-DialogBox-Header">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="RIGHT" x="-15" y="-20"/>
@@ -159,7 +159,6 @@
                     </Anchors>
                     <TexCoords left="0.00195313" right="0.43164063" top="0.21777344" bottom="0.30078125"/>
                 </Texture>
-
 
                 <Texture parentKey="TimelineFrameTopLeft" file="Interface\QuestionFrame\Question-Main">
                     <Size x="220" y="42"/>
@@ -217,36 +216,6 @@
                     <Anchor point="CENTER" />
                 </Anchors>
                 <Frames>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     <Frame name="TimelineBlock1" inherits="TimelineBlockUpTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="LEFT"/>
@@ -294,44 +263,6 @@
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock7"/>
                         </Anchors>
                     </Frame>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 </Frames>
                 <Scripts>

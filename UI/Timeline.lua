@@ -15,19 +15,15 @@ Chronicles.UI.Timeline.SelectedYear = Chronicles.constants.timeline.yearStart
 
 -- page goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
-function Chronicles.UI.Timeline:DisplayTimeline(page)
+function Chronicles.UI.Timeline:DisplayTimeline(page, force)
     local pageSize = Chronicles.constants.timeline.pageSize
     local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-    if (page < 1) then
-        page = 1
-    end
-    if (page > maxPageValue) then
-        page = maxPageValue
-    end
+    if (page < 1) then page = 1 end
+    if (page > maxPageValue) then page = maxPageValue end
 
-    if (self.CurrentPage ~= page) then
+    if (self.CurrentPage ~= page or force) then
         -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked page " .. page)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- SetMinMaxValues " .. numberOfCells .. "  " .. pageSize .. "  " .. maxPageValue)
 
@@ -113,23 +109,17 @@ end
 function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
     local lowerBoundBlock = self:GetLowerBound(blockIndex)
     local upperBoundBlock = self:GetUpperBound(blockIndex)
-
-    local text = "" .. lowerBoundBlock
     frame.lowerBound = lowerBoundBlock
     frame.upperBound = upperBoundBlock
 
-    -- local label = _G[frame:GetName() .. "Text"]
     local label = frame.Label
-    label:SetText(text)
+    label:SetText("" .. lowerBoundBlock)
 
-    frame:SetScript(
-        "OnMouseDown",
-        function()
-            local eventList = Chronicles.DB:SearchEvents(frame.lowerBound, frame.upperBound)
-            self.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
-            Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
-        end
-    )
+    frame:SetScript("OnMouseDown", function()
+        local eventList = Chronicles.DB:SearchEvents(frame.lowerBound,frame.upperBound)
+        self.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
+        Chronicles.UI.EventList:SetEventListData(frame.lowerBound,frame.upperBound, eventList)
+    end)
 end
 
 ------------------------------------------------------------------------------------------
@@ -138,71 +128,57 @@ end
 
 function Chronicles.UI.Timeline:GetStepValueIndex(stepValue)
     local index = {}
-    for k, v in pairs(self.StepValues) do
-        index[v] = k
-    end
+    for k, v in pairs(self.StepValues) do index[v] = k end
     return index[stepValue]
 end
 
 function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
-    -- if (year ~= nil) then
-        local length = math.abs(Chronicles.constants.timeline.yearStart - year)
-        local yearIndex = math.floor(length / self.CurrentStep)
+    local selectedYear = year
 
-        return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
-    -- else
-    --     local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
+    if (selectedYear == nil) then
+        local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
+        local firstIndex = 1 + ((page - 1) * pageSize)
+        
+        if (firstIndex <= 1) then firstIndex = 1 end
+        if ((firstIndex + 7) >= numberOfCells) then firstIndex = numberOfCells - 7 end
 
-    --     local firstIndex = 1 + ((page - 1) * pageSize)
-    --     if (firstIndex <= 1) then
-    --         firstIndex = 1
-    --     end
-    --     if ((firstIndex + 7) >= numberOfCells) then
-    --         firstIndex = numberOfCells - 7
-    --     end
+        local lowerBoundYear = self:GetLowerBound(firstIndex)
+        local upperBoundYear = self:GetUpperBound(firstIndex + 7)
 
-    --     local lowerBoundYear = self:GetLowerBound(firstIndex)
-    --     local upperBoundYear = self:GetUpperBound(firstIndex + 7)
+        selectedYear = (lowerBoundYear + upperBoundYear) / 2
+    end
 
-    --     year = (lowerBoundYear + upperBoundYear) / 2
+    local length = math.abs(Chronicles.constants.timeline.yearStart - selectedYear)
+    local yearIndex = math.floor(length / self.CurrentStep)
 
-    --     local length = math.abs(Chronicles.constants.timeline.yearStart - year)
-    --     local yearIndex = math.floor(length / self.CurrentStep)
-
-    --     return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
-    -- end
+    return yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
 end
 
 function Timeline_ZoomIn()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
-
     local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
 
-    if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then
-        return
-    end
+    if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then return end
 
-    Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
+    Chronicles.UI.Timeline.CurrentStep =
+        Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
-    )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear),
+        true)
 end
 
 function Timeline_ZoomOut()
     local currentStepValue = Chronicles.UI.Timeline.CurrentStep
-
     local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(currentStepValue)
 
-    if (curentStepIndex == 1) then
-        return
-    end
+    if (curentStepIndex == 1) then return end
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 
     Chronicles.UI.Timeline:DisplayTimeline(
-        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear)
-    )
+        Chronicles.UI.Timeline:FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear),
+        true)
 end
 
 ------------------------------------------------------------------------------------------
@@ -219,11 +195,11 @@ function TimelineScrollFrame_OnMouseWheel(self, value)
 end
 
 function TimelineScrollPreviousButton_OnClick(self)
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage - 1)
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage - 1, false)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function TimelineScrollNextButton_OnClick(self)
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage + 1)
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage + 1, false)
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
