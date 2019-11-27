@@ -190,7 +190,7 @@ end
 -- Scroll Page ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function EventListScrollFrame_OnMouseWheel(self, value)
-    DEFAULT_CHAT_FRAME:AddMessage("-- scroll " .. value)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- scroll " .. value)
     if (value > 0) then
         EventListPreviousButton_OnClick(self)
     else

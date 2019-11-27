@@ -34,21 +34,21 @@
 
 
 
-<!-- https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code -->
+    <!-- https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code -->
 
     <Frame name="TimelineBlockUpTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
         <Layers>
-            <Layer level="BACKGROUND">
-                <Texture file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+            <Layer level="BORDER">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
+                    <Size x="12" y="24"/>
                     <Anchors>
-                        <Anchor point="TOP" x="0" y="-30"/>
-                        <Anchor point="BOTTOM" x="0" y="30"/>
-                        <Anchor point="LEFT" x="0" y="0"/>
-                        <Anchor point="RIGHT" x="0" y="0"/>
+                        <Anchor point="CENTER" x="-20" y="0"/>
                     </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="1.0" bottom="0.0"/>
                 </Texture>
             </Layer>
+
             <Layer level="ARTWORK">
                 <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
@@ -85,14 +85,13 @@
     <Frame name="TimelineBlockDownTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
         <Layers>
-            <Layer level="BACKGROUND">
-                <Texture file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+            <Layer level="BORDER">
+                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
+                    <Size x="12" y="24"/>
                     <Anchors>
-                        <Anchor point="TOP" x="0" y="-30"/>
-                        <Anchor point="BOTTOM" x="0" y="30"/>
-                        <Anchor point="LEFT" x="0" y="0"/>
-                        <Anchor point="RIGHT" x="0" y="0"/>
+                        <Anchor point="CENTER" x="-20" y="0"/>
                     </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
@@ -216,6 +215,30 @@
                     <Anchor point="CENTER" />
                 </Anchors>
                 <Frames>
+
+
+                    <Frame name="Timeline">
+                        <Size x="680" y="20"/>
+                        <Anchors>
+                            <Anchor point="CENTER" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Background" horizTile="true" vertTile="true">
+                                    <Anchors>
+                                        <Anchor point="TOP" x="0" y="0"/>
+                                        <Anchor point="BOTTOM" x="0" y="0"/>
+                                        <Anchor point="LEFT" x="0" y="0"/>
+                                        <Anchor point="RIGHT" x="0" y="0"/>
+                                    </Anchors>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+
+
+
                     <Frame name="TimelineBlock1" inherits="TimelineBlockUpTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="LEFT"/>
