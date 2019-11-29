@@ -306,7 +306,7 @@
                     <Button name="TimelinePreviousButton" parentKey="PreviousButton">
                         <Size x="32" y="64"/>
                         <Anchors>
-                            <Anchor point="LEFT" x="-45" y="55" />
+                            <Anchor point="LEFT" relativeTo="TimelineFrame" x="-20" y="0" />
                         </Anchors>
                         <NormalTexture parentKey="Normal" file="Interface\AddOns\Chronicles\Images\Arrow">
                             <TexCoords left="0" right="1" top="0" bottom="1"/>
@@ -325,7 +325,7 @@
                     <Button name="TimelineNextButton" parentKey="NextButton">
                         <Size x="32" y="64"/>
                         <Anchors>
-                            <Anchor point="RIGHT" x="45" y="55" />
+                            <Anchor point="RIGHT" relativeTo="TimelineFrame" x="20" y="0" />
                         </Anchors>
                         <NormalTexture parentKey="Normal" file="Interface\AddOns\Chronicles\Images\Arrow">
                             <TexCoords left="1" right="0" top="0" bottom="1"/>
