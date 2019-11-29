@@ -32,12 +32,16 @@ constants.eventType = {
 	war = "War",
 	battle = "Battle",
 	death = "Death",
-	birth = "Birth"
+	birth = "Birth",
+	other = "Other"
 }
 
 constants.timeline = {
 	yearStart = -15000,
 	yearEnd = 33,
-	defaultStep = 1000,
 	pageSize = 8
+}
+
+constants.eventList = {
+	pageSize = 6
 }

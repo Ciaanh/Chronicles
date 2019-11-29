@@ -137,21 +137,32 @@
 
 
 
-	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="Chronicles_UI">
+	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="MainFrame">
 		<Size x="600" y="400"/>
 		<Anchors>
 			<Anchor point="BOTTOMRIGHT" x="-25" y="15"/>
 		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="EventDescriptionPager" inherits="GameFontNormalSmall" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-120" y="20"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
 		<Frames>
-			<ScrollFrame name="$parentScrollFrame" parentKey="scroll" inherits="UIPanelScrollFrameCodeTemplate">
+
+
+			<ScrollFrame parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
 				<Anchors>
-					<Anchor point="TOP" x="0" y="-35"/>
-					<Anchor point="RIGHT" x="-15" y="0"/>
-					<Anchor point="LEFT" x="45" y="0"/>
-					<Anchor point="BOTTOM" x="0" y="35"/>
+					<Anchor point="TOP" x="0" y="-40"/>
+					<Anchor point="RIGHT" x="-40" y="0"/>
+					<Anchor point="LEFT" x="50" y="0"/>
+					<Anchor point="BOTTOM" x="0" y="42"/>
 				</Anchors>
 				<Frames>
-					<Slider name="$parentScrollBar" inherits="MinimalScrollBarTemplate" parentKey="ScrollBar">
+					<Slider name="$parentScrollBar"  parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="0" y="-17"/>
 							<Anchor point="BOTTOMRIGHT" x="0" y="17"/>
@@ -164,17 +175,19 @@
 					</Slider>
 				</Frames>
 				<ScrollChild>
-					<Frame name="$parentScrollChild" parentKey="child">
+					<Frame parentKey="ScrollChild">
 						<Size x="10" y="10"/>
 						<Anchors>
 							<Anchor point="TOPLEFT" x="0" y="0"/>
 						</Anchors>
+
 						<Frames>
-							<SimpleHTML name="$parentHTML" parentKey="HTML">
+							<SimpleHTML parentKey="HTML" name="EventDescriptionHTML">
+								<Size x="470" y="300"/>
 								<Anchors>
 									<Anchor point="TOPLEFT" x="5" y="-5"/>
 								</Anchors>
-								<FontString inherits="GameFontNormalSmall"/>
+								<FontString inherits="QuestFontNormalSmall"/>
 							</SimpleHTML>
 						</Frames>
 					</Frame>
@@ -183,21 +196,26 @@
 
 
 
-
-
-			<Button parentKey="previous" inherits="UIPanelButtonTemplate">
-				<Size x="40" y="20"/>
+			<Button name="EventDescriptionPrevious" parentKey="PreviousButton" inherits="UIPanelButtonTemplate" hidden="true">
+				<Size x="30" y="20"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-100" y="45"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-150" y="14"/>
 				</Anchors>
+				<Scripts>
+					<OnClick function="EventDescriptionPreviousButton_OnClick"/>
+					<OnLoad function="SetPreviousButtonText"/>
+				</Scripts>
 			</Button>
 
-
-			<Button parentKey="next" inherits="UIPanelButtonTemplate">
-				<Size x="40" y="20"/>
+			<Button name="EventDescriptionNext" parentKey="NextButton" inherits="UIPanelButtonTemplate" hidden="true">
+				<Size x="30" y="20"/>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-50" y="45"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="EventDescription" x="-80" y="14"/>
 				</Anchors>
+				<Scripts>
+					<OnClick function="EventDescriptionNextButton_OnClick"/>
+					<OnLoad function="SetNextButtonText"/>
+				</Scripts>
 			</Button>
 
 
