@@ -135,6 +135,15 @@
 		</Anchors>
 	</Frame>
 
+	<Font name="EventDescriptionFont" inherits="SystemFont_Med1" virtual="true">
+		<Shadow>
+			<Offset>
+				<AbsDimension x="1" y="-1"/>
+			</Offset>
+			<Color r="0.30" g="0.18" b="0"/>
+		</Shadow>
+		<Color r="1" g=".82" b="0"/>
+	</Font>
 
 
 	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="MainFrame">
@@ -144,6 +153,12 @@
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
+				<FontString name="EventTitle" inherits="EventDescriptionFont" justifyH="CENTER">
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-15"/>
+					</Anchors>
+				</FontString>
+
 				<FontString name="EventDescriptionPager" inherits="GameFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" x="-120" y="20"/>
@@ -162,7 +177,7 @@
 					<Anchor point="BOTTOM" x="0" y="42"/>
 				</Anchors>
 				<Frames>
-					<Slider name="$parentScrollBar"  parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+					<Slider name="$parentScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="0" y="-17"/>
 							<Anchor point="BOTTOMRIGHT" x="0" y="17"/>

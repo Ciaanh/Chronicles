@@ -15,24 +15,14 @@
                 </Texture>
             </Layer>
             <Layer level="OVERLAY">
-                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER" setAllPoints="true" />
+                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER">
+                    <Size x="65" y="35"/>
+                    <Anchors>
+                        <Anchor point="CENTER" />
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
-        <Scripts>
-            <OnLoad>
-                <!-- self:SetBackdrop({
-                    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-                    tile = true,
-                    tileEdge = true,
-                    tileSize = 16,
-                    edgeSize = 16,
-                    insets = { left = 0, right = 0, top = 0, bottom = 0 },
-                });
-
-                self:SetBackdropColor(0, 0, 0, 0.9); -->
-            </OnLoad>
-        </Scripts>
     </Frame>
 
 

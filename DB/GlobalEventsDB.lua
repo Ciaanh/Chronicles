@@ -29,7 +29,7 @@ GlobalEventsDB = {
 
     [2] = {
         id = 2,
-        label = Locale["Test 2"],
+        label = Locale["Test 2 2 2 2 2 2  ddddddddddddddddddddddddddddddddddddddd"],
         description = {Locale["Dark Portal page 1"], Locale["Dark Portal page 2"]},
         yearStart = -15000,
         yearEnd = -15000,

@@ -11,6 +11,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     self.CurrentEvent = event
     self.CurrentPage = 1
 
+    EventTitle:SetText(event.label)
     EventDescriptionHTML:SetText(event.description[1])
 
     self:SetDescriptionPager(1, Chronicles:GetTableLength(event.description))
