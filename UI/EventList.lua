@@ -98,31 +98,31 @@ end
 
 function Chronicles.UI.EventList:WipeAll()
     if (EventListBlock1.event ~= nil) then
-        wipe(EventListBlock1.event)
+        EventListBlock1.event = nil
     end
 
     if (EventListBlock2.event ~= nil) then
-        wipe(EventListBlock2.event)
+        EventListBlock2.event = nil
     end
 
     if (EventListBlock3.event ~= nil) then
-        wipe(EventListBlock3.event)
+        EventListBlock3.event = nil
     end
 
     if (EventListBlock4.event ~= nil) then
-        wipe(EventListBlock4.event)
+        EventListBlock4.event = nil
     end
 
     if (EventListBlock5.event ~= nil) then
-        wipe(EventListBlock5.event)
+        EventListBlock5.event = nil
     end
 
     if (EventListBlock6.event ~= nil) then
-        wipe(EventListBlock6.event)
+        EventListBlock6.event = nil
     end
 
     if (self.Data ~= nil) then
-        wipe(self.Data)
+        self.Data = nil
     end
     self.Data = nil
     self.CurrentPage = nil
@@ -159,7 +159,6 @@ end
         id=[integer],				-- Id of the event
         label=[string], 			-- label: text that'll be the label
         description=table[string], 	-- description: text that give informations about the event
-        icon=[string], 				-- the pre-define icon type which can be found in Constant.lua
         yearStart=[integer],		-- 
         yearEnd=[integer],			-- 
         eventType=[string],			-- type of event defined in constants
@@ -168,7 +167,7 @@ end
 function Chronicles.UI.EventList:SetTextToFrame(event, frame)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Render frame")
     if (frame.event ~= nil) then
-        wipe(frame.event)
+        frame.event = nil
     end
     frame:Hide()
     if (event ~= nil) then

@@ -25,7 +25,7 @@ function Chronicles.DB:AddGlobalEvent(event)
 end
 
 -- Should return a list of objects :
--- { label, yearStart, yearEnd, description, eventType, icon, source }
+-- { label, yearStart, yearEnd, description, eventType, source }
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local nbFoundEvents = 0
     local foundEvents = {}
@@ -68,7 +68,6 @@ end
 function Chronicles.DB:CleanEventObject(event, groupName)
     if event then
         local description = event.description or UNKNOWN
-        local icon = event.icon or private.constants.defaultIcon
 
         return {
             id = event.id,
@@ -77,7 +76,6 @@ function Chronicles.DB:CleanEventObject(event, groupName)
             yearEnd = event.yearEnd,
             description = description,
             eventType = event.eventType,
-            icon = icon,
             source = groupName
         }
     end
@@ -134,7 +132,6 @@ function Chronicles.DB.RP:RegisterBirth(age, name)
     local event = {
         label = "Birth of " .. name,
         description = {"Birth of " .. name .. " imported from MRP"},
-        icon = "research",
         yearStart = birth,
         yearEnd = birth,
         eventType = Chronicles.constants.eventType.birth

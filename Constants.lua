@@ -18,14 +18,8 @@ constants.defaults = {
 	}
 }
 
-local OBJECTICONS = "Interface\\MINIMAP\\OBJECTICONS"
-constants.icon_texture = {
-	research = "Interface\\ICONS\\INV_Scroll_11",
-	borrowedtime = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
-}
-
 -- Define the default icon here
-constants.defaultIcon = constants.icon_texture["borrowedtime"]
+constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
 
 constants.eventType = {
 	era = "Era",
