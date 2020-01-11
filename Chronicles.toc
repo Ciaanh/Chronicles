@@ -1,4 +1,4 @@
-## Interface: 80205
+## Interface: 80300
 
 ## Title: Chronicles
 ## Notes: Simple timeline of wow historical events
