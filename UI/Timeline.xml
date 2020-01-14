@@ -77,6 +77,18 @@
                     </Anchors>
                 </FontString>
             </Layer>
+
+            <Layer level="OVERLAY">
+                <Texture  name="$parentOverlay" parentKey="Overlay" hidden="true" file="Interface\DialogFrame\UI-DialogBox-Background-Dark">
+                    <Size x="85" y="80"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+
+            
         </Layers>
     </Frame>
 
@@ -122,6 +134,18 @@
                     </Anchors>
                 </FontString>
             </Layer>
+
+
+            <Layer level="OVERLAY">
+                <Texture  name="$parentOverlay" parentKey="Overlay" hidden="true" file="Interface\DialogFrame\UI-DialogBox-Background-Dark">
+                    <Size x="85" y="80"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+
         </Layers>
     </Frame>
 

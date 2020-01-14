@@ -116,6 +116,10 @@ function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
     frame.lowerBound = lowerBoundBlock
     frame.upperBound = upperBoundBlock
 
+    -- check if has events then
+    -- frame.Overlay:Hide()
+    frame.Overlay:Show()
+
     local label = frame.Label
     label:SetText("" .. lowerBoundBlock)
 
