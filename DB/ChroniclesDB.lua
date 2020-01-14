@@ -24,6 +24,26 @@ function Chronicles.DB:AddGlobalEvent(event)
     table.insert(GlobalEventsDB, self:CleanEventObject(event, "Global"))
 end
 
+function Chronicles.DB:HasEvents(yearStart, yearEnd)
+    if (yearStart <= yearEnd) then
+        for groupName in pairs(self.Events) do
+            if self:HasEventsInDB(yearStart, yearEnd, self.Events[groupName]) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function Chronicles.DB:HasEventsInDB(yearStart, yearEnd, db)
+    for eventIndex in pairs(db) do
+        if self:IsInRange(db[eventIndex], yearStart, yearEnd) then
+            return true
+        end
+    end
+    return false
+end
+
 -- Should return a list of objects :
 -- { label, yearStart, yearEnd, description, eventType, source }
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
