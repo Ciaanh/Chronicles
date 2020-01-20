@@ -4,7 +4,7 @@
 ## Notes: Simple timeline of wow historical events
 
 ## Author: ciaanh
-## Version: v0.1
+## Version: v0.2b
 ## DefaultState: enabled
 ## SavedVariables: ChroniclesDB
 ## X-License: MIT
