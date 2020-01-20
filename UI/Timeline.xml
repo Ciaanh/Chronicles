@@ -40,7 +40,7 @@
         <Size x="85" y="80"/>
         <Layers>
             <Layer level="BORDER">
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
+                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
                     <Size x="12" y="24"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-20" y="0"/>
@@ -50,21 +50,21 @@
             </Layer>
 
             <Layer level="ARTWORK">
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="20"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="45" y="40"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-7" y="20"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="RIGHT" x="-15" y="20"/>
@@ -76,7 +76,7 @@
                         <Anchor point="RIGHT" x="-30" y="20" />
                     </Anchors>
                 </FontString>
-            </Layer>
+            </Layer>                        
         </Layers>
     </Frame>
 
@@ -86,7 +86,7 @@
         <Size x="85" y="80"/>
         <Layers>
             <Layer level="BORDER">
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
+                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
                     <Size x="12" y="24"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-20" y="0"/>
@@ -95,21 +95,21 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="-20"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="45" y="40"/>
                     <Anchors>
                         <Anchor point="CENTER" x="-7" y="-20"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
+                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
                     <Size x="14" y="40"/>
                     <Anchors>
                         <Anchor point="RIGHT" x="-15" y="-20"/>
@@ -122,6 +122,18 @@
                     </Anchors>
                 </FontString>
             </Layer>
+
+
+            <Layer level="OVERLAY">
+                <Texture  name="$parentOverlay" parentKey="Overlay" hidden="true" file="Interface\DialogFrame\UI-DialogBox-Background-Dark">
+                    <Size x="85" y="80"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+
         </Layers>
     </Frame>
 

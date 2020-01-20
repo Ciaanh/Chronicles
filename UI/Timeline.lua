@@ -110,11 +110,34 @@ function Chronicles.UI.Timeline:GetUpperBound(blockIndex)
     return value
 end
 
+function Chronicles.UI.Timeline:SetThemeGold(frame)
+    frame.BoxLeft:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
+    frame.BoxCenter:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
+    frame.BoxRight:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
+    frame.BoxAnchor:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Anchor-Gold")
+    frame.Label:SetTextColor(1, 0.82, 0, 1)
+end
+
+function Chronicles.UI.Timeline:SetThemeGrey(frame)
+    frame.BoxLeft:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
+    frame.BoxCenter:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
+    frame.BoxRight:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
+    frame.BoxAnchor:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Anchor-Grey")
+    frame.Label:SetTextColor(0.18, 0.18, 0.18, 1)
+end
+
 function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
     local lowerBoundBlock = self:GetLowerBound(blockIndex)
     local upperBoundBlock = self:GetUpperBound(blockIndex)
     frame.lowerBound = lowerBoundBlock
     frame.upperBound = upperBoundBlock
+
+    -- check if has events then
+    if Chronicles.DB:HasEvents(frame.lowerBound, frame.upperBound) then
+        Chronicles.UI.Timeline:SetThemeGold(frame)
+    else
+        Chronicles.UI.Timeline:SetThemeGrey(frame)
+    end
 
     local label = frame.Label
     label:SetText("" .. lowerBoundBlock)
