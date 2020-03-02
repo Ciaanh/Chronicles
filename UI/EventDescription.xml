@@ -197,7 +197,7 @@
 						</Anchors>
 
 						<Frames>
-							<SimpleHTML parentKey="HTML" name="EventDescriptionHTML">
+							<SimpleHTML parentKey="HTML" name="EventDescriptionHTML" justifyH="LEFT">
 								<Size x="470" y="300"/>
 								<Anchors>
 									<Anchor point="TOPLEFT" x="5" y="-5"/>

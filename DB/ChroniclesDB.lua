@@ -8,7 +8,7 @@ Chronicles.DB.Events = {}
 Chronicles.DB.RP = {}
 
 function Chronicles.DB:InitDB()
-    self:LoadRolePlayProfile()
+    --self:LoadRolePlayProfile()
     self:RegisterEventDB("Global", GlobalEventsDB)
 end
 -----------------------------------------------------------------------------------------
@@ -20,7 +20,9 @@ end
 
 function Chronicles.DB:AddGlobalEvent(event)
     -- check max index and set it to event
-    event.id = table.maxn(GlobalEventsDB) + 1
+    if (event.id == nil) then
+        event.id = table.maxn(GlobalEventsDB) + 1
+    end
     table.insert(GlobalEventsDB, self:CleanEventObject(event, "Global"))
 end
 
@@ -124,34 +126,35 @@ end
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:LoadRolePlayProfile()
-    -- if _G["TRP3_API"] then state.trp3 = true state.trp3_Version = GetAddOnMetadata("totalRP3", "Version") or "Unknown" end;
+
     if (_G["TRP3_API"]) then
         local age = Chronicles.DB.RP:TRP_GetAge()
         local name = Chronicles.DB.RP:TRP_GetRoleplayingName()
-        DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
+
         if (age ~= nil and name ~= nil) then
-            self.RP:RegisterBirth(age, name)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
+            self.RP:RegisterBirth(age, name, "TotalRP")
         end
     end
 
-    -- if _G["mrp"] then state.mrp = true state.mrp_Version = GetAddOnMetadata("MyRolePlay", "Version") or "Unknown" end;
     if (_G["mrp"]) then
         local age = Chronicles.DB.RP:MRP_GetAge()
         local name = Chronicles.DB.RP:MRP_GetRoleplayingName()
 
         if (age ~= nil and name ~= nil) then
-            DEFAULT_CHAT_FRAME:AddMessage("-- mrp " .. age .. " " .. name)
-            self.RP:RegisterBirth(age, name)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- mrp " .. age .. " " .. name)
+            self.RP:RegisterBirth(age, name, "MyRolePlay")
         end
     end
 end
 
-function Chronicles.DB.RP:RegisterBirth(age, name)
+function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     -- compare date with current year
     local birth = Chronicles.constants.timeline.yearEnd - age
     local event = {
+        id = 0,
         label = "Birth of " .. name,
-        description = {"Birth of " .. name .. " imported from MRP"},
+        description = {"Birth of " .. name .. " \n\nImported from " .. addon},
         yearStart = birth,
         yearEnd = birth,
         eventType = Chronicles.constants.eventType.birth
@@ -173,19 +176,21 @@ function Chronicles.DB.RP:GetName()
 end
 
 function Chronicles.DB.RP:TRP_GetCharacteristics()
-    return TRP3_API.profile.getPlayerCurrentProfile()
+    local profileID = TRP3_API.profile.getPlayerCurrentProfileID()
+    local profile = TRP3_API.profile.getProfileByID(profileID)
+    return profile.player.characteristics
 end
 
 function Chronicles.DB.RP:TRP_GetFirstName()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then
+    if characteristics ~= nil then
         return characteristics.FN
     end
 end
 
 function Chronicles.DB.RP:TRP_GetLastName()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then
+    if characteristics ~= nil then
         return characteristics.LN
     end
 end
@@ -200,7 +205,8 @@ end
 
 function Chronicles.DB.RP:TRP_GetAge()
     local characteristics = Chronicles.DB.RP:TRP_GetCharacteristics()
-    if characteristics then
+
+    if characteristics ~= nil then
         return characteristics.AG
     end
 end
