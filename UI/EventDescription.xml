@@ -2,6 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
+
+
 	<!-- Art pieces to hide border seams -->
 	<Texture name="QuestChoiceLeftHide" file="Interface\QuestionFrame\Question-Main" virtual="true">
 		<Size x="86" y="39"/>
@@ -135,7 +137,7 @@
 		</Anchors>
 	</Frame>
 
-	<Font name="EventDescriptionFont" inherits="SystemFont_Med1" virtual="true">
+	<Font name="EventDescriptionTitleFont" inherits="QuestFont_Large" virtual="true">
 		<Shadow>
 			<Offset>
 				<AbsDimension x="1" y="-1"/>
@@ -145,6 +147,9 @@
 		<Color r="1" g=".82" b="0"/>
 	</Font>
 
+	<Font name="EventDescriptionFont" inherits="SystemFont_Med3" virtual="true">
+		<Color r="0.30" g="0.18" b="0"/>
+	</Font>
 
 	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="MainFrame">
 		<Size x="600" y="400"/>
@@ -153,7 +158,7 @@
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="EventTitle" inherits="EventDescriptionFont" justifyH="CENTER">
+				<FontString name="EventTitle" inherits="EventDescriptionTitleFont" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="TOP" x="0" y="-15"/>
 					</Anchors>
@@ -202,7 +207,7 @@
 								<Anchors>
 									<Anchor point="TOPLEFT" x="5" y="-5"/>
 								</Anchors>
-								<FontString inherits="QuestFontNormalSmall"/>
+								<FontString inherits="EventDescriptionFont"/>
 							</SimpleHTML>
 						</Frames>
 					</Frame>

@@ -23,7 +23,7 @@ function Chronicles.DB:AddGlobalEvent(event)
     if (event.id == nil) then
         event.id = table.maxn(GlobalEventsDB) + 1
     end
-    table.insert(GlobalEventsDB, self:CleanEventObject(event, "Global"))
+    table.insert(GlobalEventsDB, event.id, self:CleanEventObject(event, "Global"))
 end
 
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
@@ -125,7 +125,10 @@ end
 -----------------------------------------------------------------------------------------
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.DB:LoadRolePlayProfile()
+function Chronicles.DB:LoadRolePlayProfile()    
+    if (GlobalEventsDB[0] ~= nil) then
+        return
+    end
 
     if (_G["TRP3_API"]) then
         local age = Chronicles.DB.RP:TRP_GetAge()
