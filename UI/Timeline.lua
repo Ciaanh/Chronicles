@@ -16,8 +16,22 @@ Chronicles.UI.Timeline.SelectedYear = nil
 -- page goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(page, force)
+    -- create table with all date steps and check if events exist for it
+    local numberOfCells = self:GetNumberOfTimelineBlock()
+    local dates = {}
+    for i = 1, numberOfCells do
+        lowerBoundValue = self:GetLowerBound(i)
+        upperBoundValue = self:GetUpperBound(i)
+
+        dates[i] = {
+            lowerBound = lowerBoundValue,
+            upperBound = upperBoundValue,
+            hasEvents = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
+        }
+    end
+
     local pageSize = Chronicles.constants.timeline.pageSize
-    local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
+
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
     if (page < 1) then
@@ -42,50 +56,33 @@ function Chronicles.UI.Timeline:DisplayTimeline(page, force)
             TimelineNextButton:Enable()
         end
 
-        local firstIndex = 1 + ((page - 1) * pageSize)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndex " .. firstIndex)
-
-        if (firstIndex <= 1) then
-            firstIndex = 1
-            TimelinePreviousButton:Disable()
-            self.CurrentPage = 1
-        end
-
-        if ((firstIndex + 7) >= numberOfCells) then
-            firstIndex = numberOfCells - 7
-            TimelineNextButton:Disable()
-            self.CurrentPage = maxPageValue
-        end
+        local firstIndex = Chronicles.UI.Timeline:ComputeFirstIndex(page, pageSize, numberOfCells, maxPageValue)
 
         TimelineScrollBar:SetValue(self.CurrentPage)
 
         -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndexAfterChecked " .. firstIndex)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- Page and Index " .. self.CurrentPage .. "  " .. firstIndex)
 
-        -- TimelineBlock1
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex, TimelineBlock1, 1)
-
-        -- TimelineBlock2
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 1, TimelineBlock2, 2)
-
-        -- TimelineBlock3
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 2, TimelineBlock3, 3)
-
-        -- TimelineBlock4
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 3, TimelineBlock4, 4)
-
-        -- TimelineBlock5
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 4, TimelineBlock5, 5)
-
-        -- TimelineBlock6
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 5, TimelineBlock6, 6)
-
-        -- TimelineBlock7
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 6, TimelineBlock7, 7)
-
-        -- TimelineBlock8
-        Chronicles.UI.Timeline:SetTextToFrame(firstIndex + 7, TimelineBlock8, 8)
+        Chronicles.UI.Timeline:Build(firstIndex, dates)
     end
+end
+
+function Chronicles.UI.Timeline:ComputeFirstIndex(page, pageSize, numberOfCells, maxPageValue)
+    local firstIndex = 1 + ((page - 1) * pageSize)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndex " .. firstIndex)
+
+    if (firstIndex <= 1) then
+        firstIndex = 1
+        TimelinePreviousButton:Disable()
+        self.CurrentPage = 1
+    end
+
+    if ((firstIndex + 7) >= numberOfCells) then
+        firstIndex = numberOfCells - 7
+        TimelineNextButton:Disable()
+        self.CurrentPage = maxPageValue
+    end
+    return firstIndex
 end
 
 function Chronicles.UI.Timeline:GetNumberOfTimelineBlock()
@@ -126,21 +123,44 @@ function Chronicles.UI.Timeline:SetThemeGrey(frame)
     frame.Label:SetTextColor(0.18, 0.18, 0.18, 1)
 end
 
-function Chronicles.UI.Timeline:SetTextToFrame(blockIndex, frame, position)
-    local lowerBoundBlock = self:GetLowerBound(blockIndex)
-    local upperBoundBlock = self:GetUpperBound(blockIndex)
-    frame.lowerBound = lowerBoundBlock
-    frame.upperBound = upperBoundBlock
+function Chronicles.UI.Timeline:Build(firstIndex, dates)
+    -- TimelineBlock1
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex], TimelineBlock1, 1)
 
-    -- check if has events then
-    if Chronicles.DB:HasEvents(frame.lowerBound, frame.upperBound) then
+    -- TimelineBlock2
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 1], TimelineBlock2, 2)
+
+    -- TimelineBlock3
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 2], TimelineBlock3, 3)
+
+    -- TimelineBlock4
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 3], TimelineBlock4, 4)
+
+    -- TimelineBlock5
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 4], TimelineBlock5, 5)
+
+    -- TimelineBlock6
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 5], TimelineBlock6, 6)
+
+    -- TimelineBlock7
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 6], TimelineBlock7, 7)
+
+    -- TimelineBlock8
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 7], TimelineBlock8, 8)
+end
+
+function Chronicles.UI.Timeline:SetTextToFrameFromDate(dateBlock, frame, position)
+    frame.lowerBound = dateBlock.lowerBound
+    frame.upperBound = dateBlock.upperBound
+
+    if dateBlock.hasEvents then
         Chronicles.UI.Timeline:SetThemeGold(frame)
     else
         Chronicles.UI.Timeline:SetThemeGrey(frame)
     end
 
     local label = frame.Label
-    label:SetText("" .. lowerBoundBlock)
+    label:SetText("" .. dateBlock.lowerBound)
 
     frame:SetScript(
         "OnMouseDown",
@@ -170,7 +190,7 @@ function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
     if (selectedYear == nil) then
         local page = Chronicles.UI.Timeline.CurrentPage
         local pageSize = Chronicles.constants.timeline.pageSize
-        local numberOfCells = self:GetNumberOfTimelineBlock(self.CurrentStep)
+        local numberOfCells = self:GetNumberOfTimelineBlock()
 
         if (page == nil) then
             page = 1
