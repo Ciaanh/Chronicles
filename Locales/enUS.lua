@@ -5,6 +5,9 @@ if L then
     L["Chronicles"] = true
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
+    L["start"]= "Start"
+    L["end"]= "End"
+    L["year"]= "Year"
 
     L["The War of the Ancients label"] = "The War of the Ancients"
     L["The War of the Ancients page 1"] =
@@ -79,4 +82,8 @@ if L then
     L["Assault of the Dark Portal label"] = "Assault of the Dark Portal"
     L["Assault of the Dark Portal page 1"] =
         "Garrosh Hellscream is taken to the Temple of the White Tiger in Pandaria to stand trial for his crimes. During the trial, Garrosh escapes justice. In the Blasted Lands, the Dark Portal's energies shift from green to red, and new orc invaders emerge from the portal, calling themselves the Iron Horde. Both Alliance and Horde forces launch a defense to combat the new threat, eventually leading an assault on the Dark Portal itself. Azeroth's defenders charge through the portal, determined to dismantle it from the other side and defeat the Iron Horde."
+
+        
+    L["Test event"] = "Test event"
+    L["Test event page 1"] = "Test event page 1"
 end

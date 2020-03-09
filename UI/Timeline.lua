@@ -6,6 +6,7 @@ Chronicles.UI.Timeline = {}
 Chronicles.UI.Timeline.MaxStepIndex = 3
 Chronicles.UI.Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 5, 1}
 Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[1]
+Chronicles.UI.Timeline.StepDates = {}
 Chronicles.UI.Timeline.CurrentPage = nil
 Chronicles.UI.Timeline.SelectedYear = nil
 
@@ -13,40 +14,34 @@ Chronicles.UI.Timeline.SelectedYear = nil
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
--- page goes from 1 to math.floor(numberOfCells / pageSize)
--- index should go from 1 to GetNumberOfTimelineBlock
-function Chronicles.UI.Timeline:DisplayTimeline(page, force)
-    -- create table with all date steps and check if events exist for it
-    local numberOfCells = self:GetNumberOfTimelineBlock()
-    local dates = {}
-    for i = 1, numberOfCells do
-        lowerBoundValue = self:GetLowerBound(i)
-        upperBoundValue = self:GetUpperBound(i)
-
-        dates[i] = {
-            lowerBound = lowerBoundValue,
-            upperBound = upperBoundValue,
-            hasEvents = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
-        }
+function tablelength(T)
+    local count = 0
+    for _ in pairs(T) do
+        count = count + 1
     end
+    return count
+end
+
+-- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
+-- index should go from 1 to GetNumberOfTimelineBlock
+function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
+    Chronicles.UI.Timeline:LoadSetDates()
+
+    local numberOfCells = tablelength(Chronicles.UI.Timeline.StepDates)
 
     local pageSize = Chronicles.constants.timeline.pageSize
-
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-    if (page < 1) then
-        page = 1
+    if (pageIndex < 1) then
+        pageIndex = 1
     end
-    if (page > maxPageValue) then
-        page = maxPageValue
+    if (pageIndex > maxPageValue) then
+        pageIndex = maxPageValue
     end
 
-    if (self.CurrentPage ~= page or force) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked page " .. page)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetMinMaxValues " .. numberOfCells .. "  " .. pageSize .. "  " .. maxPageValue)
-
+    if (self.CurrentPage ~= pageIndex or force) then
         TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
-        self.CurrentPage = page
+        self.CurrentPage = pageIndex
 
         if (numberOfCells <= pageSize) then
             TimelinePreviousButton:Disable()
@@ -56,33 +51,10 @@ function Chronicles.UI.Timeline:DisplayTimeline(page, force)
             TimelineNextButton:Enable()
         end
 
-        local firstIndex = Chronicles.UI.Timeline:ComputeFirstIndex(page, pageSize, numberOfCells, maxPageValue)
-
         TimelineScrollBar:SetValue(self.CurrentPage)
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndexAfterChecked " .. firstIndex)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- Page and Index " .. self.CurrentPage .. "  " .. firstIndex)
-
-        Chronicles.UI.Timeline:Build(firstIndex, dates)
+        Chronicles.UI.Timeline:BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
     end
-end
-
-function Chronicles.UI.Timeline:ComputeFirstIndex(page, pageSize, numberOfCells, maxPageValue)
-    local firstIndex = 1 + ((page - 1) * pageSize)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndex " .. firstIndex)
-
-    if (firstIndex <= 1) then
-        firstIndex = 1
-        TimelinePreviousButton:Disable()
-        self.CurrentPage = 1
-    end
-
-    if ((firstIndex + 7) >= numberOfCells) then
-        firstIndex = numberOfCells - 7
-        TimelineNextButton:Disable()
-        self.CurrentPage = maxPageValue
-    end
-    return firstIndex
 end
 
 function Chronicles.UI.Timeline:GetNumberOfTimelineBlock()
@@ -107,74 +79,154 @@ function Chronicles.UI.Timeline:GetUpperBound(blockIndex)
     return value
 end
 
-function Chronicles.UI.Timeline:SetThemeGold(frame)
-    frame.BoxLeft:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
-    frame.BoxCenter:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
-    frame.BoxRight:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Gold")
-    frame.BoxAnchor:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Anchor-Gold")
-    frame.Label:SetTextColor(1, 0.82, 0, 1)
-end
+function Chronicles.UI.Timeline:BuildTimelineBlocks(page, pageSize, numberOfCells, maxPageValue)
+    local firstIndex = 1 + ((page - 1) * pageSize)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndex " .. firstIndex)
 
-function Chronicles.UI.Timeline:SetThemeGrey(frame)
-    frame.BoxLeft:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
-    frame.BoxCenter:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
-    frame.BoxRight:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Label-Grey")
-    frame.BoxAnchor:SetTexture("Interface\\AddOns\\Chronicles\\Images\\Timeline-Anchor-Grey")
-    frame.Label:SetTextColor(0.18, 0.18, 0.18, 1)
-end
-
-function Chronicles.UI.Timeline:Build(firstIndex, dates)
-    -- TimelineBlock1
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex], TimelineBlock1, 1)
-
-    -- TimelineBlock2
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 1], TimelineBlock2, 2)
-
-    -- TimelineBlock3
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 2], TimelineBlock3, 3)
-
-    -- TimelineBlock4
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 3], TimelineBlock4, 4)
-
-    -- TimelineBlock5
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 4], TimelineBlock5, 5)
-
-    -- TimelineBlock6
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 5], TimelineBlock6, 6)
-
-    -- TimelineBlock7
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 6], TimelineBlock7, 7)
-
-    -- TimelineBlock8
-    Chronicles.UI.Timeline:SetTextToFrameFromDate(dates[firstIndex + 7], TimelineBlock8, 8)
-end
-
-function Chronicles.UI.Timeline:SetTextToFrameFromDate(dateBlock, frame, position)
-    frame.lowerBound = dateBlock.lowerBound
-    frame.upperBound = dateBlock.upperBound
-
-    if dateBlock.hasEvents then
-        Chronicles.UI.Timeline:SetThemeGold(frame)
-    else
-        Chronicles.UI.Timeline:SetThemeGrey(frame)
+    if (firstIndex <= 1) then
+        firstIndex = 1
+        TimelinePreviousButton:Disable()
+        self.CurrentPage = 1
     end
 
-    local label = frame.Label
-    label:SetText("" .. dateBlock.lowerBound)
+    if ((firstIndex + 7) >= numberOfCells) then
+        firstIndex = numberOfCells - 7
+        TimelineNextButton:Disable()
+        self.CurrentPage = maxPageValue
+    end
 
-    frame:SetScript(
-        "OnMouseDown",
-        function()
-            local eventList = Chronicles.DB:SearchEvents(frame.lowerBound, frame.upperBound)
-            self.SelectedYear = math.floor((frame.lowerBound + frame.upperBound) / 2)
-            Chronicles.UI.EventList:SetEventListData(frame.lowerBound, frame.upperBound, eventList)
-        end
-    )
+    -- TimelineBlock1
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex], 1)
+
+    -- TimelineBlock2
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 1], 2)
+
+    -- TimelineBlock3
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 2], 3)
+
+    -- TimelineBlock4
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 3], 4)
+
+    -- TimelineBlock5
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 4], 5)
+
+    -- TimelineBlock6
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 5], 6)
+
+    -- TimelineBlock7
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 6], 7)
+
+    -- TimelineBlock8
+    Chronicles.UI.Timeline:SetTextToFrameFromDate(Chronicles.UI.Timeline.StepDates[firstIndex + 7], 8)
+end
+
+function Chronicles.UI.Timeline:SetTextToFrameFromDate(dateBlock, position)
+    local frameEvent = nil
+    local frameNoEvent = nil
+
+    if (position == 1) then
+        frameEvent = TimelineBlock1
+        frameNoEvent = TimelineBlockNoEvent1
+    end
+    if (position == 2) then
+        frameEvent = TimelineBlock2
+        frameNoEvent = TimelineBlockNoEvent2
+    end
+    if (position == 3) then
+        frameEvent = TimelineBlock3
+        frameNoEvent = TimelineBlockNoEvent3
+    end
+    if (position == 4) then
+        frameEvent = TimelineBlock4
+        frameNoEvent = TimelineBlockNoEvent4
+    end
+    if (position == 5) then
+        frameEvent = TimelineBlock5
+        frameNoEvent = TimelineBlockNoEvent5
+    end
+    if (position == 6) then
+        frameEvent = TimelineBlock6
+        frameNoEvent = TimelineBlockNoEvent6
+    end
+    if (position == 7) then
+        frameEvent = TimelineBlock7
+        frameNoEvent = TimelineBlockNoEvent7
+    end
+    if (position == 8) then
+        frameEvent = TimelineBlock8
+        frameNoEvent = TimelineBlockNoEvent8
+    end
+
+    if (dateBlock.hasEvents) then
+        frameNoEvent:Hide()
+        frameEvent:Show()
+
+        frameEvent.lowerBound = dateBlock.lowerBound
+        frameEvent.upperBound = dateBlock.upperBound
+        frameEvent.Label:SetText("" .. dateBlock.lowerBound .. "\n" .. dateBlock.upperBound)
+
+        frameEvent:SetScript(
+            "OnMouseDown",
+            function()
+                local eventList = Chronicles.DB:SearchEvents(frameEvent.lowerBound, frameEvent.upperBound)
+                self.SelectedYear = math.floor((frameEvent.lowerBound + frameEvent.upperBound) / 2)
+                Chronicles.UI.EventList:SetEventListData(frameEvent.lowerBound, frameEvent.upperBound, eventList)
+            end
+        )
+    else
+        frameNoEvent:Show()
+        frameEvent:Hide()
+
+        frameEvent.lowerBound = nil
+        frameEvent.upperBound = nil
+        frameEvent.Label:SetText("")
+
+        frameEvent:SetScript(
+            "OnMouseDown",
+            function()
+                Chronicles.UI.EventList:SetEventListData(0, 0, {})
+            end
+        )
+    end
 end
 
 ------------------------------------------------------------------------------------------
 -- Zoom ----------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
+
+function Chronicles.UI.Timeline:LoadSetDates()
+    Chronicles.UI.Timeline.StepDates = {}
+
+    local numberOfCells = self:GetNumberOfTimelineBlock()
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
+
+    local dateArray = {}
+    for i = 1, numberOfCells do
+        local lowerBoundValue = self:GetLowerBound(i)
+        local upperBoundValue = self:GetUpperBound(i)
+        local hasEvent = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
+
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- index " .. i .. " bounds " .. lowerBoundValue .. " " .. upperBoundValue)
+        dateArray[i] = {
+            lowerBound = lowerBoundValue,
+            upperBound = upperBoundValue,
+            hasEvents = hasEvent
+        }
+    end
+
+    Chronicles.UI.Timeline.StepDates = {}
+    for j = 1, numberOfCells - 1 do
+        if (dateArray[j].hasEvents == true or (dateArray[j].hasEvents == false and dateArray[j + 1].hasEvents == true)) then
+            table.insert(Chronicles.UI.Timeline.StepDates, dateArray[j])
+        end
+        if (dateArray[j].hasEvents == false and dateArray[j + 1].hasEvents == false) then
+            dateArray[j + 1].lowerBound = dateArray[j].lowerBound
+        end
+    end
+    if (dateArray[numberOfCells].hasEvents == true) then
+        table.insert(Chronicles.UI.Timeline.StepDates, dateArray[j])
+    end
+end
 
 function Chronicles.UI.Timeline:GetStepValueIndex(stepValue)
     local index = {}
@@ -196,7 +248,7 @@ function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
             page = 1
         end
 
-        DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear nil " .. page)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear nil " .. page)
 
         local firstIndex = 1 + ((page - 1) * pageSize)
 
@@ -210,22 +262,22 @@ function Chronicles.UI.Timeline:FindYearIndexOnTimeline(year)
         local lowerBoundYear = self:GetLowerBound(firstIndex)
         local upperBoundYear = self:GetUpperBound(firstIndex + 7)
 
-        DEFAULT_CHAT_FRAME:AddMessage("-- lowerBoundYear " .. lowerBoundYear)
-        DEFAULT_CHAT_FRAME:AddMessage("-- upperBoundYear " .. upperBoundYear)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- lowerBoundYear " .. lowerBoundYear)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- upperBoundYear " .. upperBoundYear)
 
         selectedYear = (lowerBoundYear + upperBoundYear) / 2
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear " .. selectedYear)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear " .. selectedYear)
 
     local length = math.abs(Chronicles.constants.timeline.yearStart - selectedYear)
-    DEFAULT_CHAT_FRAME:AddMessage("-- length " .. length)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- length " .. length)
 
     local yearIndex = math.floor(length / self.CurrentStep)
-    DEFAULT_CHAT_FRAME:AddMessage("-- yearIndex " .. yearIndex)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- yearIndex " .. yearIndex)
 
     local result = yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
-    DEFAULT_CHAT_FRAME:AddMessage("-- result " .. result)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- result " .. result)
 
     return result
 end
@@ -238,7 +290,7 @@ function Timeline_ZoomIn()
         return
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- ZoomIn ")
+    --DEFAULT_CHAT_FRAME:AddMessage("-- ZoomIn ")
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex + 1]
 
@@ -256,7 +308,7 @@ function Timeline_ZoomOut()
         return
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- ZoomOut ")
+    --DEFAULT_CHAT_FRAME:AddMessage("-- ZoomOut ")
 
     Chronicles.UI.Timeline.CurrentStep = Chronicles.UI.Timeline.StepValues[curentStepIndex - 1]
 

@@ -151,6 +151,43 @@
 		<Color r="0.30" g="0.18" b="0"/>
 	</Font>
 
+
+
+	<FontFamily name="QuestFont_Medium" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Fonts\MORPHEUS.ttf" height="12"/>
+		</Member>
+		<Member alphabet="korean">
+			<Font font="Fonts\K_Pagetext.ttf" height="12" spacing="8"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\ARKai_T.ttf" height="12"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\blei00d.ttf" height="12"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\MORPHEUS_CYR.TTF" height="12"/>
+		</Member>
+	</FontFamily>
+
+	<Font name="EventDescriptionDatesFont" inherits="QuestFont_Medium" virtual="true">
+		<Shadow>
+			<Offset>
+				<AbsDimension x="1" y="-1"/>
+			</Offset>
+			<Color r="0.30" g="0.18" b="0"/>
+		</Shadow>
+		<Color r="1" g=".82" b="0"/>
+	</Font>
+
+
+
+
+
+
+
+
 	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="MainFrame">
 		<Size x="600" y="400"/>
 		<Anchors>
@@ -167,6 +204,12 @@
 				<FontString name="EventDescriptionPager" inherits="GameFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" x="-120" y="20"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name="EventDescriptionBounds" inherits="EventDescriptionDatesFont" justifyH="CENTER">
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-40" y="-25"/>
 					</Anchors>
 				</FontString>
 			</Layer>

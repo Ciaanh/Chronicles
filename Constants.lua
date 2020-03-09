@@ -31,7 +31,7 @@ constants.eventType = {
 }
 
 constants.timeline = {
-	yearStart = -15000,
+	yearStart = -200000,
 	yearEnd = 33,
 	pageSize = 8
 }
