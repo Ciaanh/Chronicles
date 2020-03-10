@@ -5,19 +5,19 @@
 
     <FontFamily name="TimelineFontFamily" virtual="true">
         <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="10"/>
+            <Font font="Fonts\MORPHEUS.ttf" height="12"/>
         </Member>
         <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="10" spacing="8"/>
+            <Font font="Fonts\K_Pagetext.ttf" height="12" spacing="8"/>
         </Member>
         <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="10"/>
+            <Font font="Fonts\ARKai_T.ttf" height="12"/>
         </Member>
         <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="10"/>
+            <Font font="Fonts\blei00d.ttf" height="12"/>
         </Member>
         <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="10"/>
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="12"/>
         </Member>
     </FontFamily>
 
@@ -30,37 +30,6 @@
         </Shadow>
         <Color r="1" g=".82" b="0"/>
     </Font>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -79,29 +48,37 @@
 
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="25"/>
+                        <Anchor point="LEFT" x="-5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="45" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="25"/>
+                        <Anchor point="CENTER" x="0" y="28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="25"/>
+                        <Anchor point="RIGHT" x="5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="CENTER">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="25" />
+                        <Anchor point="LEFT" x="8" y="24" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="32" />
                     </Anchors>
                     <OnLoad>
                         self:SetTextColor(1, 0.82, 0, 1);
@@ -125,29 +102,37 @@
             </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="-25"/>
+                        <Anchor point="LEFT" x="-5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="50" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="-25"/>
+                        <Anchor point="CENTER" x="0" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="-25"/>
+                        <Anchor point="RIGHT" x="5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="CENTER">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="-25" />
+                        <Anchor point="LEFT" x="8" y="-24" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="-32" />
                     </Anchors>
                     <OnLoad>
                         self:SetTextColor(1, 0.82, 0, 1);
@@ -155,7 +140,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Scripts>
+        <!-- <Scripts>
             <OnLoad>
                 self:SetBackdrop({
                     bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -165,31 +150,8 @@
                 });
                 self:SetBackdropColor(0, 0, 0, 0.5);
             </OnLoad>
-        </Scripts>
+        </Scripts> -->
     </Frame>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -210,32 +172,40 @@
 
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="25"/>
+                        <Anchor point="LEFT" x="-5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="45" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="25"/>
+                        <Anchor point="CENTER" x="0" y="28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="25"/>
+                        <Anchor point="RIGHT" x="5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="CENTER">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="25" />
+                        <Anchor point="LEFT" x="8" y="24" />
                     </Anchors>
                     <OnLoad>
-                        self:SetTextColor(0.18, 0.18, 0.18, 1);
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
                     </OnLoad>
                 </FontString>
             </Layer>
@@ -256,68 +226,45 @@
             </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="-25"/>
+                        <Anchor point="LEFT" x="-5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="45" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="-25"/>
+                        <Anchor point="CENTER" x="0" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="-25"/>
+                        <Anchor point="RIGHT" x="5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="CENTER">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="-25" />
+                        <Anchor point="LEFT" x="8" y="-24" />
                     </Anchors>
                     <OnLoad>
-                        self:SetTextColor(0.18, 0.18, 0.18, 1);
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="-32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
                     </OnLoad>
                 </FontString>
             </Layer>
         </Layers>
     </Frame>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

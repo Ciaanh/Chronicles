@@ -163,7 +163,10 @@ function Chronicles.UI.Timeline:SetTextToFrameFromDate(dateBlock, position)
 
         frameEvent.lowerBound = dateBlock.lowerBound
         frameEvent.upperBound = dateBlock.upperBound
-        frameEvent.Label:SetText("" .. dateBlock.lowerBound .. "\n" .. dateBlock.upperBound)
+        frameEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
+        frameEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+        frameNoEvent.LabelStart:SetText("")
+        frameNoEvent.LabelEnd:SetText("")
 
         frameEvent:SetScript(
             "OnMouseDown",
@@ -179,7 +182,10 @@ function Chronicles.UI.Timeline:SetTextToFrameFromDate(dateBlock, position)
 
         frameEvent.lowerBound = nil
         frameEvent.upperBound = nil
-        frameEvent.Label:SetText("")
+        frameEvent.LabelStart:SetText("")
+        frameEvent.LabelEnd:SetText("")
+        frameNoEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
+        frameNoEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
 
         frameEvent:SetScript(
             "OnMouseDown",
@@ -204,13 +210,13 @@ function Chronicles.UI.Timeline:LoadSetDates()
     for i = 1, numberOfCells do
         local lowerBoundValue = self:GetLowerBound(i)
         local upperBoundValue = self:GetUpperBound(i)
-        local hasEvent = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
+        local hasEvents = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
 
         -- DEFAULT_CHAT_FRAME:AddMessage("-- index " .. i .. " bounds " .. lowerBoundValue .. " " .. upperBoundValue)
         dateArray[i] = {
             lowerBound = lowerBoundValue,
             upperBound = upperBoundValue,
-            hasEvents = hasEvent
+            hasEvents = hasEvents
         }
     end
 
@@ -225,6 +231,10 @@ function Chronicles.UI.Timeline:LoadSetDates()
     end
     if (dateArray[numberOfCells].hasEvents == true) then
         table.insert(Chronicles.UI.Timeline.StepDates, dateArray[j])
+    end
+
+    if (Chronicles.UI.Timeline.StepDates[1].hasEvents == false) then
+        table.remove(Chronicles.UI.Timeline.StepDates, 1)
     end
 end
 
