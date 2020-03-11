@@ -29,12 +29,9 @@
             <Color r="0" g="0" b="0"/>
         </Shadow>
         <Color r="1" g=".82" b="0"/>
-        <!-- <Color r="0.30" g="0.18" b="0"/> -->
     </Font>
 
 
-
-    <!-- https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code -->
 
     <Frame name="TimelineBlockUpTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
@@ -43,7 +40,7 @@
                 <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
                     <Size x="12" y="24"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-20" y="0"/>
+                        <Anchor point="CENTER" x="-20" y="1"/>
                     </Anchors>
                     <TexCoords left="0.0" right="1.0" top="1.0" bottom="0.0"/>
                 </Texture>
@@ -51,36 +48,45 @@
 
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="20"/>
+                        <Anchor point="LEFT" x="-5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="45" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="20"/>
+                        <Anchor point="CENTER" x="0" y="28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="20"/>
+                        <Anchor point="RIGHT" x="5" y="28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="20" />
+                        <Anchor point="LEFT" x="8" y="24" />
                     </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
                 </FontString>
-            </Layer>                        
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
+                </FontString>
+            </Layer>
         </Layers>
     </Frame>
-
-
 
     <Frame name="TimelineBlockDownTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
@@ -89,56 +95,176 @@
                 <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
                     <Size x="12" y="24"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-20" y="0"/>
+                        <Anchor point="CENTER" x="-20" y="-1"/>
                     </Anchors>
                     <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="-20"/>
+                        <Anchor point="LEFT" x="-5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="45" y="40"/>
+                    <Size x="70" y="47"/>
                     <Anchors>
-                        <Anchor point="CENTER" x="-7" y="-20"/>
+                        <Anchor point="CENTER" x="0" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
+                    <Size x="14" y="47"/>
                     <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="-20"/>
+                        <Anchor point="RIGHT" x="5" y="-28"/>
                     </Anchors>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT">
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="-20" />
+                        <Anchor point="LEFT" x="8" y="-24" />
                     </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="-32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 0.82, 0, 1);
+                    </OnLoad>
                 </FontString>
             </Layer>
-
-
-            <Layer level="OVERLAY">
-                <Texture  name="$parentOverlay" parentKey="Overlay" hidden="true" file="Interface\DialogFrame\UI-DialogBox-Background-Dark">
-                    <Size x="85" y="80"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="0" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
-                </Texture>
-            </Layer>
-
         </Layers>
+        <!-- <Scripts>
+            <OnLoad>
+                self:SetBackdrop({
+                    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                    tile = true,
+                    tileSize = 16,
+                    insets = { left = 0, right = 0, top = 0, bottom = 0 },
+                });
+                self:SetBackdropColor(0, 0, 0, 0.5);
+            </OnLoad>
+        </Scripts> -->
     </Frame>
 
 
 
+
+
+    <Frame name="TimelineBlockUpNoEventTemplate" enableMouse="true" virtual="true">
+        <Size x="85" y="80"/>
+        <Layers>
+            <Layer level="BORDER">
+                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Grey">
+                    <Size x="12" y="24"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="-20" y="1"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="1.0" bottom="0.0"/>
+                </Texture>
+            </Layer>
+
+            <Layer level="ARTWORK">
+                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="-5" y="28"/>
+                    </Anchors>
+                    <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
+                </Texture>
+                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="70" y="47"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="28"/>
+                    </Anchors>
+                    <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
+                </Texture>
+                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" x="5" y="28"/>
+                    </Anchors>
+                    <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
+                </Texture>
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="LEFT" x="8" y="24" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="TimelineBlockDownNoEventTemplate" enableMouse="true" virtual="true">
+        <Size x="85" y="80"/>
+        <Layers>
+            <Layer level="BORDER">
+                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Grey">
+                    <Size x="12" y="24"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="-20" y="-1"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="-5" y="-28"/>
+                    </Anchors>
+                    <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
+                </Texture>
+                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="70" y="47"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="-28"/>
+                    </Anchors>
+                    <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
+                </Texture>
+                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" x="5" y="-28"/>
+                    </Anchors>
+                    <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
+                </Texture>
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="LEFT" x="8" y="-24" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-8" y="-32" />
+                    </Anchors>
+                    <OnLoad>
+                        self:SetTextColor(1, 1, 1, 1);
+                    </OnLoad>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
 
 
 
@@ -235,13 +361,21 @@
                             <Anchor point="CENTER" />
                         </Anchors>
                         <Layers>
-                            <Layer level="BACKGROUND">
+                            <!-- <Layer level="BACKGROUND">
                                 <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Background" horizTile="true" vertTile="true">
                                     <Anchors>
                                         <Anchor point="TOP" x="0" y="0"/>
                                         <Anchor point="BOTTOM" x="0" y="0"/>
                                         <Anchor point="LEFT" x="0" y="0"/>
                                         <Anchor point="RIGHT" x="0" y="0"/>
+                                    </Anchors>
+                                </Texture>
+                            </Layer> -->
+                            <Layer level="BACKGROUND">
+                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true">
+                                    <Size x="680" y="16"/>
+                                    <Anchors>
+                                        <Anchor point="CENTER" y="5" />
                                     </Anchors>
                                 </Texture>
                             </Layer>
@@ -296,6 +430,56 @@
                     <Frame name="TimelineBlock8" inherits="TimelineBlockDownTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock7"/>
+                        </Anchors>
+                    </Frame>
+
+
+
+                    <Frame name="TimelineBlockNoEvent1" inherits="TimelineBlockUpNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="LEFT"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent2" inherits="TimelineBlockDownNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent1"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent3" inherits="TimelineBlockUpNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent2"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent4" inherits="TimelineBlockDownNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent3"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent5" inherits="TimelineBlockUpNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent4"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent6" inherits="TimelineBlockDownNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent5"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent7" inherits="TimelineBlockUpNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent6"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent8" inherits="TimelineBlockDownNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent7"/>
                         </Anchors>
                     </Frame>
 
