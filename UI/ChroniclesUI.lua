@@ -8,8 +8,13 @@ Chronicles.UI = {}
 -----------------------------------------------------------------------------------------
 -- UI Fonctions -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.UI:DisplayWindow() MainFrame:Show() end
+function Chronicles.UI:DisplayWindow()
+    Chronicles.DB:LoadRolePlayProfile()
+    MainFrame:Show()
+end
 
-function Chronicles.UI:HideWindow() MainFrame:Hide() end
+function Chronicles.UI:HideWindow()
+    MainFrame:Hide()
+end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

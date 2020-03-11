@@ -18,7 +18,7 @@ GlobalEventsDB = {
 	[1] = {
 		id = 1,
 		label = Locale["The War of the Ancients label"],
-		description = {Locale["The War of the Ancients page 1"]},
+		description = {Locale["The War of the Ancients page 1"], Locale["The War of the Ancients page 2"]},
 		yearStart = -10000,
 		yearEnd = -10000,
 		eventType = Chronicles.constants.eventType.war
@@ -157,6 +157,14 @@ GlobalEventsDB = {
 		description = {Locale["Assault of the Dark Portal page 1"]},
 		yearStart = 31,
 		yearEnd = 31,
+		eventType = Chronicles.constants.eventType.other
+	},
+	[19] = {
+		id = 19,
+		label = Locale["Test event"],
+		description = {Locale["Test event page 1"]},
+		yearStart = -150000,
+		yearEnd = -149001,
 		eventType = Chronicles.constants.eventType.other
 	}
 }

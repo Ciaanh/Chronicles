@@ -174,6 +174,7 @@ function Chronicles.UI.EventList:SetTextToFrame(event, frame)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- event not nil " .. event.label)
         local label = _G[frame:GetName() .. "Text"]
         label:SetText(event.label)
+        
         frame.event = event
         frame:SetScript(
             "OnMouseDown",

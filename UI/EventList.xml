@@ -2,6 +2,37 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
+    <FontFamily name="EventListFontFamily" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\MORPHEUS.ttf" height="10"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\K_Pagetext.ttf" height="10" spacing="8"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="10"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\blei00d.ttf" height="10"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="10"/>
+        </Member>
+    </FontFamily>
+
+    <Font name="EventListFont" inherits="EventListFontFamily" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+        <!-- <Color r="0.30" g="0.18" b="0"/> -->
+    </Font>
+
+
+
     <Frame name="EventListBlockTemplate" virtual="true" enableMouse="true">
         <Size x="85" y="50"/>
         <Layers>
@@ -23,6 +54,15 @@
                 </FontString>
             </Layer>
         </Layers>
+        <Scripts>
+            <OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
+				GameTooltip:SetText(self.event.yearStart, nil, nil, nil, nil, true);
+            </OnEnter>
+            <OnLeave>
+				GameTooltip:Hide();
+            </OnLeave>
+        </Scripts>
     </Frame>
 
 
@@ -95,15 +135,6 @@
                     <OnMouseWheel>
                         EventListScrollFrame_OnMouseWheel(self, delta)
                     </OnMouseWheel>
-                    <OnLoad>
-                        <!-- self:SetBackdrop({
-                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                            tile = true,
-                            tileSize = 16,
-                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
-                        });
-                        self:SetBackdropColor(0, 0, 0, 1); -->
-                    </OnLoad>
                 </Scripts>
             </Frame>
 

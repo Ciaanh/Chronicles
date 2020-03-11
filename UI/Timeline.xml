@@ -29,118 +29,72 @@
             <Color r="0" g="0" b="0"/>
         </Shadow>
         <Color r="1" g=".82" b="0"/>
-        <!-- <Color r="0.30" g="0.18" b="0"/> -->
     </Font>
 
+    <Font name="TimelineFontWhite" inherits="TimelineFontFamily" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r=".88" g=".88" b=".88"/>
+    </Font>
 
-
-    <!-- https://wow.gamepedia.com/Viewing_Blizzard%27s_interface_code -->
-
-    <Frame name="TimelineBlockUpTemplate" enableMouse="true" virtual="true">
+    <Frame name="TimelineBlockTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
         <Layers>
             <Layer level="BORDER">
                 <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
                     <Size x="12" y="24"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="-20" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.0" right="1.0" top="1.0" bottom="0.0"/>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
                 </Texture>
             </Layer>
-
             <Layer level="ARTWORK">
                 <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
-                    <Anchors>
-                        <Anchor point="LEFT" x="0" y="20"/>
-                    </Anchors>
+                    <Size x="14" y="47"/>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="45" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="-7" y="20"/>
-                    </Anchors>
+                    <Size x="70" y="47"/>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
                 <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="20"/>
-                    </Anchors>
+                    <Size x="14" y="47"/>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT">
-                    <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="20" />
-                    </Anchors>
-                </FontString>
-            </Layer>                        
+                <FontString parentKey="LabelStart" inherits="TimelineFont" justifyH="CENTER"></FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFont" justifyH="CENTER"></FontString>
+            </Layer>
         </Layers>
     </Frame>
-
-
-
-    <Frame name="TimelineBlockDownTemplate" enableMouse="true" virtual="true">
+    <Frame name="TimelineBlockNoEventTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
         <Layers>
             <Layer level="BORDER">
-                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Gold">
+                <Texture parentKey="BoxAnchor" file="Interface\AddOns\Chronicles\Images\Timeline-Anchor-Grey">
                     <Size x="12" y="24"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="-20" y="0"/>
-                    </Anchors>
                     <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
-                    <Anchors>
-                        <Anchor point="LEFT" x="0" y="-20"/>
-                    </Anchors>
+                <Texture parentKey="BoxLeft" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
                     <TexCoords left="0.2265625" right="0.28125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="45" y="40"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="-7" y="-20"/>
-                    </Anchors>
+                <Texture parentKey="BoxCenter" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="70" y="47"/>
                     <TexCoords left="0.28125" right="0.71484375" top="0.0" bottom="0.625"/>
                 </Texture>
-                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Gold">
-                    <Size x="14" y="40"/>
-                    <Anchors>
-                        <Anchor point="RIGHT" x="-15" y="-20"/>
-                    </Anchors>
+                <Texture parentKey="BoxRight" file="Interface\AddOns\Chronicles\Images\Timeline-Label-Grey">
+                    <Size x="14" y="47"/>
                     <TexCoords left="0.71484375" right="0.76953125" top="0.0" bottom="0.625"/>
                 </Texture>
-                <FontString name="$parentText" parentKey="Label" inherits="TimelineFont" justifyH="LEFT">
-                    <Anchors>
-                        <Anchor point="RIGHT" x="-30" y="-20" />
-                    </Anchors>
-                </FontString>
+                <FontString parentKey="LabelStart" inherits="TimelineFontWhite" justifyH="CENTER"></FontString>
+                <FontString parentKey="LabelEnd" inherits="TimelineFontWhite" justifyH="CENTER"></FontString>
             </Layer>
-
-
-            <Layer level="OVERLAY">
-                <Texture  name="$parentOverlay" parentKey="Overlay" hidden="true" file="Interface\DialogFrame\UI-DialogBox-Background-Dark">
-                    <Size x="85" y="80"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="0" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
-                </Texture>
-            </Layer>
-
         </Layers>
     </Frame>
-
-
-
-
-
 
     <Frame name="TimelineFrame" parent="MainFrame">
         <Size x="735" y="150"/>
@@ -227,8 +181,6 @@
                     <Anchor point="CENTER" />
                 </Anchors>
                 <Frames>
-
-
                     <Frame name="Timeline">
                         <Size x="680" y="20"/>
                         <Anchors>
@@ -236,66 +188,110 @@
                         </Anchors>
                         <Layers>
                             <Layer level="BACKGROUND">
-                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Background" horizTile="true" vertTile="true">
+                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true">
+                                    <Size x="680" y="16"/>
                                     <Anchors>
-                                        <Anchor point="TOP" x="0" y="0"/>
-                                        <Anchor point="BOTTOM" x="0" y="0"/>
-                                        <Anchor point="LEFT" x="0" y="0"/>
-                                        <Anchor point="RIGHT" x="0" y="0"/>
+                                        <Anchor point="CENTER" y="5" />
                                     </Anchors>
                                 </Texture>
                             </Layer>
                         </Layers>
                     </Frame>
 
-
-
-
-                    <Frame name="TimelineBlock1" inherits="TimelineBlockUpTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock1" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="LEFT"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock2" inherits="TimelineBlockDownTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock2" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock1"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock3" inherits="TimelineBlockUpTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock3" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlock2"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock4" inherits="TimelineBlockDownTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock4" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock3"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock5" inherits="TimelineBlockUpTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock5" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock4"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock6" inherits="TimelineBlockDownTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock6" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock5"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock7" inherits="TimelineBlockUpTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock7" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock6"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="TimelineBlock8" inherits="TimelineBlockDownTemplate" enableMouse="true">
+                    <Frame name="TimelineBlock8" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock7"/>
+                        </Anchors>
+                    </Frame>
+
+
+                    <Frame name="TimelineBlockNoEvent1" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="LEFT"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent2" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent1"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent3" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent2"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent4" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent3"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent5" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent4"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent6" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent5"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent7" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent6"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="TimelineBlockNoEvent8" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent7"/>
                         </Anchors>
                     </Frame>
 
@@ -370,7 +366,6 @@
                 </ThumbTexture>
             </Slider>
 
-
             <Button parentKey="zoom-in" inherits="UIPanelButtonTemplate" Text="+">
                 <Size x="20" y="20"/>
                 <Anchors>
@@ -390,8 +385,6 @@
                     <OnClick function="Timeline_ZoomOut"/>
                 </Scripts>
             </Button>
-
-
         </Frames>
     </Frame>
 </Ui>
