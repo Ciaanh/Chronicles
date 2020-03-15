@@ -153,7 +153,7 @@ end
 
 function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     -- compare date with current year
-    local birth = Chronicles.constants.timeline.yearEnd - age
+    local birth = Chronicles.constants.config.timeline.yearEnd - age
     local event = {
         id = 0,
         label = "Birth of " .. name,

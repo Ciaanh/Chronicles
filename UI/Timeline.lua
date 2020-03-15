@@ -29,7 +29,7 @@ function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
 
     local numberOfCells = tablelength(Chronicles.UI.Timeline.StepDates)
 
-    local pageSize = Chronicles.constants.timeline.pageSize
+    local pageSize = Chronicles.constants.config.timeline.pageSize
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
     if (pageIndex < 1) then
@@ -58,23 +58,23 @@ function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
 end
 
 function GetNumberOfTimelineBlock()
-    local length = math.abs(Chronicles.constants.timeline.yearStart - Chronicles.constants.timeline.yearEnd)
+    local length = math.abs(Chronicles.constants.config.timeline.yearStart - Chronicles.constants.config.timeline.yearEnd)
     return math.ceil(length / Chronicles.UI.Timeline.CurrentStep)
 end
 
 function GetLowerBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + ((blockIndex - 1) * Chronicles.UI.Timeline.CurrentStep)
+    local value = Chronicles.constants.config.timeline.yearStart + ((blockIndex - 1) * Chronicles.UI.Timeline.CurrentStep)
 
-    if (value < Chronicles.constants.timeline.yearStart) then
-        return Chronicles.constants.timeline.yearStart
+    if (value < Chronicles.constants.config.timeline.yearStart) then
+        return Chronicles.constants.config.timeline.yearStart
     end
     return value
 end
 
 function GetUpperBound(blockIndex)
-    local value = Chronicles.constants.timeline.yearStart + (blockIndex * Chronicles.UI.Timeline.CurrentStep) - 1
-    if (value > Chronicles.constants.timeline.yearEnd) then
-        return Chronicles.constants.timeline.yearEnd
+    local value = Chronicles.constants.config.timeline.yearStart + (blockIndex * Chronicles.UI.Timeline.CurrentStep) - 1
+    if (value > Chronicles.constants.config.timeline.yearEnd) then
+        return Chronicles.constants.config.timeline.yearEnd
     end
     return value
 end
@@ -272,7 +272,7 @@ function FindYearIndexOnTimeline(year)
 
     if (selectedYear == nil) then
         local page = Chronicles.UI.Timeline.CurrentPage
-        local pageSize = Chronicles.constants.timeline.pageSize
+        local pageSize = Chronicles.constants.config.timeline.pageSize
         local numberOfCells = GetNumberOfTimelineBlock()
 
         if (page == nil) then
@@ -301,13 +301,13 @@ function FindYearIndexOnTimeline(year)
 
     -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear " .. selectedYear)
 
-    local length = math.abs(Chronicles.constants.timeline.yearStart - selectedYear)
+    local length = math.abs(Chronicles.constants.config.timeline.yearStart - selectedYear)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- length " .. length)
 
     local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStep)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- yearIndex " .. yearIndex)
 
-    local result = yearIndex - (yearIndex % Chronicles.constants.timeline.pageSize)
+    local result = yearIndex - (yearIndex % Chronicles.constants.config.timeline.pageSize)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- result " .. result)
 
     return result

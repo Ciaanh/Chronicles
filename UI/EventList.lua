@@ -6,7 +6,7 @@ Chronicles.UI.EventList.Data = nil
 Chronicles.UI.EventList.CurrentPage = nil
 
 function Chronicles.UI.EventList:DisplayEventList(page)
-    local pageSize = Chronicles.constants.eventList.pageSize
+    local pageSize = Chronicles.constants.config.eventList.pageSize
     -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
     if (self.Data ~= nil and self.Data.events ~= nil) then
