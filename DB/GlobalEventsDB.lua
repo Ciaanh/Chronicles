@@ -13,6 +13,7 @@ GlobalEventsDB = {
 			yearEnd=[integer],			-- 
 			eventType=[string],			-- type of event defined in constants
 			timeline=[integer],    		-- id of the timeline 
+			date=[integer],    			-- number to specify the date to order event in a year (timestamp)
 		},
 	--]]
 	[1] = {
