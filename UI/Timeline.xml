@@ -188,7 +188,19 @@
                         </Anchors>
                         <Layers>
                             <Layer level="BACKGROUND">
-                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true">
+                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline-Background" horizTile="true" vertTile="true">
+                                 <Size x="680" y="20"/>
+                                    <Anchors>
+                                        <!-- <Anchor point="TOP" x="0" y="0"/>
+                                        <Anchor point="BOTTOM" x="0" y="0"/>
+                                        <Anchor point="LEFT" x="0" y="0"/>
+                                        <Anchor point="RIGHT" x="0" y="0"/> -->
+                                        <Anchor point="CENTER" />
+                                    </Anchors>
+                                </Texture>
+                            <!-- </Layer>
+                            <Layer level="ARTWORK"> -->
+                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true" toplevel="true">
                                     <Size x="680" y="16"/>
                                     <Anchors>
                                         <Anchor point="CENTER" y="5" />
