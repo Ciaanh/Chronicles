@@ -1,25 +1,66 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-    <Frame name="EventFilter" parent="EventList">
+    <Frame name="EventFilter" parent="MainFrame">
         <Anchors>
-            <Anchor point="RIGHT" relativePoint="LEFT" x="10" y="0" />
+            <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0" />
         </Anchors>
-        <Size x="60" y="60"/>
-        <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-            <EdgeSize>
-                <AbsValue val="16"/>
-            </EdgeSize>
-            <TileSize>
-                <AbsValue val="415"/>
-            </TileSize>
-            <Color r="0.4" g="0.4" b="0.4"/>
-            <BackgroundInsets>
-                <AbsInset left="3" right="3" top="3" bottom="3"/>
-            </BackgroundInsets>
-        </Backdrop>
+
+        <Size>
+            <AbsDimension x="32" y="10"/>
+        </Size>
+
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="100" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="3" y="0" relativePoint="TOPRIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0" right="1.0" top="0" bottom="0.15625"/>
+                </Texture>
+
+                <Texture name="$parentMiddle" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="100" y="200"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="$parentLeft" relativePoint="BOTTOM"/>
+                    </Anchors>
+                    <TexCoords left="0" right="1.0" top="0.15625" bottom="0.84375"/>
+                </Texture>
+
+                <Texture name="$parentRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="100" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="$parentMiddle" relativePoint="BOTTOM"/>
+                    </Anchors>
+                    <TexCoords left="0" right="1.0" top="0.84375" bottom="1.0"/>
+                </Texture>
+
+            </Layer>
+        </Layers>
+
         <Frames>
+
+            <!-- <Frame name="FilterContent">
+                <Layer level="BACKGROUND">
+                    <Texture parentKey="Background" file="Interface\Collections\CollectionsBackgroundTile" horizTile="true" vertTile="true">
+                        <Size x="256" y="256"/>
+                        <Anchors>
+                            <Anchor point="TOP" x="0" y="-5"/>
+                            <Anchor point="BOTTOM" x="0" y="5"/>
+                            <Anchor point="LEFT" x="5" y="0"/>
+                            <Anchor point="RIGHT" x="-5" y="0"/>
+                        </Anchors>
+                    </Texture>
+                </Layer>
+            </Frame> -->
+
         </Frames>
     </Frame>
-
 </Ui>
