@@ -182,16 +182,18 @@
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
-                        <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true" toplevel="true">
-                            <Size x="680" y="32"/>
+                        <Texture file="Interface\AddOns\Chronicles\Images\Timeline">
+                            <Size>
+                                <AbsDimension x="704" y="20"/>
+                            </Size>
                             <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="TOPLEFT" y="-40"/>
-                                <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" y="40"/>
+                                <Anchor point="CENTER" />
                             </Anchors>
                             <TexCoords left="0.00000000" right="1.00000000" top="0.00000000" bottom="1.00000000"/>
                         </Texture>
                     </Layer>
                 </Layers>
+
                 <Frames>
                     <Frame name="TimelineBlock1" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
