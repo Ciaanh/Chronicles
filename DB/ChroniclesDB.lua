@@ -29,7 +29,9 @@ end
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
     if (yearStart <= yearEnd) then
         for groupName in pairs(self.Events) do
-            if self:HasEventsInDB(yearStart, yearEnd, self.Events[groupName]) then
+            local eventsGroup = self.Events[groupName]
+
+            if self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data) then
                 return true
             end
         end
@@ -54,7 +56,9 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
 
     if (yearStart <= yearEnd) then
         for groupName in pairs(self.Events) do
-            local pluginEvents = self:SearchEventsInDB(yearStart, yearEnd, self.Events[groupName])
+            local eventsGroup = self.Events[groupName]
+
+            local pluginEvents = self:SearchEventsInDB(yearStart, yearEnd, eventsGroup.data)
 
             for eventIndex in pairs(pluginEvents) do
                 local event = pluginEvents[eventIndex]
@@ -113,9 +117,38 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin.")
     else
-        self.Events[groupName] = db
+        self.Events[groupName] = {
+            data = db,
+            name = groupName,
+            isActive = true
+        }
     end
 end
+
+function Chronicles.DB:GetEventGroupNames()
+    local dataGroups = {}
+    for groupName in pairs(self.Events) do
+        local group = self.Events[groupName]
+
+        local groupProjection = {
+            name = group.name,
+            isActive = group.isActive
+        }
+        table.insert(dataGroups, groupProjection)
+        DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
+    end
+    return dataGroups
+end
+
+function Chronicles.DB:SetGroupStatus(groupName, status)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    if self.Events[groupName] ~= nil then
+        self.Events[groupName].isActive = status
+    else
+        error(groupName .. " does not exist as a data group.")
+    end
+end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -125,7 +158,7 @@ end
 -----------------------------------------------------------------------------------------
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.DB:LoadRolePlayProfile()    
+function Chronicles.DB:LoadRolePlayProfile()
     if (GlobalEventsDB[0] ~= nil) then
         return
     end

@@ -1,6 +1,56 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
+
+
+    <!-- <Frame name="EventGroupTemplate" enableMouse="true" virtual="true">
+        <Size x="100" y="50"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture file="Interface\AddOns\Chronicles\Images\Event-Background">
+                    <Size x="85" y="50"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER">
+                    <Size x="65" y="35"/>
+                    <Anchors>
+                        <Anchor point="CENTER" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame> -->
+
+
+
+    <!--<CheckButton name="EventGroupTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true" checked="false">
+         <Scripts>
+            <OnLoad>
+				self.Text = _G[self:GetName() .. "Text"];
+				self.Text:SetFontObject(GameFontNormalSmall);
+            </OnLoad>
+            <OnEnter>
+				TRP3_RefreshTooltipForFrame(self);
+            </OnEnter>
+            <OnLeave>
+				TRP3_MainTooltip:Hide();
+            </OnLeave>
+            <PostClick>
+				TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+            </PostClick>
+        </Scripts> 
+    </CheckButton>-->
+
+
+
+
+
+
     <Frame name="EventFilter" parent="MainFrame">
         <Anchors>
             <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0" />
@@ -11,7 +61,7 @@
 
         <Frames>
             <Frame name="FilterContent">
-                <Size x="64" y="240"/>
+                <Size x="128" y="340"/>
                 <Anchors>
                     <Anchor point="CENTER" />
                 </Anchors>
@@ -81,19 +131,112 @@
                             <TexCoords left="0.5" right="1.0" top="0.84375" bottom="1.0"/>
                         </Texture>
                     </Layer>
-
-                    <!-- <Layer level="BACKGROUND">
-                        <Texture parentKey="Background" file="Interface\Collections\CollectionsBackgroundTile" horizTile="true" vertTile="true">
-                            <Size x="256" y="256"/>
-                            <Anchors>
-                                <Anchor point="TOP" x="0" y="-5"/>
-                                <Anchor point="BOTTOM" x="0" y="5"/>
-                                <Anchor point="LEFT" x="5" y="0"/>
-                                <Anchor point="RIGHT" x="-5" y="0"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer> -->
                 </Layers>
+
+
+                <Frames>
+                    <Frame name="EventFilterScrollFrame" parentKey="ScrollFrame">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" x="0" y="0"/>
+                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                        </Anchors>
+
+                        <Frames>
+                        <!-- inherits="InterfaceOptionsCheckButtonTemplate" virtual="true" checked="false" -->
+                            <CheckButton name="EventFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" x="0" y="0" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="EventFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock1" y="-5"/>
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="EventFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock2" y="-5"/>
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="EventFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock3" y="-5"/>
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="EventFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock4" y="-5"/>
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="EventFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock5" y="-5"/>
+                                </Anchors>
+                            </CheckButton>
+                        </Frames>
+
+                        <Scripts>
+                            <OnMouseWheel>
+                        EventFilterScrollFrame_OnMouseWheel(self, delta)
+                            </OnMouseWheel>
+                        </Scripts>
+                    </Frame>
+
+                    <Slider name="EventFilterScrollBar" parentKey="ScrollBar" orientation="VERTICAL" enableMouse="true" enableMouseWheel="true">
+                        <Size x="25" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventFilterScrollFrame" x="0" y="0" />
+                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventFilterScrollFrame" x="0" y="0" />
+                        </Anchors>
+                        <Frames>
+
+                            <Button name="EventFilterPreviousButton" parentKey="PreviousButton">
+                                <Size x="25" y="30"/>
+                                <Anchors>
+                                    <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="EventFilterScrollBar" y="-3" />
+                                </Anchors>
+                                <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+                                <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+                                <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+                                <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
+                                <Scripts>
+                                    <OnClick function="EventFilterPreviousButton_OnClick"/>
+                                </Scripts>
+                            </Button>
+
+                            <Button name="EventFilterNextButton" parentKey="NextButton">
+                                <Size x="25" y="30"/>
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterScrollBar" y="18" />
+                                </Anchors>
+                                <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+                                <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+                                <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+                                <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight" alphaMode="ADD"/>
+                                <Scripts>
+                                    <OnClick function="EventFilterNextButton_OnClick"/>
+                                </Scripts>
+                            </Button>
+
+                        </Frames>
+                        <Scripts>
+                            <OnLoad>
+                        self:SetBackdrop({
+                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+                            tile = true,
+                            tileSize = 16,
+                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
+                        });
+                        self:SetBackdropColor(0.9, 0.75, 0.49, 1);
+                            </OnLoad>
+                        </Scripts>
+                        <ThumbTexture name="EventFilterThumbTexture" parentKey="ThumbTexture" file="Interface\Buttons\UI-ScrollBar-Knob">
+                            <Size x="18" y="24"/>
+                            <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+                        </ThumbTexture>
+                    </Slider>
+                </Frames>
+
 
 
 
@@ -111,7 +254,7 @@
                 </Anchors>
                 <Scripts>
                     <OnLoad function="EventFilter_InitToggle" />
-                    <OnClick function="EventFilter_Toggle"/>
+                    <OnClick function="EventFilter_Toggle" />
                     <OnEnter>
                         GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
                         GameTooltip:SetText("Toggle event filters", nil, nil, nil, nil, true);

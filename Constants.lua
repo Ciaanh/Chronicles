@@ -43,5 +43,8 @@ constants.config = {
 	},
 	eventList = {
 		pageSize = 6
+	},
+	eventFilter = {
+		pageSize = 6
 	}
 }
