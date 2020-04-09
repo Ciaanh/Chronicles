@@ -7,6 +7,19 @@ Chronicles.UI.EventDescription = {}
 Chronicles.UI.EventDescription.CurrentPage = nil
 Chronicles.UI.EventDescription.CurrentEvent = nil
 
+function Chronicles.UI.Timeline:Refresh()
+    self.CurrentEvent = nil
+    self.CurrentPage = nil
+
+    EventTitle:SetText("")
+    EventDescriptionHTML:SetText("")
+    EventDescriptionBounds:SetText("")
+
+    EventDescriptionPrevious:Hide()
+    EventDescriptionNext:Hide()
+    EventDescriptionPager:Hide()
+end
+
 function Chronicles.UI.EventDescription:DrawEventDescription(event)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventDescription " .. event.label)
     self.CurrentEvent = event

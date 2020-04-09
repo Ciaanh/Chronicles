@@ -22,6 +22,10 @@ function tablelength(T)
     return count
 end
 
+function Chronicles.UI.Timeline:Refresh()
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage,true)
+end
+
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
