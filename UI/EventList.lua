@@ -6,9 +6,20 @@ Chronicles.UI.EventList.Data = nil
 Chronicles.UI.EventList.CurrentPage = nil
 
 function Chronicles.UI.EventList:Refresh()
+    DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
     Chronicles.UI.EventList:DisplayEventList(Chronicles.UI.EventList.CurrentPage)
+end
 
-    -- check for each displayed event if the group is active
+function Chronicles.UI.EventList:FilterEvents(events)
+    local foundEvents = {}
+    for eventIndex in pairs(events) do
+        local event = events[eventIndex]
+
+        if Chronicles.DB:GetGroupStatus(event.source) then
+            table.insert(foundEvents, event)
+        end
+    end
+    return foundEvents
 end
 
 function Chronicles.UI.EventList:DisplayEventList(page)
@@ -16,7 +27,7 @@ function Chronicles.UI.EventList:DisplayEventList(page)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
     if (self.Data ~= nil and self.Data.events ~= nil) then
-        local eventList = self.Data.events
+        local eventList = Chronicles.UI.EventList:FilterEvents(self.Data.events)
 
         local numberOfEvents = Chronicles:GetTableLength(eventList)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
@@ -180,7 +191,7 @@ function Chronicles.UI.EventList:SetTextToFrame(event, frame)
         -- DEFAULT_CHAT_FRAME:AddMessage("-- event not nil " .. event.label)
         local label = _G[frame:GetName() .. "Text"]
         label:SetText(event.label)
-        
+
         frame.event = event
         frame:SetScript(
             "OnMouseDown",

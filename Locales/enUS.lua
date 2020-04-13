@@ -12,9 +12,7 @@ if L then
     L["The War of the Ancients label"] = "The War of the Ancients"
     L["The War of the Ancients page 1"] =
         "An ancient race called night elves recklessly pursue the use of arcane magic and manipulate the powers of the Well of Eternity. Their efforts catch the attention of Sargeras, the fallen titan. War erupts between the night elves, and the demonic hordes of Sargeras' Burning Legion. The Well of Eternity is destroyed, and the Great Sundering splits the continent of Kalimdor. The World Tree Nordrassil is created."
-    L["The War of the Ancients page 2"] =
-        '<html><body><h1>|cFF0000FF SimpleHTML Demo: Ambush|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'You think this hurts? Just wait.\'|r</p><br/><br/><p>Among every ability a rogue has at his disposal,<br/>Ambush is without a doubt the hardest hitting Rogue ability.</p><img src="Interface\\AddOns\\Chronicles\\Images\\Dwarf-Crest" width="128" height="128" align="center"/>papa</body></html>'
-
+   
     L["Quel'Thalas Founded	 label"] = "Quel'Thalas Founded"
     L["Quel'Thalas Founded page 1"] =
         "The Highborne sorcerers of night elf society are banished from Kalimdor after continuing to use forbidden arcane magic. The banished night elves arrive in the Eastern Kingdoms, transforming into high elves. The high elf kingdom of Quel'Thalas is founded, and the high elves use a vial of water from the Well of Eternity to create a new fount of power, calling it the Sunwell."

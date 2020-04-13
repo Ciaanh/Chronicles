@@ -23,7 +23,8 @@ function tablelength(T)
 end
 
 function Chronicles.UI.Timeline:Refresh()
-    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage,true)
+    DEFAULT_CHAT_FRAME:AddMessage("-- Refresh timeline " .. Chronicles.UI.Timeline.CurrentPage)
+    Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage, true)
 end
 
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
@@ -62,12 +63,14 @@ function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
 end
 
 function GetNumberOfTimelineBlock()
-    local length = math.abs(Chronicles.constants.config.timeline.yearStart - Chronicles.constants.config.timeline.yearEnd)
+    local length =
+        math.abs(Chronicles.constants.config.timeline.yearStart - Chronicles.constants.config.timeline.yearEnd)
     return math.ceil(length / Chronicles.UI.Timeline.CurrentStep)
 end
 
 function GetLowerBound(blockIndex)
-    local value = Chronicles.constants.config.timeline.yearStart + ((blockIndex - 1) * Chronicles.UI.Timeline.CurrentStep)
+    local value =
+        Chronicles.constants.config.timeline.yearStart + ((blockIndex - 1) * Chronicles.UI.Timeline.CurrentStep)
 
     if (value < Chronicles.constants.config.timeline.yearStart) then
         return Chronicles.constants.config.timeline.yearStart
@@ -120,7 +123,8 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
     end
     local dateBlock = Chronicles.UI.Timeline.StepDates[index]
 
-    if (dateBlock.hasEvents) then
+    local hasEvents = Chronicles.DB:HasEvents(dateBlock.lowerBound, dateBlock.upperBound)
+    if (hasEvents) then
         frameNoEvent:Hide()
         frameEvent:Show()
 
@@ -235,30 +239,45 @@ function Chronicles.UI.Timeline:LoadSetDates()
     for i = 1, numberOfCells do
         local lowerBoundValue = GetLowerBound(i)
         local upperBoundValue = GetUpperBound(i)
-        local hasEvents = Chronicles.DB:HasEvents(lowerBoundValue, upperBoundValue)
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- index " .. i .. " bounds " .. lowerBoundValue .. " " .. upperBoundValue)
+        -- if (i == 1) then
+        --     DEFAULT_CHAT_FRAME:AddMessage(
+        --         "-- index " .. i .. " bounds " .. tostring(lowerBoundValue) .. " " .. tostring(upperBoundValue)
+        --     )
+        -- end
         dateArray[i] = {
             lowerBound = lowerBoundValue,
-            upperBound = upperBoundValue,
-            hasEvents = hasEvents
+            upperBound = upperBoundValue
         }
     end
 
     Chronicles.UI.Timeline.StepDates = {}
     for j = 1, numberOfCells - 1 do
-        if (dateArray[j].hasEvents == true or (dateArray[j].hasEvents == false and dateArray[j + 1].hasEvents == true)) then
+        local block = dateArray[j]
+        local nextBlock = dateArray[j + 1]
+
+        local hasEvents = Chronicles.DB:HasEvents(block.lowerBound, block.upperBound)
+        local nextHasEvents = Chronicles.DB:HasEvents(nextBlock.lowerBound, nextBlock.upperBound)
+
+        if (hasEvents == true or (hasEvents == false and nextHasEvents == true)) then
             table.insert(Chronicles.UI.Timeline.StepDates, dateArray[j])
         end
-        if (dateArray[j].hasEvents == false and dateArray[j + 1].hasEvents == false) then
+        if (hasEvents == false and nextHasEvents == false) then
             dateArray[j + 1].lowerBound = dateArray[j].lowerBound
         end
     end
-    if (dateArray[numberOfCells].hasEvents == true) then
+
+    local last = dateArray[numberOfCells]
+    local lastHasEvents = Chronicles.DB:HasEvents(last.lowerBound, last.upperBound)
+    if (lastHasEvents == true) then
         table.insert(Chronicles.UI.Timeline.StepDates, dateArray[j])
     end
 
-    if (Chronicles.UI.Timeline.StepDates[1].hasEvents == false) then
+    DEFAULT_CHAT_FRAME:AddMessage("-- display toto " .. tostring(Chronicles.UI.Timeline.StepDates[1]))
+
+    local first = Chronicles.UI.Timeline.StepDates[1]
+    local firstHasEvents = Chronicles.DB:HasEvents(first.lowerBound, first.upperBound)
+    if (firstHasEvents == false) then
         table.remove(Chronicles.UI.Timeline.StepDates, 1)
     end
 end

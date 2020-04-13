@@ -26,7 +26,7 @@ end
 function Chronicles.UI.EventFilter:DisplayEventFilter(page)
     local pageSize = Chronicles.constants.config.eventFilter.pageSize
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:DisplayEventFilter call")
+    --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:DisplayEventFilter call")
 
     if (self.Data ~= nil) then
         local eventGroups = self.Data
@@ -159,7 +159,7 @@ function Chronicles.UI.EventFilter:SetEventFilterData()
     else
         local numberOfGroups = Chronicles:GetTableLength(groupList)
 
-        DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetEventFilterData numberOfGroups " .. numberOfGroups)
+        --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetEventFilterData numberOfGroups " .. numberOfGroups)
 
         if (numberOfGroups == 0) then
             self:HideAll()
@@ -174,7 +174,7 @@ function Chronicles.UI.EventFilter:SetEventFilterData()
 end
 
 function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
-    DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame call")
+    --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame call")
 
     if (checkBox.group ~= nil) then
         checkBox.group = nil
@@ -182,7 +182,7 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
     checkBox:Hide()
 
     if (group ~= nil) then
-        DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame " .. group.name .. " "..tostring(group.isActive))
+        --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame " .. group.name .. " "..tostring(group.isActive))
         local label = _G[checkBox:GetName() .. "Text"]
         label:SetText(group.name)
 
@@ -194,6 +194,10 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
             function(selfCheckBox)
                 local checked = selfCheckBox:GetChecked()
                 Chronicles.DB:SetGroupStatus(group.name, not group.isActive)
+
+                Chronicles.UI.EventList:Refresh()
+                Chronicles.UI.Timeline:Refresh()
+                Chronicles.UI.Timeline:Refresh()
             end
         )
         checkBox:Show()

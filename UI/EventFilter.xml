@@ -2,66 +2,18 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
-
-    <!-- <Frame name="EventGroupTemplate" enableMouse="true" virtual="true">
-        <Size x="100" y="50"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture file="Interface\AddOns\Chronicles\Images\Event-Background">
-                    <Size x="85" y="50"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="0" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
-                </Texture>
-            </Layer>
-            <Layer level="OVERLAY">
-                <FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER">
-                    <Size x="65" y="35"/>
-                    <Anchors>
-                        <Anchor point="CENTER" />
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Frame> -->
-
-
-
-    <!--<CheckButton name="EventGroupTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true" checked="false">
-         <Scripts>
-            <OnLoad>
-				self.Text = _G[self:GetName() .. "Text"];
-				self.Text:SetFontObject(GameFontNormalSmall);
-            </OnLoad>
-            <OnEnter>
-				TRP3_RefreshTooltipForFrame(self);
-            </OnEnter>
-            <OnLeave>
-				TRP3_MainTooltip:Hide();
-            </OnLeave>
-            <PostClick>
-				TRP3_API.ui.misc.playUISound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-            </PostClick>
-        </Scripts> 
-    </CheckButton>-->
-
-
-
-
-
-
     <Frame name="EventFilter" parent="MainFrame">
         <Anchors>
             <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0" />
         </Anchors>
         <Size>
-            <AbsDimension x="64" y="240"/>
+            <AbsDimension x="128" y="200"/>
         </Size>
+
 
         <Frames>
             <Frame name="FilterContent">
-                <Size x="128" y="340"/>
+                <Size x="128" y="200"/>
                 <Anchors>
                     <Anchor point="CENTER" />
                 </Anchors>
@@ -86,13 +38,9 @@
                             <TexCoords left="0" right="0.5" top="0" bottom="0.15625"/>
                         </Texture>
 
-
-
-
-
                         <Texture name="$parentMiddleLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
                             <Size>
-                                <AbsDimension x="16" y="300"/>
+                                <AbsDimension x="16" y="160"/>
                             </Size>
                             <Anchors>
                                 <Anchor point="TOP" relativeTo="$parentTopLeft" relativePoint="BOTTOM"/>
@@ -102,15 +50,13 @@
 
                         <Texture name="$parentMiddleRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
                             <Size>
-                                <AbsDimension x="112" y="300"/>
+                                <AbsDimension x="112" y="160"/>
                             </Size>
                             <Anchors>
                                 <Anchor point="LEFT" relativeTo="$parentMiddleLeft" relativePoint="RIGHT"/>
                             </Anchors>
                             <TexCoords left="0.5" right="1.0" top="0.15625" bottom="0.84375"/>
                         </Texture>
-
-
 
                         <Texture name="$parentBottomLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
                             <Size>
@@ -132,8 +78,6 @@
                         </Texture>
                     </Layer>
                 </Layers>
-
-
                 <Frames>
                     <Frame name="EventFilterScrollFrame" parentKey="ScrollFrame">
                         <Anchors>
@@ -142,10 +86,9 @@
                         </Anchors>
 
                         <Frames>
-                        <!-- inherits="InterfaceOptionsCheckButtonTemplate" virtual="true" checked="false" -->
                             <CheckButton name="EventFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" x="0" y="0" />
+                                    <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </CheckButton>
                             <CheckButton name="EventFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
@@ -177,7 +120,7 @@
 
                         <Scripts>
                             <OnMouseWheel>
-                        EventFilterScrollFrame_OnMouseWheel(self, delta)
+                                EventFilterScrollFrame_OnMouseWheel(self, delta)
                             </OnMouseWheel>
                         </Scripts>
                     </Frame>
@@ -185,8 +128,8 @@
                     <Slider name="EventFilterScrollBar" parentKey="ScrollBar" orientation="VERTICAL" enableMouse="true" enableMouseWheel="true">
                         <Size x="25" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventFilterScrollFrame" x="0" y="0" />
-                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventFilterScrollFrame" x="0" y="0" />
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventFilterScrollFrame" x="-20" y="-35" />
+                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventFilterScrollFrame" x="-20" y="20" />
                         </Anchors>
                         <Frames>
 

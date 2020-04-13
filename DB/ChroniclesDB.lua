@@ -31,7 +31,7 @@ function Chronicles.DB:HasEvents(yearStart, yearEnd)
         for groupName in pairs(self.Events) do
             local eventsGroup = self.Events[groupName]
 
-            if self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data) then
+            if (eventsGroup.isActive and self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data)) then
                 return true
             end
         end
@@ -135,13 +135,12 @@ function Chronicles.DB:GetEventGroupNames()
             isActive = group.isActive
         }
         table.insert(dataGroups, groupProjection)
-        DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
+        --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
     end
     return dataGroups
 end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Events[groupName] ~= nil then
         self.Events[groupName].isActive = status
     else
@@ -149,6 +148,13 @@ function Chronicles.DB:SetGroupStatus(groupName, status)
     end
 end
 
+function Chronicles.DB:GetGroupStatus(groupName)
+    if self.Events[groupName] ~= nil then
+        return self.Events[groupName].isActive
+    else
+        error(groupName .. " does not exist as a data group.")
+    end
+end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
