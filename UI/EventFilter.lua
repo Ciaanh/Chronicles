@@ -196,8 +196,9 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
                 Chronicles.DB:SetGroupStatus(group.name, not group.isActive)
 
                 Chronicles.UI.EventList:Refresh()
+                DEFAULT_CHAT_FRAME:AddMessage("-- blob ")
                 Chronicles.UI.Timeline:Refresh()
-                Chronicles.UI.Timeline:Refresh()
+                DEFAULT_CHAT_FRAME:AddMessage("-- blob 2")
             end
         )
         checkBox:Show()

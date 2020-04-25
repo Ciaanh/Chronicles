@@ -42,8 +42,7 @@ function Chronicles:OnInitialize()
     self:RegisterChatCommand("chronicles", function() self.UI:DisplayWindow() end)
 
     Chronicles.DB:InitDB()
-    Chronicles.UI.Timeline:LoadSetDates()
-    Chronicles.UI.Timeline:DisplayTimeline(1)
+    Chronicles.UI.Timeline:Init()
     Chronicles.UI.EventList:DisplayEventList(1)
 end
 
