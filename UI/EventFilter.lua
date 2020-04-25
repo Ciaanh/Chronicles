@@ -186,19 +186,20 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
         local label = _G[checkBox:GetName() .. "Text"]
         label:SetText(group.name)
 
-        checkBox:SetChecked(group.isActive);
+        checkBox:SetChecked(group.isActive)
 
         checkBox.group = group
         checkBox:SetScript(
             "OnClick",
             function(selfCheckBox)
-                local checked = selfCheckBox:GetChecked()
+                --local checked = selfCheckBox:GetChecked()
+                group.isActive = not group.isActive
+
                 Chronicles.DB:SetGroupStatus(group.name, not group.isActive)
 
                 Chronicles.UI.EventList:Refresh()
-                DEFAULT_CHAT_FRAME:AddMessage("-- blob ")
                 Chronicles.UI.Timeline:Refresh()
-                DEFAULT_CHAT_FRAME:AddMessage("-- blob 2")
+                Chronicles.UI.EventDescription:Refresh()
             end
         )
         checkBox:Show()

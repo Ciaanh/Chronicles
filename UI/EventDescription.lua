@@ -7,7 +7,7 @@ Chronicles.UI.EventDescription = {}
 Chronicles.UI.EventDescription.CurrentPage = nil
 Chronicles.UI.EventDescription.CurrentEvent = nil
 
-function Chronicles.UI.Timeline:Refresh()
+function Chronicles.UI.EventDescription:Refresh()
     if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
         self.CurrentEvent = nil
         self.CurrentPage = nil

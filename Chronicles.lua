@@ -42,8 +42,7 @@ function Chronicles:OnInitialize()
     self:RegisterChatCommand("chronicles", function() self.UI:DisplayWindow() end)
 
     Chronicles.DB:InitDB()
-    Chronicles.UI.Timeline:Init()
-    Chronicles.UI.EventList:DisplayEventList(1)
+    Chronicles.UI:Init()
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)

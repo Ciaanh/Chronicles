@@ -7,10 +7,7 @@ Chronicles.UI.Timeline.MaxStepIndex = 3
 
 Chronicles.UI.Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 5, 1}
 Chronicles.UI.Timeline.CurrentStepValue = nil
-
-Chronicles.UI.Timeline.TimelineSteps = {}
 Chronicles.UI.Timeline.TimeFrames = {}
-
 Chronicles.UI.Timeline.CurrentPage = nil
 Chronicles.UI.Timeline.SelectedYear = nil
 
@@ -19,6 +16,10 @@ Chronicles.UI.Timeline.SelectedYear = nil
 ------------------------------------------------------------------------------------------
 
 function tablelength(T)
+    if (T == nil) then
+        return 0
+    end
+
     local count = 0
     for _ in pairs(T) do
         count = count + 1
@@ -41,21 +42,32 @@ function copyTable(tableToCopy)
 end
 
 function Chronicles.UI.Timeline:Init()
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Init timeline ")
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
-    Chronicles.UI.Timeline:DisplayTimeline(1)
+    Chronicles.UI.Timeline:DisplayTimeline(1, true)
 end
 
 function Chronicles.UI.Timeline:Refresh()
-    DEFAULT_CHAT_FRAME:AddMessage("-- Refresh timeline " .. Chronicles.UI.Timeline.CurrentPage)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Refresh timeline " .. Chronicles.UI.Timeline.CurrentPage)
     Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage, true)
 end
 
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
     Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
     local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+
+    if (numberOfCells == 0) then
+        TimelineScrollBar:SetMinMaxValues(1, 1)
+        ChangeCurrentPage(1)
+        TimelinePreviousButton:Disable()
+        TimelineNextButton:Disable()
+        HideAllTimelineBlocks()
+        return
+    end
 
     local pageSize = Chronicles.constants.config.timeline.pageSize
     local maxPageValue = math.ceil(numberOfCells / pageSize)
@@ -87,9 +99,21 @@ end
 
 function GetDisplayableTimeFrames()
     local displayableTimeFrames = {}
+    local stepValue = Chronicles.UI.Timeline.CurrentStepValue
 
-    local dateSteps = copyTable(Chronicles.UI.Timeline.TimelineSteps)
-    local numberOfCells = tablelength(dateSteps)
+    local numberOfCells = GetNumberOfTimelineBlock(stepValue)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
+
+    local dateSteps = {}
+    for i = 1, numberOfCells do
+        local lowerBoundValue = GetLowerBound(i, stepValue)
+        local upperBoundValue = GetUpperBound(i, stepValue)
+
+        dateSteps[i] = {
+            lowerBound = lowerBoundValue,
+            upperBound = upperBoundValue
+        }
+    end
 
     for j = 1, numberOfCells - 1 do
         local block = dateSteps[j]
@@ -127,7 +151,7 @@ function GetDisplayableTimeFrames()
         )
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- displayable timeframes " .. tostring(tablelength(displayableTimeFrames)))
+    --DEFAULT_CHAT_FRAME:AddMessage("-- displayable timeframes " .. tostring(tablelength(displayableTimeFrames)))
 
     if (tablelength(displayableTimeFrames) > 0) then
         local first = displayableTimeFrames[1]
@@ -144,20 +168,6 @@ end
 
 function ChangeCurrentStepValue(stepValue)
     Chronicles.UI.Timeline.CurrentStepValue = stepValue
-
-    local numberOfCells = GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
-
-    Chronicles.UI.Timeline.TimelineSteps = {}
-    for i = 1, numberOfCells do
-        local lowerBoundValue = GetLowerBound(i, stepValue)
-        local upperBoundValue = GetUpperBound(i, stepValue)
-
-        Chronicles.UI.Timeline.TimelineSteps[i] = {
-            lowerBound = lowerBoundValue,
-            upperBound = upperBoundValue
-        }
-    end
 end
 
 function ChangeCurrentPage(currentPageIndex)
@@ -217,12 +227,38 @@ function LoadTimelineDatesToBlock(firstIndex)
     SetDateToBlock(firstIndex + 7, TimelineBlock8, TimelineBlockNoEvent8)
 end
 
+function HideAllTimelineBlocks()
+    TimelineBlock1:Hide()
+    TimelineBlockNoEvent1:Hide()
+    TimelineBlock2:Hide()
+    TimelineBlockNoEvent2:Hide()
+    TimelineBlock3:Hide()
+    TimelineBlockNoEvent3:Hide()
+    TimelineBlock4:Hide()
+    TimelineBlockNoEvent4:Hide()
+    TimelineBlock5:Hide()
+    TimelineBlockNoEvent5:Hide()
+    TimelineBlock6:Hide()
+    TimelineBlockNoEvent6:Hide()
+    TimelineBlock7:Hide()
+    TimelineBlockNoEvent7:Hide()
+    TimelineBlock8:Hide()
+    TimelineBlockNoEvent8:Hide()
+end
+
 function SetDateToBlock(index, frameEvent, frameNoEvent)
     local isUp = true
     if ((index % 2) == 0) then
         isUp = false
     end
     local dateBlock = Chronicles.UI.Timeline.TimeFrames[index]
+
+    if (dateBlock == nil) then
+        frameNoEvent:Hide()
+        frameEvent:Hide()
+
+        return
+    end
 
     --local hasEvents = Chronicles.DB:HasEvents(dateBlock.lowerBound, dateBlock.upperBound)
     if (dateBlock.hasEvents) then

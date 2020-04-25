@@ -5,9 +5,14 @@ Chronicles.UI.EventList = {}
 Chronicles.UI.EventList.Data = nil
 Chronicles.UI.EventList.CurrentPage = nil
 
+function Chronicles.UI.EventList:Init()
+    Chronicles.UI.EventList:DisplayEventList(1)
+end
+
 function Chronicles.UI.EventList:Refresh()
     DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
-    Chronicles.UI.EventList:DisplayEventList(Chronicles.UI.EventList.CurrentPage)
+    Chronicles.UI.EventList.CurrentPage = 1
+    Chronicles.UI.EventList:DisplayEventList(1)
 end
 
 function Chronicles.UI.EventList:FilterEvents(events)

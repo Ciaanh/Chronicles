@@ -113,7 +113,7 @@ end
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:RegisterEventDB(groupName, db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin.")
     else
@@ -123,6 +123,8 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
             isActive = true
         }
     end
+
+    Chronicles.UI:Init()
 end
 
 function Chronicles.DB:GetEventGroupNames()
@@ -141,6 +143,9 @@ function Chronicles.DB:GetEventGroupNames()
 end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
+
+    DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+
     if self.Events[groupName] ~= nil then
         self.Events[groupName].isActive = status
     else
@@ -150,6 +155,8 @@ end
 
 function Chronicles.DB:GetGroupStatus(groupName)
     if self.Events[groupName] ~= nil then
+        DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
+
         return self.Events[groupName].isActive
     else
         error(groupName .. " does not exist as a data group.")
