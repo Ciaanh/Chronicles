@@ -195,7 +195,7 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
                 --local checked = selfCheckBox:GetChecked()
                 group.isActive = not group.isActive
 
-                Chronicles.DB:SetGroupStatus(group.name, not group.isActive)
+                Chronicles.DB:SetGroupStatus(group.name, group.isActive)
 
                 Chronicles.UI.EventList:Refresh()
                 Chronicles.UI.Timeline:Refresh()

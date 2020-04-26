@@ -144,7 +144,7 @@ end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
 
     if self.Events[groupName] ~= nil then
         self.Events[groupName].isActive = status
@@ -155,7 +155,7 @@ end
 
 function Chronicles.DB:GetGroupStatus(groupName)
     if self.Events[groupName] ~= nil then
-        DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
+        --DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
 
         return self.Events[groupName].isActive
     else

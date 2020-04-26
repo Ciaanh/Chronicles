@@ -10,9 +10,9 @@ function Chronicles.UI.EventList:Init()
 end
 
 function Chronicles.UI.EventList:Refresh()
-    DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
     Chronicles.UI.EventList.CurrentPage = 1
-    Chronicles.UI.EventList:DisplayEventList(1)
+    Chronicles.UI.EventList:DisplayEventList(1, true)
 end
 
 function Chronicles.UI.EventList:FilterEvents(events)
@@ -27,15 +27,15 @@ function Chronicles.UI.EventList:FilterEvents(events)
     return foundEvents
 end
 
-function Chronicles.UI.EventList:DisplayEventList(page)
+function Chronicles.UI.EventList:DisplayEventList(page, force)
     local pageSize = Chronicles.constants.config.eventList.pageSize
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
     if (self.Data ~= nil and self.Data.events ~= nil) then
         local eventList = Chronicles.UI.EventList:FilterEvents(self.Data.events)
 
         local numberOfEvents = Chronicles:GetTableLength(eventList)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
+        --DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
         if (numberOfEvents > 0) then
             local maxPageValue = math.ceil(numberOfEvents / pageSize)
@@ -49,7 +49,7 @@ function Chronicles.UI.EventList:DisplayEventList(page)
                 page = 1
             end
 
-            if (self.CurrentPage ~= page) then
+            if (self.CurrentPage ~= page or force) then
                 self:HideAll()
 
                 if (numberOfEvents > pageSize) then
