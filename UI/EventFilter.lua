@@ -14,10 +14,12 @@ function EventFilter_Toggle()
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Toggle EventFilter " .. tostring(Chronicles.UI.EventFilter.Displayed))
 
     if (Chronicles.UI.EventFilter.Displayed) then
+        EventFilter:Hide()
         FilterContent:Hide()
         Chronicles.UI.EventFilter.Displayed = false
     else
         Chronicles.UI.EventFilter:SetEventFilterData()
+        EventFilter:Show()
         FilterContent:Show()
         Chronicles.UI.EventFilter.Displayed = true
     end

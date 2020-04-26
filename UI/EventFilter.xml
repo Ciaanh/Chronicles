@@ -12,6 +12,10 @@
 
 
         <Frames>
+
+
+
+
             <Frame name="FilterContent">
                 <Size x="128" y="200"/>
                 <Anchors>
@@ -179,16 +183,14 @@
                         </ThumbTexture>
                     </Slider>
                 </Frames>
-
-
-
-
                 <Scripts>
                     <OnLoad>
                         FilterContent:Hide()
                     </OnLoad>
                 </Scripts>
             </Frame>
+
+
 
             <Button name="EventFilterToggle" inherits="UIPanelButtonTemplate">
                 <Size x="20" y="20"/>
@@ -207,6 +209,8 @@
                     </OnLeave>
                 </Scripts>
             </Button>
+
+
         </Frames>
     </Frame>
 </Ui>
