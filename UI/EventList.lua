@@ -24,6 +24,13 @@ function Chronicles.UI.EventList:FilterEvents(events)
             table.insert(foundEvents, event)
         end
     end
+
+    table.sort(
+        foundEvents,
+        function(a, b)
+            return a.yearStart < b.yearStart
+        end
+    )
     return foundEvents
 end
 
