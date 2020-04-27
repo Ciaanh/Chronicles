@@ -15,31 +15,7 @@ Chronicles.UI.Timeline.SelectedYear = nil
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function tablelength(T)
-    if (T == nil) then
-        return 0
-    end
 
-    local count = 0
-    for _ in pairs(T) do
-        count = count + 1
-    end
-    return count
-end
-
-function copyTable(tableToCopy)
-    local orig_type = type(tableToCopy)
-    local copy
-    if orig_type == "table" then
-        copy = {}
-        for orig_key, orig_value in pairs(tableToCopy) do
-            copy[orig_key] = orig_value
-        end
-    else -- number, string, boolean, etc
-        copy = tableToCopy
-    end
-    return copy
-end
 
 function Chronicles.UI.Timeline:Init()
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Init timeline ")
@@ -55,45 +31,53 @@ end
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
+    DisplayTimeline(pageIndex, force)
+end
+    
+function DisplayTimeline(pageIndex, force) 
     --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
-    Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
-    local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    if (pageIndex ~= nil) then
+        --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
+        Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
-    if (numberOfCells == 0) then
-        TimelineScrollBar:SetMinMaxValues(1, 1)
-        ChangeCurrentPage(1)
-        TimelinePreviousButton:Disable()
-        TimelineNextButton:Disable()
-        HideAllTimelineBlocks()
-        return
-    end
+        local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
 
-    local pageSize = Chronicles.constants.config.timeline.pageSize
-    local maxPageValue = math.ceil(numberOfCells / pageSize)
-
-    if (pageIndex < 1) then
-        pageIndex = 1
-    end
-    if (pageIndex > maxPageValue) then
-        pageIndex = maxPageValue
-    end
-
-    if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
-        TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
-        ChangeCurrentPage(pageIndex)
-
-        if (numberOfCells <= pageSize) then
+        if (numberOfCells == 0) then
+            TimelineScrollBar:SetMinMaxValues(1, 1)
+            ChangeCurrentPage(1)
             TimelinePreviousButton:Disable()
             TimelineNextButton:Disable()
-        else
-            TimelinePreviousButton:Enable()
-            TimelineNextButton:Enable()
+            HideAllTimelineBlocks()
+            return
         end
 
-        TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
+        local pageSize = Chronicles.constants.config.timeline.pageSize
+        local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-        BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
+        if (pageIndex < 1) then
+            pageIndex = 1
+        end
+        if (pageIndex > maxPageValue) then
+            pageIndex = maxPageValue
+        end
+
+        if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
+            TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
+            ChangeCurrentPage(pageIndex)
+
+            if (numberOfCells <= pageSize) then
+                TimelinePreviousButton:Disable()
+                TimelineNextButton:Disable()
+            else
+                TimelinePreviousButton:Enable()
+                TimelineNextButton:Enable()
+            end
+
+            TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
+
+            BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
+        end
     end
 end
 

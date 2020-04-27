@@ -1,216 +1,319 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
+    <Font name="FilterTitleFont" inherits="SystemFont_Med3" virtual="true">
+        <Color r="0.50" g="0.5" b="0.5"/>
+    </Font>
+
 
     <Frame name="EventFilter" parent="MainFrame">
         <Anchors>
             <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0" />
         </Anchors>
         <Size>
-            <AbsDimension x="128" y="200"/>
+            <AbsDimension x="128" y="440"/>
         </Size>
 
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentTopRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="112" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="3" y="0" relativePoint="TOPRIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.5" right="1.0" top="0" bottom="0.15625"/>
+                </Texture>
+                <Texture name="$parentTopLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="16" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" relativeTo="$parentTopRight" relativePoint="TOPLEFT"/>
+                    </Anchors>
+                    <TexCoords left="0" right="0.5" top="0" bottom="0.15625"/>
+                </Texture>
 
+                <Texture name="$parentMiddleLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="16" y="400"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="$parentTopLeft" relativePoint="BOTTOM"/>
+                    </Anchors>
+                    <TexCoords left="0" right="0.5" top="0.15625" bottom="0.84375"/>
+                </Texture>
+
+                <Texture name="$parentMiddleRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="112" y="400"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentMiddleLeft" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.5" right="1.0" top="0.15625" bottom="0.84375"/>
+                </Texture>
+
+                <Texture name="$parentBottomLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="16" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="$parentMiddleLeft" relativePoint="BOTTOM"/>
+                    </Anchors>
+                    <TexCoords left="0" right="0.5" top="0.84375" bottom="1.0"/>
+                </Texture>
+                <Texture name="$parentBottomRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
+                    <Size>
+                        <AbsDimension x="112" y="20"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativeTo="$parentBottomLeft" relativePoint="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <TexCoords left="0.5" right="1.0" top="0.84375" bottom="1.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
         <Frames>
 
 
 
 
-            <Frame name="FilterContent">
-                <Size x="128" y="200"/>
+
+
+
+
+
+            <Frame name="EventTypeFilter">
+                <Size x="110" y="200"/>
                 <Anchors>
-                    <Anchor point="CENTER" />
+                    <Anchor point="TOP" x="5" y="-15" />
                 </Anchors>
                 <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture name="$parentTopRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="112" y="20"/>
-                            </Size>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Name" inherits="FilterTitleFont" justifyH="LEFT" text="Event Types">
+                            <Size y="20"/>
                             <Anchors>
-                                <Anchor point="TOPRIGHT" x="3" y="0" relativePoint="TOPRIGHT"/>
+                                <Anchor point="TOP" x="0" y="0"/>
                             </Anchors>
-                            <TexCoords left="0.5" right="1.0" top="0" bottom="0.15625"/>
-                        </Texture>
-                        <Texture name="$parentTopLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="16" y="20"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="TOPRIGHT" relativeTo="$parentTopRight" relativePoint="TOPLEFT"/>
-                            </Anchors>
-                            <TexCoords left="0" right="0.5" top="0" bottom="0.15625"/>
-                        </Texture>
-
-                        <Texture name="$parentMiddleLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="16" y="160"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="TOP" relativeTo="$parentTopLeft" relativePoint="BOTTOM"/>
-                            </Anchors>
-                            <TexCoords left="0" right="0.5" top="0.15625" bottom="0.84375"/>
-                        </Texture>
-
-                        <Texture name="$parentMiddleRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="112" y="160"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="LEFT" relativeTo="$parentMiddleLeft" relativePoint="RIGHT"/>
-                            </Anchors>
-                            <TexCoords left="0.5" right="1.0" top="0.15625" bottom="0.84375"/>
-                        </Texture>
-
-                        <Texture name="$parentBottomLeft" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="16" y="20"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="TOP" relativeTo="$parentMiddleLeft" relativePoint="BOTTOM"/>
-                            </Anchors>
-                            <TexCoords left="0" right="0.5" top="0.84375" bottom="1.0"/>
-                        </Texture>
-                        <Texture name="$parentBottomRight" file="Interface\AddOns\Chronicles\Images\LateralTab">
-                            <Size>
-                                <AbsDimension x="112" y="20"/>
-                            </Size>
-                            <Anchors>
-                                <Anchor point="BOTTOMLEFT" relativeTo="$parentBottomLeft" relativePoint="BOTTOMRIGHT"/>
-                            </Anchors>
-                            <TexCoords left="0.5" right="1.0" top="0.84375" bottom="1.0"/>
-                        </Texture>
+                        </FontString>
                     </Layer>
                 </Layers>
                 <Frames>
-                    <Frame name="EventFilterScrollFrame" parentKey="ScrollFrame">
+                    <CheckButton name="EventTypeBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOPLEFT" x="0" y="0"/>
-                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                            <Anchor point="TOPLEFT" y="-30" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.era));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.era))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.era,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                    <CheckButton name="EventTypeBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock1"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.war));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.war))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.war,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                    <CheckButton name="EventTypeBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock2" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.battle));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.battle))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.battle,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                    <CheckButton name="EventTypeBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock3" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.death));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.death))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.death,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                    <CheckButton name="EventTypeBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock4" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.birth));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.birth))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.birth,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                    <CheckButton name="EventTypeBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock5" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType.other));
+                                self:SetChecked(get_EventType_Checked(get_constants().eventType.other))
+                            </OnLoad>
+                            <OnClick>
+                                change_EventType(get_constants().eventType.other,self:GetChecked())
+                            </OnClick>
+                        </Scripts>
+                    </CheckButton>
+                </Frames>
+            </Frame>
+
+
+
+
+
+
+            <Frame name="LibrariesFilter">
+                <Size x="110" y="200"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" x="5" y="15" />
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString name="LibrariesFilterTitle" parentKey="Name" inherits="FilterTitleFont" justifyH="LEFT" text="Libraries">
+                            <Size y="20"/>
+                            <Anchors>
+                                <Anchor point="TOP"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+
+                    <Frame name="LibrariesFilterScrollFrame" parentKey="ScrollFrame">
+                        <Size x="85" y="180"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" y="-20"/>
                         </Anchors>
 
                         <Frames>
-                            <CheckButton name="EventFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" x="15" y="-15" />
+                                    <Anchor point="TOPLEFT" />
                                 </Anchors>
                             </CheckButton>
-                            <CheckButton name="EventFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock1" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1"/>
                                 </Anchors>
                             </CheckButton>
-                            <CheckButton name="EventFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock2" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock2" />
                                 </Anchors>
                             </CheckButton>
-                            <CheckButton name="EventFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock3" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock3" />
                                 </Anchors>
                             </CheckButton>
-                            <CheckButton name="EventFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock4" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock4" />
                                 </Anchors>
                             </CheckButton>
-                            <CheckButton name="EventFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton name="LibrariesFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterBlock5" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock5" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock7" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
                                 </Anchors>
                             </CheckButton>
                         </Frames>
 
                         <Scripts>
                             <OnMouseWheel>
-                                EventFilterScrollFrame_OnMouseWheel(self, delta)
+                                LibrariesFilterScrollFrame_OnMouseWheel(self, delta)
                             </OnMouseWheel>
                         </Scripts>
                     </Frame>
 
-                    <Slider name="EventFilterScrollBar" parentKey="ScrollBar" orientation="VERTICAL" enableMouse="true" enableMouseWheel="true">
-                        <Size x="25" />
+                    <Slider name="LibrariesFilterScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                        <Size x="25" y="147" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventFilterScrollFrame" x="-20" y="-35" />
-                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventFilterScrollFrame" x="-20" y="20" />
+                            <Anchor point="TOPRIGHT" y="-37" />
                         </Anchors>
-                        <Frames>
-
-                            <Button name="EventFilterPreviousButton" parentKey="PreviousButton">
-                                <Size x="25" y="30"/>
-                                <Anchors>
-                                    <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="EventFilterScrollBar" y="-3" />
-                                </Anchors>
-                                <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
-                                <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
-                                <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
-                                <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
-                                <Scripts>
-                                    <OnClick function="EventFilterPreviousButton_OnClick"/>
-                                </Scripts>
-                            </Button>
-
-                            <Button name="EventFilterNextButton" parentKey="NextButton">
-                                <Size x="25" y="30"/>
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventFilterScrollBar" y="18" />
-                                </Anchors>
-                                <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
-                                <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
-                                <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
-                                <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight" alphaMode="ADD"/>
-                                <Scripts>
-                                    <OnClick function="EventFilterNextButton_OnClick"/>
-                                </Scripts>
-                            </Button>
-
-                        </Frames>
                         <Scripts>
                             <OnLoad>
-                        self:SetBackdrop({
-                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                            tile = true,
-                            tileSize = 16,
-                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
-                        });
-                        self:SetBackdropColor(0.9, 0.75, 0.49, 1);
+                                self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+
+                                self.ScrollUpButton:SetScript(
+                                    "OnClick",
+                                    function(source) LibrariesFilterPreviousButton_OnClick(source) end
+                                );
+
+                                self.ScrollDownButton:SetScript(
+                                    "OnClick",
+                                    function(source) LibrariesFilterNextButton_OnClick(source) end
+                                );
+
+                                self.scrollStep = 1;
                             </OnLoad>
+                            <OnValueChanged>
+                                DisplayLibrariesFilter(adjust_value(value, self.scrollStep));
+                            </OnValueChanged>
                         </Scripts>
-                        <ThumbTexture name="EventFilterThumbTexture" parentKey="ThumbTexture" file="Interface\Buttons\UI-ScrollBar-Knob">
-                            <Size x="18" y="24"/>
-                            <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
-                        </ThumbTexture>
                     </Slider>
                 </Frames>
-                <Scripts>
-                    <OnLoad>
-                        FilterContent:Hide()
-                    </OnLoad>
-                </Scripts>
             </Frame>
-
-
-
-            <Button name="EventFilterToggle" inherits="UIPanelButtonTemplate">
-                <Size x="20" y="20"/>
-                <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" x="12" y="80"/>
-                </Anchors>
-                <Scripts>
-                    <OnLoad function="EventFilter_InitToggle" />
-                    <OnClick function="EventFilter_Toggle" />
-                    <OnEnter>
-                        GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
-                        GameTooltip:SetText("Toggle event filters", nil, nil, nil, nil, true);
-                    </OnEnter>
-                    <OnLeave>
-				        GameTooltip:Hide();
-                    </OnLeave>
-                </Scripts>
-            </Button>
-
-
         </Frames>
+        <Scripts>
+            <OnLoad>
+                EventFilter:Hide()
+            </OnLoad>
+        </Scripts>
     </Frame>
+
+
+
+    <Button name="EventFilterToggle" inherits="UIPanelButtonTemplate" parent="MainFrame">
+        <Size x="20" y="40"/>
+        <Anchors>
+            <Anchor point="LEFT" x="12" />
+        </Anchors>
+        <Scripts>
+            <OnLoad function="EventFilter_InitToggle" />
+            <OnClick function="EventFilter_Toggle" />
+            <OnEnter>
+                GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
+                GameTooltip:SetText("Toggle event filters", nil, nil, nil, nil, true);
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide();
+            </OnLeave>
+        </Scripts>
+    </Button>
 </Ui>

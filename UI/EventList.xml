@@ -184,7 +184,11 @@
                             insets = { left = 6, right = 6, top = 0, bottom = 17 },
                         });
                         self:SetBackdropColor(0.9, 0.75, 0.49, 1);
+                        self.scrollStep = 1;
                     </OnLoad>
+                    <OnValueChanged>
+                        DisplayEventList(adjust_value(value, self.scrollStep));
+                    </OnValueChanged>
                 </Scripts>
                 <ThumbTexture name="EventListThumbTexture" parentKey="ThumbTexture" file="Interface\Buttons\UI-ScrollBar-Knob">
                     <Size x="18" y="24"/>

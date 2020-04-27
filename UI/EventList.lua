@@ -35,81 +35,87 @@ function Chronicles.UI.EventList:FilterEvents(events)
 end
 
 function Chronicles.UI.EventList:DisplayEventList(page, force)
-    local pageSize = Chronicles.constants.config.eventList.pageSize
-    --DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
+    DisplayEventList(page, force)
+end
 
-    if (self.Data ~= nil and self.Data.events ~= nil) then
-        local eventList = Chronicles.UI.EventList:FilterEvents(self.Data.events)
+function DisplayEventList(page, force)
+    if (page ~= nil) then
+        local pageSize = Chronicles.constants.config.eventList.pageSize
+        --DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
-        local numberOfEvents = Chronicles:GetTableLength(eventList)
-        --DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
+        if (Chronicles.UI.EventList.Data ~= nil and Chronicles.UI.EventList.Data.events ~= nil) then
+            local eventList = Chronicles.UI.EventList:FilterEvents(Chronicles.UI.EventList.Data.events)
 
-        if (numberOfEvents > 0) then
-            local maxPageValue = math.ceil(numberOfEvents / pageSize)
-            EventListScrollBar:SetMinMaxValues(1, maxPageValue)
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
+            local numberOfEvents = tablelength(eventList)
+            --DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
-            if (page > maxPageValue) then
-                page = maxPageValue
-            end
-            if (page < 1) then
-                page = 1
-            end
+            if (numberOfEvents > 0) then
+                local maxPageValue = math.ceil(numberOfEvents / pageSize)
+                EventListScrollBar:SetMinMaxValues(1, maxPageValue)
+                -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
 
-            if (self.CurrentPage ~= page or force) then
-                self:HideAll()
-
-                if (numberOfEvents > pageSize) then
-                    EventListPreviousButton:Enable()
-                    EventListNextButton:Enable()
+                if (page > maxPageValue) then
+                    page = maxPageValue
+                end
+                if (page < 1) then
+                    page = 1
                 end
 
-                local firstIndex = 1 + ((page - 1) * pageSize)
-                local lastIndex = firstIndex + 5
+                if (Chronicles.UI.EventList.CurrentPage ~= page or force) then
+                    Chronicles.UI.EventList:HideAll()
 
-                if (firstIndex <= 1) then
-                    firstIndex = 1
-                    EventListPreviousButton:Disable()
-                    self.CurrentPage = 1
+                    if (numberOfEvents > pageSize) then
+                        EventListPreviousButton:Enable()
+                        EventListNextButton:Enable()
+                    end
+
+                    local firstIndex = 1 + ((page - 1) * pageSize)
+                    local lastIndex = firstIndex + 5
+
+                    if (firstIndex <= 1) then
+                        firstIndex = 1
+                        EventListPreviousButton:Disable()
+                        Chronicles.UI.EventList.CurrentPage = 1
+                    end
+
+                    if ((firstIndex + 5) >= numberOfEvents) then
+                        lastIndex = numberOfEvents
+                        EventListNextButton:Disable()
+                    end
+
+                    Chronicles.UI.EventList.CurrentPage = page
+                    EventListScrollBar:SetValue(Chronicles.UI.EventList.CurrentPage)
+
+                    if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex], EventListBlock1)
+                    end
+
+                    if (((firstIndex + 1) > 0) and ((firstIndex + 1) <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex + 1], EventListBlock2)
+                    end
+
+                    if (((firstIndex + 2) > 0) and ((firstIndex + 2) <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex + 2], EventListBlock3)
+                    end
+
+                    if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex + 3], EventListBlock4)
+                    end
+
+                    if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex + 4], EventListBlock5)
+                    end
+
+                    if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
+                        Chronicles.UI.EventList:SetTextToFrame(eventList[firstIndex + 5], EventListBlock6)
+                    end
                 end
-
-                if ((firstIndex + 5) >= numberOfEvents) then
-                    lastIndex = numberOfEvents
-                    EventListNextButton:Disable()
-                end
-
-                self.CurrentPage = page
-                EventListScrollBar:SetValue(self.CurrentPage)
-
-                if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex], EventListBlock1)
-                end
-
-                if (((firstIndex + 1) > 0) and ((firstIndex + 1) <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex + 1], EventListBlock2)
-                end
-
-                if (((firstIndex + 2) > 0) and ((firstIndex + 2) <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex + 2], EventListBlock3)
-                end
-
-                if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex + 3], EventListBlock4)
-                end
-
-                if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex + 4], EventListBlock5)
-                end
-
-                if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
-                    self:SetTextToFrame(eventList[firstIndex + 5], EventListBlock6)
-                end
+            else
+                Chronicles.UI.EventList:HideAll()
             end
         else
-            self:HideAll()
+            Chronicles.UI.EventList:HideAll()
         end
-    else
-        self:HideAll()
     end
 end
 
@@ -165,7 +171,7 @@ function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventL
         self:WipeAll()
     else
         -- DEFAULT_CHAT_FRAME:AddMessage("-- SetEventListData numberOfEvents " .. numberOfEvents)
-        local numberOfEvents = Chronicles:GetTableLength(eventList)
+        local numberOfEvents = tablelength(eventList)
 
         if (numberOfEvents == 0) then
             self:HideAll()

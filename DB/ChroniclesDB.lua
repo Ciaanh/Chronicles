@@ -139,6 +139,15 @@ function Chronicles.DB:GetEventGroupNames()
         table.insert(dataGroups, groupProjection)
         --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
     end
+
+
+    
+    table.insert(dataGroups, { name = "dummy 1", isActive = false })
+    table.insert(dataGroups, { name = "dummy 2", isActive = false })
+    table.insert(dataGroups, { name = "dummy 3", isActive = false })
+    table.insert(dataGroups, { name = "dummy 4", isActive = false })
+    table.insert(dataGroups, { name = "dummy 56789101112131415", isActive = false })
+
     return dataGroups
 end
 
