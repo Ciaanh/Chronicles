@@ -65,8 +65,8 @@ function DisplayEventList(page, force)
                     Chronicles.UI.EventList:HideAll()
 
                     if (numberOfEvents > pageSize) then
-                        EventListPreviousButton:Enable()
-                        EventListNextButton:Enable()
+                        EventListScrollBar.ScrollUpButton:Enable()
+                        EventListScrollBar.ScrollDownButton:Enable()
                     end
 
                     local firstIndex = 1 + ((page - 1) * pageSize)
@@ -74,13 +74,13 @@ function DisplayEventList(page, force)
 
                     if (firstIndex <= 1) then
                         firstIndex = 1
-                        EventListPreviousButton:Disable()
+                        EventListScrollBar.ScrollUpButton:Disable()
                         Chronicles.UI.EventList.CurrentPage = 1
                     end
 
                     if ((firstIndex + 5) >= numberOfEvents) then
                         lastIndex = numberOfEvents
-                        EventListNextButton:Disable()
+                        EventListScrollBar.ScrollDownButton:Disable()
                     end
 
                     Chronicles.UI.EventList.CurrentPage = page
@@ -127,8 +127,8 @@ function Chronicles.UI.EventList:HideAll()
     EventListBlock5:Hide()
     EventListBlock6:Hide()
 
-    EventListPreviousButton:Disable()
-    EventListNextButton:Disable()
+    EventListScrollBar.ScrollUpButton:Disable()
+    EventListScrollBar.ScrollDownButton:Disable()
 end
 
 function Chronicles.UI.EventList:WipeAll()

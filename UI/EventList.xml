@@ -138,65 +138,32 @@
                 </Scripts>
             </Frame>
 
-            <Slider name="EventListScrollBar" parentKey="ScrollBar" orientation="VERTICAL" enableMouse="true" enableMouseWheel="true">
-                <Size x="25" />
+            <Slider name="EventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                <Size x="25" y="312" />
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="EventListScrollFrame" x="-32" y="-25" />
-                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="EventListScrollFrame" x="-32" y="25" />
+                    <Anchor point="TOPRIGHT" x="-12" y="-32" />
                 </Anchors>
-                <Frames>
-
-                    <Button name="EventListPreviousButton" parentKey="PreviousButton">
-                        <Size x="25" y="30"/>
-                        <Anchors>
-                            <Anchor point="BOTTOM" relativePoint="TOP" relativeTo="EventListScrollBar" y="-3" />
-                        </Anchors>
-                        <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
-                        <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
-                        <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
-                        <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
-                        <Scripts>
-                            <OnClick function="EventListPreviousButton_OnClick"/>
-                        </Scripts>
-                    </Button>
-
-                    <Button name="EventListNextButton" parentKey="NextButton">
-                        <Size x="25" y="30"/>
-                        <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventListScrollBar" y="18" />
-                        </Anchors>
-                        <NormalTexture parentKey="Normal" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
-                        <PushedTexture parentKey="Pushed" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
-                        <DisabledTexture parentKey="Disabled" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
-                        <HighlightTexture parentKey="Highlight" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight" alphaMode="ADD"/>
-                        <Scripts>
-                            <OnClick function="EventListNextButton_OnClick"/>
-                        </Scripts>
-                    </Button>
-
-                </Frames>
                 <Scripts>
                     <OnLoad>
-                        self:SetBackdrop({
-                            bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-                            tile = true,
-                            tileSize = 16,
-                            insets = { left = 6, right = 6, top = 0, bottom = 17 },
-                        });
-                        self:SetBackdropColor(0.9, 0.75, 0.49, 1);
+                        self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+
+                        self.ScrollUpButton:SetScript(
+                            "OnClick",
+                            function(source) EventListPreviousButton_OnClick(source) end
+                        );
+
+                        self.ScrollDownButton:SetScript(
+                            "OnClick",
+                            function(source) EventListNextButton_OnClick(source) end
+                        );
+
                         self.scrollStep = 1;
                     </OnLoad>
                     <OnValueChanged>
                         DisplayEventList(adjust_value(value, self.scrollStep));
                     </OnValueChanged>
                 </Scripts>
-                <ThumbTexture name="EventListThumbTexture" parentKey="ThumbTexture" file="Interface\Buttons\UI-ScrollBar-Knob">
-                    <Size x="18" y="24"/>
-                    <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
-                </ThumbTexture>
             </Slider>
         </Frames>
-
-
     </Frame>
 </Ui>
