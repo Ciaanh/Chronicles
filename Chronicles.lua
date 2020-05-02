@@ -16,6 +16,8 @@ Chronicles.description = Locale["Description"]
 
 Chronicles.constants = private.constants
 
+-- https://www.wowace.com/projects/ace3/pages/ace-db-3-0-tutorial
+
 function Chronicles:OnInitialize()
     self.db =
         LibStub("AceDB-3.0"):New(
