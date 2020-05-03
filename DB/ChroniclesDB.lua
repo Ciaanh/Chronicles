@@ -7,8 +7,7 @@ Chronicles.DB = {}
 Chronicles.DB.Events = {}
 Chronicles.DB.RP = {}
 
-function Chronicles.DB:InitDB()
-    --self:LoadRolePlayProfile()
+function Chronicles.DB:Init()
     self:RegisterEventDB("Global", GlobalEventsDB)
 end
 -----------------------------------------------------------------------------------------
@@ -29,7 +28,10 @@ end
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
     if (yearStart <= yearEnd) then
         for groupName in pairs(self.Events) do
-            if self:HasEventsInDB(yearStart, yearEnd, self.Events[groupName]) then
+            local eventsGroup = self.Events[groupName]
+
+            local isActive = Chronicles.DB:GetGroupStatus(groupName)
+            if (isActive and self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data)) then
                 return true
             end
         end
@@ -39,7 +41,10 @@ end
 
 function Chronicles.DB:HasEventsInDB(yearStart, yearEnd, db)
     for eventIndex in pairs(db) do
-        if self:IsInRange(db[eventIndex], yearStart, yearEnd) then
+        local event = db[eventIndex]
+        local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+        if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
             return true
         end
     end
@@ -54,7 +59,9 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
 
     if (yearStart <= yearEnd) then
         for groupName in pairs(self.Events) do
-            local pluginEvents = self:SearchEventsInDB(yearStart, yearEnd, self.Events[groupName])
+            local eventsGroup = self.Events[groupName]
+
+            local pluginEvents = self:SearchEventsInDB(yearStart, yearEnd, eventsGroup.data)
 
             for eventIndex in pairs(pluginEvents) do
                 local event = pluginEvents[eventIndex]
@@ -70,7 +77,10 @@ end
 function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
     local foundEvents = {}
     for eventIndex in pairs(db) do
-        if self:IsInRange(db[eventIndex], yearStart, yearEnd) then
+        local event = db[eventIndex]
+        local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+        if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
             table.insert(foundEvents, db[eventIndex])
         end
     end
@@ -109,12 +119,78 @@ end
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:RegisterEventDB(groupName, db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin.")
     else
-        self.Events[groupName] = db
+        local isActive = Chronicles.storage.global.EventDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.EventDB[groupName] = isActive
+        end
+
+        self.Events[groupName] = {
+            data = db,
+            name = groupName
+        }
     end
+
+    Chronicles.UI:Init()
+end
+
+function Chronicles.DB:GetEventGroupNames()
+    local dataGroups = {}
+    for groupName in pairs(self.Events) do
+        local group = self.Events[groupName]
+
+        local groupProjection = {
+            name = group.name,
+            isActive = Chronicles.storage.global.EventDB[groupName]
+        }
+        table.insert(dataGroups, groupProjection)
+        --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
+    end
+
+    return dataGroups
+end
+
+function Chronicles.DB:SetGroupStatus(groupName, status)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+
+    if self.Events[groupName] ~= nil then
+        --self.Events[groupName].isActive = status
+        Chronicles.storage.global.EventDB[groupName] = status
+    else
+        error(groupName .. " does not exist as a data group.")
+    end
+end
+
+function Chronicles.DB:GetGroupStatus(groupName)
+    if self.Events[groupName] ~= nil then
+        --DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
+        local isActive = Chronicles.storage.global.EventDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.EventDB[groupName] = isActive
+        end
+        return isActive
+    else
+        error(groupName .. " does not exist as a data group.")
+    end
+end
+
+function Chronicles.DB:SetEventTypeStatus(eventType, status)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+    Chronicles.storage.global.EventTypes[eventType] = status
+end
+
+function Chronicles.DB:GetEventTypeStatus(eventType)
+    local isActive = Chronicles.storage.global.EventTypes[eventType]
+    if (isActive == nil) then
+        isActive = true
+        Chronicles.storage.global.EventTypes[eventType] = isActive
+    end
+    return isActive
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -125,7 +201,7 @@ end
 -----------------------------------------------------------------------------------------
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.DB:LoadRolePlayProfile()    
+function Chronicles.DB:LoadRolePlayProfile()
     if (GlobalEventsDB[0] ~= nil) then
         return
     end
@@ -153,7 +229,7 @@ end
 
 function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     -- compare date with current year
-    local birth = Chronicles.constants.timeline.yearEnd - age
+    local birth = Chronicles.constants.config.timeline.yearEnd - age
     local event = {
         id = 0,
         label = "Birth of " .. name,

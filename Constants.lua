@@ -30,12 +30,21 @@ constants.eventType = {
 	other = "Other"
 }
 
-constants.timeline = {
-	yearStart = -200000,
-	yearEnd = 33,
-	pageSize = 8
+constants.timelines = {
+	main = 1,
+	past_dreanor = 2
 }
 
-constants.eventList = {
-	pageSize = 6
+constants.config = {
+	timeline = {
+		yearStart = -200000,
+		yearEnd = 33,
+		pageSize = 8
+	},
+	eventList = {
+		pageSize = 6
+	},
+	eventFilter = {
+		pageSize = 7
+	}
 }

@@ -8,6 +8,11 @@ Chronicles.UI = {}
 -----------------------------------------------------------------------------------------
 -- UI Fonctions -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
+function Chronicles.UI:Init()
+    Chronicles.UI.Timeline:Init()
+    Chronicles.UI.EventList:Init()
+end
+
 function Chronicles.UI:DisplayWindow()
     Chronicles.DB:LoadRolePlayProfile()
     MainFrame:Show()

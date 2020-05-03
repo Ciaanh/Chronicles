@@ -180,24 +180,21 @@
                 <Anchors>
                     <Anchor point="CENTER" />
                 </Anchors>
-                <Frames>
-                    <Frame name="Timeline">
-                        <Size x="680" y="20"/>
-                        <Anchors>
-                            <Anchor point="CENTER" />
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND">
-                                <Texture file="Interface\AddOns\Chronicles\Images\Timeline" horizTile="true" vertTile="true">
-                                    <Size x="680" y="16"/>
-                                    <Anchors>
-                                        <Anchor point="CENTER" y="5" />
-                                    </Anchors>
-                                </Texture>
-                            </Layer>
-                        </Layers>
-                    </Frame>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture file="Interface\AddOns\Chronicles\Images\Timeline">
+                            <Size>
+                                <AbsDimension x="704" y="20"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="CENTER" />
+                            </Anchors>
+                            <TexCoords left="0.00000000" right="1.00000000" top="0.00000000" bottom="1.00000000"/>
+                        </Texture>
+                    </Layer>
+                </Layers>
 
+                <Frames>
                     <Frame name="TimelineBlock1" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="LEFT"/>
@@ -349,6 +346,10 @@
                         </Scripts>
                     </Button>
                 </Frames>
+                <ThumbTexture name="TimelineThumbTexture" parentKey="ThumbTexture" file="Interface\Minimap\MinimapArrow">
+                    <Size x="20" y="20"/>
+                    <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
+                </ThumbTexture>
                 <Scripts>
                     <OnLoad>
                         self:SetBackdrop({
@@ -358,12 +359,12 @@
                             insets = { left = 6, right = 6, top = 0, bottom = 17 },
                         });
                         self:SetBackdropColor(0.8, 0.65, 0.39, 1);
+                        self.scrollStep = 1;
                     </OnLoad>
-                </Scripts>
-                <ThumbTexture name="TimelineThumbTexture" parentKey="ThumbTexture" file="Interface\Minimap\MinimapArrow">
-                    <Size x="20" y="20"/>
-                    <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
-                </ThumbTexture>
+                    <OnValueChanged>
+                        DisplayTimeline(adjust_value(value, self.scrollStep));
+                    </OnValueChanged>
+                </Scripts>                
             </Slider>
 
             <Button parentKey="zoom-in" inherits="UIPanelButtonTemplate" Text="+">

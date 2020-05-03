@@ -12,7 +12,8 @@ GlobalEventsDB = {
 			yearStart=[integer],		-- 
 			yearEnd=[integer],			-- 
 			eventType=[string],			-- type of event defined in constants
-
+			timeline=[integer],    		-- id of the timeline 
+			date=[integer],    			-- number to specify the date to order event in a year (timestamp)
 		},
 	--]]
 	[1] = {
@@ -21,7 +22,8 @@ GlobalEventsDB = {
 		description = {Locale["The War of the Ancients page 1"], Locale["The War of the Ancients page 2"]},
 		yearStart = -10000,
 		yearEnd = -10000,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[2] = {
 		id = 2,
@@ -29,7 +31,8 @@ GlobalEventsDB = {
 		description = {Locale["Quel'Thalas Founded page 1"]},
 		yearStart = -6800,
 		yearEnd = -6800,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[3] = {
 		id = 3,
@@ -37,7 +40,8 @@ GlobalEventsDB = {
 		description = {Locale["The Troll Wars page 1"]},
 		yearStart = -2800,
 		yearEnd = -2800,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[4] = {
 		id = 4,
@@ -45,7 +49,8 @@ GlobalEventsDB = {
 		description = {Locale["War of the Three Hammers page 1"]},
 		yearStart = -230,
 		yearEnd = -230,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[5] = {
 		id = 5,
@@ -53,7 +58,8 @@ GlobalEventsDB = {
 		description = {Locale["The First War page 1"]},
 		yearStart = 0,
 		yearEnd = 0,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[6] = {
 		id = 6,
@@ -61,7 +67,8 @@ GlobalEventsDB = {
 		description = {Locale["The Fall of Stormwind page 1"]},
 		yearStart = 3,
 		yearEnd = 5,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[7] = {
 		id = 7,
@@ -69,7 +76,8 @@ GlobalEventsDB = {
 		description = {Locale["The Second War page 1"]},
 		yearStart = 6,
 		yearEnd = 6,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[8] = {
 		id = 8,
@@ -77,7 +85,8 @@ GlobalEventsDB = {
 		description = {Locale["The Destruction of Draenor page 1"]},
 		yearStart = 8,
 		yearEnd = 8,
-		eventType = Chronicles.constants.eventType.battle
+		eventType = Chronicles.constants.eventType.battle,
+		timeline = 1
 	},
 	[9] = {
 		id = 9,
@@ -85,7 +94,8 @@ GlobalEventsDB = {
 		description = {Locale["The New Horde page 1"]},
 		yearStart = 18,
 		yearEnd = 18,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[10] = {
 		id = 10,
@@ -93,7 +103,8 @@ GlobalEventsDB = {
 		description = {Locale["The Third War page 1"]},
 		yearStart = 20,
 		yearEnd = 20,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[11] = {
 		id = 11,
@@ -101,7 +112,8 @@ GlobalEventsDB = {
 		description = {Locale["The Battle of Mount Hyjal page 1"]},
 		yearStart = 21,
 		yearEnd = 21,
-		eventType = Chronicles.constants.eventType.battle
+		eventType = Chronicles.constants.eventType.battle,
+		timeline = 1
 	},
 	[12] = {
 		id = 12,
@@ -109,7 +121,8 @@ GlobalEventsDB = {
 		description = {Locale["Rise of the Lich King page 1"]},
 		yearStart = 22,
 		yearEnd = 22,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[13] = {
 		id = 13,
@@ -117,7 +130,8 @@ GlobalEventsDB = {
 		description = {Locale["The Gathering Storm page 1"]},
 		yearStart = 25,
 		yearEnd = 25,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[14] = {
 		id = 14,
@@ -125,7 +139,8 @@ GlobalEventsDB = {
 		description = {Locale["The Burning Crusade page 1"]},
 		yearStart = 26,
 		yearEnd = 26,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[15] = {
 		id = 15,
@@ -133,7 +148,8 @@ GlobalEventsDB = {
 		description = {Locale["The Wrath of the Lich King page 1"]},
 		yearStart = 27,
 		yearEnd = 27,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[16] = {
 		id = 16,
@@ -141,7 +157,8 @@ GlobalEventsDB = {
 		description = {Locale["The Cataclysm page 1"]},
 		yearStart = 28,
 		yearEnd = 28,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
 	[17] = {
 		id = 17,
@@ -149,7 +166,8 @@ GlobalEventsDB = {
 		description = {Locale["The Invasion of Pandaria page 1"]},
 		yearStart = 30,
 		yearEnd = 30,
-		eventType = Chronicles.constants.eventType.war
+		eventType = Chronicles.constants.eventType.war,
+		timeline = 1
 	},
 	[18] = {
 		id = 18,
@@ -157,14 +175,17 @@ GlobalEventsDB = {
 		description = {Locale["Assault of the Dark Portal page 1"]},
 		yearStart = 31,
 		yearEnd = 31,
-		eventType = Chronicles.constants.eventType.other
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	},
+
 	[19] = {
 		id = 19,
-		label = Locale["Test event"],
-		description = {Locale["Test event page 1"]},
-		yearStart = -150000,
-		yearEnd = -149001,
-		eventType = Chronicles.constants.eventType.other
+		label = Locale["Example event"],
+		description = {Locale["Example event page 1"], Locale["Example event page 2"]},
+		yearStart = 0,
+		yearEnd = 0,
+		eventType = Chronicles.constants.eventType.other,
+		timeline = 1
 	}
 }

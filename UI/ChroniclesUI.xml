@@ -12,6 +12,9 @@
 	<Script file="EventList.lua" />
 	<Include file="EventList.xml" />
 
+	<Script file="EventFilter.lua" />
+	<Include file="EventFilter.xml" />
+
 	<Script file="EventDescription.lua" />
 	<Include file="EventDescription.xml" />
 </Ui>
