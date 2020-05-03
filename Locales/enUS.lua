@@ -82,6 +82,7 @@ if L then
         "Garrosh Hellscream is taken to the Temple of the White Tiger in Pandaria to stand trial for his crimes. During the trial, Garrosh escapes justice. In the Blasted Lands, the Dark Portal's energies shift from green to red, and new orc invaders emerge from the portal, calling themselves the Iron Horde. Both Alliance and Horde forces launch a defense to combat the new threat, eventually leading an assault on the Dark Portal itself. Azeroth's defenders charge through the portal, determined to dismantle it from the other side and defeat the Iron Horde."
 
         
-    L["Test event"] = "Test event"
-    L["Test event page 1"] = "Test event page 1"
+    L["Example event"] = "Example event name"
+    L["Example event page 1"] = "This is an example event, this page uses only text. On the next page you can see an example of HTML and images."
+    L["Example event page 2"] = '<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'
 end

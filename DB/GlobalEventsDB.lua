@@ -178,12 +178,13 @@ GlobalEventsDB = {
 		eventType = Chronicles.constants.eventType.other,
 		timeline = 1
 	},
+
 	[19] = {
 		id = 19,
-		label = Locale["Test event"],
-		description = {Locale["Test event page 1"]},
-		yearStart = -150000,
-		yearEnd = -149001,
+		label = Locale["Example event"],
+		description = {Locale["Example event page 1"], Locale["Example event page 2"]},
+		yearStart = 0,
+		yearEnd = 0,
 		eventType = Chronicles.constants.eventType.other,
 		timeline = 1
 	}
