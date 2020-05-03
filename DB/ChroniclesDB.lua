@@ -7,8 +7,7 @@ Chronicles.DB = {}
 Chronicles.DB.Events = {}
 Chronicles.DB.RP = {}
 
-function Chronicles.DB:InitDB()
-    --self:LoadRolePlayProfile()
+function Chronicles.DB:Init()
     self:RegisterEventDB("Global", GlobalEventsDB)
 end
 -----------------------------------------------------------------------------------------
@@ -31,7 +30,8 @@ function Chronicles.DB:HasEvents(yearStart, yearEnd)
         for groupName in pairs(self.Events) do
             local eventsGroup = self.Events[groupName]
 
-            if (eventsGroup.isActive and self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data)) then
+            local isActive = Chronicles.DB:GetGroupStatus(groupName)
+            if (isActive and self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data)) then
                 return true
             end
         end
@@ -41,7 +41,10 @@ end
 
 function Chronicles.DB:HasEventsInDB(yearStart, yearEnd, db)
     for eventIndex in pairs(db) do
-        if self:IsInRange(db[eventIndex], yearStart, yearEnd) then
+        local event = db[eventIndex]
+        local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+        if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
             return true
         end
     end
@@ -74,7 +77,10 @@ end
 function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
     local foundEvents = {}
     for eventIndex in pairs(db) do
-        if self:IsInRange(db[eventIndex], yearStart, yearEnd) then
+        local event = db[eventIndex]
+        local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+        if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
             table.insert(foundEvents, db[eventIndex])
         end
     end
@@ -117,10 +123,15 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin.")
     else
+        local isActive = Chronicles.storage.global.EventDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.EventDB[groupName] = isActive
+        end
+
         self.Events[groupName] = {
             data = db,
-            name = groupName,
-            isActive = true
+            name = groupName
         }
     end
 
@@ -134,29 +145,21 @@ function Chronicles.DB:GetEventGroupNames()
 
         local groupProjection = {
             name = group.name,
-            isActive = group.isActive
+            isActive = Chronicles.storage.global.EventDB[groupName]
         }
         table.insert(dataGroups, groupProjection)
         --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
     end
 
-
-    
-    table.insert(dataGroups, { name = "dummy 1", isActive = false })
-    table.insert(dataGroups, { name = "dummy 2", isActive = false })
-    table.insert(dataGroups, { name = "dummy 3", isActive = false })
-    table.insert(dataGroups, { name = "dummy 4", isActive = false })
-    table.insert(dataGroups, { name = "dummy 56789101112131415", isActive = false })
-
     return dataGroups
 end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
-
     --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
 
     if self.Events[groupName] ~= nil then
-        self.Events[groupName].isActive = status
+        --self.Events[groupName].isActive = status
+        Chronicles.storage.global.EventDB[groupName] = status
     else
         error(groupName .. " does not exist as a data group.")
     end
@@ -165,11 +168,29 @@ end
 function Chronicles.DB:GetGroupStatus(groupName)
     if self.Events[groupName] ~= nil then
         --DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
-
-        return self.Events[groupName].isActive
+        local isActive = Chronicles.storage.global.EventDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.EventDB[groupName] = isActive
+        end
+        return isActive
     else
         error(groupName .. " does not exist as a data group.")
     end
+end
+
+function Chronicles.DB:SetEventTypeStatus(eventType, status)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+    Chronicles.storage.global.EventTypes[eventType] = status
+end
+
+function Chronicles.DB:GetEventTypeStatus(eventType)
+    local isActive = Chronicles.storage.global.EventTypes[eventType]
+    if (isActive == nil) then
+        isActive = true
+        Chronicles.storage.global.EventTypes[eventType] = isActive
+    end
+    return isActive
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

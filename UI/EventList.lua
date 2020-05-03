@@ -20,7 +20,10 @@ function Chronicles.UI.EventList:FilterEvents(events)
     for eventIndex in pairs(events) do
         local event = events[eventIndex]
 
-        if Chronicles.DB:GetGroupStatus(event.source) then
+        local eventGroupStatus = Chronicles.DB:GetGroupStatus(event.source)
+        local eventTypeStatus = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+        if eventGroupStatus and eventTypeStatus then
             table.insert(foundEvents, event)
         end
     end

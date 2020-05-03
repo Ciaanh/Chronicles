@@ -15,8 +15,6 @@ Chronicles.UI.Timeline.SelectedYear = nil
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-
-
 function Chronicles.UI.Timeline:Init()
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Init timeline ")
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
@@ -33,8 +31,8 @@ end
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
     DisplayTimeline(pageIndex, force)
 end
-    
-function DisplayTimeline(pageIndex, force) 
+
+function DisplayTimeline(pageIndex, force)
     --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
 
     if (pageIndex ~= nil) then
@@ -244,7 +242,6 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
         return
     end
 
-    --local hasEvents = Chronicles.DB:HasEvents(dateBlock.lowerBound, dateBlock.upperBound)
     if (dateBlock.hasEvents) then
         frameNoEvent:Hide()
         frameEvent:Show()

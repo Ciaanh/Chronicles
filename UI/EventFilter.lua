@@ -7,6 +7,15 @@ Chronicles.UI.EventFilter.Displayed = false
 Chronicles.UI.EventFilter.LibrariesData = nil
 Chronicles.UI.EventFilter.CurrentLibrariesPage = nil
 
+function Chronicles.UI.EventFilter:Init()
+    EventTypeBlockEra:SetChecked(get_EventType_Checked(get_constants().eventType.era))
+    EventTypeBlockWar:SetChecked(get_EventType_Checked(get_constants().eventType.war))
+    EventTypeBlockBattle:SetChecked(get_EventType_Checked(get_constants().eventType.battle))
+    EventTypeBlockDeath:SetChecked(get_EventType_Checked(get_constants().eventType.death))
+    EventTypeBlockBirth:SetChecked(get_EventType_Checked(get_constants().eventType.birth))
+    EventTypeBlockOther:SetChecked(get_EventType_Checked(get_constants().eventType.other))
+end
+
 function EventFilter_InitToggle(self)
     self:SetText("<")
 end
@@ -30,15 +39,18 @@ end
 -- Event type Filter ---------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function change_EventType(eventType, checked)
-    DEFAULT_CHAT_FRAME:AddMessage("-- change_EventType " .. eventType .. " " .. tostring(checked))
+    --DEFAULT_CHAT_FRAME:AddMessage("-- change_EventType " .. eventType .. " " .. tostring(checked))
 
-    -- self:SetChecked(GetCVarBool("movieSubtitle"));
-    -- SetCVar("movieSubtitle", self:GetChecked());
+    Chronicles.DB:SetEventTypeStatus(eventType, checked)
+
+    Chronicles.UI.EventList:Refresh()
+    Chronicles.UI.Timeline:Refresh()
+    Chronicles.UI.EventDescription:Refresh()
 end
 
 function get_EventType_Checked(eventType)
-    DEFAULT_CHAT_FRAME:AddMessage("-- get_EventType_Checked " .. eventType)
-    return true
+    --DEFAULT_CHAT_FRAME:AddMessage("-- get_EventType_Checked " .. eventType)
+    return Chronicles.DB:GetEventTypeStatus(eventType)
 end
 
 ------------------------------------------------------------------------------------------

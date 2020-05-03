@@ -16,17 +16,16 @@ Chronicles.description = Locale["Description"]
 
 Chronicles.constants = private.constants
 
--- https://www.wowace.com/projects/ace3/pages/ace-db-3-0-tutorial
-
 function Chronicles:OnInitialize()
-    self.db =
-        LibStub("AceDB-3.0"):New(
-        "ChroniclesDB",
-        {
-            global = {options = {version = "", minimap = {hide = false}}}
-        },
-        true
-    )
+    --https://www.wowace.com/projects/ace3/pages/ace-db-3-0-tutorial
+    local defaults = {
+        global = {
+            options = {minimap = {hide = false}},
+            EventTypes = {},
+            EventDB = {}
+        }
+    }
+    self.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
 
     self.mapIcon =
         LibStub("LibDataBroker-1.1"):NewDataObject(
@@ -48,7 +47,7 @@ function Chronicles:OnInitialize()
             end
         }
     )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
+    Icon:Register(FOLDER_NAME, self.mapIcon, self.storage.global.options.minimap)
 
     self:RegisterChatCommand(
         "chronicles",
@@ -57,7 +56,8 @@ function Chronicles:OnInitialize()
         end
     )
 
-    Chronicles.DB:InitDB()
+    Chronicles.UI.EventFilter:Init()
+    Chronicles.DB:Init()
     Chronicles.UI:Init()
 end
 

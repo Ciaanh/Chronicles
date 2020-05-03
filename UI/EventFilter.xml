@@ -101,84 +101,78 @@
                     </Layer>
                 </Layers>
                 <Frames>
-                    <CheckButton name="EventTypeBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockEra" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
                             <Anchor point="TOPLEFT" y="-30" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.era));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.era))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.era,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                    <CheckButton name="EventTypeBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockWar" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock1"/>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockEra"/>
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.war));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.war))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.war,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                    <CheckButton name="EventTypeBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockBattle" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock2" />
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockWar" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.battle));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.battle))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.battle,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                    <CheckButton name="EventTypeBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockDeath" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock3" />
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBattle" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.death));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.death))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.death,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                    <CheckButton name="EventTypeBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockBirth" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock4" />
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockDeath" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.birth));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.birth))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.birth,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                    <CheckButton name="EventTypeBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                    <CheckButton name="EventTypeBlockOther" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlock5" />
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBirth" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
                                 self.Text:SetText(get_locale(get_constants().eventType.other));
-                                self:SetChecked(get_EventType_Checked(get_constants().eventType.other))
                             </OnLoad>
                             <OnClick>
                                 change_EventType(get_constants().eventType.other,self:GetChecked())
