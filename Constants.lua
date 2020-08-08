@@ -32,7 +32,9 @@ constants.eventType = {
 
 constants.timelines = {
 	main = 1,
-	past_dreanor = 2
+	dreanor = 2,
+	eot = 3,
+	wota = 4
 }
 
 constants.config = {
