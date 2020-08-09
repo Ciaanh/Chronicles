@@ -31,6 +31,7 @@ constants.eventType = {
 }
 
 constants.timelines = {
+	undefined = 0,
 	main = 1,
 	dreanor = 2,
 	eot = 3,
