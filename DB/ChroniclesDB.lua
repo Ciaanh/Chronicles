@@ -11,7 +11,7 @@ Chronicles.DB.RP = {}
 
 function Chronicles.DB:Init()
     self:RegisterEventDB("Global", GlobalEventsDB)
-    self:RegisterFactionDB("Global", GlobalFactionsDB)
+    self:RegisterFactionDB("Global1", GlobalFactionsDB)
     self:RegisterCharacterDB("Global", GlobalCharactersDB)
 end
 -----------------------------------------------------------------------------------------
@@ -182,25 +182,64 @@ function Chronicles.DB:RegisterFactionDB(groupName, db)
     Chronicles.UI:Init()
 end
 
+function exist_in_table(value, lookUpTable)
+    for key, item in pairs(lookUpTable) do
+        if (item.name == value) then
+            return true
+        end
+    end
+    return false
+end
+
 function Chronicles.DB:GetGroupNames()
     local dataGroups = {}
-    for groupName in pairs(self.Events) do
-        local group = self.Events[groupName]
 
+    for eventGroupName in pairs(self.Events) do
+        local group = self.Events[eventGroupName]
         local groupProjection = {
             name = group.name,
-            isActive = Chronicles.storage.global.EventDB[groupName]
+            isActive = Chronicles.storage.global.EventDB[eventGroupName]
         }
-        table.insert(dataGroups, groupProjection)
-        --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupProjection.name)
+
+        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+
+        if not exist_in_table(eventGroupName, dataGroups) then
+            table.insert(dataGroups, groupProjection)
+        end
+    end
+
+    for factionGroupName in pairs(self.Factions) do
+        local group = self.Factions[factionGroupName]
+        local groupProjection = {
+            name = group.name,
+            isActive = Chronicles.storage.global.FactionDB[factionGroupName]
+        }
+
+        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+
+        if not exist_in_table(factionGroupName, dataGroups) then
+            table.insert(dataGroups, groupProjection)
+        end
+    end
+
+    for characterGroupName in pairs(self.Characters) do
+        local group = self.Characters[characterGroupName]
+        local groupProjection = {
+            name = group.name,
+            isActive = Chronicles.storage.global.CharacterDB[characterGroupName]
+        }
+
+        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+
+        if not exist_in_table(characterGroupName, dataGroups) then
+            table.insert(dataGroups, groupProjection)
+        end
     end
 
     return dataGroups
 end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
-
     if self.Events[groupName] ~= nil then
         Chronicles.storage.global.EventDB[groupName] = status
     end
