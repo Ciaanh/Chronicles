@@ -3,6 +3,8 @@
 ..\FrameXML\UI.xsd">
 
 	<Script file="GlobalEventsDB.lua" />
+	<Script file="GlobalFactionsDB.lua" />
+	<Script file="GlobalCharactersDB.lua" />
 	<Script file="ChroniclesDB.lua" />
 
 </Ui>

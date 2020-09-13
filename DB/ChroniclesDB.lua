@@ -5,10 +5,14 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.DB = {}
 Chronicles.DB.Events = {}
+Chronicles.DB.Factions = {}
+Chronicles.DB.Characters = {}
 Chronicles.DB.RP = {}
 
 function Chronicles.DB:Init()
     self:RegisterEventDB("Global", GlobalEventsDB)
+    self:RegisterFactionDB("Global", GlobalFactionsDB)
+    self:RegisterCharacterDB("Global", GlobalCharactersDB)
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -121,7 +125,7 @@ end
 function Chronicles.DB:RegisterEventDB(groupName, db)
     --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Events[groupName] ~= nil then
-        error(groupName .. " is already registered by another plugin.")
+        error(groupName .. " is already registered by another plugin in Events.")
     else
         local isActive = Chronicles.storage.global.EventDB[groupName]
         if (isActive == nil) then
@@ -138,7 +142,47 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
     Chronicles.UI:Init()
 end
 
-function Chronicles.DB:GetEventGroupNames()
+function Chronicles.DB:RegisterCharacterDB(groupName, db)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    if self.Characters[groupName] ~= nil then
+        error(groupName .. " is already registered by another plugin in Characters.")
+    else
+        local isActive = Chronicles.storage.global.CharacterDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.CharacterDB[groupName] = isActive
+        end
+
+        self.Characters[groupName] = {
+            data = db,
+            name = groupName
+        }
+    end
+
+    Chronicles.UI:Init()
+end
+
+function Chronicles.DB:RegisterFactionDB(groupName, db)
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    if self.Factions[groupName] ~= nil then
+        error(groupName .. " is already registered by another plugin in Factions.")
+    else
+        local isActive = Chronicles.storage.global.FactionDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.FactionDB[groupName] = isActive
+        end
+
+        self.Factions[groupName] = {
+            data = db,
+            name = groupName
+        }
+    end
+
+    Chronicles.UI:Init()
+end
+
+function Chronicles.DB:GetGroupNames()
     local dataGroups = {}
     for groupName in pairs(self.Events) do
         local group = self.Events[groupName]
@@ -158,25 +202,81 @@ function Chronicles.DB:SetGroupStatus(groupName, status)
     --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
 
     if self.Events[groupName] ~= nil then
-        --self.Events[groupName].isActive = status
         Chronicles.storage.global.EventDB[groupName] = status
-    else
-        error(groupName .. " does not exist as a data group.")
+    end
+
+    if self.Factions[groupName] ~= nil then
+        Chronicles.storage.global.FactionDB[groupName] = status
+    end
+
+    if self.Characters[groupName] ~= nil then
+        Chronicles.storage.global.CharacterDB[groupName] = status
     end
 end
 
 function Chronicles.DB:GetGroupStatus(groupName)
+    local isEventActive = nil
+    local isFactionActive = nil
+    local isCharacterActive = nil
+
     if self.Events[groupName] ~= nil then
-        --DEFAULT_CHAT_FRAME:AddMessage("-- GetGroupStatus " .. groupName .. " " .. tostring(self.Events[groupName].isActive))
         local isActive = Chronicles.storage.global.EventDB[groupName]
         if (isActive == nil) then
             isActive = true
             Chronicles.storage.global.EventDB[groupName] = isActive
         end
-        return isActive
-    else
-        error(groupName .. " does not exist as a data group.")
+        isEventActive = isActive
     end
+
+    if self.Factions[groupName] ~= nil then
+        local isActive = Chronicles.storage.global.FactionDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.FactionDB[groupName] = isActive
+        end
+        isFactionActive = isActive
+    end
+
+    if self.Characters[groupName] ~= nil then
+        local isActive = Chronicles.storage.global.CharacterDB[groupName]
+        if (isActive == nil) then
+            isActive = true
+            Chronicles.storage.global.CharacterDB[groupName] = isActive
+        end
+        isCharacterActive = isActive
+    end
+    --------------------------------------------------
+    if (isEventActive) then
+        if self.Factions[groupName] ~= nil then
+            Chronicles.storage.global.FactionDB[groupName] = true
+        end
+        if self.Characters[groupName] ~= nil then
+            Chronicles.storage.global.CharacterDB[groupName] = true
+        end
+        return true
+    end
+
+    if (isFactionActive) then
+        if self.Events[groupName] ~= nil then
+            Chronicles.storage.global.EventDB[groupName] = true
+        end
+        if self.Characters[groupName] ~= nil then
+            Chronicles.storage.global.CharacterDB[groupName] = true
+        end
+        return true
+    end
+
+    if (isCharacterActive) then
+        if self.Events[groupName] ~= nil then
+            Chronicles.storage.global.EventDB[groupName] = true
+        end
+        if self.Factions[groupName] ~= nil then
+            Chronicles.storage.global.FactionDB[groupName] = true
+        end
+        return true
+    end
+
+    return false
 end
 
 function Chronicles.DB:SetEventTypeStatus(eventType, status)

@@ -21,8 +21,6 @@ function EventFilter_InitToggle(self)
 end
 
 function EventFilter_Toggle()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Toggle EventFilter " .. tostring(Chronicles.UI.EventFilter.Displayed))
-
     if (Chronicles.UI.EventFilter.Displayed) then
         EventFilter:Hide()
         Chronicles.UI.EventFilter.Displayed = false
@@ -39,8 +37,6 @@ end
 -- Event type Filter ---------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function change_EventType(eventType, checked)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- change_EventType " .. eventType .. " " .. tostring(checked))
-
     Chronicles.DB:SetEventTypeStatus(eventType, checked)
 
     Chronicles.UI.EventList:Refresh()
@@ -49,7 +45,6 @@ function change_EventType(eventType, checked)
 end
 
 function get_EventType_Checked(eventType)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- get_EventType_Checked " .. eventType)
     return Chronicles.DB:GetEventTypeStatus(eventType)
 end
 
@@ -63,8 +58,6 @@ function DisplayLibrariesFilter(page)
     if (page ~= nil) then
         local pageSize = Chronicles.constants.config.eventFilter.pageSize
 
-        --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:DisplayEventFilter call")
-
         if (Chronicles.UI.EventFilter.LibrariesData ~= nil) then
             local eventGroups = Chronicles.UI.EventFilter.LibrariesData
 
@@ -73,7 +66,6 @@ function DisplayLibrariesFilter(page)
             if (numberOfGroups > 0) then
                 local maxPageValue = math.ceil(numberOfGroups / pageSize)
                 LibrariesFilterScrollBar:SetMinMaxValues(1, maxPageValue)
-                -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
 
                 if (page > maxPageValue) then
                     page = maxPageValue
@@ -194,19 +186,13 @@ function Chronicles.UI.EventFilter:WipeAllLibrariesContent()
 end
 
 function Chronicles.UI.EventFilter:SetLibrariesFilterData()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetEventFilterData call")
-
-    local groupList = Chronicles.DB:GetEventGroupNames()
+    local groupList = Chronicles.DB:GetGroupNames()
 
     if (groupList == nil) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetEventFilterData nil")
-
         self:HideAllLibrariesContent()
         self:WipeAllLibrariesContent()
     else
         local numberOfGroups = tablelength(groupList)
-
-        --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetEventFilterData numberOfGroups " .. numberOfGroups)
 
         if (numberOfGroups == 0) then
             self:HideAllLibrariesContent()
@@ -221,16 +207,12 @@ function Chronicles.UI.EventFilter:SetLibrariesFilterData()
 end
 
 function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame call")
-
     if (checkBox.group ~= nil) then
         checkBox.group = nil
     end
     checkBox:Hide()
 
     if (group ~= nil) then
-        --DEFAULT_CHAT_FRAME:AddMessage("-- EventFilter:SetTextToFrame " .. group.name .. " "..tostring(group.isActive))
-
         local text = group.name
         if (text:len() > 6) then
             text = text:sub(0, 6)
@@ -270,7 +252,6 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
         checkBox:SetScript(
             "OnClick",
             function(selfCheckBox)
-                --local checked = selfCheckBox:GetChecked()
                 group.isActive = not group.isActive
 
                 Chronicles.DB:SetGroupStatus(group.name, group.isActive)
@@ -285,7 +266,6 @@ function Chronicles.UI.EventFilter:SetTextToFrame(group, checkBox)
 end
 
 function LibrariesFilterScrollFrame_OnMouseWheel(self, value)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- scroll " .. value)
     if (value > 0) then
         LibrariesFilterPreviousButton_OnClick(self)
     else

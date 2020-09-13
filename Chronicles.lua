@@ -22,7 +22,9 @@ function Chronicles:OnInitialize()
         global = {
             options = {minimap = {hide = false}},
             EventTypes = {},
-            EventDB = {}
+            EventDB = {},
+            FactionDB = {},
+            CharacterDB = {}
         }
     }
     self.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)

@@ -14,6 +14,8 @@ GlobalEventsDB = {
 			eventType=[string],			-- type of event defined in constants
 			timeline=[integer],    		-- id of the timeline 
 			date=[integer],    			-- number to specify the date to order event in a year (timestamp)
+			characters=table[integer], 	-- concerned characters
+            factions=table[integer], 	-- concerned factions
 		},
 	--]]
 	[1] = {
