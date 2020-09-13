@@ -1,13 +1,8 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
-    <Frame name="MainFrameTemplate" virtual="true">
-        <Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-            <EdgeSize>
-                <AbsValue val="26"/>
-            </EdgeSize>
-        </Backdrop>
+    <Frame name="MainFrameTemplate" virtual="true" inherits="BackdropTemplate">
         <Size x="220" y="100"/>
         <Layers>
             <Layer level="BACKGROUND">
@@ -93,7 +88,7 @@
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
-        
+
         <Frames>
             <Button parentKey="Close" inherits="UIPanelCloseButton">
                 <Anchors>

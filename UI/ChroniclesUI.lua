@@ -9,6 +9,13 @@ Chronicles.UI = {}
 -- UI Fonctions -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.UI:Init()
+    MainFrame:SetBackdrop(
+        {
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            tileEdge = false,
+            edgeSize = 26
+        }
+    )
     Chronicles.UI.Timeline:Init()
     Chronicles.UI.EventList:Init()
 end

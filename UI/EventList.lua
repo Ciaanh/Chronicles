@@ -6,6 +6,14 @@ Chronicles.UI.EventList.Data = nil
 Chronicles.UI.EventList.CurrentPage = nil
 
 function Chronicles.UI.EventList:Init()
+    EventListFrame:SetBackdrop(
+        {
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            tileEdge = false,
+            edgeSize = 26
+        }
+    )
+
     Chronicles.UI.EventList:DisplayEventList(1)
 end
 

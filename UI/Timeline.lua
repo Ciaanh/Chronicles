@@ -16,13 +16,22 @@ Chronicles.UI.Timeline.SelectedYear = nil
 ------------------------------------------------------------------------------------------
 
 function Chronicles.UI.Timeline:Init()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Init timeline ")
+    TimelineScrollBar:SetBackdrop(
+        {
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            tile = true,
+            tileSize = 16,
+            insets = {left = 6, right = 6, top = 0, bottom = 17}
+        }
+    )
+
+    TimelineScrollBar:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
-    Chronicles.UI.Timeline:DisplayTimeline(1, true)
+    Chronicles.UI.Timeline.CurrentPage = 1
+    Chronicles.UI.Timeline:Refresh()
 end
 
 function Chronicles.UI.Timeline:Refresh()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Refresh timeline " .. Chronicles.UI.Timeline.CurrentPage)
     Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage, true)
 end
 
