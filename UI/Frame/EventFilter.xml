@@ -1,4 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
     <Font name="FilterTitleFont" inherits="SystemFont_Med3" virtual="true">
@@ -76,14 +76,6 @@
             </Layer>
         </Layers>
         <Frames>
-
-
-
-
-
-
-
-
 
             <Frame name="EventTypeFilter">
                 <Size x="110" y="200"/>
@@ -181,11 +173,6 @@
                     </CheckButton>
                 </Frames>
             </Frame>
-
-
-
-
-
 
             <Frame name="LibrariesFilter">
                 <Size x="110" y="200"/>
@@ -299,11 +286,11 @@
             <Anchor point="LEFT" x="12" />
         </Anchors>
         <Scripts>
-            <OnLoad function="EventFilter_InitToggle" />
-            <OnClick function="EventFilter_Toggle" />
+            <OnLoad function="EventFilterToggle_SetText" />
+            <OnClick function="EventFilterToggle_Click" />
             <OnEnter>
                 GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
-                GameTooltip:SetText("Toggle event filters", nil, nil, nil, nil, true);
+                GameTooltip:SetText("Events filters", nil, nil, nil, nil, true);
             </OnEnter>
             <OnLeave>
                 GameTooltip:Hide();

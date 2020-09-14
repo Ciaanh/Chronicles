@@ -16,11 +16,11 @@ function Chronicles.UI.EventFilter:Init()
     EventTypeBlockOther:SetChecked(get_EventType_Checked(get_constants().eventType.other))
 end
 
-function EventFilter_InitToggle(self)
+function EventFilterToggle_SetText(self)
     self:SetText("<")
 end
 
-function EventFilter_Toggle()
+function EventFilterToggle_Click()
     if (Chronicles.UI.EventFilter.Displayed) then
         EventFilter:Hide()
         Chronicles.UI.EventFilter.Displayed = false

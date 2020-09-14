@@ -188,7 +188,7 @@
 
 
 
-	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="MainFrame">
+	<Frame name="EventDescription" inherits="EventDescriptionTemplate" parent="EventView">
 		<Size x="600" y="400"/>
 		<Anchors>
 			<Anchor point="BOTTOMRIGHT" x="-25" y="15"/>

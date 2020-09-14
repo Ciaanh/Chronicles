@@ -67,7 +67,7 @@
 
 
 
-    <Frame name="EventListFrame" parent="MainFrame" inherits="BackdropTemplate">
+    <Frame name="EventListFrame" parent="EventView" inherits="BackdropTemplate">
         <Size x="150" y="375"/>
 
         <Anchors>

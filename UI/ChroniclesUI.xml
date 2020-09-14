@@ -1,20 +1,32 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
 	<Script file="ChroniclesUI.lua" />
 
-	<Include file="MainFrame.xml" />
+	<Include file="Frame/MainFrame.xml" />
 
-	<Script file="Timeline.lua" />
-	<Include file="Timeline.xml" />
+	<Script file="Code/EventView.lua" />
+	<Include file="Frame/EventView.xml" />
 
-	<Script file="EventList.lua" />
-	<Include file="EventList.xml" />
+	<Script file="Code/OtherView.lua" />
+	<Include file="Frame/OtherView.xml" />
 
-	<Script file="EventFilter.lua" />
-	<Include file="EventFilter.xml" />
+	<Script file="Code/Timeline.lua" />
+	<Include file="Frame/Timeline.xml" />
 
-	<Script file="EventDescription.lua" />
-	<Include file="EventDescription.xml" />
+	<Script file="Code/EventList.lua" />
+	<Include file="Frame/EventList.xml" />
+
+	<Script file="Code/EventFilter.lua" />
+	<Include file="Frame/EventFilter.xml" />
+
+	<Script file="Code/EventDescription.lua" />
+	<Include file="Frame/EventDescription.xml" />
+
+	<Script file="Code/Characters.lua" />
+	<Include file="Frame/Characters.xml" />
+
+	<Script file="Code/Factions.lua" />
+	<Include file="Frame/Factions.xml" />
 </Ui>

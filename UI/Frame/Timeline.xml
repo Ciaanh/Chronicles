@@ -1,8 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-
-
     <FontFamily name="TimelineFontFamily" virtual="true">
         <Member alphabet="roman">
             <Font font="Fonts\MORPHEUS.ttf" height="12"/>
@@ -96,7 +94,7 @@
         </Layers>
     </Frame>
 
-    <Frame name="TimelineFrame" parent="MainFrame">
+    <Frame name="TimelineFrame" parent="EventView">
         <Size x="735" y="150"/>
         <Anchors>
             <Anchor point="TOP" x="0" y="-30" />
