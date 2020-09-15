@@ -13,4 +13,11 @@ GlobalCharactersDB = {
             factions=table[integer], 	-- concerned factions
 		},
 	--]]
+	[1] = {
+		id = 1,
+		name = Locale["Norgannon"],
+		biography = Locale["Norgannon biography"],
+		timeline = 1,
+		factions = {1}
+	},
 }

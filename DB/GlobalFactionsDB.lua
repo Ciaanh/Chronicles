@@ -12,4 +12,10 @@ GlobalFactionsDB = {
 			timeline=[integer],    		-- id of the timeline 
 		},
 	--]]
+	[1] = {
+		id = 1,
+		name = Locale["Titans"],
+		description = Locale["Titans description"],
+		timeline = 1
+	},
 }
