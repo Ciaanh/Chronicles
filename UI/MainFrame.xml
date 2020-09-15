@@ -2,6 +2,34 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <Frame name="MainFrameTemplate" virtual="true" inherits="BackdropTemplate">
         <Size x="220" y="100"/>
         <Layers>
@@ -100,7 +128,49 @@
                     </OnClick>
                 </Scripts>
             </Button>
-        </Frames>
-    </Frame>
 
+            <Button name="EventsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1" text="Events">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="15" y="7"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="EventsViewShow_Click"/>
+                </Scripts>
+            </Button>
+
+            <Button name="CharactersViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2" text="Characters">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="EventsViewShow"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="CharactersViewShow_Click"/>
+                </Scripts>
+            </Button>
+
+            <Button name="FactionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3" text="Factions">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharactersViewShow"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="FactionsViewShow_Click"/>
+                </Scripts>
+            </Button>
+
+            <Button name="OptionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab4" id="4" text="Options">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="FactionsViewShow"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="OptionsViewShow_Click"/>
+                </Scripts>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnLoad function="MainFrame_OnLoad"/>
+        </Scripts>
+    </Frame>
 </Ui>

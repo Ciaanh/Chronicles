@@ -1,38 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-
-    <FontFamily name="EventListFontFamily" virtual="true">
-        <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="10"/>
-        </Member>
-        <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="10" spacing="8"/>
-        </Member>
-        <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="10"/>
-        </Member>
-        <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="10"/>
-        </Member>
-        <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="10"/>
-        </Member>
-    </FontFamily>
-
-    <Font name="EventListFont" inherits="EventListFontFamily" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-        <!-- <Color r="0.30" g="0.18" b="0"/> -->
-    </Font>
-
-
-
     <Frame name="EventListBlockTemplate" virtual="true" enableMouse="true">
         <Size x="85" y="50"/>
         <Layers>
@@ -67,7 +35,7 @@
 
 
 
-    <Frame name="EventListFrame" parent="EventView" inherits="BackdropTemplate">
+    <Frame name="EventListFrame" parent="EventsView" inherits="BackdropTemplate">
         <Size x="150" y="375"/>
 
         <Anchors>

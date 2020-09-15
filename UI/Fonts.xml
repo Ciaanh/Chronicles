@@ -1,0 +1,89 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <Font name="FilterTitleFont" inherits="SystemFont_Med3" virtual="true">
+        <Color r="0.50" g="0.5" b="0.5"/>
+    </Font>
+
+    <Font name="EventDescriptionTitleFont" inherits="QuestFont_Large" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0.30" g="0.18" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
+
+    <Font name="EventDescriptionFont" inherits="SystemFont_Med3" virtual="true">
+        <Color r="0.30" g="0.18" b="0"/>
+    </Font>
+
+    <FontFamily name="ChroniclesFontFamily_Medium" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\MORPHEUS.ttf" height="12"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\K_Pagetext.ttf" height="12" spacing="8"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="12"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\blei00d.ttf" height="12"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="12"/>
+        </Member>
+    </FontFamily>
+
+    <!-- <FontFamily name="ChroniclesFontFamily_Small" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\MORPHEUS.ttf" height="10"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\K_Pagetext.ttf" height="10" spacing="8"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="10"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\blei00d.ttf" height="10"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="10"/>
+        </Member>
+    </FontFamily> -->
+
+    <Font name="EventDescriptionDatesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0.30" g="0.18" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
+
+    <Font name="ChroniclesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
+
+    <Font name="ChroniclesFontWhite" inherits="ChroniclesFontFamily_Medium" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r=".88" g=".88" b=".88"/>
+    </Font>
+
+
+</Ui>

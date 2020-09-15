@@ -1,12 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-    <Font name="FilterTitleFont" inherits="SystemFont_Med3" virtual="true">
-        <Color r="0.50" g="0.5" b="0.5"/>
-    </Font>
-
-
-    <Frame name="EventFilter" parent="MainFrame">
+    <Frame name="EventFilter" parent="EventsView">
         <Anchors>
             <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0" />
         </Anchors>
@@ -278,23 +273,4 @@
         </Scripts>
     </Frame>
 
-
-
-    <Button name="EventFilterToggle" inherits="UIPanelButtonTemplate" parent="MainFrame">
-        <Size x="20" y="40"/>
-        <Anchors>
-            <Anchor point="LEFT" x="12" />
-        </Anchors>
-        <Scripts>
-            <OnLoad function="EventFilterToggle_SetText" />
-            <OnClick function="EventFilterToggle_Click" />
-            <OnEnter>
-                GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
-                GameTooltip:SetText("Events filters", nil, nil, nil, nil, true);
-            </OnEnter>
-            <OnLeave>
-                GameTooltip:Hide();
-            </OnLeave>
-        </Scripts>
-    </Button>
 </Ui>

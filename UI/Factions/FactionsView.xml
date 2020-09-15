@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-    <Frame name="Factions" parent="OtherView">
+    <Frame name="FactionsView" parent="MainFrame" hidden="true">
         <Size x="800" y="600"/>
         <Anchors>
             <Anchor point="CENTER" />
