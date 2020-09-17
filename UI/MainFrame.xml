@@ -142,7 +142,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="CharactersViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2" text="Characters">
+            <Button name="CharactersViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="EventsViewShow"></Anchor>
                 </Anchors>
@@ -151,7 +151,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="FactionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3" text="Factions">
+            <Button name="FactionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharactersViewShow"></Anchor>
                 </Anchors>
@@ -160,12 +160,21 @@
                 </Scripts>
             </Button>
 
-            <Button name="OptionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab4" id="4" text="Options">
+            <Button name="OptionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab4" id="4">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="FactionsViewShow"></Anchor>
                 </Anchors>
                 <Scripts>
                     <OnClick function="OptionsViewShow_Click"/>
+                </Scripts>
+            </Button>
+
+            <Button name="MyJournalViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab5" id="5">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="OptionsViewShow"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="MyJournalViewShow_Click"/>
                 </Scripts>
             </Button>
         </Frames>

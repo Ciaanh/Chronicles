@@ -6,5 +6,165 @@
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                    <Size y="20"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-10"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame name="LibrariesFilter" inherits="BackdropTemplate">
+                <Size x="195" y="225"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="30" y="-30" />
+                </Anchors>
+
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
+                            <Size y="20"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <Frame name="LibrariesFilterScrollFrame" parentKey="ScrollFrame">
+                        <Size x="150" y="180"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" x="10" y="-25"/>
+                        </Anchors>
+                        <Frames>
+                            <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad> self.type=1
+                                    </OnLoad>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock2" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock3" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock4" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock5" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock7" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
+                                </Anchors>
+                            </CheckButton>
+                        </Frames>
+
+                        <Scripts>
+                            <OnMouseWheel>
+                                LibrariesFilterScrollFrame_OnMouseWheel(self, delta)
+                            </OnMouseWheel>
+                        </Scripts>
+                    </Frame>
+
+                    <Slider name="LibrariesFilterScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                        <Size x="20" y="147" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="LibrariesFilterScrollFrame" x="3" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                <!-- self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25); -->
+                                self.trackBG:SetVertexColor(0.5, 0.5, 0.5, 0.25);
+
+                                self.ScrollUpButton:SetScript(
+                                    "OnClick",
+                                    function(source) LibrariesFilterPreviousButton_OnClick(source) end
+                                );
+
+                                self.ScrollDownButton:SetScript(
+                                    "OnClick",
+                                    function(source) LibrariesFilterNextButton_OnClick(source) end
+                                );
+
+                                self.scrollStep = 1;
+                            </OnLoad>
+                            <OnValueChanged>
+                                DisplayLibrariesFilter(adjust_value(value, self.scrollStep));
+                            </OnValueChanged>
+                        </Scripts>
+                    </Slider>
+                </Frames>
+            </Frame>
+
+            <Frame name="ConfigurationList" inherits="BackdropTemplate">
+                <Size x="250" y="250"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="30" y="30" />
+                </Anchors>
+
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
+                            <Size y="20"/>
+                            <Anchors>
+                                <Anchor point="TOP" y="-10"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+                    <CheckButton name="MyJournalCheckBox" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" x="10" y="-25"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyJournalCheckBox_OnClick" />
+                        </Scripts>
+                    </CheckButton>
+                </Frames>
+            </Frame>
+        </Frames>
     </Frame>
 </Ui>

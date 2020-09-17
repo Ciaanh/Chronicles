@@ -71,7 +71,6 @@
             </Layer>
         </Layers>
         <Frames>
-
             <Frame name="EventTypeFilter">
                 <Size x="110" y="200"/>
                 <Anchors>
@@ -166,103 +165,6 @@
                             </OnClick>
                         </Scripts>
                     </CheckButton>
-                </Frames>
-            </Frame>
-
-            <Frame name="LibrariesFilter">
-                <Size x="110" y="200"/>
-                <Anchors>
-                    <Anchor point="BOTTOM" x="5" y="15" />
-                </Anchors>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <FontString name="LibrariesFilterTitle" parentKey="Name" inherits="FilterTitleFont" justifyH="LEFT" text="Libraries">
-                            <Size y="20"/>
-                            <Anchors>
-                                <Anchor point="TOP"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
-                <Frames>
-
-                    <Frame name="LibrariesFilterScrollFrame" parentKey="ScrollFrame">
-                        <Size x="85" y="180"/>
-                        <Anchors>
-                            <Anchor point="TOPLEFT" y="-20"/>
-                        </Anchors>
-
-                        <Frames>
-                            <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1"/>
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock2" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock3" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock4" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock5" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock7" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
-                                </Anchors>
-                            </CheckButton>
-                        </Frames>
-
-                        <Scripts>
-                            <OnMouseWheel>
-                                LibrariesFilterScrollFrame_OnMouseWheel(self, delta)
-                            </OnMouseWheel>
-                        </Scripts>
-                    </Frame>
-
-                    <Slider name="LibrariesFilterScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
-                        <Size x="25" y="147" />
-                        <Anchors>
-                            <Anchor point="TOPRIGHT" y="-37" />
-                        </Anchors>
-                        <Scripts>
-                            <OnLoad>
-                                self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
-
-                                self.ScrollUpButton:SetScript(
-                                    "OnClick",
-                                    function(source) LibrariesFilterPreviousButton_OnClick(source) end
-                                );
-
-                                self.ScrollDownButton:SetScript(
-                                    "OnClick",
-                                    function(source) LibrariesFilterNextButton_OnClick(source) end
-                                );
-
-                                self.scrollStep = 1;
-                            </OnLoad>
-                            <OnValueChanged>
-                                DisplayLibrariesFilter(adjust_value(value, self.scrollStep));
-                            </OnValueChanged>
-                        </Scripts>
-                    </Slider>
                 </Frames>
             </Frame>
         </Frames>

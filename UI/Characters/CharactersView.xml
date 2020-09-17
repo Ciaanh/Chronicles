@@ -6,5 +6,55 @@
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                    <Size y="20"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-10"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame name="CharacterList">
+                <Size x="200" y="600"/>
+                <Anchors>
+                    <Anchor point="Left" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                            <Size y="20"/>
+                            <Anchors>
+                                <Anchor point="CENTER" x="0" y="0"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Frame name="CharacterDetails">
+                <Size x="600" y="600"/>
+                <Anchors>
+                    <Anchor point="RIGHT" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                            <Size y="20"/>
+                            <Anchors>
+                                <Anchor point="CENTER" x="0" y="0"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Frames>
+
+                </Frames>
+            </Frame>
+        </Frames>
     </Frame>
+
+
+
 </Ui>

@@ -13,7 +13,6 @@ function EventFilterToggle_Click()
         Chronicles.UI.EventFilter.Displayed = false
         EventFilterToggle:SetText("<")
     else
-        Chronicles.UI.EventFilter:SetLibrariesFilterData()
         EventFilter:Show()
         Chronicles.UI.EventFilter.Displayed = true
         EventFilterToggle:SetText(">")

@@ -20,11 +20,28 @@ function Chronicles:OnInitialize()
     --https://www.wowace.com/projects/ace3/pages/ace-db-3-0-tutorial
     local defaults = {
         global = {
-            options = {minimap = {hide = false}},
+            options = {
+                minimap = {hide = false},
+                myjournal = true
+            },
             EventTypes = {},
-            EventDB = {},
-            FactionDB = {},
-            CharacterDB = {}
+            EventDBStatuses = {},
+            FactionDBStatuses = {},
+            CharacterDBStatuses = {},
+
+            MyJournalEventDB = {
+                [1] = {
+                    id = 1,
+                    label = Locale["MyJournal Event"],
+                    description = {Locale["An event from my journal"]},
+                    yearStart = -1,
+                    yearEnd = -1,
+                    eventType = Chronicles.constants.eventType.war,
+                    timeline = 1
+                },
+            },
+            MyJournalFactionDB = {},
+            MyJournalCharacterDB = {}
         }
     }
     self.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)

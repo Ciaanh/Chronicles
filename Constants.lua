@@ -49,5 +49,12 @@ constants.config = {
 	},
 	eventFilter = {
 		pageSize = 7
+	},
+	librariesFilter = {
+		pageSize = 7
 	}
+}
+
+constants.configurationName = {
+	myjournal = "myjournal"
 }

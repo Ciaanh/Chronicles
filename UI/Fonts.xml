@@ -37,23 +37,23 @@
         </Member>
     </FontFamily>
 
-    <!-- <FontFamily name="ChroniclesFontFamily_Small" virtual="true">
+    <FontFamily name="ChroniclesFontFamily_Large" virtual="true">
         <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="10"/>
+            <Font font="Fonts\MORPHEUS.ttf" height="16" outline="NORMAL"/>
         </Member>
         <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="10" spacing="8"/>
+            <Font font="Fonts\K_Pagetext.ttf" height="15"/>
         </Member>
         <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="10"/>
+            <Font font="Fonts\ARKai_T.ttf" height="15" outline="NORMAL"/>
         </Member>
         <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="10"/>
+            <Font font="Fonts\blei00d.ttf" height="15" outline="NORMAL"/>
         </Member>
         <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="10"/>
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="16" outline="NORMAL"/>
         </Member>
-    </FontFamily> -->
+    </FontFamily>
 
     <Font name="EventDescriptionDatesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
         <Shadow>
@@ -85,5 +85,23 @@
         <Color r=".88" g=".88" b=".88"/>
     </Font>
 
+    <Font name="ChroniclesFontLarge" inherits="ChroniclesFontFamily_Large" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
 
+    <Font name="ChroniclesFontLargeWhite" inherits="ChroniclesFontFamily_Large" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r=".88" g=".88" b=".88"/>
+    </Font>
 </Ui>

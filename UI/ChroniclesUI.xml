@@ -31,19 +31,11 @@
 	<Script file="Characters/CharactersView.lua" />
 	<Include file="Characters/CharactersView.xml" />
 
-	<Script file="Characters/Characters.lua" />
-	<Include file="Characters/Characters.xml" />
-
-
 
 
 
 	<Script file="Factions/FactionsView.lua" />
 	<Include file="Factions/FactionsView.xml" />
-
-	<Script file="Factions/Factions.lua" />
-	<Include file="Factions/Factions.xml" />
-
 
 
 
@@ -51,7 +43,9 @@
 	<Script file="Options/OptionsView.lua" />
 	<Include file="Options/OptionsView.xml" />
 
-	<Script file="Options/Options.lua" />
-	<Include file="Options/Options.xml" />
+
+
+	<Script file="MyJournal/MyJournalView.lua" />
+	<Include file="MyJournal/MyJournalView.xml" />
 
 </Ui>

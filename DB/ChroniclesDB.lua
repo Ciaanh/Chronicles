@@ -11,8 +11,14 @@ Chronicles.DB.RP = {}
 
 function Chronicles.DB:Init()
     self:RegisterEventDB("Global", GlobalEventsDB)
-    self:RegisterFactionDB("Global1", GlobalFactionsDB)
+    self:RegisterFactionDB("Global", GlobalFactionsDB)
     self:RegisterCharacterDB("Global", GlobalCharactersDB)
+
+    -- load data for my journal
+    -- check refresh and intial status
+    self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
+    self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())
+    self:RegisterCharacterDB("myjournal", Chronicles.DB:GetMyJournalCharacters())
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -127,10 +133,10 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Events.")
     else
-        local isActive = Chronicles.storage.global.EventDB[groupName]
+        local isActive = Chronicles.storage.global.EventDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.EventDB[groupName] = isActive
+            Chronicles.storage.global.EventDBStatuses[groupName] = isActive
         end
 
         self.Events[groupName] = {
@@ -147,10 +153,10 @@ function Chronicles.DB:RegisterCharacterDB(groupName, db)
     if self.Characters[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Characters.")
     else
-        local isActive = Chronicles.storage.global.CharacterDB[groupName]
+        local isActive = Chronicles.storage.global.CharacterDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.CharacterDB[groupName] = isActive
+            Chronicles.storage.global.CharacterDBStatuses[groupName] = isActive
         end
 
         self.Characters[groupName] = {
@@ -167,10 +173,10 @@ function Chronicles.DB:RegisterFactionDB(groupName, db)
     if self.Factions[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Factions.")
     else
-        local isActive = Chronicles.storage.global.FactionDB[groupName]
+        local isActive = Chronicles.storage.global.FactionDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.FactionDB[groupName] = isActive
+            Chronicles.storage.global.FactionDBStatuses[groupName] = isActive
         end
 
         self.Factions[groupName] = {
@@ -195,44 +201,50 @@ function Chronicles.DB:GetGroupNames()
     local dataGroups = {}
 
     for eventGroupName in pairs(self.Events) do
-        local group = self.Events[eventGroupName]
-        local groupProjection = {
-            name = group.name,
-            isActive = Chronicles.storage.global.EventDB[eventGroupName]
-        }
+        if (eventGroupName ~= "myjournal") then
+            local group = self.Events[eventGroupName]
+            local groupProjection = {
+                name = group.name,
+                isActive = Chronicles.storage.global.EventDBStatuses[eventGroupName]
+            }
 
-        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
 
-        if not exist_in_table(eventGroupName, dataGroups) then
-            table.insert(dataGroups, groupProjection)
+            if not exist_in_table(eventGroupName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
+            end
         end
     end
 
     for factionGroupName in pairs(self.Factions) do
-        local group = self.Factions[factionGroupName]
-        local groupProjection = {
-            name = group.name,
-            isActive = Chronicles.storage.global.FactionDB[factionGroupName]
-        }
+        if (factionGroupName ~= "myjournal") then
+            local group = self.Factions[factionGroupName]
+            local groupProjection = {
+                name = group.name,
+                isActive = Chronicles.storage.global.FactionDBStatuses[factionGroupName]
+            }
 
-        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
 
-        if not exist_in_table(factionGroupName, dataGroups) then
-            table.insert(dataGroups, groupProjection)
+            if not exist_in_table(factionGroupName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
+            end
         end
     end
 
     for characterGroupName in pairs(self.Characters) do
-        local group = self.Characters[characterGroupName]
-        local groupProjection = {
-            name = group.name,
-            isActive = Chronicles.storage.global.CharacterDB[characterGroupName]
-        }
+        if (characterGroupName ~= "myjournal") then
+            local group = self.Characters[characterGroupName]
+            local groupProjection = {
+                name = group.name,
+                isActive = Chronicles.storage.global.CharacterDBStatuses[characterGroupName]
+            }
 
-        Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
 
-        if not exist_in_table(characterGroupName, dataGroups) then
-            table.insert(dataGroups, groupProjection)
+            if not exist_in_table(characterGroupName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
+            end
         end
     end
 
@@ -241,15 +253,15 @@ end
 
 function Chronicles.DB:SetGroupStatus(groupName, status)
     if self.Events[groupName] ~= nil then
-        Chronicles.storage.global.EventDB[groupName] = status
+        Chronicles.storage.global.EventDBStatuses[groupName] = status
     end
 
     if self.Factions[groupName] ~= nil then
-        Chronicles.storage.global.FactionDB[groupName] = status
+        Chronicles.storage.global.FactionDBStatuses[groupName] = status
     end
 
     if self.Characters[groupName] ~= nil then
-        Chronicles.storage.global.CharacterDB[groupName] = status
+        Chronicles.storage.global.CharacterDBStatuses[groupName] = status
     end
 end
 
@@ -259,58 +271,58 @@ function Chronicles.DB:GetGroupStatus(groupName)
     local isCharacterActive = nil
 
     if self.Events[groupName] ~= nil then
-        local isActive = Chronicles.storage.global.EventDB[groupName]
+        local isActive = Chronicles.storage.global.EventDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.EventDB[groupName] = isActive
+            Chronicles.storage.global.EventDBStatuses[groupName] = isActive
         end
         isEventActive = isActive
     end
 
     if self.Factions[groupName] ~= nil then
-        local isActive = Chronicles.storage.global.FactionDB[groupName]
+        local isActive = Chronicles.storage.global.FactionDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.FactionDB[groupName] = isActive
+            Chronicles.storage.global.FactionDBStatuses[groupName] = isActive
         end
         isFactionActive = isActive
     end
 
     if self.Characters[groupName] ~= nil then
-        local isActive = Chronicles.storage.global.CharacterDB[groupName]
+        local isActive = Chronicles.storage.global.CharacterDBStatuses[groupName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.storage.global.CharacterDB[groupName] = isActive
+            Chronicles.storage.global.CharacterDBStatuses[groupName] = isActive
         end
         isCharacterActive = isActive
     end
     --------------------------------------------------
     if (isEventActive) then
         if self.Factions[groupName] ~= nil then
-            Chronicles.storage.global.FactionDB[groupName] = true
+            Chronicles.storage.global.FactionDBStatuses[groupName] = true
         end
         if self.Characters[groupName] ~= nil then
-            Chronicles.storage.global.CharacterDB[groupName] = true
+            Chronicles.storage.global.CharacterDBStatuses[groupName] = true
         end
         return true
     end
 
     if (isFactionActive) then
         if self.Events[groupName] ~= nil then
-            Chronicles.storage.global.EventDB[groupName] = true
+            Chronicles.storage.global.EventDBStatuses[groupName] = true
         end
         if self.Characters[groupName] ~= nil then
-            Chronicles.storage.global.CharacterDB[groupName] = true
+            Chronicles.storage.global.CharacterDBStatuses[groupName] = true
         end
         return true
     end
 
     if (isCharacterActive) then
         if self.Events[groupName] ~= nil then
-            Chronicles.storage.global.EventDB[groupName] = true
+            Chronicles.storage.global.EventDBStatuses[groupName] = true
         end
         if self.Factions[groupName] ~= nil then
-            Chronicles.storage.global.FactionDB[groupName] = true
+            Chronicles.storage.global.FactionDBStatuses[groupName] = true
         end
         return true
     end
@@ -333,6 +345,21 @@ function Chronicles.DB:GetEventTypeStatus(eventType)
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
+
+
+function Chronicles.DB:GetMyJournalEvents()
+    return Chronicles.storage.global.MyJournalEventDB
+end
+
+function Chronicles.DB:GetMyJournalFactions()
+    return Chronicles.storage.global.MyJournalFactionDB
+end
+
+function Chronicles.DB:GetMyJournalCharacters()
+    return Chronicles.storage.global.MyJournalCharacterDB
+end
+
+-- function add - delete
 
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
