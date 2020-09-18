@@ -31,6 +31,12 @@ function Chronicles.UI:Init()
     Chronicles.UI.MyJournalView:Init()
 end
 
+function Chronicles.UI:Refresh()
+    Chronicles.UI.EventList:Refresh()
+    Chronicles.UI.Timeline:Refresh()
+    Chronicles.UI.EventDescription:Refresh()
+end
+
 function Chronicles.UI:DisplayWindow()
     Chronicles.DB:LoadRolePlayProfile()
     MainFrame:Show()

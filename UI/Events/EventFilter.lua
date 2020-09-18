@@ -18,10 +18,7 @@ end
 ------------------------------------------------------------------------------------------
 function change_EventType(eventType, checked)
     Chronicles.DB:SetEventTypeStatus(eventType, checked)
-
-    Chronicles.UI.EventList:Refresh()
-    Chronicles.UI.Timeline:Refresh()
-    Chronicles.UI.EventDescription:Refresh()
+    Chronicles.UI:Refresh()
 end
 
 function get_EventType_Checked(eventType)

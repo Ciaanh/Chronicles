@@ -27,6 +27,9 @@ end
 -- Events Tools -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
+function Chronicles.DB:AvailableDbId(db)
+end
+
 function Chronicles.DB:AddGlobalEvent(event)
     -- check max index and set it to event
     if (event.id == nil) then
@@ -37,9 +40,7 @@ end
 
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
     if (yearStart <= yearEnd) then
-        for groupName in pairs(self.Events) do
-            local eventsGroup = self.Events[groupName]
-
+        for groupName, eventsGroup in pairs(self.Events) do
             local isActive = Chronicles.DB:GetGroupStatus(groupName)
             if (isActive and self:HasEventsInDB(yearStart, yearEnd, eventsGroup.data)) then
                 return true
@@ -50,8 +51,7 @@ function Chronicles.DB:HasEvents(yearStart, yearEnd)
 end
 
 function Chronicles.DB:HasEventsInDB(yearStart, yearEnd, db)
-    for eventIndex in pairs(db) do
-        local event = db[eventIndex]
+    for eventIndex, event in pairs(db) do
         local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
 
         if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
@@ -68,26 +68,21 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local foundEvents = {}
 
     if (yearStart <= yearEnd) then
-        for groupName in pairs(self.Events) do
-            local eventsGroup = self.Events[groupName]
-
+        for groupName, eventsGroup in pairs(self.Events) do
             local pluginEvents = self:SearchEventsInDB(yearStart, yearEnd, eventsGroup.data)
 
-            for eventIndex in pairs(pluginEvents) do
-                local event = pluginEvents[eventIndex]
+            for eventIndex, event in pairs(pluginEvents) do
                 table.insert(foundEvents, self:CleanEventObject(event, groupName))
                 nbFoundEvents = nbFoundEvents + 1
             end
         end
     end
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Found events " .. nbFoundEvents)
     return foundEvents
 end
 
 function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
     local foundEvents = {}
-    for eventIndex in pairs(db) do
-        local event = db[eventIndex]
+    for eventIndex, event in pairs(db) do
         local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
 
         if isEventTypeActive and self:IsInRange(db[eventIndex], yearStart, yearEnd) then
@@ -200,9 +195,8 @@ end
 function Chronicles.DB:GetGroupNames()
     local dataGroups = {}
 
-    for eventGroupName in pairs(self.Events) do
+    for eventGroupName, group in pairs(self.Events) do
         if (eventGroupName ~= "myjournal") then
-            local group = self.Events[eventGroupName]
             local groupProjection = {
                 name = group.name,
                 isActive = Chronicles.storage.global.EventDBStatuses[eventGroupName]
@@ -216,9 +210,8 @@ function Chronicles.DB:GetGroupNames()
         end
     end
 
-    for factionGroupName in pairs(self.Factions) do
+    for factionGroupName, group in pairs(self.Factions) do
         if (factionGroupName ~= "myjournal") then
-            local group = self.Factions[factionGroupName]
             local groupProjection = {
                 name = group.name,
                 isActive = Chronicles.storage.global.FactionDBStatuses[factionGroupName]
@@ -232,9 +225,8 @@ function Chronicles.DB:GetGroupNames()
         end
     end
 
-    for characterGroupName in pairs(self.Characters) do
+    for characterGroupName, group in pairs(self.Characters) do
         if (characterGroupName ~= "myjournal") then
-            local group = self.Characters[characterGroupName]
             local groupProjection = {
                 name = group.name,
                 isActive = Chronicles.storage.global.CharacterDBStatuses[characterGroupName]
@@ -346,7 +338,6 @@ end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-
 function Chronicles.DB:GetMyJournalEvents()
     return Chronicles.storage.global.MyJournalEventDB
 end
@@ -360,6 +351,28 @@ function Chronicles.DB:GetMyJournalCharacters()
 end
 
 -- function add - delete
+
+function Chronicles.DB:AvailableDbId(db)
+    for key, value in pairs(db) do
+        if (value == nil) then
+            return key
+        end
+    end
+
+    return table.maxn(db) + 1
+end
+
+function Chronicles.DB:AddToMyJournal(object, db)
+    if (object.id == nil) then
+        object.id = Chronicles.DB:AvailableDbId(db)
+    end
+    object.source = "myjournal"
+    table.insert(db, object.id, object)
+end
+
+function Chronicles.DB:RemoveFromMyJournal(object, db)
+    table.remove(db, object.id)
+end
 
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

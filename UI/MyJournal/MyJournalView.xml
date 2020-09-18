@@ -17,41 +17,22 @@
             </Layer>
         </Layers>
         <Frames>
-            <Frame name="MyJournalViewList">
-                <Size x="200" y="600"/>
+            <Frame name="MyEvents" inherits="ListDetailTemplate">
                 <Anchors>
-                    <Anchor point="Left" />
+                    <Anchor point="LEFT" />
                 </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
-                            <Size y="20"/>
-                            <Anchors>
-                                <Anchor point="CENTER" x="0" y="0"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
             </Frame>
-            <Frame name="MyJournalViewDetails">
-                <Size x="600" y="600"/>
+            <Frame name="MyCharacters" inherits="ListDetailTemplate">
                 <Anchors>
-                    <Anchor point="RIGHT" />
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents" />
                 </Anchors>
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
-                            <Size y="20"/>
-                            <Anchors>
-                                <Anchor point="CENTER" x="0" y="0"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
-                </Layers>
-                <Frames>
+            </Frame>
+            <Frame name="MyFactions" inherits="ListDetailTemplate">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacters" />
+                </Anchors>
+            </Frame>
 
-                </Frames>
-            </Frame>
         </Frames>
     </Frame>
 </Ui>

@@ -47,6 +47,8 @@ function MyJournalCheckBox_OnClick()
         MyJournalViewShow:Hide()
         Chronicles.DB:SetGroupStatus("myjournal", false)
     end
+
+    Chronicles.UI:Refresh()
 end
 
 ------------------------------------------------------------------------------------------
@@ -258,10 +260,7 @@ function Chronicles.UI.OptionsView:SetTextToFrame(group, checkBox)
                 group.isActive = not group.isActive
 
                 Chronicles.DB:SetGroupStatus(group.name, group.isActive)
-
-                Chronicles.UI.EventList:Refresh()
-                Chronicles.UI.Timeline:Refresh()
-                Chronicles.UI.EventDescription:Refresh()
+                Chronicles.UI:Refresh()
             end
         )
         checkBox:Show()
