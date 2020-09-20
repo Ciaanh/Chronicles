@@ -100,7 +100,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="EventsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1" text="Events">
+            <Button name="EventsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
                         <Offset>

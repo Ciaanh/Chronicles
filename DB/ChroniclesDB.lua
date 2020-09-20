@@ -15,7 +15,6 @@ function Chronicles.DB:Init()
     self:RegisterCharacterDB("Global", GlobalCharactersDB)
 
     -- load data for my journal
-    -- check refresh and intial status
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())
     self:RegisterCharacterDB("myjournal", Chronicles.DB:GetMyJournalCharacters())

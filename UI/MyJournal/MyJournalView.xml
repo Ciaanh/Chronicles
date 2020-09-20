@@ -19,20 +19,52 @@
         <Frames>
             <Frame name="MyEvents" inherits="ListDetailTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" />
+                    <Anchor point="CENTER" />
                 </Anchors>
             </Frame>
-            <Frame name="MyCharacters" inherits="ListDetailTemplate">
+            <Frame name="MyCharacters" inherits="ListDetailTemplate" hidden="true">
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents" />
+                    <Anchor point="CENTER" />
                 </Anchors>
             </Frame>
-            <Frame name="MyFactions" inherits="ListDetailTemplate">
+            <Frame name="MyFactions" inherits="ListDetailTemplate" hidden="true">
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacters" />
+                    <Anchor point="CENTER" />
                 </Anchors>
             </Frame>
 
+
+
+            <Button name="MyEventsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="MyEventsTabButton_Click"/>
+                </Scripts>
+            </Button>
+            <Button name="MyCharactersTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsTabButton" x="5"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="MyCharactersTabButton_Click"/>
+                </Scripts>
+            </Button>
+            <Button name="MyFactionsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3">
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersTabButton" x="5"></Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick function="MyFactionsTabButton_Click"/>
+                </Scripts>
+            </Button>
+
+
+
         </Frames>
     </Frame>
+    <Scripts>
+        <OnLoad function="MyJournalView_OnLoad"/>
+    </Scripts>
 </Ui>

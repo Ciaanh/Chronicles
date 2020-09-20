@@ -4,7 +4,7 @@
 
 	<Include file="Fonts.xml" />
 
-	<Script file="ChroniclesUI.lua" />
+	<Script file="MainFrame.lua" />
 	<Include file="MainFrame.xml" />
 
 
