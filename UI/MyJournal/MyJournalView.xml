@@ -37,7 +37,7 @@
 
             <Button name="MyEventsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"></Anchor>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="40" y="45"></Anchor>
                 </Anchors>
                 <Scripts>
                     <OnClick function="MyEventsTabButton_Click"/>
@@ -60,11 +60,10 @@
                 </Scripts>
             </Button>
 
-
-
         </Frames>
+        <Scripts>
+            <OnLoad function="MyJournalView_OnLoad"/>
+        </Scripts>
     </Frame>
-    <Scripts>
-        <OnLoad function="MyJournalView_OnLoad"/>
-    </Scripts>
+
 </Ui>

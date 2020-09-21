@@ -104,7 +104,7 @@
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
                         <Offset>
-                            <AbsDimension x="15" y="7"/>
+                            <AbsDimension x="15" y="6"/>
                         </Offset>
                     </Anchor>
                 </Anchors>
