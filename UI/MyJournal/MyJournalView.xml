@@ -17,23 +17,6 @@
             </Layer>
         </Layers>
         <Frames>
-            <Frame name="MyEvents" inherits="ListDetailTemplate">
-                <Anchors>
-                    <Anchor point="CENTER" />
-                </Anchors>
-            </Frame>
-            <Frame name="MyCharacters" inherits="ListDetailTemplate" hidden="true">
-                <Anchors>
-                    <Anchor point="CENTER" />
-                </Anchors>
-            </Frame>
-            <Frame name="MyFactions" inherits="ListDetailTemplate" hidden="true">
-                <Anchors>
-                    <Anchor point="CENTER" />
-                </Anchors>
-            </Frame>
-
-
 
             <Button name="MyEventsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>

@@ -1,0 +1,44 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <Frame name="MyEvents" parent="MyJournalView">
+        <Size x="240" y="540"/>
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                    <Size y="20"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-10"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+
+
+            <Frame name="MyEventsList" parentKey="List" inherits="BackdropTemplate">
+                <Size x="240" y="200"/>
+                <Anchors>
+                    <Anchor point="TOP" x="0" y="0"/>
+                </Anchors>
+
+            </Frame>
+
+
+            <Frame name="MyEventsDetails" parentKey="Details" inherits="BackdropTemplate">
+                <Size x="200" y="340"/>
+                <Anchors>
+                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsList" x="0" y="0"/>
+                </Anchors>
+
+            </Frame>
+
+
+        </Frames>
+
+    </Frame>
+</Ui>

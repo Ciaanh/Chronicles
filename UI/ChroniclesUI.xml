@@ -44,10 +44,15 @@
 	<Include file="Options/OptionsView.xml" />
 
 
-	<Script file="MyJournal/ListDetailTemplate.lua" />
-	<Include file="MyJournal/ListDetailTemplate.xml" />
 	<Script file="MyJournal/MyJournalView.lua" />
 	<Include file="MyJournal/MyJournalView.xml" />
+	<Script file="MyJournal/MyEvents.lua" />
+	<Include file="MyJournal/MyEvents.xml" />
+	<Script file="MyJournal/MyCharacters.lua" />
+	<Include file="MyJournal/MyCharacters.xml" />
+	<Script file="MyJournal/MyFactions.lua" />
+	<Include file="MyJournal/MyFactions.xml" />
+
 
 
 </Ui>

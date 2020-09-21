@@ -8,9 +8,9 @@ Chronicles.UI.MyJournalView = {}
 function Chronicles.UI.MyJournalView:Init()
     MyJournalView.Title:SetText(Locale["My Journal"])
 
-    MyEvents.Title:SetText(Locale["My Events"])
-    MyCharacters.Title:SetText(Locale["My Characters"])
-    MyFactions.Title:SetText(Locale["My Factions"])
+    Chronicles.UI.MyEvents:Init(true)
+    Chronicles.UI.MyCharacters:Init(false)
+    Chronicles.UI.MyFactions:Init(false)
 end
 
 function Chronicles.UI.MyJournalView:HideViews()
