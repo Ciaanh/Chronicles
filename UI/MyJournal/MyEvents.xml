@@ -1,8 +1,46 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-    <Frame name="MyEvents" parent="MyJournalView">
-        <Size x="240" y="540"/>
+
+
+
+    <Frame name="MyEventItemTemplate" virtual="true" enableMouse="true">
+        <Size x="85" y="50"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture file="Interface\AddOns\Chronicles\Images\Event-Background">
+                    <Size x="85" y="50"/>
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="0"/>
+                    </Anchors>
+                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString parentKey="Text" inherits="GameFontNormalSmall" justifyH="CENTER">
+                    <Size x="65" y="35"/>
+                    <Anchors>
+                        <Anchor point="CENTER" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", -5, 30);
+				GameTooltip:SetText(self.event.yearStart, nil, nil, nil, nil, true);
+            </OnEnter>
+            <OnLeave>
+				GameTooltip:Hide();
+            </OnLeave>
+        </Scripts>
+    </Frame>
+
+
+
+
+    <Frame name="MyEvents" parent="MyJournalView" hidden="true">
+        <Size x="740" y="540"/>
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
@@ -12,7 +50,7 @@
                 <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
                     <Size y="20"/>
                     <Anchors>
-                        <Anchor point="TOP" x="0" y="-10"/>
+                        <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyJournalViewTitle" />
                     </Anchors>
                 </FontString>
             </Layer>
@@ -21,20 +59,121 @@
 
 
             <Frame name="MyEventsList" parentKey="List" inherits="BackdropTemplate">
-                <Size x="240" y="200"/>
+                <Size x="200" y="530"/>
                 <Anchors>
-                    <Anchor point="TOP" x="0" y="0"/>
+                    <Anchor point="TOPLEFT" />
                 </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
+
+                <Frames>
+
+                    <Frame name="MyEventListScrollFrame" parentKey="ScrollFrame">
+                    
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                            <Anchor point="BOTTOMRIGHT"/>
+                        </Anchors>
+
+                        <Frames>
+                            <Frame name="MyEventListBlock1" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" x="-5" y="-10" />
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock2" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock1" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock3" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock2" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock4" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock3" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock5" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock4" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock6" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock5" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                        </Frames>
+
+                        <Scripts>
+                            <OnMouseWheel>
+                                MyEventListScrollFrame_OnMouseWheel(self, delta)
+                            </OnMouseWheel>
+                        </Scripts>
+                    </Frame>
+
+                    <Slider name="MyEventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                        <Size x="25" y="312" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventListScrollFrame" x="0" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+
+                                self.ScrollUpButton:SetScript(
+                                    "OnClick",
+                                    function(source) MyEventListPreviousButton_OnClick(source) end
+                                );
+
+                                self.ScrollDownButton:SetScript(
+                                    "OnClick",
+                                    function(source) MyEventListNextButton_OnClick(source) end
+                                );
+
+                                self.scrollStep = 1;
+                            </OnLoad>
+                            <OnValueChanged>
+                                DisplayMyEventList(adjust_value(value, self.scrollStep));
+                            </OnValueChanged>
+                        </Scripts>
+                    </Slider>
+
+                </Frames>
 
             </Frame>
 
 
             <Frame name="MyEventsDetails" parentKey="Details" inherits="BackdropTemplate">
-                <Size x="200" y="340"/>
+                <Size x="540" y="530"/>
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsList" x="0" y="0"/>
+                    <Anchor point="TOPRIGHT" />
                 </Anchors>
-
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
             </Frame>
 
 

@@ -1,8 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-    <Frame name="MyFactions" parent="MyJournalView">
-        <Size x="240" y="540"/>
+    <Frame name="MyFactions" parent="MyJournalView" hidden="true">
+        <Size x="740" y="540"/>
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
@@ -12,7 +12,7 @@
                 <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
                     <Size y="20"/>
                     <Anchors>
-                        <Anchor point="TOP" x="0" y="-10"/>
+                        <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyJournalViewTitle" />
                     </Anchors>
                 </FontString>
             </Layer>
@@ -21,20 +21,42 @@
 
 
             <Frame name="MyFactionsList" parentKey="List" inherits="BackdropTemplate">
-                <Size x="240" y="200"/>
+                <Size x="200" y="530"/>
                 <Anchors>
-                    <Anchor point="TOP" x="0" y="0"/>
+                    <Anchor point="TOPLEFT" />
                 </Anchors>
-
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
             </Frame>
 
 
             <Frame name="MyFactionsDetails" parentKey="Details" inherits="BackdropTemplate">
-                <Size x="200" y="340"/>
+                <Size x="540" y="530"/>
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyFactionsList" x="0" y="0"/>
+                    <Anchor point="TOPRIGHT" />
                 </Anchors>
-
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                            <Anchors>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
             </Frame>
 
 

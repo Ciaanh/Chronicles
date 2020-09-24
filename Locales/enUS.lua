@@ -8,6 +8,11 @@ if L then
     L["start"]= "Start"
     L["end"]= "End"
     L["year"]= "Year"
+    L[":My Characters"]=" : my characters"
+    L[":My Factions"]=" : my factions"
+    L[":My Events"]=" : my events"
+
+
 
     L["The War of the Ancients label"] = "The War of the Ancients"
     L["The War of the Ancients page 1"] =

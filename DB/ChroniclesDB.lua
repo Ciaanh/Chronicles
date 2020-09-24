@@ -138,8 +138,6 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
             name = groupName
         }
     end
-
-    Chronicles.UI:Init()
 end
 
 function Chronicles.DB:RegisterCharacterDB(groupName, db)
@@ -158,8 +156,6 @@ function Chronicles.DB:RegisterCharacterDB(groupName, db)
             name = groupName
         }
     end
-
-    Chronicles.UI:Init()
 end
 
 function Chronicles.DB:RegisterFactionDB(groupName, db)
@@ -178,8 +174,6 @@ function Chronicles.DB:RegisterFactionDB(groupName, db)
             name = groupName
         }
     end
-
-    Chronicles.UI:Init()
 end
 
 function exist_in_table(value, lookUpTable)

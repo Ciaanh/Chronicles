@@ -76,12 +76,15 @@ function Chronicles:OnInitialize()
     )
 
     Chronicles.UI.EventFilter:Init()
+    
     Chronicles.DB:Init()
+
     Chronicles.UI:Init()
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
     Chronicles.DB:RegisterEventDB(pluginName, db)
+    Chronicles.UI:Init()
 end
 
 function get_constants()

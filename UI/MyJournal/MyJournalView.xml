@@ -8,7 +8,7 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
+                <FontString name="MyJournalViewTitle" parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
                     <Size y="20"/>
                     <Anchors>
                         <Anchor point="TOP" x="0" y="-10"/>
@@ -20,7 +20,7 @@
 
             <Button name="MyEventsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="40" y="45"></Anchor>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="400" y="45"></Anchor>
                 </Anchors>
                 <Scripts>
                     <OnClick function="MyEventsTabButton_Click"/>
@@ -28,7 +28,7 @@
             </Button>
             <Button name="MyCharactersTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2">
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsTabButton" x="5"></Anchor>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsTabButton"></Anchor>
                 </Anchors>
                 <Scripts>
                     <OnClick function="MyCharactersTabButton_Click"/>
@@ -36,7 +36,7 @@
             </Button>
             <Button name="MyFactionsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3">
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersTabButton" x="5"></Anchor>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersTabButton"></Anchor>
                 </Anchors>
                 <Scripts>
                     <OnClick function="MyFactionsTabButton_Click"/>

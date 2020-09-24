@@ -6,11 +6,12 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 Chronicles.UI.MyCharacters = {}
 
 function Chronicles.UI.MyCharacters:Init(isVisible)
-    MyCharacters.Title:SetText(Locale["My Characters"])
+    DEFAULT_CHAT_FRAME:AddMessage("-- init My Characters")
+    MyCharacters.Title:SetText(Locale[":My Characters"])
 
     MyCharacters.List:SetBackdrop(
         {
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
             tileEdge = false,
             edgeSize = 26
         }
@@ -18,13 +19,12 @@ function Chronicles.UI.MyCharacters:Init(isVisible)
 
     MyCharacters.Details:SetBackdrop(
         {
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
             tileEdge = false,
             edgeSize = 26
         }
     )
 
-    
     if (isVisible) then
         MyCharacters:Show()
     else

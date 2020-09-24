@@ -44,6 +44,7 @@
 	<Include file="Options/OptionsView.xml" />
 
 
+
 	<Script file="MyJournal/MyJournalView.lua" />
 	<Include file="MyJournal/MyJournalView.xml" />
 	<Script file="MyJournal/MyEvents.lua" />

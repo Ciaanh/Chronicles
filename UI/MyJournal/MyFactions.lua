@@ -6,11 +6,13 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 Chronicles.UI.MyFactions = {}
 
 function Chronicles.UI.MyFactions:Init(isVisible)
-    MyFactions.Title:SetText(Locale["My Factions"])
+    DEFAULT_CHAT_FRAME:AddMessage("-- init My Factions")
+
+    MyFactions.Title:SetText(Locale[":My Factions"])
 
     MyFactions.List:SetBackdrop(
         {
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
             tileEdge = false,
             edgeSize = 26
         }
@@ -18,7 +20,7 @@ function Chronicles.UI.MyFactions:Init(isVisible)
 
     MyFactions.Details:SetBackdrop(
         {
-            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
             tileEdge = false,
             edgeSize = 26
         }

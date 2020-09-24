@@ -8,6 +8,8 @@ Chronicles.UI.MyJournalView = {}
 function Chronicles.UI.MyJournalView:Init()
     MyJournalView.Title:SetText(Locale["My Journal"])
 
+    DEFAULT_CHAT_FRAME:AddMessage("-- init MyJournalView")
+
     Chronicles.UI.MyEvents:Init(true)
     Chronicles.UI.MyCharacters:Init(false)
     Chronicles.UI.MyFactions:Init(false)
@@ -24,9 +26,9 @@ function MyJournalView_OnLoad(self)
     PanelTemplates_SetNumTabs(self, 3)
     PanelTemplates_SetTab(self, 1)
 
-    self.tab1:SetText("My Events")
-    self.tab2:SetText("My Characters")
-    self.tab3:SetText("My Factions")
+    self.tab1:SetText(Locale["My Events"])
+    self.tab2:SetText(Locale["My Characters"])
+    self.tab3:SetText(Locale["My Factions"])
 end
 
 function MyEventsTabButton_Click()
