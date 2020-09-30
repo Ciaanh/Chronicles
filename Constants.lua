@@ -52,6 +52,9 @@ constants.config = {
 	},
 	librariesFilter = {
 		pageSize = 7
+	},
+	myJournal =  {
+		eventListPageSize = 9
 	}
 }
 

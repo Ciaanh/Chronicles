@@ -29,8 +29,6 @@ function Chronicles.UI:Init()
     Chronicles.UI.FactionsView:Init()
     Chronicles.UI.OptionsView:Init()
     Chronicles.UI.MyJournalView:Init()
-
-    DEFAULT_CHAT_FRAME:AddMessage("-- init UI")
 end
 
 function Chronicles.UI:Refresh()

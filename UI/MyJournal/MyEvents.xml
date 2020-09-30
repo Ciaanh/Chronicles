@@ -5,11 +5,11 @@
 
 
     <Frame name="MyEventItemTemplate" virtual="true" enableMouse="true">
-        <Size x="85" y="50"/>
+        <Size x="150" y="50"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture file="Interface\AddOns\Chronicles\Images\Event-Background">
-                    <Size x="85" y="50"/>
+                    <Size x="150" y="50"/>
                     <Anchors>
                         <Anchor point="CENTER" x="0" y="0"/>
                     </Anchors>
@@ -18,7 +18,7 @@
             </Layer>
             <Layer level="OVERLAY">
                 <FontString parentKey="Text" inherits="GameFontNormalSmall" justifyH="CENTER">
-                    <Size x="65" y="35"/>
+                    <Size x="130" y="35"/>
                     <Anchors>
                         <Anchor point="CENTER" />
                     </Anchors>
@@ -79,16 +79,14 @@
                 <Frames>
 
                     <Frame name="MyEventListScrollFrame" parentKey="ScrollFrame">
-                    
+                        <Size x="150" y="530" />
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
-                            <Anchor point="BOTTOMRIGHT"/>
                         </Anchors>
-
                         <Frames>
                             <Frame name="MyEventListBlock1" inherits="MyEventItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" x="-5" y="-10" />
+                                    <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </Frame>
                             <Frame name="MyEventListBlock2" inherits="MyEventItemTemplate">
@@ -116,6 +114,21 @@
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock5" y="-5"/>
                                 </Anchors>
                             </Frame>
+                            <Frame name="MyEventListBlock7" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock6" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock8" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock7" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyEventListBlock9" inherits="MyEventItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock8" y="-5"/>
+                                </Anchors>
+                            </Frame>
                         </Frames>
 
                         <Scripts>
@@ -126,9 +139,9 @@
                     </Frame>
 
                     <Slider name="MyEventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
-                        <Size x="25" y="312" />
+                        <Size x="20" y="470"/>
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventListScrollFrame" x="0" y="0" />
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventListScrollFrame" x="15" y="0" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>

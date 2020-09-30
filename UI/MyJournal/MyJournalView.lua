@@ -8,7 +8,7 @@ Chronicles.UI.MyJournalView = {}
 function Chronicles.UI.MyJournalView:Init()
     MyJournalView.Title:SetText(Locale["My Journal"])
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- init MyJournalView")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- init MyJournalView")
 
     Chronicles.UI.MyEvents:Init(true)
     Chronicles.UI.MyCharacters:Init(false)

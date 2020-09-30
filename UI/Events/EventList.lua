@@ -14,7 +14,7 @@ function Chronicles.UI.EventList:Init()
         }
     )
 
-    Chronicles.UI.EventList:DisplayEventList(1)
+    Chronicles.UI.EventList:DisplayEventList(1, true)
 end
 
 function Chronicles.UI.EventList:Refresh()

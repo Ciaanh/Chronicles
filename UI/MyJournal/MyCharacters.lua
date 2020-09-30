@@ -6,7 +6,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 Chronicles.UI.MyCharacters = {}
 
 function Chronicles.UI.MyCharacters:Init(isVisible)
-    DEFAULT_CHAT_FRAME:AddMessage("-- init My Characters")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- init My Characters")
     MyCharacters.Title:SetText(Locale[":My Characters"])
 
     MyCharacters.List:SetBackdrop(

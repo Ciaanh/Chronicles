@@ -332,7 +332,101 @@ end
 -----------------------------------------------------------------------------------------
 
 function Chronicles.DB:GetMyJournalEvents()
-    return Chronicles.storage.global.MyJournalEventDB
+    local myEvent = {
+        [1] = {
+            id = 1,
+            label = "My event 1",
+            description = {"My event 1 label"},
+            yearStart = -10000,
+            yearEnd = -10000,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [2] = {
+            id = 2,
+            label = "My event 2",
+            description = {"My event 2 label"},
+            yearStart = -6800,
+            yearEnd = -6800,
+            eventType = Chronicles.constants.eventType.other,
+            timeline = 1
+        },
+        [3] = {
+            id = 3,
+            label = "My event 3",
+            description = {"My event 3 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [4] = {
+            id = 4,
+            label = "My event 4",
+            description = {"My event 4 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [5] = {
+            id = 5,
+            label = "My event 5",
+            description = {"My event 5 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [6] = {
+            id = 6,
+            label = "My event 6",
+            description = {"My event 6 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [7] = {
+            id = 7,
+            label = "My event 7",
+            description = {"My event 7 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [8] = {
+            id = 8,
+            label = "My event 8",
+            description = {"My event 8 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [9] = {
+            id = 9,
+            label = "My event 9",
+            description = {"My event 9 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        },
+        [10] = {
+            id = 10,
+            label = "My event 10",
+            description = {"My event 10 label"},
+            yearStart = -2800,
+            yearEnd = -2800,
+            eventType = Chronicles.constants.eventType.war,
+            timeline = 1
+        }
+    }
+    return myEvent
+
+    --return Chronicles.storage.global.MyJournalEventDB
 end
 
 function Chronicles.DB:GetMyJournalFactions()

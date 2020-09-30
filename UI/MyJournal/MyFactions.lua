@@ -6,7 +6,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 Chronicles.UI.MyFactions = {}
 
 function Chronicles.UI.MyFactions:Init(isVisible)
-    DEFAULT_CHAT_FRAME:AddMessage("-- init My Factions")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- init My Factions")
 
     MyFactions.Title:SetText(Locale[":My Factions"])
 

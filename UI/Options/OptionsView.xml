@@ -59,10 +59,6 @@
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1" />
                                 </Anchors>
-                                <Scripts>
-                                    <OnLoad> self.type=1
-                                    </OnLoad>
-                                </Scripts>
                             </CheckButton>
                             <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
