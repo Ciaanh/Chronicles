@@ -19,6 +19,10 @@
         <Color r="0.30" g="0.18" b="0"/>
     </Font>
 
+    <Font name="EventDescriptionFontLight" inherits="SystemFont_Med3" virtual="true">
+        <Color r=".77" g=".67" b=".49"/>
+    </Font>
+
     <FontFamily name="ChroniclesFontFamily_Medium" virtual="true">
         <Member alphabet="roman">
             <Font font="Fonts\MORPHEUS.ttf" height="12"/>

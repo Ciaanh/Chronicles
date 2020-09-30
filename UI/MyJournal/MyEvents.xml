@@ -4,7 +4,7 @@
 
 
 
-    <Frame name="MyEventItemTemplate" virtual="true" enableMouse="true">
+    <Frame name="MyEventListItemTemplate" virtual="true" enableMouse="true">
         <Size x="150" y="50"/>
         <Layers>
             <Layer level="BACKGROUND">
@@ -37,8 +37,6 @@
     </Frame>
 
 
-
-
     <Frame name="MyEvents" parent="MyJournalView" hidden="true">
         <Size x="740" y="540"/>
         <Anchors>
@@ -56,7 +54,6 @@
             </Layer>
         </Layers>
         <Frames>
-
 
             <Frame name="MyEventsList" parentKey="List" inherits="BackdropTemplate">
                 <Size x="200" y="530"/>
@@ -84,47 +81,47 @@
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <Frames>
-                            <Frame name="MyEventListBlock1" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock1" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock2" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock2" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock1" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock3" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock3" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock2" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock4" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock4" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock3" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock5" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock5" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock4" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock6" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock6" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock5" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock7" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock7" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock6" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock8" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock8" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock7" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock9" inherits="MyEventItemTemplate">
+                            <Frame name="MyEventListBlock9" inherits="MyEventListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock8" y="-5"/>
                                 </Anchors>
@@ -169,7 +166,6 @@
 
             </Frame>
 
-
             <Frame name="MyEventsDetails" parentKey="Details" inherits="BackdropTemplate">
                 <Size x="540" y="530"/>
                 <Anchors>
@@ -186,7 +182,54 @@
                             </Anchors>
                         </Texture>
                     </Layer>
+
+                    <Layer level="OVERLAY">
+                        <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Id :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="15" y="-15" />
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+
                 </Layers>
+                <Frames>
+
+                    <!-- 
+                        id = 9,
+                        label = "My event 9",
+                        description = {"My event 9 label"},
+                        yearStart = -2800,
+                        yearEnd = -2800,
+                        eventType = Chronicles.constants.eventType.war,
+                        timeline = 1 
+                    -->
+
+                    <EditBox name="MyEventsDetailsId" parentKey="Id" letters="0"  inherits="InputBoxTemplate">
+                        <Size x="100" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+
+                    <Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" Text="Save">
+                        <Size x="50" y="40"/>
+                        <Anchors>
+                            <Anchor point="BOTTOM" x="150" y="50" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventSave_Click" />
+                        </Scripts>
+                    </Button>
+
+
+                </Frames>
+
             </Frame>
 
 

@@ -26,6 +26,8 @@ function Chronicles.UI.MyEvents:Init(isVisible)
         }
     )
 
+    --MyEventsDetailsId:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
+
     Chronicles.UI.MyEvents:DisplayEventList(1, true)
 
     if (isVisible) then
@@ -134,6 +136,7 @@ function Chronicles.UI.MyEvents:SetTextToFrame(event, frame)
             function()
                 --Chronicles.UI.EventDescription:DrawEventDescription(frame.event)
                 DEFAULT_CHAT_FRAME:AddMessage("-- clicked my event " .. event.label)
+                Chronicles.UI.MyEvents:SetMyEventDetails(event)
             end
         )
         frame:Show()
@@ -198,6 +201,24 @@ function Chronicles.UI.MyEvents:WipeAll()
     -- end
     -- self.Data = nil
     self.CurrentPage = nil
+end
+
+function Chronicles.UI.MyEvents:SetMyEventDetails(event)
+    -- id = 9,
+    -- label = "My event 9",
+    -- description = {"My event 9 label"},
+    -- yearStart = -2800,
+    -- yearEnd = -2800,
+    -- eventType = Chronicles.constants.eventType.war,
+    -- timeline = 1 
+
+    MyEventsDetails.Id:SetText(event.id)
+
+end
+
+
+function MyEventSave_Click()
+    DEFAULT_CHAT_FRAME:AddMessage("-- saving my event ")
 end
 
 ------------------------------------------------------------------------------------------
