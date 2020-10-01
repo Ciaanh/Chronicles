@@ -93,10 +93,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.era));
+                                self.Text:SetText(get_locale(get_constants().eventType[1]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.era,self:GetChecked())
+                                change_EventType(1,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
@@ -106,10 +106,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.war));
+                                self.Text:SetText(get_locale(get_constants().eventType[2]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.war,self:GetChecked())
+                                change_EventType(2,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
@@ -119,10 +119,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.battle));
+                                self.Text:SetText(get_locale(get_constants().eventType[3]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.battle,self:GetChecked())
+                                change_EventType(3,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
@@ -132,10 +132,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.death));
+                                self.Text:SetText(get_locale(get_constants().eventType[4]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.death,self:GetChecked())
+                                change_EventType(4,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
@@ -145,10 +145,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.birth));
+                                self.Text:SetText(get_locale(get_constants().eventType[5]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.birth,self:GetChecked())
+                                change_EventType(5,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>
@@ -158,10 +158,10 @@
                         </Anchors>
                         <Scripts>
                             <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType.other));
+                                self.Text:SetText(get_locale(get_constants().eventType[6]));
                             </OnLoad>
                             <OnClick>
-                                change_EventType(get_constants().eventType.other,self:GetChecked())
+                                change_EventType(6,self:GetChecked())
                             </OnClick>
                         </Scripts>
                     </CheckButton>

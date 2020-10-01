@@ -26,7 +26,7 @@ function Chronicles.UI.MyEvents:Init(isVisible)
         }
     )
 
-    --MyEventsDetailsId:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
+    MyEventsDetailsDescription:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
 
     Chronicles.UI.MyEvents:DisplayEventList(1, true)
 
@@ -35,12 +35,24 @@ function Chronicles.UI.MyEvents:Init(isVisible)
     else
         MyEvents:Hide()
     end
+
+    UIDropDownMenu_SetWidth(MyEventTypeDropDown, 95)
+    UIDropDownMenu_JustifyText(MyEventTypeDropDown, "LEFT")
+    UIDropDownMenu_Initialize(MyEventTypeDropDown, Init_EventType_Dropdown)
+
+    UIDropDownMenu_SetWidth(MyEventTimelineDropDown, 95)
+    UIDropDownMenu_JustifyText(MyEventTimelineDropDown, "LEFT")
+    UIDropDownMenu_Initialize(MyEventTimelineDropDown, Init_Timeline_Dropdown)
+end
+
+function DisplayMyEventList(page)
+    Chronicles.UI.MyEvents:DisplayEventList(page)
 end
 
 function Chronicles.UI.MyEvents:DisplayEventList(page, force)
     if (page ~= nil) then
         local pageSize = Chronicles.constants.config.myJournal.eventListPageSize
-        local eventList = Chronicles.DB:GetMyJournalEvents() 
+        local eventList = Chronicles.DB:GetMyJournalEvents()
         local numberOfEvents = tablelength(eventList)
 
         if (numberOfEvents > 0) then
@@ -209,16 +221,84 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     -- description = {"My event 9 label"},
     -- yearStart = -2800,
     -- yearEnd = -2800,
-    -- eventType = Chronicles.constants.eventType.war,
-    -- timeline = 1 
+    -- eventType = 2,
+    -- timeline = 2
 
     MyEventsDetails.Id:SetText(event.id)
+    MyEventsDetails.Label:SetText(event.label)
+    MyEventsDetails.Description:SetText(event.description[1])
 
+    UIDropDownMenu_SetSelectedID(MyEventTypeDropDown, event.eventType)
+    UIDropDownMenu_SetText(MyEventTypeDropDown, Chronicles.constants.eventType[event.eventType])
+
+    UIDropDownMenu_SetSelectedID(MyEventTimelineDropDown, event.timeline)
+    UIDropDownMenu_SetText(MyEventTimelineDropDown, Chronicles.constants.timelines[event.timeline])
 end
 
+function Init_EventType_Dropdown()
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
+
+    for key, value in ipairs(Chronicles.constants.eventType) do
+        local info = UIDropDownMenu_CreateInfo()
+
+        info.text = value
+        info.value = key
+
+        info.arg1 = MyEventTypeDropDown
+        info.arg2 = Chronicles.constants.eventType
+        info.func = Set_DropdownValue
+
+        info.notCheckable = true
+        info.checked = false
+        info.disabled = false
+
+        --DEFAULT_CHAT_FRAME:AddMessage("-- event type " .. info.text .. " " .. info.value)
+
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+function Set_DropdownValue(self, frame, data)
+    local index = self:GetID()
+    DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
+    UIDropDownMenu_SetSelectedID(frame, index)
+    UIDropDownMenu_SetText(frame, data[index])
+end
+
+function Init_Timeline_Dropdown()
+    for key, value in ipairs(Chronicles.constants.timelines) do
+        local info = UIDropDownMenu_CreateInfo()
+
+        info.text = value
+        info.value = key
+
+        info.arg1 = MyEventTimelineDropDown
+        info.arg2 = Chronicles.constants.timelines
+        info.func = Set_DropdownValue
+
+        info.notCheckable = true
+        info.checked = false
+        info.disabled = false
+
+        UIDropDownMenu_AddButton(info)
+    end
+end
 
 function MyEventSave_Click()
     DEFAULT_CHAT_FRAME:AddMessage("-- saving my event ")
+
+    --local index = MyEventTimelineDropDown.selectedID
+    DEFAULT_CHAT_FRAME:AddMessage("-- eventtype selectedID " .. tostring(MyEventTypeDropDown.selectedID))
+
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline selectedID " .. tostring(MyEventTimelineDropDown.selectedID))
+
+
+    -- DEFAULT_CHAT_FRAME:AddMessage(
+    --     "--MyEventTypeDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventTypeDropDown))
+    -- )
+    -- DEFAULT_CHAT_FRAME:AddMessage(
+    --     "--MyEventTimelineDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventTimelineDropDown))
+    -- )
 end
 
 ------------------------------------------------------------------------------------------

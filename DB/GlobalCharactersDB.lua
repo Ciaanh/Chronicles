@@ -17,7 +17,7 @@ GlobalCharactersDB = {
 		id = 1,
 		name = Locale["Norgannon"],
 		biography = Locale["Norgannon biography"],
-		timeline = 1,
+		timeline = 2,
 		factions = {1}
 	},
 }

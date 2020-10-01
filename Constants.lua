@@ -22,20 +22,20 @@ constants.defaults = {
 constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
 
 constants.eventType = {
-	era = "Era",
-	war = "War",
-	battle = "Battle",
-	death = "Death",
-	birth = "Birth",
-	other = "Other"
+	[1] = "era",
+	[2] = "war",
+	[3] = "battle",
+	[4] = "death",
+	[5] = "birth",
+	[6] = "other"
 }
 
 constants.timelines = {
-	undefined = 0,
-	main = 1,
-	dreanor = 2,
-	eot = 3,
-	wota = 4
+	[1] = "undefined",
+	[2] = "main",
+	[3] = "dreanor",
+	[4] = "eot",
+	[5] = "wota"
 }
 
 constants.config = {
@@ -53,7 +53,7 @@ constants.config = {
 	librariesFilter = {
 		pageSize = 7
 	},
-	myJournal =  {
+	myJournal = {
 		eventListPageSize = 9
 	}
 }

@@ -16,6 +16,6 @@ GlobalFactionsDB = {
 		id = 1,
 		name = Locale["Titans"],
 		description = Locale["Titans description"],
-		timeline = 1
+		timeline = 2
 	},
 }

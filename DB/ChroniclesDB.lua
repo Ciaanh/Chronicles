@@ -317,14 +317,15 @@ end
 
 function Chronicles.DB:SetEventTypeStatus(eventType, status)
     --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
-    Chronicles.storage.global.EventTypes[eventType] = status
+    Chronicles.storage.global.EventTypesStatuses[eventType] = status
 end
 
 function Chronicles.DB:GetEventTypeStatus(eventType)
-    local isActive = Chronicles.storage.global.EventTypes[eventType]
+    --DEFAULT_CHAT_FRAME:AddMessage("-- GetEventTypeStatus " .. tostring(eventType))
+    local isActive = Chronicles.storage.global.EventTypesStatuses[eventType]
     if (isActive == nil) then
         isActive = true
-        Chronicles.storage.global.EventTypes[eventType] = isActive
+        Chronicles.storage.global.EventTypesStatuses[eventType] = isActive
     end
     return isActive
 end
@@ -339,17 +340,17 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 1 label"},
             yearStart = -10000,
             yearEnd = -10000,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [2] = {
             id = 2,
             label = "My event 2",
-            description = {"My event 2 label"},
+            description = {"My event 2 label\n\n\ndssdgfqgddd"},
             yearStart = -6800,
             yearEnd = -6800,
-            eventType = Chronicles.constants.eventType.other,
-            timeline = 1
+            eventType = 6,
+            timeline = 2
         },
         [3] = {
             id = 3,
@@ -357,8 +358,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 3 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [4] = {
             id = 4,
@@ -366,8 +367,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 4 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [5] = {
             id = 5,
@@ -375,8 +376,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 5 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [6] = {
             id = 6,
@@ -384,8 +385,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 6 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [7] = {
             id = 7,
@@ -393,8 +394,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 7 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [8] = {
             id = 8,
@@ -402,8 +403,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 8 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [9] = {
             id = 9,
@@ -411,8 +412,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 9 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         },
         [10] = {
             id = 10,
@@ -420,8 +421,8 @@ function Chronicles.DB:GetMyJournalEvents()
             description = {"My event 10 label"},
             yearStart = -2800,
             yearEnd = -2800,
-            eventType = Chronicles.constants.eventType.war,
-            timeline = 1
+            eventType = 2,
+            timeline = 2
         }
     }
     return myEvent
@@ -502,7 +503,7 @@ function Chronicles.DB.RP:RegisterBirth(age, name, addon)
         description = {"Birth of " .. name .. " \n\nImported from " .. addon},
         yearStart = birth,
         yearEnd = birth,
-        eventType = Chronicles.constants.eventType.birth
+        eventType = 5
     }
     Chronicles.DB:AddGlobalEvent(event)
 end

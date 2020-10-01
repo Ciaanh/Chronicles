@@ -200,21 +200,69 @@
                         description = {"My event 9 label"},
                         yearStart = -2800,
                         yearEnd = -2800,
-                        eventType = Chronicles.constants.eventType.war,
-                        timeline = 1 
+                        eventType = 2,
+                        timeline = 2 
                     -->
 
-                    <EditBox name="MyEventsDetailsId" parentKey="Id" letters="0"  inherits="InputBoxTemplate">
+                    <EditBox name="MyEventsDetailsId" parentKey="Id" letters="0" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
                         </Anchors>
                         <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
                             <OnLoad>
                             </OnLoad>
                         </Scripts>
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
+
+                    <EditBox name="MyEventsDetailsLabel" parentKey="Label" letters="0" inherits="InputBoxTemplate" autoFocus="false">
+                        <Size x="100" y="32" />
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsDetailsId" y="-10"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+
+                    <!-- numeric="true" autoFocus="false" -->
+                    <EditBox name="MyEventsDetailsDescription" parentKey="Description" letters="500" multiline="true" autoFocus="false" inherits="BackdropTemplate">
+                        <Size x="300" y="200" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsLabel" y="-10"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+
+                    <Frame name="MyEventTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsDescription" y="-10"/>
+                        </Anchors>
+                    </Frame>
+
+
+                    <Frame name="MyEventTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventTypeDropDown" y="-10"/>
+                        </Anchors>
+                    </Frame>
+
+
+
+
+
 
 
                     <Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" Text="Save">

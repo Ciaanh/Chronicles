@@ -24,7 +24,7 @@ function Chronicles:OnInitialize()
                 minimap = {hide = false},
                 myjournal = true
             },
-            EventTypes = {},
+            EventTypesStatuses = {},
             EventDBStatuses = {},
             FactionDBStatuses = {},
             CharacterDBStatuses = {},
@@ -36,8 +36,8 @@ function Chronicles:OnInitialize()
                     description = {Locale["An event from my journal"]},
                     yearStart = -1,
                     yearEnd = -1,
-                    eventType = Chronicles.constants.eventType.war,
-                    timeline = 1
+                    eventType = 2,
+                    timeline = 2
                 },
             },
             MyJournalFactionDB = {},
