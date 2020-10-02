@@ -26,8 +26,6 @@ function Chronicles.UI.MyEvents:Init(isVisible)
         }
     )
 
-    MyEventsDetailsDescription:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
-
     Chronicles.UI.MyEvents:DisplayEventList(1, true)
 
     if (isVisible) then
@@ -147,7 +145,7 @@ function Chronicles.UI.MyEvents:SetTextToFrame(event, frame)
             "OnMouseDown",
             function()
                 --Chronicles.UI.EventDescription:DrawEventDescription(frame.event)
-                DEFAULT_CHAT_FRAME:AddMessage("-- clicked my event " .. event.label)
+                --DEFAULT_CHAT_FRAME:AddMessage("-- clicked my event " .. event.label)
                 Chronicles.UI.MyEvents:SetMyEventDetails(event)
             end
         )
@@ -225,8 +223,10 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     -- timeline = 2
 
     MyEventsDetails.Id:SetText(event.id)
-    MyEventsDetails.Label:SetText(event.label)
-    MyEventsDetails.Description:SetText(event.description[1])
+    MyEventsDetails.Title:SetText(event.label)
+    MyEventsDetails.YearStart:SetNumber(event.yearStart)
+    MyEventsDetails.YearEnd:SetNumber(event.yearEnd)
+    MyEventsDetailsDescription:SetText(event.description[1])
 
     UIDropDownMenu_SetSelectedID(MyEventTypeDropDown, event.eventType)
     UIDropDownMenu_SetText(MyEventTypeDropDown, Chronicles.constants.eventType[event.eventType])
@@ -260,7 +260,7 @@ end
 
 function Set_DropdownValue(self, frame, data)
     local index = self:GetID()
-    DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
     UIDropDownMenu_SetSelectedID(frame, index)
     UIDropDownMenu_SetText(frame, data[index])
 end
@@ -292,7 +292,10 @@ function MyEventSave_Click()
 
     DEFAULT_CHAT_FRAME:AddMessage("-- timeline selectedID " .. tostring(MyEventTimelineDropDown.selectedID))
 
-
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Id " .. tostring(MyEventsDetails.Id:GetText()))
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Title " .. tostring(MyEventsDetails.Title:GetText()))
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearStart " .. tostring(MyEventsDetails.YearStart:GetNumber()))
+    
     -- DEFAULT_CHAT_FRAME:AddMessage(
     --     "--MyEventTypeDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventTypeDropDown))
     -- )

@@ -186,7 +186,37 @@
                     <Layer level="OVERLAY">
                         <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Id :">
                             <Anchors>
-                                <Anchor point="TOPLEFT" x="15" y="-15" />
+                                <Anchor point="TOPLEFT" x="25" y="-25" />
+                            </Anchors>
+                        </FontString>
+                        <FontString name="MyEventsDetailsId" parentKey="Id" inherits="EventDescriptionFont" justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
+                            </Anchors>
+                        </FontString>
+
+                        <FontString name="MyEventsDetailsTitleLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Title :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsIdLabel" y="-15"/>
+                            </Anchors>
+                        </FontString>
+
+
+                        <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Year start :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTitleLabel" y="-15"/>
+                            </Anchors>
+                        </FontString>
+
+                        <FontString name="MyEventsDetailsYearEndLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Year end :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearStartLabel" y="-15"/>
+                            </Anchors>
+                        </FontString>
+
+                        <FontString name="MyEventsDetailsDescriptionsLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Description :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabel" y="-30"/>
                             </Anchors>
                         </FontString>
                     </Layer>
@@ -204,71 +234,111 @@
                         timeline = 2 
                     -->
 
-                    <EditBox name="MyEventsDetailsId" parentKey="Id" letters="0" inherits="InputBoxTemplate" autoFocus="false">
-                        <Size x="100" y="32" />
+                    <Frame name="MyEventTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
+                            <Anchor point="TOPRIGHT" x="0" y="-15"/>
                         </Anchors>
-                        <Scripts>
-                            <OnEscapePressed function="EditBox_ClearFocus"/>
-                            <OnLoad>
-                            </OnLoad>
-                        </Scripts>
-                        <FontString inherits="EventDescriptionFontLight" />
-                    </EditBox>
-
-                    <EditBox name="MyEventsDetailsLabel" parentKey="Label" letters="0" inherits="InputBoxTemplate" autoFocus="false">
-                        <Size x="100" y="32" />
-                        <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsDetailsId" y="-10"/>
-                        </Anchors>
-                        <Scripts>
-                            <OnEscapePressed function="EditBox_ClearFocus"/>
-                            <OnLoad>
-                            </OnLoad>
-                        </Scripts>
-                        <FontString inherits="EventDescriptionFontLight" />
-                    </EditBox>
-
-
-                    <!-- numeric="true" autoFocus="false" -->
-                    <EditBox name="MyEventsDetailsDescription" parentKey="Description" letters="500" multiline="true" autoFocus="false" inherits="BackdropTemplate">
-                        <Size x="300" y="200" />
-                        <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsLabel" y="-10"/>
-                        </Anchors>
-                        <Scripts>
-                            <OnEscapePressed function="EditBox_ClearFocus"/>
-                            <OnLoad>
-                            </OnLoad>
-                        </Scripts>
-                        <FontString inherits="EventDescriptionFontLight" />
-                    </EditBox>
-
+                    </Frame>
 
                     <Frame name="MyEventTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsDescription" y="-10"/>
+                            <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="MyEventTimelineDropDown" x="0"/>
                         </Anchors>
                     </Frame>
 
-
-                    <Frame name="MyEventTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
+                    <EditBox name="MyEventsDetailsTitle" parentKey="Title" letters="0" inherits="InputBoxTemplate" autoFocus="false">
+                        <Size x="200" y="32" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventTypeDropDown" y="-10"/>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTitleLabel" x="10"/>
                         </Anchors>
+                        <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+
+
+                    <!-- numeric="true" autoFocus="false" -->
+                    <EditBox name="MyEventsDetailsYearStart" parentKey="YearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                        <Size x="100" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearStartLabel" x="10"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+                    <EditBox name="MyEventsDetailsYearEnd" parentKey="YearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                        <Size x="100" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearEndLabel" x="10"/>
+                        </Anchors>
+                        <Scripts>
+                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                            <OnLoad>
+                            </OnLoad>
+                        </Scripts>
+                        <FontString inherits="EventDescriptionFontLight" />
+                    </EditBox>
+
+
+
+
+                    <Frame name="MyEventsDetailsDescriptionContainer" inherits="BackdropTemplate">
+                        <Size x="400" y="300" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsDescriptionsLabel" y="-5"/>
+                        </Anchors>
+                        <KeyValues>
+                            <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_8_8_1111" type="global"/>
+                            <KeyValue key="backdropColor" value="BLACK_FONT_COLOR" type="global"/>
+                            <KeyValue key="backdropColorAlpha" value="0.9" type="number"/>
+                            <KeyValue key="backdropBorderColor" value="TOOLTIP_DEFAULT_COLOR" type="global"/>
+                        </KeyValues>
+
+                        <Frames>
+                            <ScrollFrame name="MyEventsDetailsDescriptionScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" x="0" y="-5"/>
+                                    <Anchor point="RIGHT" x="-5" y="0"/>
+                                    <Anchor point="LEFT" x="5" y="0"/>
+                                    <Anchor point="BOTTOM" x="0" y="5"/>
+                                </Anchors>
+                                <Scripts>
+                                    <OnMouseDown>
+								        MyEventsDetailsDescription:SetFocus();
+                                    </OnMouseDown>
+                                </Scripts>
+                                <ScrollChild>
+                                    <EditBox name="MyEventsDetailsDescription" letters="500" multiline="true" autoFocus="false">
+                                        <Size x="390" y="290"/>
+                                        <Anchors>
+                                            <Anchor point="CENTER" />
+                                        </Anchors>
+                                        <Scripts>
+                                            <OnEscapePressed function="EditBox_ClearFocus"/>
+                                            <OnLoad>
+                                            </OnLoad>
+                                        </Scripts>
+                                        <FontString inherits="EventDescriptionFontLight" />
+                                    </EditBox>
+                                </ScrollChild>
+                            </ScrollFrame>
+                        </Frames>
                     </Frame>
-
-
-
-
-
 
 
                     <Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" Text="Save">
-                        <Size x="50" y="40"/>
+                        <Size x="50" y="30"/>
                         <Anchors>
-                            <Anchor point="BOTTOM" x="150" y="50" />
+                            <Anchor point="BOTTOMRIGHT" x="-20" y="20" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyEventSave_Click" />
