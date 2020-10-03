@@ -94,7 +94,6 @@ end
 ------------------------------------------------------------------------------------------
 function EventDescriptionPreviousButton_OnClick(self)
     Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.UI.EventDescription.CurrentPage - 1)
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function SetPreviousButtonText()
@@ -103,7 +102,6 @@ end
 
 function EventDescriptionNextButton_OnClick(self)
     Chronicles.UI.EventDescription:ChangeEventDescriptionPage(Chronicles.UI.EventDescription.CurrentPage + 1)
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function SetNextButtonText()

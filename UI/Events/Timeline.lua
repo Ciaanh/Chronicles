@@ -453,10 +453,8 @@ end
 
 function TimelineScrollPreviousButton_OnClick(self)
     Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage - 1, false)
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function TimelineScrollNextButton_OnClick(self)
     Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage + 1, false)
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end

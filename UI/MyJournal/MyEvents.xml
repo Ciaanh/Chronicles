@@ -4,7 +4,7 @@
 
 
 
-    <Frame name="MyEventListItemTemplate" virtual="true" enableMouse="true">
+    <Frame name="MyEventsListItemTemplate" virtual="true" enableMouse="true">
         <Size x="150" y="50"/>
         <Layers>
             <Layer level="BACKGROUND">
@@ -81,47 +81,47 @@
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <Frames>
-                            <Frame name="MyEventListBlock1" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock1" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock2" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock2" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock1" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock3" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock3" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock2" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock4" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock4" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock3" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock5" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock5" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock4" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock6" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock6" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock5" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock7" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock7" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock6" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock8" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock8" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock7" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock9" inherits="MyEventListItemTemplate">
+                            <Frame name="MyEventListBlock9" inherits="MyEventsListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock8" y="-5"/>
                                 </Anchors>
@@ -161,9 +161,7 @@
                             </OnValueChanged>
                         </Scripts>
                     </Slider>
-
                 </Frames>
-
             </Frame>
 
             <Frame name="MyEventsDetails" parentKey="Details" inherits="BackdropTemplate">
@@ -201,7 +199,6 @@
                             </Anchors>
                         </FontString>
 
-
                         <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Year start :">
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTitleLabel" y="-15"/>
@@ -219,30 +216,30 @@
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabel" y="-30"/>
                             </Anchors>
                         </FontString>
-                    </Layer>
 
+                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Event type :">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="250"/>
+                            </Anchors>
+                        </FontString>
+
+                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Timeline :">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsEventTypeLabel" y="-20"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
                 </Layers>
                 <Frames>
-
-                    <!-- 
-                        id = 9,
-                        label = "My event 9",
-                        description = {"My event 9 label"},
-                        yearStart = -2800,
-                        yearEnd = -2800,
-                        eventType = 2,
-                        timeline = 2 
-                    -->
-
-                    <Frame name="MyEventTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
+                    <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
                         <Anchors>
-                            <Anchor point="TOPRIGHT" x="0" y="-15"/>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsEventTypeLabel" x="0" y="0"/>
                         </Anchors>
                     </Frame>
 
-                    <Frame name="MyEventTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
+                    <Frame name="MyEventsDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
                         <Anchors>
-                            <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="MyEventTimelineDropDown" x="0"/>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTypeDropDown" y="0"/>
                         </Anchors>
                     </Frame>
 
@@ -259,10 +256,8 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
-
-
                     <!-- numeric="true" autoFocus="false" -->
-                    <EditBox name="MyEventsDetailsYearStart" parentKey="YearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                    <EditBox name="MyEventsDetailsYearStart" parentKey="YearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearStartLabel" x="10"/>
@@ -275,7 +270,7 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
-                    <EditBox name="MyEventsDetailsYearEnd" parentKey="YearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false" numeric="true">
+                    <EditBox name="MyEventsDetailsYearEnd" parentKey="YearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearEndLabel" x="10"/>
@@ -287,9 +282,6 @@
                         </Scripts>
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
-
-
-
 
                     <Frame name="MyEventsDetailsDescriptionContainer" inherits="BackdropTemplate">
                         <Size x="400" y="300" />
@@ -324,8 +316,6 @@
                                         </Anchors>
                                         <Scripts>
                                             <OnEscapePressed function="EditBox_ClearFocus"/>
-                                            <OnLoad>
-                                            </OnLoad>
                                         </Scripts>
                                         <FontString inherits="EventDescriptionFontLight" />
                                     </EditBox>
@@ -334,22 +324,89 @@
                         </Frames>
                     </Frame>
 
+                    <Button name="MyEventsDetailsDescriptionPrevious">
+                        <Size>
+                            <AbsDimension x="32" y="32"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsDescriptionContainer" x="0" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsDescriptionPrevious_OnClick"/>
+                        </Scripts>
+                        <NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+                        <PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+                        <DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                    </Button>
 
-                    <Button parentKey="SaveButton" inherits="UIPanelButtonTemplate" Text="Save">
+                    <Frame name="MyEventsDetailsDescriptionPagerContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsDescriptionPrevious" x="0" y="0" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsDescriptionPager" inherits="EventDescriptionFont" justifyH="CENTER">
+                                    <Anchors>
+                                        <Anchor point="CENTER"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Button name="MyEventsDetailsDescriptionNext">
+                        <Size>
+                            <AbsDimension x="32" y="32"/>
+                        </Size>
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsDescriptionPrevious" x="50" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsDescriptionNext_OnClick"/>
+                        </Scripts>
+                        <NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+                        <PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+                        <DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+                    </Button>
+
+                    <Button name="MyEventsDetailsAddDescriptionPage" inherits="UIPanelButtonTemplate" Text="Add page">
+                        <Size x="70" y="30"/>
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsDescriptionNext" x="50" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsAddDescriptionPage_OnClick" />
+                        </Scripts>
+                    </Button>
+
+                    <Button name="MyEventsDetailsRemoveDescriptionPage" inherits="UIPanelButtonTemplate" Text="Remove last page">
+                        <Size x="120" y="30"/>
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsAddDescriptionPage" x="10" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsRemoveDescriptionPage_OnClick" />
+                        </Scripts>
+                    </Button>
+
+                    <Button name="MyEventsDetailsSaveButton" inherits="UIPanelButtonTemplate" Text="Save">
                         <Size x="50" y="30"/>
                         <Anchors>
                             <Anchor point="BOTTOMRIGHT" x="-20" y="20" />
                         </Anchors>
                         <Scripts>
-                            <OnClick function="MyEventSave_Click" />
+                            <OnClick function="MyEventsDetailsSave_Click" />
                         </Scripts>
                     </Button>
+
 
 
                 </Frames>
 
             </Frame>
-
 
         </Frames>
 

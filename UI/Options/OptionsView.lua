@@ -281,7 +281,6 @@ function LibrariesFilterPreviousButton_OnClick(self)
     else
         Chronicles.UI.OptionsView:DisplayLibrariesFilter(Chronicles.UI.OptionsView.CurrentLibrariesPage - 1)
     end
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function LibrariesFilterNextButton_OnClick(self)
@@ -290,5 +289,4 @@ function LibrariesFilterNextButton_OnClick(self)
     else
         Chronicles.UI.OptionsView:DisplayLibrariesFilter(Chronicles.UI.OptionsView.CurrentLibrariesPage + 1)
     end
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end

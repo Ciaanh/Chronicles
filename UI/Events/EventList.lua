@@ -250,7 +250,6 @@ function EventListPreviousButton_OnClick(self)
     else
         Chronicles.UI.EventList:DisplayEventList(Chronicles.UI.EventList.CurrentPage - 1)
     end
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end
 
 function EventListNextButton_OnClick(self)
@@ -259,5 +258,4 @@ function EventListNextButton_OnClick(self)
     else
         Chronicles.UI.EventList:DisplayEventList(Chronicles.UI.EventList.CurrentPage + 1)
     end
-    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
 end

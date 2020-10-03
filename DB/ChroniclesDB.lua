@@ -337,16 +337,16 @@ function Chronicles.DB:GetMyJournalEvents()
         [1] = {
             id = 1,
             label = "My event 1",
-            description = {"My event 1 label"},
-            yearStart = -10000,
-            yearEnd = -10000,
+            description = {},
+            yearStart = -963,
+            yearEnd = -666,
             eventType = 2,
             timeline = 2
         },
         [2] = {
             id = 2,
             label = "My event 2",
-            description = {"My event 2 label\n\n\ndssdgfqgddd"},
+            description = {"My event 2 label\n\n\ndssdgfqgddd", "page 2", "page 3"},
             yearStart = -6800,
             yearEnd = -6800,
             eventType = 6,
