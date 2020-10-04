@@ -75,7 +75,7 @@
                 </Layers>
 
                 <Frames>
-                    <Frame name="MyEventListScrollFrame" parentKey="ScrollFrame">
+                    <Frame name="MyEventsListScrollFrame" parentKey="ScrollFrame">
                         <Size x="150" y="530" />
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
@@ -130,15 +130,15 @@
 
                         <Scripts>
                             <OnMouseWheel>
-                                MyEventListScrollFrame_OnMouseWheel(self, delta)
+                                MyEventsListScrollFrame_OnMouseWheel(self, delta)
                             </OnMouseWheel>
                         </Scripts>
                     </Frame>
 
-                    <Slider name="MyEventListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                    <Slider name="MyEventsListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
                         <Size x="20" y="470"/>
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventListScrollFrame" x="15" y="0" />
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsListScrollFrame" x="15" y="0" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
@@ -157,28 +157,18 @@
                                 self.scrollStep = 1;
                             </OnLoad>
                             <OnValueChanged>
-                                DisplayMyEventList(adjust_value(value, self.scrollStep));
+                                DisplayMyEventsList(adjust_value(value, self.scrollStep));
                             </OnValueChanged>
                         </Scripts>
                     </Slider>
                     
-                    <Button name="MyEventsDetailsAddEvent" inherits="UIPanelButtonTemplate" Text="Add event">
+                    <Button name="MyEventsListAddEvent" inherits="UIPanelButtonTemplate" Text="Add event">
                         <Size x="75" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventListScrollFrame" x="0" y="0" />
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsListScrollFrame" x="0" y="0" />
                         </Anchors>
                         <Scripts>
-                            <OnClick function="MyEventsDetailsAddEvent_OnClick" />
-                        </Scripts>
-                    </Button>
-
-                    <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate" Text="Remove last event">
-                        <Size x="125" y="30"/>
-                        <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsAddEvent" x="0" y="0" />
-                        </Anchors>
-                        <Scripts>
-                            <OnClick function="MyEventsDetailsRemoveEvent_OnClick" />
+                            <OnClick function="MyEventsListAddEvent_OnClick" />
                         </Scripts>
                     </Button>
                 </Frames>
@@ -420,6 +410,17 @@
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyEventsDetailsSave_Click" />
+                        </Scripts>
+                    </Button>
+
+
+                    <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate" Text="Remove event">
+                        <Size x="125" y="30"/>
+                        <Anchors>
+                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsDetailsSaveButton" x="0" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsRemoveEvent_OnClick" />
                         </Scripts>
                     </Button>
                 </Frames>

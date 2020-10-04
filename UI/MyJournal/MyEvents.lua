@@ -57,8 +57,8 @@ function Chronicles.UI.MyEvents:HideAll()
     MyEventListBlock8:Hide()
     MyEventListBlock9:Hide()
 
-    MyEventListScrollBar.ScrollUpButton:Disable()
-    MyEventListScrollBar.ScrollDownButton:Disable()
+    MyEventsListScrollBar.ScrollUpButton:Disable()
+    MyEventsListScrollBar.ScrollDownButton:Disable()
 end
 
 function Chronicles.UI.MyEvents:WipeAll()
@@ -126,6 +126,7 @@ function Chronicles.UI.MyEvents:HideFields()
     MyEventsDetailsSaveButton:Hide()
     MyEventsDetailsAddDescriptionPage:Hide()
     MyEventsDetailsRemoveDescriptionPage:Hide()
+    MyEventsDetailsRemoveEvent:Hide()
 end
 
 function Chronicles.UI.MyEvents:ShowFields()
@@ -149,25 +150,44 @@ function Chronicles.UI.MyEvents:ShowFields()
     MyEventsDetailsSaveButton:Show()
     MyEventsDetailsAddDescriptionPage:Show()
     MyEventsDetailsRemoveDescriptionPage:Show()
+    MyEventsDetailsRemoveEvent:Show()
 end
 
 ------------------------------------------------------------------------------------------
 -- List ----------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function DisplayMyEventList(page)
+function DisplayMyEventsList(page)
     Chronicles.UI.MyEvents:DisplayEventList(page)
+end
+
+function Chronicles.UI.MyEvents:FilterEvents(events)
+    local foundEvents = {}
+    for eventIndex, event in pairs(events) do
+        if event ~= nil then
+            table.insert(foundEvents, event)
+        end
+    end
+
+    table.sort(
+        foundEvents,
+        function(a, b)
+            return a.yearStart < b.yearStart
+        end
+    )
+    return foundEvents
 end
 
 function Chronicles.UI.MyEvents:DisplayEventList(page, force)
     if (page ~= nil) then
         local pageSize = Chronicles.constants.config.myJournal.eventListPageSize
-        local eventList = Chronicles.DB:GetMyJournalEvents()
+        local eventList = Chronicles.UI.MyEvents:FilterEvents(Chronicles.DB:GetMyJournalEvents())
+
         local numberOfEvents = tablelength(eventList)
 
         if (numberOfEvents > 0) then
             local maxPageValue = math.ceil(numberOfEvents / pageSize)
-            MyEventListScrollBar:SetMinMaxValues(1, maxPageValue)
+            MyEventsListScrollBar:SetMinMaxValues(1, maxPageValue)
 
             if (page > maxPageValue) then
                 page = maxPageValue
@@ -181,8 +201,8 @@ function Chronicles.UI.MyEvents:DisplayEventList(page, force)
                 Chronicles.UI.MyEvents:WipeAll()
 
                 if (numberOfEvents > pageSize) then
-                    MyEventListScrollBar.ScrollUpButton:Enable()
-                    MyEventListScrollBar.ScrollDownButton:Enable()
+                    MyEventsListScrollBar.ScrollUpButton:Enable()
+                    MyEventsListScrollBar.ScrollDownButton:Enable()
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
@@ -190,17 +210,17 @@ function Chronicles.UI.MyEvents:DisplayEventList(page, force)
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
-                    MyEventListScrollBar.ScrollUpButton:Disable()
+                    MyEventsListScrollBar.ScrollUpButton:Disable()
                     Chronicles.UI.MyEvents.CurrentPage = 1
                 end
 
                 if ((firstIndex + 5) >= numberOfEvents) then
                     lastIndex = numberOfEvents
-                    MyEventListScrollBar.ScrollDownButton:Disable()
+                    MyEventsListScrollBar.ScrollDownButton:Disable()
                 end
 
                 Chronicles.UI.MyEvents.CurrentPage = page
-                MyEventListScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentPage)
+                MyEventsListScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentPage)
 
                 if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
                     Chronicles.UI.MyEvents:SetTextToFrame(eventList[firstIndex], MyEventListBlock1)
@@ -263,8 +283,8 @@ function Chronicles.UI.MyEvents:SetTextToFrame(event, frame)
     end
 end
 
-function MyEventsDetailsAddEvent_OnClick()
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsDetailsAddEvent_OnClick ")
+function MyEventsListAddEvent_OnClick()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsListAddEvent_OnClick ")
     local event = {
         id = nil,
         label = "Title",
@@ -275,10 +295,14 @@ function MyEventsDetailsAddEvent_OnClick()
         timeline = 1
     }
     Chronicles.DB:SetMyJournalEvents(event)
+    Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage, true)
 end
 
 function MyEventsDetailsRemoveEvent_OnClick()
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsDetailsRemoveEvent_OnClick ")
+    Chronicles.DB:RemoveMyJournalEvent(Chronicles.UI.MyEvents.SelectedEvent.id)
+    Chronicles.UI.MyEvents:HideFields()
+    Chronicles.UI.MyEvents.SelectedEvent = {}
+    Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage, true)
 end
 
 ------------------------------------------------------------------------------------------
@@ -550,7 +574,7 @@ end
 ------------------------------------------------------------------------------------------
 -- Scroll List ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
-function MyEventListScrollFrame_OnMouseWheel(self, value)
+function MyEventsListScrollFrame_OnMouseWheel(self, value)
     if (value > 0) then
         MyEventListPreviousButton_OnClick(self)
     else

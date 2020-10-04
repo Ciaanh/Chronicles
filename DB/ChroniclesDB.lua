@@ -338,8 +338,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 1,
             label = "My event 1",
             description = {},
-            yearStart = -963,
-            yearEnd = -666,
+            yearStart = 0,
+            yearEnd = 1,
             eventType = 2,
             timeline = 2
         },
@@ -347,8 +347,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 2,
             label = "My event 2",
             description = {"My event 2 label\n\n\ndssdgfqgddd", "page 2", "page 3"},
-            yearStart = -6800,
-            yearEnd = -6800,
+            yearStart = -4000,
+            yearEnd = -4000,
             eventType = 6,
             timeline = 2
         },
@@ -356,8 +356,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 3,
             label = "My event 3",
             description = {"My event 3 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = -2000,
+            yearEnd = -2000,
             eventType = 2,
             timeline = 2
         },
@@ -365,8 +365,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 4,
             label = "My event 4",
             description = {"My event 4 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 50,
+            yearEnd = 50,
             eventType = 2,
             timeline = 2
         },
@@ -374,8 +374,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 5,
             label = "My event 5",
             description = {"My event 5 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 0,
+            yearEnd = 0,
             eventType = 2,
             timeline = 2
         },
@@ -383,8 +383,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 6,
             label = "My event 6",
             description = {"My event 6 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 0,
+            yearEnd = 0,
             eventType = 2,
             timeline = 2
         },
@@ -392,8 +392,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 7,
             label = "My event 7",
             description = {"My event 7 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 0,
+            yearEnd = 0,
             eventType = 2,
             timeline = 2
         },
@@ -401,8 +401,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 8,
             label = "My event 8",
             description = {"My event 8 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 0,
+            yearEnd = 0,
             eventType = 2,
             timeline = 2
         },
@@ -410,8 +410,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 9,
             label = "My event 9",
             description = {"My event 9 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 0,
+            yearEnd = 0,
             eventType = 2,
             timeline = 2
         },
@@ -419,8 +419,8 @@ function Chronicles.DB:GetMyJournalEvents()
             id = 10,
             label = "My event 10",
             description = {"My event 10 label"},
-            yearStart = -2800,
-            yearEnd = -2800,
+            yearStart = 20,
+            yearEnd = 20,
             eventType = 2,
             timeline = 2
         }
@@ -432,7 +432,11 @@ end
 
 function Chronicles.DB:SetMyJournalEvents(event)
     Chronicles.DB:AddToMyJournal(event, Chronicles.storage.global.MyJournalEventDB)
-end 
+end
+
+function Chronicles.DB:RemoveMyJournalEvent(eventId)
+    Chronicles.DB:RemoveFromMyJournal(eventId, Chronicles.storage.global.MyJournalEventDB)
+end
 
 function Chronicles.DB:GetMyJournalFactions()
     return Chronicles.storage.global.MyJournalFactionDB
@@ -442,12 +446,20 @@ function Chronicles.DB:SetMyJournalFactions(faction)
     Chronicles.DB:AddToMyJournal(faction, Chronicles.storage.global.MyJournalFactionDB)
 end
 
+function Chronicles.DB:RemoveMyJournalFaction(factionId)
+    Chronicles.DB:RemoveFromMyJournal(factionId, Chronicles.storage.global.MyJournalFactionDB)
+end
+
 function Chronicles.DB:GetMyJournalCharacters()
     return Chronicles.storage.global.MyJournalCharacterDB
 end
 
 function Chronicles.DB:SetMyJournalCharacters(character)
     Chronicles.DB:AddToMyJournal(character, Chronicles.storage.global.MyJournalCharacterDB)
+end
+
+function Chronicles.DB:RemoveMyJournalCharacter(characterId)
+    Chronicles.DB:RemoveFromMyJournal(characterId, Chronicles.storage.global.MyJournalCharacterDB)
 end
 
 -- function add - delete
@@ -470,8 +482,11 @@ function Chronicles.DB:AddToMyJournal(object, db)
     table.insert(db, object.id, object)
 end
 
-function Chronicles.DB:RemoveFromMyJournal(object, db)
-    table.remove(db, object.id)
+function Chronicles.DB:RemoveFromMyJournal(objectId, db)
+    DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFromMyJournal " .. objectId)
+    table.remove(db, objectId)
+
+    DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFromMyJournal " .. tostring(db[objectId]))
 end
 
 -----------------------------------------------------------------------------------------
