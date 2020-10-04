@@ -16,6 +16,7 @@
                     <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
                 </Texture>
             </Layer>
+
             <Layer level="OVERLAY">
                 <FontString parentKey="Text" inherits="GameFontNormalSmall" justifyH="CENTER">
                     <Size x="130" y="35"/>
@@ -74,7 +75,6 @@
                 </Layers>
 
                 <Frames>
-
                     <Frame name="MyEventListScrollFrame" parentKey="ScrollFrame">
                         <Size x="150" y="530" />
                         <Anchors>
@@ -161,6 +161,26 @@
                             </OnValueChanged>
                         </Scripts>
                     </Slider>
+                    
+                    <Button name="MyEventsDetailsAddEvent" inherits="UIPanelButtonTemplate" Text="Add event">
+                        <Size x="75" y="30"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventListScrollFrame" x="0" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsAddEvent_OnClick" />
+                        </Scripts>
+                    </Button>
+
+                    <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate" Text="Remove last event">
+                        <Size x="125" y="30"/>
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsAddEvent" x="0" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsRemoveEvent_OnClick" />
+                        </Scripts>
+                    </Button>
                 </Frames>
             </Frame>
 
@@ -187,6 +207,7 @@
                                 <Anchor point="TOPLEFT" x="25" y="-25" />
                             </Anchors>
                         </FontString>
+
                         <FontString name="MyEventsDetailsId" parentKey="Id" inherits="EventDescriptionFont" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
@@ -230,6 +251,7 @@
                         </FontString>
                     </Layer>
                 </Layers>
+
                 <Frames>
                     <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
                         <Anchors>
@@ -256,7 +278,6 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
-                    <!-- numeric="true" autoFocus="false" -->
                     <EditBox name="MyEventsDetailsYearStart" parentKey="YearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
@@ -401,14 +422,8 @@
                             <OnClick function="MyEventsDetailsSave_Click" />
                         </Scripts>
                     </Button>
-
-
-
                 </Frames>
-
             </Frame>
-
         </Frames>
-
     </Frame>
 </Ui>

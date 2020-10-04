@@ -430,12 +430,24 @@ function Chronicles.DB:GetMyJournalEvents()
     --return Chronicles.storage.global.MyJournalEventDB
 end
 
+function Chronicles.DB:SetMyJournalEvents(event)
+    Chronicles.DB:AddToMyJournal(event, Chronicles.storage.global.MyJournalEventDB)
+end 
+
 function Chronicles.DB:GetMyJournalFactions()
     return Chronicles.storage.global.MyJournalFactionDB
 end
 
+function Chronicles.DB:SetMyJournalFactions(faction)
+    Chronicles.DB:AddToMyJournal(faction, Chronicles.storage.global.MyJournalFactionDB)
+end
+
 function Chronicles.DB:GetMyJournalCharacters()
     return Chronicles.storage.global.MyJournalCharacterDB
+end
+
+function Chronicles.DB:SetMyJournalCharacters(character)
+    Chronicles.DB:AddToMyJournal(character, Chronicles.storage.global.MyJournalCharacterDB)
 end
 
 -- function add - delete

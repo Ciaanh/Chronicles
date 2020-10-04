@@ -5,7 +5,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI.MyEvents = {}
 Chronicles.UI.MyEvents.CurrentPage = 1
-
 Chronicles.UI.MyEvents.SelectedEvent = {}
 
 function Chronicles.UI.MyEvents:Init(isVisible)
@@ -46,6 +45,115 @@ function Chronicles.UI.MyEvents:Init(isVisible)
 
     Chronicles.UI.MyEvents:HideFields()
 end
+
+function Chronicles.UI.MyEvents:HideAll()
+    MyEventListBlock1:Hide()
+    MyEventListBlock2:Hide()
+    MyEventListBlock3:Hide()
+    MyEventListBlock4:Hide()
+    MyEventListBlock5:Hide()
+    MyEventListBlock6:Hide()
+    MyEventListBlock7:Hide()
+    MyEventListBlock8:Hide()
+    MyEventListBlock9:Hide()
+
+    MyEventListScrollBar.ScrollUpButton:Disable()
+    MyEventListScrollBar.ScrollDownButton:Disable()
+end
+
+function Chronicles.UI.MyEvents:WipeAll()
+    if (MyEventListBlock1.event ~= nil) then
+        MyEventListBlock1.event = nil
+    end
+
+    if (MyEventListBlock2.event ~= nil) then
+        MyEventListBlock2.event = nil
+    end
+
+    if (MyEventListBlock3.event ~= nil) then
+        MyEventListBlock3.event = nil
+    end
+
+    if (MyEventListBlock4.event ~= nil) then
+        MyEventListBlock4.event = nil
+    end
+
+    if (MyEventListBlock5.event ~= nil) then
+        MyEventListBlock5.event = nil
+    end
+
+    if (MyEventListBlock6.event ~= nil) then
+        MyEventListBlock6.event = nil
+    end
+
+    if (MyEventListBlock7.event ~= nil) then
+        MyEventListBlock7.event = nil
+    end
+
+    if (MyEventListBlock8.event ~= nil) then
+        MyEventListBlock8.event = nil
+    end
+
+    if (MyEventListBlock9.event ~= nil) then
+        MyEventListBlock9.event = nil
+    end
+
+    -- if (self.Data ~= nil) then
+    --     self.Data = nil
+    -- end
+    -- self.Data = nil
+    self.CurrentPage = nil
+end
+
+function Chronicles.UI.MyEvents:HideFields()
+    MyEventsDetailsIdLabel:Hide()
+    MyEventsDetailsId:Hide()
+    MyEventsDetailsTitleLabel:Hide()
+    MyEventsDetailsYearStartLabel:Hide()
+    MyEventsDetailsYearEndLabel:Hide()
+    MyEventsDetailsDescriptionsLabel:Hide()
+    MyEventsDetailsDescriptionPager:Hide()
+    MyEventsDetailsEventTypeLabel:Hide()
+    MyEventsDetailsTimelineLabel:Hide()
+    MyEventsDetailsTypeDropDown:Hide()
+    MyEventsDetailsTimelineDropDown:Hide()
+    MyEventsDetailsTitle:Hide()
+    MyEventsDetailsYearStart:Hide()
+    MyEventsDetailsYearEnd:Hide()
+    MyEventsDetailsDescriptionContainer:Hide()
+    MyEventsDetailsDescriptionPrevious:Hide()
+    MyEventsDetailsDescriptionNext:Hide()
+    MyEventsDetailsSaveButton:Hide()
+    MyEventsDetailsAddDescriptionPage:Hide()
+    MyEventsDetailsRemoveDescriptionPage:Hide()
+end
+
+function Chronicles.UI.MyEvents:ShowFields()
+    MyEventsDetailsIdLabel:Show()
+    MyEventsDetailsId:Show()
+    MyEventsDetailsTitleLabel:Show()
+    MyEventsDetailsYearStartLabel:Show()
+    MyEventsDetailsYearEndLabel:Show()
+    MyEventsDetailsDescriptionsLabel:Show()
+    MyEventsDetailsDescriptionPager:Show()
+    MyEventsDetailsEventTypeLabel:Show()
+    MyEventsDetailsTimelineLabel:Show()
+    MyEventsDetailsTypeDropDown:Show()
+    MyEventsDetailsTimelineDropDown:Show()
+    MyEventsDetailsTitle:Show()
+    MyEventsDetailsYearStart:Show()
+    MyEventsDetailsYearEnd:Show()
+    MyEventsDetailsDescriptionContainer:Show()
+    MyEventsDetailsDescriptionPrevious:Show()
+    MyEventsDetailsDescriptionNext:Show()
+    MyEventsDetailsSaveButton:Show()
+    MyEventsDetailsAddDescriptionPage:Show()
+    MyEventsDetailsRemoveDescriptionPage:Show()
+end
+
+------------------------------------------------------------------------------------------
+-- List ----------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
 function DisplayMyEventList(page)
     Chronicles.UI.MyEvents:DisplayEventList(page)
@@ -155,106 +263,27 @@ function Chronicles.UI.MyEvents:SetTextToFrame(event, frame)
     end
 end
 
-function Chronicles.UI.MyEvents:HideAll()
-    MyEventListBlock1:Hide()
-    MyEventListBlock2:Hide()
-    MyEventListBlock3:Hide()
-    MyEventListBlock4:Hide()
-    MyEventListBlock5:Hide()
-    MyEventListBlock6:Hide()
-    MyEventListBlock7:Hide()
-    MyEventListBlock8:Hide()
-    MyEventListBlock9:Hide()
-
-    MyEventListScrollBar.ScrollUpButton:Disable()
-    MyEventListScrollBar.ScrollDownButton:Disable()
+function MyEventsDetailsAddEvent_OnClick()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsDetailsAddEvent_OnClick ")
+    local event = {
+        id = nil,
+        label = "Title",
+        description = {""},
+        yearStart = 0,
+        yearEnd = 0,
+        eventType = 1,
+        timeline = 1
+    }
+    Chronicles.DB:SetMyJournalEvents(event)
 end
 
-function Chronicles.UI.MyEvents:WipeAll()
-    if (MyEventListBlock1.event ~= nil) then
-        MyEventListBlock1.event = nil
-    end
-
-    if (MyEventListBlock2.event ~= nil) then
-        MyEventListBlock2.event = nil
-    end
-
-    if (MyEventListBlock3.event ~= nil) then
-        MyEventListBlock3.event = nil
-    end
-
-    if (MyEventListBlock4.event ~= nil) then
-        MyEventListBlock4.event = nil
-    end
-
-    if (MyEventListBlock5.event ~= nil) then
-        MyEventListBlock5.event = nil
-    end
-
-    if (MyEventListBlock6.event ~= nil) then
-        MyEventListBlock6.event = nil
-    end
-
-    if (MyEventListBlock7.event ~= nil) then
-        MyEventListBlock7.event = nil
-    end
-
-    if (MyEventListBlock8.event ~= nil) then
-        MyEventListBlock8.event = nil
-    end
-
-    if (MyEventListBlock9.event ~= nil) then
-        MyEventListBlock9.event = nil
-    end
-
-    -- if (self.Data ~= nil) then
-    --     self.Data = nil
-    -- end
-    -- self.Data = nil
-    self.CurrentPage = nil
+function MyEventsDetailsRemoveEvent_OnClick()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsDetailsRemoveEvent_OnClick ")
 end
 
-function Chronicles.UI.MyEvents:HideFields()
-    MyEventsDetailsIdLabel:Hide()
-    MyEventsDetailsId:Hide()
-    MyEventsDetailsTitleLabel:Hide()
-    MyEventsDetailsYearStartLabel:Hide()
-    MyEventsDetailsYearEndLabel:Hide()
-    MyEventsDetailsDescriptionsLabel:Hide()
-    MyEventsDetailsDescriptionPager:Hide()
-    MyEventsDetailsEventTypeLabel:Hide()
-    MyEventsDetailsTimelineLabel:Hide()
-    MyEventsDetailsTypeDropDown:Hide()
-    MyEventsDetailsTimelineDropDown:Hide()
-    MyEventsDetailsTitle:Hide()
-    MyEventsDetailsYearStart:Hide()
-    MyEventsDetailsYearEnd:Hide()
-    MyEventsDetailsDescriptionContainer:Hide()
-    MyEventsDetailsDescriptionPrevious:Hide()
-    MyEventsDetailsDescriptionNext:Hide()
-    MyEventsDetailsSaveButton:Hide()
-end
-
-function Chronicles.UI.MyEvents:ShowFields()
-    MyEventsDetailsIdLabel:Show()
-    MyEventsDetailsId:Show()
-    MyEventsDetailsTitleLabel:Show()
-    MyEventsDetailsYearStartLabel:Show()
-    MyEventsDetailsYearEndLabel:Show()
-    MyEventsDetailsDescriptionsLabel:Show()
-    MyEventsDetailsDescriptionPager:Show()
-    MyEventsDetailsEventTypeLabel:Show()
-    MyEventsDetailsTimelineLabel:Show()
-    MyEventsDetailsTypeDropDown:Show()
-    MyEventsDetailsTimelineDropDown:Show()
-    MyEventsDetailsTitle:Show()
-    MyEventsDetailsYearStart:Show()
-    MyEventsDetailsYearEnd:Show()
-    MyEventsDetailsDescriptionContainer:Show()
-    MyEventsDetailsDescriptionPrevious:Show()
-    MyEventsDetailsDescriptionNext:Show()
-    MyEventsDetailsSaveButton:Show()
-end
+------------------------------------------------------------------------------------------
+-- Details -------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
 function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     if (Chronicles.UI.MyEvents.SelectedEvent.id ~= nil) then
@@ -359,41 +388,39 @@ function Chronicles.UI.MyEvents:ChangeEventDescriptionPage(page)
     end
 end
 
-function Chronicles.UI.MyEvents:SaveDescriptionPage()
-    if
-        (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ~= nil and
-            Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ~= 0)
-     then
-        local text = MyEventsDetailsDescription:GetText()
+function MyEventsDetailsSave_Click()
+    DEFAULT_CHAT_FRAME:AddMessage("-- saving my event ")
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- SaveDescriptionPage text " .. text)
-        -- DEFAULT_CHAT_FRAME:AddMessage(
-        --     "-- SaveDescriptionPage page " .. Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage
-        -- )
+    DEFAULT_CHAT_FRAME:AddMessage("-- eventtype selectedID " .. tostring(MyEventsDetailsTypeDropDown.selectedID))
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline selectedID " .. tostring(MyEventsDetailsTimelineDropDown.selectedID))
 
-        Chronicles.UI.MyEvents.SelectedEvent.description[Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage] =
-            text
-    end
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Id " .. tostring(MyEventsDetails.Id:GetText()))
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Title " .. tostring(MyEventsDetails.Title:GetText()))
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearStart " .. tostring(MyEventsDetails.YearStart:GetNumber()))
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearEnd " .. tostring(MyEventsDetails.YearEnd:GetNumber()))
+
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearStart " .. tostring(MyEventsDetails.YearStart:GetText()))
+    DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearEnd " .. tostring(MyEventsDetails.YearEnd:GetText()))
+
+    local yearStart = tonumber(MyEventsDetails.YearStart:GetText())
+    local yearEnd = tonumber(MyEventsDetails.YearEnd:GetText())
+
+    -- DEFAULT_CHAT_FRAME:AddMessage(
+    --     "--MyEventsDetailsTypeDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventsDetailsTypeDropDown))
+    -- )
+    -- DEFAULT_CHAT_FRAME:AddMessage(
+    --     "--MyEventsDetailsTimelineDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventsDetailsTimelineDropDown))
+    -- )
 end
 
-function MyEventsDetailsDescriptionNext_OnClick()
-    if
-        (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ==
-            Chronicles.UI.MyEvents.SelectedEvent.MaxDescriptionPages)
-     then
-        return
-    end
-    Chronicles.UI.MyEvents:SaveDescriptionPage()
-    Chronicles.UI.MyEvents:ChangeEventDescriptionPage(Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage + 1)
+function Chronicles.UI.MyEvents:ClearDetails()
+    DEFAULT_CHAT_FRAME:AddMessage("-- ClearDetails ")
 end
 
-function MyEventsDetailsDescriptionPrevious_OnClick()
-    if (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage == 0) then
-        return
-    end
-    Chronicles.UI.MyEvents:SaveDescriptionPage()
-    Chronicles.UI.MyEvents:ChangeEventDescriptionPage(Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage - 1)
-end
+------------------------------------------------------------------------------------------
+-- Dropdowns -----------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
 function Init_EventType_Dropdown()
     --DEFAULT_CHAT_FRAME:AddMessage("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
@@ -418,13 +445,6 @@ function Init_EventType_Dropdown()
     end
 end
 
-function Set_DropdownValue(self, frame, data)
-    local index = self:GetID()
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
-    UIDropDownMenu_SetSelectedID(frame, index)
-    UIDropDownMenu_SetText(frame, data[index])
-end
-
 function Init_Timeline_Dropdown()
     for key, value in ipairs(Chronicles.constants.timelines) do
         local info = UIDropDownMenu_CreateInfo()
@@ -441,6 +461,34 @@ function Init_Timeline_Dropdown()
         info.disabled = false
 
         UIDropDownMenu_AddButton(info)
+    end
+end
+
+function Set_DropdownValue(self, frame, data)
+    local index = self:GetID()
+    --DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
+    UIDropDownMenu_SetSelectedID(frame, index)
+    UIDropDownMenu_SetText(frame, data[index])
+end
+
+------------------------------------------------------------------------------------------
+-- Descriptions --------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function Chronicles.UI.MyEvents:SaveDescriptionPage()
+    if
+        (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ~= nil and
+            Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ~= 0)
+     then
+        local text = MyEventsDetailsDescription:GetText()
+
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- SaveDescriptionPage text " .. text)
+        -- DEFAULT_CHAT_FRAME:AddMessage(
+        --     "-- SaveDescriptionPage page " .. Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage
+        -- )
+
+        Chronicles.UI.MyEvents.SelectedEvent.description[Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage] =
+            text
     end
 end
 
@@ -480,34 +528,27 @@ function MyEventsDetailsRemoveDescriptionPage_OnClick()
     end
 end
 
-function MyEventsDetailsSave_Click()
-    DEFAULT_CHAT_FRAME:AddMessage("-- saving my event ")
+function MyEventsDetailsDescriptionNext_OnClick()
+    if
+        (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage ==
+            Chronicles.UI.MyEvents.SelectedEvent.MaxDescriptionPages)
+     then
+        return
+    end
+    Chronicles.UI.MyEvents:SaveDescriptionPage()
+    Chronicles.UI.MyEvents:ChangeEventDescriptionPage(Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage + 1)
+end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- eventtype selectedID " .. tostring(MyEventsDetailsTypeDropDown.selectedID))
-    DEFAULT_CHAT_FRAME:AddMessage("-- timeline selectedID " .. tostring(MyEventsDetailsTimelineDropDown.selectedID))
-
-    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Id " .. tostring(MyEventsDetails.Id:GetText()))
-    DEFAULT_CHAT_FRAME:AddMessage("-- timeline Title " .. tostring(MyEventsDetails.Title:GetText()))
-
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearStart " .. tostring(MyEventsDetails.YearStart:GetNumber()))
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearEnd " .. tostring(MyEventsDetails.YearEnd:GetNumber()))
-
-    DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearStart " .. tostring(MyEventsDetails.YearStart:GetText()))
-    DEFAULT_CHAT_FRAME:AddMessage("-- timeline YearEnd " .. tostring(MyEventsDetails.YearEnd:GetText()))
-
-    local yearStart = tonumber(MyEventsDetails.YearStart:GetText())
-    local yearEnd = tonumber(MyEventsDetails.YearEnd:GetText())
-
-    -- DEFAULT_CHAT_FRAME:AddMessage(
-    --     "--MyEventsDetailsTypeDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventsDetailsTypeDropDown))
-    -- )
-    -- DEFAULT_CHAT_FRAME:AddMessage(
-    --     "--MyEventsDetailsTimelineDropDown_GetSelectedID " .. tostring(UIDropDownMenu_GetSelectedID(MyEventsDetailsTimelineDropDown))
-    -- )
+function MyEventsDetailsDescriptionPrevious_OnClick()
+    if (Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage == 0) then
+        return
+    end
+    Chronicles.UI.MyEvents:SaveDescriptionPage()
+    Chronicles.UI.MyEvents:ChangeEventDescriptionPage(Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage - 1)
 end
 
 ------------------------------------------------------------------------------------------
--- Scroll Page ---------------------------------------------------------------------------
+-- Scroll List ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function MyEventListScrollFrame_OnMouseWheel(self, value)
     if (value > 0) then
