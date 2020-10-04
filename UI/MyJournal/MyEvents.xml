@@ -161,8 +161,8 @@
                             </OnValueChanged>
                         </Scripts>
                     </Slider>
-                    
-                    <Button name="MyEventsListAddEvent" inherits="UIPanelButtonTemplate" Text="Add event">
+
+                    <Button name="MyEventsListAddEvent" inherits="UIPanelButtonTemplate">
                         <Size x="75" y="30"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsListScrollFrame" x="0" y="0" />
@@ -192,7 +192,7 @@
                     </Layer>
 
                     <Layer level="OVERLAY">
-                        <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Id :">
+                        <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER" >
                             <Anchors>
                                 <Anchor point="TOPLEFT" x="25" y="-25" />
                             </Anchors>
@@ -204,37 +204,37 @@
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsTitleLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Title :">
+                        <FontString name="MyEventsDetailsTitleLabel" inherits="EventDescriptionFont" justifyH="CENTER" >
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsIdLabel" y="-15"/>
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Year start :">
+                        <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTitleLabel" y="-15"/>
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsYearEndLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Year end :">
+                        <FontString name="MyEventsDetailsYearEndLabel" inherits="EventDescriptionFont" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearStartLabel" y="-15"/>
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsDescriptionsLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Description :">
+                        <FontString name="MyEventsDetailsDescriptionsLabel" inherits="EventDescriptionFont" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabel" y="-30"/>
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Event type :">
+                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="250"/>
                             </Anchors>
                         </FontString>
 
-                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="CENTER" text="Timeline :">
+                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="CENTER" >
                             <Anchors>
                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsEventTypeLabel" y="-20"/>
                             </Anchors>
@@ -281,6 +281,22 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
+                    <Frame name="MyEventsDetailsYearStartErrorContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearStart" x="0" y="0" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsYearStartError" inherits="EventDescriptionFont" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="CENTER"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
                     <EditBox name="MyEventsDetailsYearEnd" parentKey="YearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
@@ -293,6 +309,22 @@
                         </Scripts>
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
+
+                    <Frame name="MyEventsDetailsYearEndErrorContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearEnd" x="0" y="0" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsYearEndError" inherits="EventDescriptionFont" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="CENTER"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
 
                     <Frame name="MyEventsDetailsDescriptionContainer" inherits="BackdropTemplate">
                         <Size x="400" y="300" />
@@ -383,7 +415,7 @@
                         <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
                     </Button>
 
-                    <Button name="MyEventsDetailsAddDescriptionPage" inherits="UIPanelButtonTemplate" Text="Add page">
+                    <Button name="MyEventsDetailsAddDescriptionPage" inherits="UIPanelButtonTemplate">
                         <Size x="70" y="30"/>
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsDescriptionNext" x="50" y="0" />
@@ -393,7 +425,7 @@
                         </Scripts>
                     </Button>
 
-                    <Button name="MyEventsDetailsRemoveDescriptionPage" inherits="UIPanelButtonTemplate" Text="Remove last page">
+                    <Button name="MyEventsDetailsRemoveDescriptionPage" inherits="UIPanelButtonTemplate">
                         <Size x="120" y="30"/>
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsAddDescriptionPage" x="10" y="0" />
@@ -403,7 +435,7 @@
                         </Scripts>
                     </Button>
 
-                    <Button name="MyEventsDetailsSaveButton" inherits="UIPanelButtonTemplate" Text="Save">
+                    <Button name="MyEventsDetailsSaveButton" inherits="UIPanelButtonTemplate">
                         <Size x="50" y="30"/>
                         <Anchors>
                             <Anchor point="BOTTOMRIGHT" x="-20" y="20" />
@@ -413,8 +445,7 @@
                         </Scripts>
                     </Button>
 
-
-                    <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate" Text="Remove event">
+                    <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate">
                         <Size x="125" y="30"/>
                         <Anchors>
                             <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsDetailsSaveButton" x="0" y="0" />

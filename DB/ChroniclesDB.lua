@@ -333,101 +333,7 @@ end
 -----------------------------------------------------------------------------------------
 
 function Chronicles.DB:GetMyJournalEvents()
-    local myEvent = {
-        [1] = {
-            id = 1,
-            label = "My event 1",
-            description = {},
-            yearStart = 0,
-            yearEnd = 1,
-            eventType = 2,
-            timeline = 2
-        },
-        [2] = {
-            id = 2,
-            label = "My event 2",
-            description = {"My event 2 label\n\n\ndssdgfqgddd", "page 2", "page 3"},
-            yearStart = -4000,
-            yearEnd = -4000,
-            eventType = 6,
-            timeline = 2
-        },
-        [3] = {
-            id = 3,
-            label = "My event 3",
-            description = {"My event 3 label"},
-            yearStart = -2000,
-            yearEnd = -2000,
-            eventType = 2,
-            timeline = 2
-        },
-        [4] = {
-            id = 4,
-            label = "My event 4",
-            description = {"My event 4 label"},
-            yearStart = 50,
-            yearEnd = 50,
-            eventType = 2,
-            timeline = 2
-        },
-        [5] = {
-            id = 5,
-            label = "My event 5",
-            description = {"My event 5 label"},
-            yearStart = 0,
-            yearEnd = 0,
-            eventType = 2,
-            timeline = 2
-        },
-        [6] = {
-            id = 6,
-            label = "My event 6",
-            description = {"My event 6 label"},
-            yearStart = 0,
-            yearEnd = 0,
-            eventType = 2,
-            timeline = 2
-        },
-        [7] = {
-            id = 7,
-            label = "My event 7",
-            description = {"My event 7 label"},
-            yearStart = 0,
-            yearEnd = 0,
-            eventType = 2,
-            timeline = 2
-        },
-        [8] = {
-            id = 8,
-            label = "My event 8",
-            description = {"My event 8 label"},
-            yearStart = 0,
-            yearEnd = 0,
-            eventType = 2,
-            timeline = 2
-        },
-        [9] = {
-            id = 9,
-            label = "My event 9",
-            description = {"My event 9 label"},
-            yearStart = 0,
-            yearEnd = 0,
-            eventType = 2,
-            timeline = 2
-        },
-        [10] = {
-            id = 10,
-            label = "My event 10",
-            description = {"My event 10 label"},
-            yearStart = 20,
-            yearEnd = 20,
-            eventType = 2,
-            timeline = 2
-        }
-    }
-    return myEvent
-
-    --return Chronicles.storage.global.MyJournalEventDB
+    return Chronicles.storage.global.MyJournalEventDB
 end
 
 function Chronicles.DB:SetMyJournalEvents(event)
@@ -475,18 +381,18 @@ function Chronicles.DB:AvailableDbId(db)
 end
 
 function Chronicles.DB:AddToMyJournal(object, db)
+    object.source = "myjournal"
+
     if (object.id == nil) then
         object.id = Chronicles.DB:AvailableDbId(db)
+        table.insert(db, object.id, object)
+    else
+        db[object.id] = object
     end
-    object.source = "myjournal"
-    table.insert(db, object.id, object)
 end
 
 function Chronicles.DB:RemoveFromMyJournal(objectId, db)
-    DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFromMyJournal " .. objectId)
     table.remove(db, objectId)
-
-    DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFromMyJournal " .. tostring(db[objectId]))
 end
 
 -----------------------------------------------------------------------------------------
