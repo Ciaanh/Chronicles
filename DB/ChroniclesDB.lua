@@ -392,7 +392,11 @@ function Chronicles.DB:AddToMyJournal(object, db)
 end
 
 function Chronicles.DB:RemoveFromMyJournal(objectId, db)
-    table.remove(db, objectId)
+    for key, value in ipairs(db) do
+        if (value.id == objectId) then
+            table.remove(db, key)
+        end
+    end
 end
 
 -----------------------------------------------------------------------------------------

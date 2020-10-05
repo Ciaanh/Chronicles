@@ -28,18 +28,7 @@ function Chronicles:OnInitialize()
             EventDBStatuses = {},
             FactionDBStatuses = {},
             CharacterDBStatuses = {},
-
-            MyJournalEventDB = {
-                [1] = {
-                    id = 1,
-                    label = Locale["MyJournal Event"],
-                    description = {Locale["An event from my journal"]},
-                    yearStart = -1,
-                    yearEnd = -1,
-                    eventType = 2,
-                    timeline = 2
-                },
-            },
+            MyJournalEventDB = {},
             MyJournalFactionDB = {},
             MyJournalCharacterDB = {}
         }
@@ -76,7 +65,7 @@ function Chronicles:OnInitialize()
     )
 
     Chronicles.UI.EventFilter:Init()
-    
+
     Chronicles.DB:Init()
 
     Chronicles.UI:Init()

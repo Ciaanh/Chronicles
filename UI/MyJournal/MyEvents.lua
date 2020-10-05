@@ -49,6 +49,7 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEvents.Title:SetText(Locale[":My Events"])
     MyEventsDetailsYearStartError:SetText(Locale["ErrorYearAsNumber"])
     MyEventsDetailsYearEndError:SetText(Locale["ErrorYearAsNumber"])
+    MyEventsDetailsYearOrderError:SetText(Locale["ErrorYearOrder"])
 
     MyEventsDetailsAddDescriptionPage:SetText(Locale["AddPage"])
     MyEventsDetailsRemoveDescriptionPage:SetText(Locale["RemovePage"])
@@ -57,13 +58,13 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsListAddEvent:SetText(Locale["AddEvent"])
     MyEventsDetailsRemoveEvent:SetText(Locale["RemoveEvent"])
 
-    MyEventsDetailsIdLabel:SetText(Locale["Id"] .. " :")
-    MyEventsDetailsTitleLabel:SetText(Locale["Title"] .. " :")
-    MyEventsDetailsYearStartLabel:SetText(Locale["YearStart"] .. " :")
-    MyEventsDetailsYearEndLabel:SetText(Locale["YearEnd"] .. " :")
-    MyEventsDetailsDescriptionsLabel:SetText(Locale["Description"] .. " :")
-    MyEventsDetailsEventTypeLabel:SetText(Locale["EventType"] .. " :")
-    MyEventsDetailsTimelineLabel:SetText(Locale["Timeline"] .. " :")
+    MyEventsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
+    MyEventsDetailsTitleLabel:SetText(Locale["Title_Field"] .. " :")
+    MyEventsDetailsYearStartLabel:SetText(Locale["YearStart_Field"] .. " :")
+    MyEventsDetailsYearEndLabel:SetText(Locale["YearEnd_Field"] .. " :")
+    MyEventsDetailsDescriptionsLabel:SetText(Locale["Description_Field"] .. " :")
+    MyEventsDetailsEventTypeLabel:SetText(Locale["EventType_Field"] .. " :")
+    MyEventsDetailsTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
 end
 
 function Chronicles.UI.MyEvents:HideAll()
@@ -149,6 +150,7 @@ function Chronicles.UI.MyEvents:HideFields()
     MyEventsDetailsRemoveEvent:Hide()
     MyEventsDetailsYearStartErrorContainer:Hide()
     MyEventsDetailsYearEndErrorContainer:Hide()
+    MyEventsDetailsYearOrderErrorContainer:Hide()
 end
 
 function Chronicles.UI.MyEvents:ShowFields()
@@ -335,7 +337,8 @@ end
 function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     MyEventsDetailsYearStartErrorContainer:Hide()
     MyEventsDetailsYearEndErrorContainer:Hide()
-    
+    MyEventsDetailsYearOrderErrorContainer:Hide()
+
     if (Chronicles.UI.MyEvents.SelectedEvent.id ~= nil) then
         if (event.id == Chronicles.UI.MyEvents.SelectedEvent.id) then
             return
@@ -445,6 +448,10 @@ function MyEventsDetailsSave_Click()
     local yearStartNumber = tonumber(MyEventsDetails.YearStart:GetText())
     local yearEndNumber = tonumber(MyEventsDetails.YearEnd:GetText())
 
+    MyEventsDetailsYearStartErrorContainer:Hide()
+    MyEventsDetailsYearEndErrorContainer:Hide()
+    MyEventsDetailsYearOrderErrorContainer:Hide()
+
     if (yearStartNumber == nil) then
         MyEventsDetailsYearStartErrorContainer:Show()
     end
@@ -457,8 +464,10 @@ function MyEventsDetailsSave_Click()
         return
     end
 
-    MyEventsDetailsYearStartErrorContainer:Hide()
-    MyEventsDetailsYearEndErrorContainer:Hide()
+    if (yearStartNumber > yearEndNumber) then
+        MyEventsDetailsYearOrderErrorContainer:Show()
+        return
+    end
 
     local event = {
         id = tonumber(MyEventsDetails.Id:GetText()),

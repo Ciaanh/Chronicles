@@ -18,15 +18,16 @@ if L then
     L["AddEvent"] = "Add event"
     L["RemoveEvent"] = "Remove event"
 
-    L["Id"] = "Id"
-    L["Title"] = "Title"
-    L["YearStart"] = "Year start"
-    L["YearEnd"] = "Year end"
-    L["Description"] = "Description"
-    L["EventType"] = "Event type"
-    L["Timeline"] = "Timeline"
+    L["Id_Field"] = "Id"
+    L["Title_Field"] = "Title"
+    L["YearStart_Field"] = "Year start"
+    L["YearEnd_Field"] = "Year end"
+    L["Description_Field"] = "Description"
+    L["EventType_Field"] = "Event type"
+    L["Timeline_Field"] = "Timeline"
 
     L["ErrorYearAsNumber"] = "A year must be a number"
+    L["ErrorYearOrder"] = "Event ends before it's started"
 
 
 
