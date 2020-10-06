@@ -371,13 +371,29 @@ end
 -- function add - delete
 
 function Chronicles.DB:AvailableDbId(db)
+    DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId ")
+    local ids = {}
+
     for key, value in pairs(db) do
-        if (value == nil) then
-            return key
+        if (value ~= nil) then
+            table.insert(ids, value.id)
         end
     end
 
-    return table.maxn(db) + 1
+    table.sort(ids)
+
+    local maxId = 1
+
+    for key, value in ipairs(ids) do
+        DEFAULT_CHAT_FRAME:AddMessage("-- key " .. key .. " , value " .. value .. " , maxid " .. maxId)
+        if (value > maxId + 1) then
+            return maxId + 1
+        end
+        maxId = maxId + 1
+    end
+
+    DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId maxId "..maxId)
+    return maxId -- table.maxn(db) + 1
 end
 
 function Chronicles.DB:AddToMyJournal(object, db)
@@ -385,7 +401,7 @@ function Chronicles.DB:AddToMyJournal(object, db)
 
     if (object.id == nil) then
         object.id = Chronicles.DB:AvailableDbId(db)
-        table.insert(db, object.id, object)
+        table.insert(db, object)
     else
         db[object.id] = object
     end
