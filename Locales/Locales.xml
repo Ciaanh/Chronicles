@@ -4,4 +4,6 @@
 
 	<Script file="enUS.lua"/>
 
+	<Script file="events_enUS.lua"/>
+
 </Ui>

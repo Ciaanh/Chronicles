@@ -39,7 +39,7 @@ end
 ------------------------------------------------------------------------------------------
 function MyJournalCheckBox_OnClick()
     Chronicles.storage.global.options.myjournal = not Chronicles.storage.global.options.myjournal
-    
+
     if (Chronicles.storage.global.options.myjournal) then
         MyJournalViewShow:Show()
         Chronicles.DB:SetGroupStatus("myjournal", true)
@@ -217,42 +217,8 @@ function Chronicles.UI.OptionsView:SetTextToFrame(group, checkBox)
     checkBox:Hide()
 
     if (group ~= nil) then
-        local text = group.name
-        if (text:len() > 15) then
-            text = text:sub(0, 15)
-
-            checkBox:SetScript(
-                "OnEnter",
-                function()
-                    GameTooltip:SetOwner(checkBox, "ANCHOR_BOTTOMRIGHT", -5, 30)
-                    GameTooltip:SetText(group.name, nil, nil, nil, nil, true)
-                end
-            )
-            checkBox:SetScript(
-                "OnLeave",
-                function()
-                    GameTooltip:Hide()
-                end
-            )
-        else
-            checkBox:SetScript(
-                "OnEnter",
-                function()
-                end
-            )
-            checkBox:SetScript(
-                "OnLeave",
-                function()
-                end
-            )
-        end
-
-        -- local label = _G[checkBox:GetName() .. "Text"]
-        -- label:SetText(text)
-        checkBox.Text:SetText(text)
-
+        checkBox.Text:SetText(adjustTextLength(group.name, 15, checkBox))
         checkBox:SetChecked(group.isActive)
-
         checkBox.group = group
         checkBox:SetScript(
             "OnClick",

@@ -17,7 +17,6 @@ Chronicles.description = Locale["Description"]
 Chronicles.constants = private.constants
 
 function Chronicles:OnInitialize()
-    --https://www.wowace.com/projects/ace3/pages/ace-db-3-0-tutorial
     local defaults = {
         global = {
             options = {
@@ -65,9 +64,7 @@ function Chronicles:OnInitialize()
     )
 
     Chronicles.UI.EventFilter:Init()
-
     Chronicles.DB:Init()
-
     Chronicles.UI:Init()
 end
 
@@ -87,7 +84,6 @@ end
 function adjust_value(value, step)
     local valueFloor = math.floor(value)
     local valueMiddle = valueFloor + (step / 2)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- adjust_value " .. value .. " " .. step .. " " .. valueFloor .. " " .. valueMiddle)
 
     if (value < valueMiddle) then
         return valueFloor
@@ -120,5 +116,39 @@ function copyTable(tableToCopy)
     end
     return copy
 end
+
+function adjustTextLength(text, size, frame)
+    local adjustedText = text
+    if (text:len() > size) then
+        adjustedText = text:sub(0, size)
+
+        frame:SetScript(
+            "OnEnter",
+            function()
+                GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMRIGHT", -5, 30)
+                GameTooltip:SetText(text, nil, nil, nil, nil, true)
+            end
+        )
+        frame:SetScript(
+            "OnLeave",
+            function()
+                GameTooltip:Hide()
+            end
+        )
+    else
+        frame:SetScript(
+            "OnEnter",
+            function()
+            end
+        )
+        frame:SetScript(
+            "OnLeave",
+            function()
+            end
+        )
+    end
+    return adjustedText
+end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

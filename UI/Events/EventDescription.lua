@@ -27,7 +27,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     self.CurrentEvent = event
     self.CurrentPage = 1
 
-    EventTitle:SetText(event.label)
+    EventTitle:SetText(adjustTextLength(event.label, 45, EventTitleContainer))
     EventDescriptionHTML:SetText(event.description[1])
 
     local eventDates = Locale["start"] .. " : " .. event.yearStart .. "    " .. Locale["end"] .. " : " .. event.yearEnd

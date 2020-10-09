@@ -152,11 +152,11 @@
 		</Anchors>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="EventTitle" inherits="EventDescriptionTitleFont" justifyH="CENTER">
+				<!-- <FontString name="EventTitle" inherits="EventDescriptionTitleFont" justifyH="CENTER">
 					<Anchors>
 						<Anchor point="TOP" x="0" y="-15"/>
 					</Anchors>
-				</FontString>
+				</FontString> -->
 
 				<FontString name="EventDescriptionPager" inherits="GameFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
@@ -172,6 +172,22 @@
 			</Layer>
 		</Layers>
 		<Frames>
+			<Frame name="EventTitleContainer">
+				<Size x="600" y="20"/>
+				<Anchors>
+					<Anchor point="TOP" x="0" y="-15"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="EventTitle" inherits="EventDescriptionTitleFont" justifyH="CENTER">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
 			<ScrollFrame parentKey="ScrollFrame" inherits="UIPanelScrollFrameCodeTemplate">
 				<Anchors>
 					<Anchor point="TOP" x="0" y="-40"/>
