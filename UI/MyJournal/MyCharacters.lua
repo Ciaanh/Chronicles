@@ -46,10 +46,11 @@ function Chronicles.UI.MyCharacters:InitLocales()
 
     MyCharactersDetailsSaveButton:SetText(Locale["Save"])
     MyCharactersListAddCharacter:SetText(Locale["AddCharacter"])
-    MyCharactersDetailsRemoveCharacter:SetText(Locale["RemoveCharacter"])
+    MyCharactersDetailsRemoveCharacter:SetText(Locale["Delete"])
+    
     MyCharactersDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
     MyCharactersDetailsNameLabel:SetText(Locale["Name_Field"] .. " :")
-    MyCharactersDetailsBiographysLabel:SetText(Locale["Biography_Field"] .. " :")
+    MyCharactersDetailsBiographyLabel:SetText(Locale["Biography_Field"] .. " :")
     MyCharactersDetailsTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
 end
 
@@ -112,7 +113,7 @@ function Chronicles.UI.MyCharacters:HideFields()
     MyCharactersDetailsIdLabel:Hide()
     MyCharactersDetailsId:Hide()
     MyCharactersDetailsNameLabel:Hide()
-    MyCharactersDetailsBiographysLabel:Hide()
+    MyCharactersDetailsBiographyLabel:Hide()
     MyCharactersDetailsTimelineLabel:Hide()
     MyCharactersDetailsTimelineDropDown:Hide()
     MyCharactersDetailsName:Hide()
@@ -125,7 +126,7 @@ function Chronicles.UI.MyCharacters:ShowFields()
     MyCharactersDetailsIdLabel:Show()
     MyCharactersDetailsId:Show()
     MyCharactersDetailsNameLabel:Show()
-    MyCharactersDetailsBiographysLabel:Show()
+    MyCharactersDetailsBiographyLabel:Show()
     MyCharactersDetailsTimelineLabel:Show()
     MyCharactersDetailsTimelineDropDown:Show()
     MyCharactersDetailsName:Show()
@@ -292,8 +293,8 @@ function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
     -- timeline=[integer],    		-- id of the timeline
     -- factions=table[integer], 	-- concerned factions
 
-    MyCharactersDetails.Id:SetText(character.id)
-    MyCharactersDetails.Name:SetText(character.name)
+    MyCharactersDetailsId:SetText(character.id)
+    MyCharactersDetailsName:SetText(character.name)
     MyCharactersDetailsBiography:SetText("")
 
     UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
@@ -302,8 +303,8 @@ end
 
 function MyCharactersDetailsSave_Click()
     local character = {
-        id = tonumber(MyCharactersDetails.Id:GetText()),
-        name = MyCharactersDetails.Name:GetText(),
+        id = tonumber(MyCharactersDetailsId:GetText()),
+        name = MyCharactersDetailsName:GetText(),
         biography = MyCharactersDetailsBiography:GetText(),
         timeline = MyCharactersDetailsTimelineDropDown.selectedID
     }

@@ -60,8 +60,44 @@ function Chronicles.DB:HasEventsInDB(yearStart, yearEnd, db)
     return false
 end
 
--- Should return a list of objects :
--- { label, yearStart, yearEnd, description, eventType, source }
+function Chronicles.DB:MinEventYear()
+    local MinEventYear = 0
+    for groupName, eventsGroup in pairs(self.Events) do
+        local isActive = Chronicles.DB:GetGroupStatus(groupName)
+        if (isActive) then
+            for eventIndex, event in pairs(eventsGroup.data) do
+                local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+                if (isEventTypeActive and event.yearStart < MinEventYear) then
+                    MinEventYear = event.yearStart
+                end
+            end
+        end
+    end
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MinEventYear " .. MinEventYear)
+    return MinEventYear
+end
+
+function Chronicles.DB:MaxEventYear()
+    local MaxEventYear = 0
+    for groupName, eventsGroup in pairs(self.Events) do
+        local isActive = Chronicles.DB:GetGroupStatus(groupName)
+        if (isActive) then
+            for eventIndex, event in pairs(eventsGroup.data) do
+                local isEventTypeActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
+
+                if (isEventTypeActive and event.yearEnd > MaxEventYear) then
+                    MaxEventYear = event.yearEnd
+                end
+            end
+        end
+    end
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MaxEventYear " .. MaxEventYear)
+    return MaxEventYear
+end
+
+-- Search events ------------------------------------------------------------------------
+
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local nbFoundEvents = 0
     local foundEvents = {}
@@ -116,6 +152,66 @@ function Chronicles.DB:CleanEventObject(event, groupName)
         }
     end
 end
+
+-- Search factions ----------------------------------------------------------------------
+
+function Chronicles.DB:SearchFactions()
+    local foundFactions = {}
+
+    for groupName, factionsGroup in pairs(self.Factions) do
+        local factionGroupStatus = Chronicles.DB:GetGroupStatus(groupName)
+        if (factionGroupStatus) then
+            for factionIndex, faction in pairs(factionsGroup.data) do
+                table.insert(foundFactions, self:CleanFactionObject(faction, groupName))
+            end
+        end
+    end
+    return foundFactions
+end
+
+function Chronicles.DB:CleanFactionObject(faction, groupName)
+    if faction then
+        return {
+            id = faction.id,
+            name = faction.name,
+            description = faction.description,
+            timeline = faction.timeline,
+            source = groupName
+        }
+    end
+    return nil
+end
+
+-- Search characters --------------------------------------------------------------------
+
+function Chronicles.DB:SearchCharacters()
+    local foundCharacters = {}
+
+    for groupName, charactersGroup in pairs(self.Characters) do
+        local characterGroupStatus = Chronicles.DB:GetGroupStatus(groupName)
+        if (characterGroupStatus) then
+            for characterIndex, character in pairs(charactersGroup.data) do
+                table.insert(foundCharacters, self:CleanCharacterObject(character, groupName))
+            end
+        end
+    end
+    return foundCharacters
+end
+
+function Chronicles.DB:CleanCharacterObject(character, groupName)
+    if character then
+        return {
+            id = character.id,
+            name = character.name,
+            biography = character.biography,
+            timeline = character.timeline,
+            factions = character.factions,
+            source = groupName
+        }
+    end
+    return nil
+end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -368,8 +464,6 @@ function Chronicles.DB:RemoveMyJournalCharacter(characterId)
     Chronicles.DB:RemoveFromMyJournal(characterId, Chronicles.storage.global.MyJournalCharacterDB)
 end
 
--- function add - delete
-
 function Chronicles.DB:AvailableDbId(db)
     DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId ")
     local ids = {}
@@ -392,7 +486,7 @@ function Chronicles.DB:AvailableDbId(db)
         maxId = maxId + 1
     end
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId maxId "..maxId)
+    DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId maxId " .. maxId)
     return maxId -- table.maxn(db) + 1
 end
 
@@ -449,7 +543,7 @@ end
 
 function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     -- compare date with current year
-    local birth = Chronicles.constants.config.timeline.yearEnd - age
+    local birth = Chronicles.constants.config.currentYear - age
     local event = {
         id = 0,
         label = "Birth of " .. name,

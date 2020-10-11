@@ -39,9 +39,9 @@ constants.timelines = {
 }
 
 constants.config = {
+	currentYear = 33,
+	historyStartYear = -150000,
 	timeline = {
-		yearStart = -200000,
-		yearEnd = 33,
 		pageSize = 8
 	},
 	eventList = {

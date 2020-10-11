@@ -1,34 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
-
-
-
-    <Frame name="MyCharactersListItemTemplate" virtual="true" enableMouse="true">
-        <Size x="150" y="50"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture file="Interface\AddOns\Chronicles\Images\Event-Background">
-                    <Size x="150" y="50"/>
-                    <Anchors>
-                        <Anchor point="CENTER" x="0" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.0" right="1.0" top="0.0" bottom="1.0"/>
-                </Texture>
-            </Layer>
-
-            <Layer level="OVERLAY">
-                <FontString parentKey="Text" inherits="GameFontNormalSmall" justifyH="CENTER">
-                    <Size x="130" y="35"/>
-                    <Anchors>
-                        <Anchor point="CENTER" />
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Frame>
-
-
     <Frame name="MyCharacters" parent="MyJournalView" hidden="true">
         <Size x="740" y="540"/>
         <Anchors>
@@ -72,47 +44,47 @@
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <Frames>
-                            <Frame name="MyCharactersListBlock1" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock1" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock2" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock2" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock1" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock3" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock3" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock2" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock4" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock4" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock3" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock5" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock5" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock4" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock6" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock6" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock5" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock7" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock7" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock6" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock8" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock8" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock7" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyCharactersListBlock9" inherits="MyCharactersListItemTemplate">
+                            <Frame name="MyCharactersListBlock9" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersListBlock8" y="-5"/>
                                 </Anchors>
@@ -181,51 +153,31 @@
                             </Anchors>
                         </Texture>
                     </Layer>
-
-                    <Layer level="OVERLAY">
-                        <FontString name="MyCharactersDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="25" y="-25" />
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyCharactersDetailsId" parentKey="Id" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsIdLabel" x="10"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyCharactersDetailsNameLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsIdLabel" y="-15"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyCharactersDetailsBiographysLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsNameLabel" y="-30"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyCharactersDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsIdLabel" x="250"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
                 </Layers>
 
                 <Frames>
-                    <Frame name="MyCharactersDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
+                    <Frame name="MyCharactersDetailsIdContainer">
+                        <Size x="50" y="32" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsTimelineLabel"/>
+                            <Anchor point="TOPLEFT" x="25" y="-25" />
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyCharactersDetailsIdLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+
+                                <FontString name="MyCharactersDetailsId" inherits="EventDescriptionFont" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsIdLabel" x="10"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
                     </Frame>
 
-                    <EditBox name="MyCharactersDetailsName" parentKey="Name" letters="0" inherits="InputBoxTemplate" autoFocus="false">
-                        <Size x="200" y="32" />
+                    <EditBox name="MyCharactersDetailsName" letters="0" inherits="InputBoxTemplate" autoFocus="false">
+                        <Size x="250" y="32" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsNameLabel" x="10"/>
+                            <Anchor point="TOPRIGHT" x="-25" y="-25" />
                         </Anchors>
                         <Scripts>
                             <OnEscapePressed function="EditBox_ClearFocus"/>
@@ -235,10 +187,54 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
+                    <Frame name="MyCharactersDetailsNameLabelContainer">
+                        <Size x="70" y="32" />
+                        <Anchors>
+                            <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="MyCharactersDetailsName" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyCharactersDetailsNameLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyCharactersDetailsTimelineLabelContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsIdContainer" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyCharactersDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyCharactersDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" >
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsTimelineLabel"/>
+                        </Anchors>
+                    </Frame>
+
+
+
+                    <Frame name="MyCharactersDetailsBiographyLabelContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsTimelineLabelContainer" y="-30"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyCharactersDetailsBiographyLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
                     <Frame name="MyCharactersDetailsBiographyContainer" inherits="BackdropTemplate">
                         <Size x="400" y="300" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsBiographysLabel" y="-5"/>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsBiographyLabel" y="-5"/>
                         </Anchors>
                         <KeyValues>
                             <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_8_8_1111" type="global"/>
@@ -261,7 +257,7 @@
                                     </OnMouseDown>
                                 </Scripts>
                                 <ScrollChild>
-                                    <EditBox name="MyCharactersDetailsBiography" letters="500" multiline="true" autoFocus="false">
+                                    <EditBox name="MyCharactersDetailsBiography" letters="0" multiline="true" autoFocus="false">
                                         <Size x="390" y="290"/>
                                         <Anchors>
                                             <Anchor point="CENTER" />
@@ -276,6 +272,12 @@
                         </Frames>
                     </Frame>
 
+
+
+
+
+
+
                     <Button name="MyCharactersDetailsSaveButton" inherits="UIPanelButtonTemplate">
                         <Size x="50" y="30"/>
                         <Anchors>
@@ -287,9 +289,9 @@
                     </Button>
 
                     <Button name="MyCharactersDetailsRemoveCharacter" inherits="UIPanelButtonTemplate">
-                        <Size x="125" y="30"/>
+                        <Size x="70" y="30"/>
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharactersDetailsSaveButton" x="0" y="0" />
+                            <Anchor point="TOPRIGHT" x="5" y="5" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyCharactersDetailsRemoveCharacter_OnClick" />

@@ -54,9 +54,8 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsDetailsAddDescriptionPage:SetText(Locale["AddPage"])
     MyEventsDetailsRemoveDescriptionPage:SetText(Locale["RemovePage"])
     MyEventsDetailsSaveButton:SetText(Locale["Save"])
-
     MyEventsListAddEvent:SetText(Locale["AddEvent"])
-    MyEventsDetailsRemoveEvent:SetText(Locale["RemoveEvent"])
+    MyEventsDetailsRemoveEvent:SetText(Locale["Delete"])
 
     MyEventsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
     MyEventsDetailsTitleLabel:SetText(Locale["Title_Field"] .. " :")
@@ -384,14 +383,14 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     -- eventType = 2,
     -- timeline = 2
 
-    MyEventsDetails.Id:SetText(event.id)
-    MyEventsDetails.Title:SetText(event.label)
+    MyEventsDetailsId:SetText(event.id)
+    MyEventsDetailsTitle:SetText(event.label)
 
     -- MyEventsDetails.YearStart:SetText(event.yearStart)
     -- MyEventsDetails.YearEnd:SetText(event.yearEnd)
 
-    MyEventsDetails.YearStart:SetNumber(event.yearStart)
-    MyEventsDetails.YearEnd:SetNumber(event.yearEnd)
+    MyEventsDetailsYearStart:SetNumber(event.yearStart)
+    MyEventsDetailsYearEnd:SetNumber(event.yearEnd)
 
     UIDropDownMenu_SetSelectedID(MyEventsDetailsTypeDropDown, event.eventType)
     UIDropDownMenu_SetText(MyEventsDetailsTypeDropDown, Chronicles.constants.eventType[event.eventType])
@@ -445,8 +444,8 @@ function Chronicles.UI.MyEvents:ChangeEventDescriptionPage(page)
 end
 
 function MyEventsDetailsSave_Click()
-    local yearStartNumber = tonumber(MyEventsDetails.YearStart:GetText())
-    local yearEndNumber = tonumber(MyEventsDetails.YearEnd:GetText())
+    local yearStartNumber = tonumber(MyEventsDetailsYearStart:GetText())
+    local yearEndNumber = tonumber(MyEventsDetailsYearEnd:GetText())
 
     MyEventsDetailsYearStartErrorContainer:Hide()
     MyEventsDetailsYearEndErrorContainer:Hide()
@@ -470,11 +469,11 @@ function MyEventsDetailsSave_Click()
     end
 
     local event = {
-        id = tonumber(MyEventsDetails.Id:GetText()),
-        label = MyEventsDetails.Title:GetText(),
+        id = tonumber(MyEventsDetailsId:GetText()),
+        label = MyEventsDetailsTitle:GetText(),
         description = copyTable(Chronicles.UI.MyEvents.SelectedEvent.description),
-        yearStart = MyEventsDetails.YearStart:GetNumber(),
-        yearEnd = MyEventsDetails.YearEnd:GetNumber(),
+        yearStart = MyEventsDetailsYearStart:GetNumber(),
+        yearEnd = MyEventsDetailsYearEnd:GetNumber(),
         eventType = MyEventsDetailsTypeDropDown.selectedID,
         timeline = MyEventsDetailsTimelineDropDown.selectedID
     }

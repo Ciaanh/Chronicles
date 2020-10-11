@@ -46,7 +46,8 @@ function Chronicles.UI.MyFactions:InitLocales()
 
     MyFactionsDetailsSaveButton:SetText(Locale["Save"])
     MyFactionsListAddFaction:SetText(Locale["AddFaction"])
-    MyFactionsDetailsRemoveFaction:SetText(Locale["RemoveFaction"])
+    MyFactionsDetailsRemoveFaction:SetText(Locale["Delete"])
+    
     MyFactionsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
     MyFactionsDetailsNameLabel:SetText(Locale["Name_Field"] .. " :")
     MyFactionsDetailsDescriptionsLabel:SetText(Locale["Description_Field"] .. " :")
@@ -284,8 +285,8 @@ function Chronicles.UI.MyFactions:SetMyFactionDetails(faction)
     -- description=[string],		-- description
     -- timeline=[integer],    		-- id of the timeline
 
-    MyFactionsDetails.Id:SetText(faction.id)
-    MyFactionsDetails.Name:SetText(faction.name)
+    MyFactionsDetailsId:SetText(faction.id)
+    MyFactionsDetailsName:SetText(faction.name)
     MyFactionsDetailsDescription:SetText("")
 
     UIDropDownMenu_SetSelectedID(MyFactionsDetailsTimelineDropDown, faction.timeline)
@@ -294,8 +295,8 @@ end
 
 function MyFactionsDetailsSave_Click()
     local faction = {
-        id = tonumber(MyFactionsDetails.Id:GetText()),
-        name = MyFactionsDetails.Name:GetText(),
+        id = tonumber(MyFactionsDetailsId:GetText()),
+        name = MyFactionsDetailsName:GetText(),
         description = MyFactionsDetailsDescription:GetText(),
         timeline = MyFactionsDetailsTimelineDropDown.selectedID
     }

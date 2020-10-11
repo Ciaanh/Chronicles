@@ -1,0 +1,21 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <!-- Art pieces to hide border seams -->
+	<Texture name="QuestChoiceLeftHide" file="Interface\QuestionFrame\Question-Main" virtual="true">
+		<Size x="86" y="39"/>
+		<TexCoords left="0.59765625" right="0.76562500" top="0.00195313" bottom="0.07812500"/>
+	</Texture>
+	<Texture name="QuestChoiceRightHide" file="Interface\QuestionFrame\Question-Main" virtual="true">
+		<Size x="61" y="32"/>
+		<TexCoords left="0.76953125" right="0.88867188" top="0.00195313" bottom="0.06445313"/>
+	</Texture>
+	<Texture name="QuestChoiceTopHide" file="Interface\QuestionFrame\Question-Main" virtual="true">
+		<Size x="33" y="66"/>
+		<TexCoords left="0.89257813" right="0.95703125" top="0.00195313" bottom="0.13085938"/>
+	</Texture>
+	<Texture name="QuestChoiceBottomHide" file="Interface\QuestionFrame\Question-Main" virtual="true">
+		<Size x="33" y="90"/>
+		<TexCoords left="0.82617188" right="0.89062500" top="0.30468750" bottom="0.48046875"/>
+	</Texture>
+</Ui>

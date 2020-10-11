@@ -166,24 +166,34 @@ function ChangeCurrentPage(currentPageIndex)
 end
 
 function GetNumberOfTimelineBlock(stepValue)
-    local length =
-        math.abs(Chronicles.constants.config.timeline.yearStart - Chronicles.constants.config.timeline.yearEnd)
+    local length = math.abs(GetMinYear() - GetMaxYear())
+
     return math.ceil(length / stepValue)
 end
 
-function GetLowerBound(blockIndex, stepValue)
-    local value = Chronicles.constants.config.timeline.yearStart + ((blockIndex - 1) * stepValue)
+function GetMinYear()
+    return Chronicles.DB:MinEventYear()
+end
 
-    if (value < Chronicles.constants.config.timeline.yearStart) then
-        return Chronicles.constants.config.timeline.yearStart
+function GetMaxYear()
+    return Chronicles.DB:MaxEventYear()
+end
+
+function GetLowerBound(blockIndex, stepValue)
+    local minYear = GetMinYear()
+    local value = minYear + ((blockIndex - 1) * stepValue)
+
+    if (value < minYear) then
+        return minYear
     end
     return value
 end
 
 function GetUpperBound(blockIndex, stepValue)
-    local value = Chronicles.constants.config.timeline.yearStart + (blockIndex * stepValue) - 1
-    if (value > Chronicles.constants.config.timeline.yearEnd) then
-        return Chronicles.constants.config.timeline.yearEnd
+    local maxYear = GetMaxYear()
+    local value = GetMinYear() + (blockIndex * stepValue) - 1
+    if (value > maxYear) then
+        return maxYear
     end
     return value
 end
@@ -398,7 +408,7 @@ function FindYearIndexOnTimeline(year)
 
     -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear " .. selectedYear)
 
-    local length = math.abs(Chronicles.constants.config.timeline.yearStart - selectedYear)
+    local length = math.abs(GetMinYear() - selectedYear)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- length " .. length)
 
     local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)

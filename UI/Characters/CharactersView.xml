@@ -2,10 +2,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
     <Frame name="CharactersView" parent="MainFrame" hidden="true">
-        <Size x="800" y="600"/>
+        <Size x="740" y="540"/>
         <Anchors>
             <Anchor point="CENTER" />
         </Anchors>
+        
         <Layers>
             <Layer level="ARTWORK">
                 <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
@@ -18,21 +19,113 @@
         </Layers>
         <Frames>
             <Frame name="CharacterList">
-                <Size x="200" y="600"/>
+                <Size x="200" y="530"/>
                 <Anchors>
-                    <Anchor point="Left" />
+                    <Anchor point="TOPLEFT" />
                 </Anchors>
                 <Layers>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Title" inherits="ChroniclesFontLarge" justifyH="CENTER">
-                            <Size y="20"/>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
                             <Anchors>
-                                <Anchor point="CENTER" x="0" y="0"/>
+                                <Anchor point="TOP" y="-5"/>
+                                <Anchor point="BOTTOM" y="5"/>
+                                <Anchor point="LEFT" x="5"/>
+                                <Anchor point="RIGHT" x="-5"/>
                             </Anchors>
-                        </FontString>
+                        </Texture>
                     </Layer>
                 </Layers>
+
+                <Frames>
+                    <Frame name="CharactersListScrollFrame" parentKey="ScrollFrame">
+                        <Size x="150" y="530" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <Frames>
+                            <Frame name="CharactersListBlock1" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="15" y="-15" />
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock2" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock1" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock3" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock2" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock4" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock3" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock5" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock4" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock6" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock5" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock7" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock6" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock8" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock7" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="CharactersListBlock9" inherits="LargeListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharactersListBlock8" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                        </Frames>
+
+                        <Scripts>
+                            <OnMouseWheel>
+                                CharactersListScrollFrame_OnMouseWheel(self, delta)
+                            </OnMouseWheel>
+                        </Scripts>
+                    </Frame>
+
+                    <Slider name="CharactersListScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                        <Size x="20" y="470"/>
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharactersListScrollFrame" x="15" y="0" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+
+                                self.ScrollUpButton:SetScript(
+                                    "OnClick",
+                                    function(source) CharactersListPreviousButton_OnClick(source) end
+                                );
+
+                                self.ScrollDownButton:SetScript(
+                                    "OnClick",
+                                    function(source) CharactersListNextButton_OnClick(source) end
+                                );
+
+                                self.scrollStep = 1;
+                            </OnLoad>
+                            <OnValueChanged>
+                                DisplayCharactersList(adjust_value(value, self.scrollStep));
+                            </OnValueChanged>
+                        </Scripts>
+                    </Slider>
+                </Frames>
             </Frame>
+
             <Frame name="CharacterDetails">
                 <Size x="600" y="600"/>
                 <Anchors>

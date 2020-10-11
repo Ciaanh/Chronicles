@@ -8,7 +8,6 @@
         <Size>
             <AbsDimension x="128" y="440"/>
         </Size>
-
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture name="$parentTopRight" file="Interface\AddOns\Chronicles\Images\LateralTab">

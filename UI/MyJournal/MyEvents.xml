@@ -81,47 +81,47 @@
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <Frames>
-                            <Frame name="MyEventListBlock1" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock1" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="15" y="-15" />
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock2" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock2" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock1" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock3" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock3" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock2" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock4" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock4" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock3" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock5" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock5" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock4" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock6" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock6" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock5" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock7" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock7" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock6" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock8" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock8" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock7" y="-5"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="MyEventListBlock9" inherits="MyEventsListItemTemplate">
+                            <Frame name="MyEventListBlock9" inherits="LargeListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventListBlock8" y="-5"/>
                                 </Anchors>
@@ -190,75 +190,30 @@
                             </Anchors>
                         </Texture>
                     </Layer>
-
-                    <Layer level="OVERLAY">
-                        <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="25" y="-25" />
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsId" parentKey="Id" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsTitleLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsIdLabel" y="-15"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTitleLabel" y="-15"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsYearEndLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearStartLabel" y="-15"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsDescriptionsLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabel" y="-30"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="250"/>
-                            </Anchors>
-                        </FontString>
-
-                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsEventTypeLabel" y="-20"/>
-                            </Anchors>
-                        </FontString>
-                    </Layer>
                 </Layers>
-
                 <Frames>
-                    <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TypeDropDown">
+                    <Frame name="MyEventsDetailsIdContainer">
+                        <Size x="50" y="32" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsEventTypeLabel" x="0" y="0"/>
+                            <Anchor point="TOPLEFT" x="25" y="-25" />
                         </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsIdLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+
+                                <FontString name="MyEventsDetailsId" inherits="EventDescriptionFont" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsIdLabel" x="10"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
+                        </Layers>
                     </Frame>
 
-                    <Frame name="MyEventsDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" parentKey="TimelineDropDown">
+                    <EditBox name="MyEventsDetailsTitle" letters="0" inherits="InputBoxTemplate" autoFocus="false">
+                        <Size x="250" y="32" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsTypeDropDown" y="0"/>
-                        </Anchors>
-                    </Frame>
-
-                    <EditBox name="MyEventsDetailsTitle" parentKey="Title" letters="0" inherits="InputBoxTemplate" autoFocus="false">
-                        <Size x="200" y="32" />
-                        <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTitleLabel" x="10"/>
+                            <Anchor point="TOPRIGHT" x="-25" y="-25" />
                         </Anchors>
                         <Scripts>
                             <OnEscapePressed function="EditBox_ClearFocus"/>
@@ -268,10 +223,70 @@
                         <FontString inherits="EventDescriptionFontLight" />
                     </EditBox>
 
-                    <EditBox name="MyEventsDetailsYearStart" parentKey="YearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false">
+                    <Frame name="MyEventsDetailsTitleLabelContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="RIGHT" relativePoint="LEFT" relativeTo="MyEventsDetailsTitle" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsTitleLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsEventTypeLabelContainer">
+                        <Size x="75" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsIdContainer" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsEventTypeLabelContainer" x="10" y="-5"/>
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsTimelineLabelContainer">
+                        <Size x="75" y="32" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTypeDropDown" y="5"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTimelineLabelContainer" y="-5" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsYearStartLabelContainer">
+                        <Size x="75" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsEventTypeLabelContainer" y="-5" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsYearStartLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <EditBox name="MyEventsDetailsYearStart" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearStartLabel" x="10"/>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearStartLabelContainer" x="10"/>
                         </Anchors>
                         <Scripts>
                             <OnEscapePressed function="EditBox_ClearFocus"/>
@@ -297,10 +312,22 @@
                         </Layers>
                     </Frame>
 
-                    <EditBox name="MyEventsDetailsYearEnd" parentKey="YearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false">
+                    <Frame name="MyEventsDetailsYearEndLabelContainer">
+                        <Size x="75" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearStartLabelContainer" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsYearEndLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <EditBox name="MyEventsDetailsYearEnd" letters="15" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="100" y="32" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearEndLabel" x="10"/>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsYearEndLabelContainer" x="10"/>
                         </Anchors>
                         <Scripts>
                             <OnEscapePressed function="EditBox_ClearFocus"/>
@@ -338,6 +365,18 @@
                                         <Anchor point="LEFT"/>
                                     </Anchors>
                                 </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
+                    <Frame name="MyEventsDetailsDescriptionsLabelContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabelContainer"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyEventsDetailsDescriptionsLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
                             </Layer>
                         </Layers>
                     </Frame>
@@ -451,6 +490,11 @@
                         </Scripts>
                     </Button>
 
+
+
+
+
+
                     <Button name="MyEventsDetailsSaveButton" inherits="UIPanelButtonTemplate">
                         <Size x="50" y="30"/>
                         <Anchors>
@@ -462,9 +506,9 @@
                     </Button>
 
                     <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate">
-                        <Size x="125" y="30"/>
+                        <Size x="70" y="30"/>
                         <Anchors>
-                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsDetailsSaveButton" x="0" y="0" />
+                            <Anchor point="TOPRIGHT" x="5" y="5" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyEventsDetailsRemoveEvent_OnClick" />

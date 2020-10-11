@@ -16,7 +16,7 @@ if L then
     L["Save"] = "Save"
 
     L["AddEvent"] = "Add event"
-    L["RemoveEvent"] = "Remove event"
+    L["Delete"] = "Delete"
 
     L["Id_Field"] = "Id"
     L["Title_Field"] = "Title"
