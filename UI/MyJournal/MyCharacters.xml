@@ -202,7 +202,7 @@
                     <Frame name="MyCharactersDetailsTimelineLabelContainer">
                         <Size x="50" y="32" />
                         <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsIdContainer" />
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsIdContainer" />
                         </Anchors>
                         <Layers>
                             <Layer level="OVERLAY">
@@ -211,7 +211,7 @@
                         </Layers>
                     </Frame>
 
-                    <Frame name="MyCharactersDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true" >
+                    <Frame name="MyCharactersDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
                         <Anchors>
                             <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersDetailsTimelineLabel"/>
                         </Anchors>

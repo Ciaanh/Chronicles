@@ -18,4 +18,10 @@ GlobalFactionsDB = {
 		description = Locale["Titans description"],
 		timeline = 2
 	},
+	[2] = {
+		id = 1,
+		name = Locale["HTML"],
+		description = Locale["HTMLdescription"],
+		timeline = 2
+	},
 }

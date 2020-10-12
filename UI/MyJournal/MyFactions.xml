@@ -174,7 +174,7 @@
                         </Layers>
                     </Frame>
 
-                    <EditBox name="MyFactionsDetailsName" letters="500" inherits="InputBoxTemplate" autoFocus="false">
+                    <EditBox name="MyFactionsDetailsName" letters="0" inherits="InputBoxTemplate" autoFocus="false">
                         <Size x="200" y="32" />
                         <Anchors>
                             <Anchor point="TOPRIGHT" x="-25" y="-25" />

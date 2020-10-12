@@ -150,5 +150,16 @@ function adjustTextLength(text, size, frame)
     return adjustedText
 end
 
+function cleanHTML(text)
+    DEFAULT_CHAT_FRAME:AddMessage("-- cleanHTML " .. text)
+    if (text ~= nil) then
+        text = string.gsub(text, "||", "|")
+        text = string.gsub(text, "\\\\", "\\")
+    else
+        text = ""
+    end
+    return text
+end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

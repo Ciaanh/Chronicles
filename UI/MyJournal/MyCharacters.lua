@@ -47,7 +47,7 @@ function Chronicles.UI.MyCharacters:InitLocales()
     MyCharactersDetailsSaveButton:SetText(Locale["Save"])
     MyCharactersListAddCharacter:SetText(Locale["AddCharacter"])
     MyCharactersDetailsRemoveCharacter:SetText(Locale["Delete"])
-    
+
     MyCharactersDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
     MyCharactersDetailsNameLabel:SetText(Locale["Name_Field"] .. " :")
     MyCharactersDetailsBiographyLabel:SetText(Locale["Biography_Field"] .. " :")
@@ -295,7 +295,7 @@ function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
 
     MyCharactersDetailsId:SetText(character.id)
     MyCharactersDetailsName:SetText(character.name)
-    MyCharactersDetailsBiography:SetText("")
+    MyCharactersDetailsBiography:SetText(character.biography)
 
     UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
     UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, Chronicles.constants.timelines[character.timeline])

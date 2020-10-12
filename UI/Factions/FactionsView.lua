@@ -26,13 +26,7 @@ end
 function Chronicles.UI.FactionsView:InitLocales()
     FactionsView.Title:SetText(Locale["Factions"])
 
-    -- FactionsDetailsSaveButton:SetText(Locale["Save"])
-    -- FactionsListAddFaction:SetText(Locale["AddFaction"])
-    -- FactionsDetailsRemoveFaction:SetText(Locale["Delete"])
-    -- FactionsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
-    -- FactionsDetailsNameLabel:SetText(Locale["Name_Field"] .. " :")
-    -- FactionsDetailsDescriptionsLabel:SetText(Locale["Description_Field"] .. " :")
-    -- FactionsDetailsTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
+    FactionTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
 end
 
 function Chronicles.UI.EventList:Refresh()
@@ -214,6 +208,7 @@ end
 ------------------------------------------------------------------------------------------
 
 function Chronicles.UI.FactionsView:CleanSelectedFaction()
+    FactionTimelineLabel:Hide()
     FactionTitle:SetText("")
     FactionDescriptionHTML:SetText("")
     FactionTimeline:SetText("")
@@ -225,15 +220,14 @@ function Chronicles.UI.FactionsView:SetFactionDetails(faction)
         return
     end
 
-    -- Chronicles.UI.FactionsView.SelectedFaction.id = faction.id
-
     -- id=[integer],				-- Id of the faction
     -- name=[string], 				-- name of the faction
     -- description=[string],		-- description
     -- timeline=[integer],    		-- id of the timeline
-
+    
+    FactionTimelineLabel:Show()
     FactionTitle:SetText(faction.name)
-    FactionDescriptionHTML:SetText(faction.description)
+    FactionDescriptionHTML:SetText(cleanHTML(faction.description))
     FactionTimeline:SetText(Chronicles.constants.timelines[faction.timeline])
 end
 

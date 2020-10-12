@@ -287,7 +287,7 @@ function Chronicles.UI.MyFactions:SetMyFactionDetails(faction)
 
     MyFactionsDetailsId:SetText(faction.id)
     MyFactionsDetailsName:SetText(faction.name)
-    MyFactionsDetailsDescription:SetText("")
+    MyFactionsDetailsDescription:SetText(faction.description)
 
     UIDropDownMenu_SetSelectedID(MyFactionsDetailsTimelineDropDown, faction.timeline)
     UIDropDownMenu_SetText(MyFactionsDetailsTimelineDropDown, Chronicles.constants.timelines[faction.timeline])

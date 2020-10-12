@@ -243,7 +243,7 @@
                 <Frames>
 
                     <Frame name="FactionDetailsTitleContainer">
-                        <Size x="600" y="20"/>
+                        <Size x="540" y="20"/>
                         <Anchors>
                             <Anchor point="TOP" x="0" y="-15"/>
                         </Anchors>
@@ -261,11 +261,16 @@
                     <Frame name="FactionTimelineContainer">
                         <Size x="50" y="20"/>
                         <Anchors>
-                            <Anchor point="TOPRIGHT" x="-40" y="-25"/>
+                            <Anchor point="BOTTOMLEFT" x="75" y="15"/>
                         </Anchors>
                         <Layers>
                             <Layer level="OVERLAY">
-                                <FontString name="FactionTimeline" inherits="EventDescriptionDatesFont" justifyH="CENTER"/>
+                                <FontString name="FactionTimelineLabel" inherits="EventDescriptionDatesFont" justifyH="LEFT"/>
+                                <FontString name="FactionTimeline" inherits="EventDescriptionDatesFont" justifyH="CENTER">
+                                    <Anchors>
+                                        <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="FactionTimelineLabel"/>
+                                    </Anchors>
+                                </FontString>
                             </Layer>
                         </Layers>
                     </Frame>
@@ -299,7 +304,7 @@
 
                                 <Frames>
                                     <SimpleHTML parentKey="HTML" name="FactionDescriptionHTML" justifyH="LEFT">
-                                        <Size x="470" y="300"/>
+                                        <Size x="415" y="300"/>
                                         <Anchors>
                                             <Anchor point="TOPLEFT" x="5" y="-5"/>
                                         </Anchors>
