@@ -19,9 +19,9 @@ GlobalFactionsDB = {
 		timeline = 2
 	},
 	[2] = {
-		id = 1,
-		name = Locale["HTML"],
-		description = Locale["HTMLdescription"],
+		id = 2,
+		name = Locale["OldGods"],
+		description = Locale["OldGods description"],
 		timeline = 2
 	},
 }

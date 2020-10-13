@@ -5,7 +5,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI.FactionsView = {}
 Chronicles.UI.FactionsView.CurrentPage = 1
--- Chronicles.UI.FactionsView.SelectedFaction = {}
 
 function Chronicles.UI.FactionsView:Init()
     FactionsView.List:SetBackdrop(
@@ -135,7 +134,7 @@ function Chronicles.UI.FactionsView:DisplayFactionList(page, force)
                     Chronicles.UI.FactionsView.CurrentPage = 1
                 end
 
-                if ((firstIndex + 5) >= numberOfFactions) then
+                if ((firstIndex + pageSize - 1) >= numberOfFactions) then
                     lastIndex = numberOfFactions
                     FactionsListScrollBar.ScrollDownButton:Disable()
                 end
@@ -204,34 +203,6 @@ function Chronicles.UI.FactionsView:SetTextToFrame(faction, frame)
 end
 
 ------------------------------------------------------------------------------------------
--- Details -------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------
-
-function Chronicles.UI.FactionsView:CleanSelectedFaction()
-    FactionTimelineLabel:Hide()
-    FactionTitle:SetText("")
-    FactionDescriptionHTML:SetText("")
-    FactionTimeline:SetText("")
-end
-
-function Chronicles.UI.FactionsView:SetFactionDetails(faction)
-    if (faction == nil) then
-        Chronicles.UI.FactionsView:CleanSelectedFaction()
-        return
-    end
-
-    -- id=[integer],				-- Id of the faction
-    -- name=[string], 				-- name of the faction
-    -- description=[string],		-- description
-    -- timeline=[integer],    		-- id of the timeline
-    
-    FactionTimelineLabel:Show()
-    FactionTitle:SetText(faction.name)
-    FactionDescriptionHTML:SetText(cleanHTML(faction.description))
-    FactionTimeline:SetText(Chronicles.constants.timelines[faction.timeline])
-end
-
-------------------------------------------------------------------------------------------
 -- Scroll List ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function FactionsListScrollFrame_OnMouseWheel(self, value)
@@ -256,4 +227,32 @@ function FactionsListNextButton_OnClick(self)
     else
         Chronicles.UI.FactionsView:DisplayFactionList(Chronicles.UI.FactionsView.CurrentPage + 1)
     end
+end
+
+------------------------------------------------------------------------------------------
+-- Details -------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function Chronicles.UI.FactionsView:CleanSelectedFaction()
+    FactionTimelineLabel:Hide()
+    FactionTitle:SetText("")
+    FactionDescriptionHTML:SetText("")
+    FactionTimeline:SetText("")
+end
+
+function Chronicles.UI.FactionsView:SetFactionDetails(faction)
+    if (faction == nil) then
+        Chronicles.UI.FactionsView:CleanSelectedFaction()
+        return
+    end
+
+    -- id=[integer],				-- Id of the faction
+    -- name=[string], 				-- name of the faction
+    -- description=[string],		-- description
+    -- timeline=[integer],    		-- id of the timeline
+
+    FactionTimelineLabel:Show()
+    FactionTitle:SetText(faction.name)
+    FactionDescriptionHTML:SetText(cleanHTML(faction.description))
+    FactionTimeline:SetText(Chronicles.constants.timelines[faction.timeline])
 end

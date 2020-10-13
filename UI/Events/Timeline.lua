@@ -208,7 +208,7 @@ function BuildTimelineBlocks(page, pageSize, numberOfCells, maxPageValue)
         Chronicles.UI.Timeline.CurrentPage = 1
     end
 
-    if ((firstIndex + 7) >= numberOfCells) then
+    if ((firstIndex + pageSize - 1) >= numberOfCells) then
         firstIndex = numberOfCells - 7
         TimelineNextButton:Disable()
         Chronicles.UI.Timeline.CurrentPage = maxPageValue
@@ -393,7 +393,7 @@ function FindYearIndexOnTimeline(year)
         if (firstIndex <= 1) then
             firstIndex = 1
         end
-        if ((firstIndex + 7) >= numberOfCells) then
+        if ((firstIndex + pageSize - 1) >= numberOfCells) then
             firstIndex = numberOfCells - 7
         end
 

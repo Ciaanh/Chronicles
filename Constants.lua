@@ -56,7 +56,8 @@ constants.config = {
 	myJournal = {
 		eventListPageSize = 9,
 		factionListPageSize = 9,
-		characterListPageSize = 9
+		characterListPageSize = 9,
+		characterFactionsPageSize = 9,
 	}
 }
 

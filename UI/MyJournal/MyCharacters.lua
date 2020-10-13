@@ -179,7 +179,7 @@ function Chronicles.UI.MyCharacters:DisplayCharacterList(page, force)
                     Chronicles.UI.MyCharacters.CurrentPage = 1
                 end
 
-                if ((firstIndex + 5) >= numberOfCharacters) then
+                if ((firstIndex + pageSize - 1) >= numberOfCharacters) then
                     lastIndex = numberOfCharacters
                     MyCharactersListScrollBar.ScrollDownButton:Disable()
                 end

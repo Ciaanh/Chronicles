@@ -169,8 +169,34 @@ function Chronicles.DB:SearchFactions()
     return foundFactions
 end
 
+function Chronicles.DB:FindFactions(ids)
+    local foundFactions = {}
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- FindFactions " .. tostring(ids))
+
+    for group, factionIds in pairs(ids) do
+        -- DEFAULT_CHAT_FRAME:AddMessage("---- group " .. group)
+        local factionGroupStatus = Chronicles.DB:GetGroupStatus(group)
+        if (factionGroupStatus) then
+            local factionsGroup = self.Factions[group]
+            -- DEFAULT_CHAT_FRAME:AddMessage("------ factionsGroup " .. tablelength(factionsGroup.data))
+            if (factionsGroup ~= nil and factionsGroup.data ~= nil and tablelength(factionsGroup.data) > 0) then
+                for factionIndex, faction in pairs(factionsGroup.data) do
+                    for index, id in ipairs(factionIds) do
+                        -- DEFAULT_CHAT_FRAME:AddMessage("-------- faction.id " .. faction.id .. " id " .. id)
+                        if (faction.id == id) then
+                            table.insert(foundFactions, Chronicles.DB:CleanFactionObject(faction, group))
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return foundFactions
+end
+
 function Chronicles.DB:CleanFactionObject(faction, groupName)
-    if faction then
+    if faction ~= nil then
         return {
             id = faction.id,
             name = faction.name,
@@ -199,7 +225,7 @@ function Chronicles.DB:SearchCharacters()
 end
 
 function Chronicles.DB:CleanCharacterObject(character, groupName)
-    if character then
+    if character ~= nil then
         return {
             id = character.id,
             name = character.name,

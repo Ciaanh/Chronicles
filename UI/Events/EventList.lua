@@ -89,7 +89,7 @@ function DisplayEventList(page, force)
                         Chronicles.UI.EventList.CurrentPage = 1
                     end
 
-                    if ((firstIndex + 5) >= numberOfEvents) then
+                    if ((firstIndex + pageSize - 1) >= numberOfEvents) then
                         lastIndex = numberOfEvents
                         EventListScrollBar.ScrollDownButton:Disable()
                     end

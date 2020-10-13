@@ -9,7 +9,7 @@ GlobalCharactersDB = {
  			id=[integer],				-- Id of the character
 			name=[string], 				-- name of the character
 			biography=[string],			-- small biography
-			timeline=[integer],    		-- id of the timeline 
+			timeline=[integer],    		-- id of the timeline
             factions=table[integer], 	-- concerned factions
 		},
 	--]]
@@ -18,6 +18,9 @@ GlobalCharactersDB = {
 		name = Locale["Norgannon"],
 		biography = Locale["Norgannon biography"],
 		timeline = 2,
-		factions = {1}
+		factions = {
+			["Global"] = {2, 1},
+			["myjournal"] = {1}
+		}
 	}
 }
