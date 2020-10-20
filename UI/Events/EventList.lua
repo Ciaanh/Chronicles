@@ -81,7 +81,7 @@ function DisplayEventList(page, force)
                     end
 
                     local firstIndex = 1 + ((page - 1) * pageSize)
-                    local lastIndex = firstIndex + 5
+                    local lastIndex = firstIndex + pageSize - 1
 
                     if (firstIndex <= 1) then
                         firstIndex = 1

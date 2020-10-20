@@ -141,7 +141,7 @@
     </Frame>
 
     <Frame name="TextListItemTemplate" virtual="true" enableMouse="true" inherits="BackdropTemplate">
-        <Size x="50" y="50"/>
+        <Size x="115" y="30"/>
         <KeyValues>
             <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_8_8_1111" type="global"/>
             <KeyValue key="backdropColor" value="BLACK_FONT_COLOR" type="global"/>
@@ -151,7 +151,7 @@
         <Layers>
             <Layer level="OVERLAY">
                 <FontString parentKey="Text" inherits="GameFontNormalSmall" justifyH="CENTER">
-                    <Size x="40" y="40"/>
+                    <Size x="90" y="25"/>
                     <Anchors>
                         <Anchor point="CENTER" />
                     </Anchors>

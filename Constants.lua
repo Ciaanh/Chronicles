@@ -57,7 +57,7 @@ constants.config = {
 		eventListPageSize = 9,
 		factionListPageSize = 9,
 		characterListPageSize = 9,
-		characterFactionsPageSize = 9,
+		characterFactionsPageSize = 8,
 	}
 }
 

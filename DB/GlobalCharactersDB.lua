@@ -19,8 +19,8 @@ GlobalCharactersDB = {
 		biography = Locale["Norgannon biography"],
 		timeline = 2,
 		factions = {
-			["Global"] = {2, 1},
-			["myjournal"] = {1}
+			["Global"] = {2, 1, 1, 1, 2, 2, 2},
+			["myjournal"] = {1, 1, 1, 1, 1}
 		}
 	}
 }

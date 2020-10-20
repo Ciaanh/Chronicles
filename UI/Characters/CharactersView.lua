@@ -17,6 +17,14 @@ function Chronicles.UI.CharactersView:Init()
         }
     )
 
+    CharacterFactionsScrollFrame:SetBackdrop(
+        {
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+            tileEdge = false,
+            edgeSize = 26
+        }
+    )
+
     Chronicles.UI.CharactersView:DisplayCharacterList(1, true)
 
     Chronicles.UI.CharactersView:CleanSelectedCharacter()
@@ -28,9 +36,11 @@ function Chronicles.UI.CharactersView:InitLocales()
     CharactersView.Title:SetText(Locale["Characters"])
 
     CharacterTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
+
+    CharacterFactionsLabel:SetText(Locale["Factions_List"] .. " :")
 end
 
-function Chronicles.UI.EventList:Refresh()
+function Chronicles.UI.CharactersView:Refresh()
     Chronicles.UI.CharactersView.CurrentPage = 1
     Chronicles.UI.CharactersView:DisplayCharacterList(1, true)
 
@@ -128,7 +138,7 @@ function Chronicles.UI.CharactersView:DisplayCharacterList(page, force)
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
-                local lastIndex = firstIndex + 8
+                local lastIndex = firstIndex + pageSize - 1
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
@@ -292,6 +302,10 @@ function CharacterFactionsScrollFrame_OnMouseWheel(self, value)
     end
 end
 
+function ChangeFactionsPage(page)
+    Chronicles.UI.CharactersView:ChangeFactionsPage(page)
+end
+
 function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeFactionsPage " .. page)
 
@@ -329,7 +343,7 @@ function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
-                local lastIndex = firstIndex + 8
+                local lastIndex = firstIndex + pageSize - 1
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
@@ -366,29 +380,40 @@ function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
                     )
                 end
 
-            -- if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 3], CharacterFactionsBlock4)
-            -- end
+                if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
+                    Chronicles.UI.CharactersView:SetFactionTextToFrame(
+                        factionsList[firstIndex + 3],
+                        CharacterFactionsBlock4
+                    )
+                end
 
-            -- if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 4], CharacterFactionsBlock5)
-            -- end
+                if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
+                    Chronicles.UI.CharactersView:SetFactionTextToFrame(
+                        factionsList[firstIndex + 4],
+                        CharacterFactionsBlock5
+                    )
+                end
 
-            -- if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 5], CharacterFactionsBlock6)
-            -- end
+                if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
+                    Chronicles.UI.CharactersView:SetFactionTextToFrame(
+                        factionsList[firstIndex + 5],
+                        CharacterFactionsBlock6
+                    )
+                end
 
-            -- if (((firstIndex + 6) > 0) and ((firstIndex + 6) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 6], CharacterFactionsBlock7)
-            -- end
+                if (((firstIndex + 6) > 0) and ((firstIndex + 6) <= lastIndex)) then
+                    Chronicles.UI.CharactersView:SetFactionTextToFrame(
+                        factionsList[firstIndex + 6],
+                        CharacterFactionsBlock7
+                    )
+                end
 
-            -- if (((firstIndex + 7) > 0) and ((firstIndex + 7) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 7], CharacterFactionsBlock8)
-            -- end
-
-            -- if (((firstIndex + 8) > 0) and ((firstIndex + 8) <= lastIndex)) then
-            --     Chronicles.UI.CharactersView:SetFactionTextToFrame(factionsList[firstIndex + 8], CharacterFactionsBlock9)
-            -- end
+                if (((firstIndex + 7) > 0) and ((firstIndex + 7) <= lastIndex)) then
+                    Chronicles.UI.CharactersView:SetFactionTextToFrame(
+                        factionsList[firstIndex + 7],
+                        CharacterFactionsBlock8
+                    )
+                end
             end
         else
             Chronicles.UI.CharactersView:HideAllFactions()
@@ -404,8 +429,8 @@ function Chronicles.UI.CharactersView:SetFactionTextToFrame(faction, frame)
     end
     frame:Hide()
     if (faction ~= nil) then
-        DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
-        frame.Text:SetText(adjustTextLength(faction.name, 15, frame))
+        --DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
         frame.faction = faction
         -- frame:SetScript(
         --     "OnMouseDown",
@@ -421,12 +446,11 @@ function Chronicles.UI.CharactersView:HideAllFactions()
     CharacterFactionsBlock1:Hide()
     CharacterFactionsBlock2:Hide()
     CharacterFactionsBlock3:Hide()
-    -- CharacterFactionsBlock4:Hide()
-    -- CharacterFactionsBlock5:Hide()
-    -- CharacterFactionsBlock6:Hide()
-    -- CharacterFactionsBlock7:Hide()
-    -- CharacterFactionsBlock8:Hide()
-    -- CharacterFactionsBlock9:Hide()
+    CharacterFactionsBlock4:Hide()
+    CharacterFactionsBlock5:Hide()
+    CharacterFactionsBlock6:Hide()
+    CharacterFactionsBlock7:Hide()
+    CharacterFactionsBlock8:Hide()
 
     CharacterFactionsScrollBar.ScrollUpButton:Disable()
     CharacterFactionsScrollBar.ScrollDownButton:Disable()
@@ -445,29 +469,25 @@ function Chronicles.UI.CharactersView:WipeAllFactions()
         CharacterFactionsBlock3.faction = nil
     end
 
-    -- if (CharacterFactionsBlock4.faction ~= nil) then
-    --     CharacterFactionsBlock4.faction = nil
-    -- end
+    if (CharacterFactionsBlock4.faction ~= nil) then
+        CharacterFactionsBlock4.faction = nil
+    end
 
-    -- if (CharacterFactionsBlock5.faction ~= nil) then
-    --     CharacterFactionsBlock5.faction = nil
-    -- end
+    if (CharacterFactionsBlock5.faction ~= nil) then
+        CharacterFactionsBlock5.faction = nil
+    end
 
-    -- if (CharacterFactionsBlock6.faction ~= nil) then
-    --     CharacterFactionsBlock6.faction = nil
-    -- end
+    if (CharacterFactionsBlock6.faction ~= nil) then
+        CharacterFactionsBlock6.faction = nil
+    end
 
-    -- if (CharacterFactionsBlock7.faction ~= nil) then
-    --     CharacterFactionsBlock7.faction = nil
-    -- end
+    if (CharacterFactionsBlock7.faction ~= nil) then
+        CharacterFactionsBlock7.faction = nil
+    end
 
-    -- if (CharacterFactionsBlock8.faction ~= nil) then
-    --     CharacterFactionsBlock8.faction = nil
-    -- end
-
-    -- if (CharacterFactionsBlock9.faction ~= nil) then
-    --     CharacterFactionsBlock9.faction = nil
-    -- end
+    if (CharacterFactionsBlock8.faction ~= nil) then
+        CharacterFactionsBlock8.faction = nil
+    end
 
     Chronicles.UI.CharactersView.CurrentFactionsPage = nil
 end

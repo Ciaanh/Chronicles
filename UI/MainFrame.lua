@@ -35,6 +35,9 @@ function Chronicles.UI:Refresh()
     Chronicles.UI.EventList:Refresh()
     Chronicles.UI.Timeline:Refresh()
     Chronicles.UI.EventDescription:Refresh()
+    
+    Chronicles.UI.CharactersView:Refresh()
+    -- Chronicles.UI.FactionsView:Refresh()
 end
 
 function Chronicles.UI:DisplayWindow()

@@ -28,6 +28,8 @@ if L then
     L["Name_Field"] = "Name"
     L["Biography_Field"] = "Biography"
 
+    L["Factions_List"] = "Factions"
+
     L["ErrorYearAsNumber"] = "A year must be a number"
     L["ErrorYearOrder"] = "Event ends before it's started"
 end

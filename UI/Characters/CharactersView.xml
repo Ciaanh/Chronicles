@@ -316,84 +316,84 @@
                 </Frames>
             </Frame>
 
-
-
-            <Frame name="CharacterFactionsLabelContainer">
-                <Size x="50" y="32" />
+            <Frame name="CharacterFactionsContainer">
+                <Size x="530" y="125" />
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CharacterDetails"/>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CharacterDetails" x="5" y="5" />
                 </Anchors>
+
                 <Layers>
                     <Layer level="OVERLAY">
-                        <FontString name="CharacterFactionsLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                        <FontString name="CharacterFactionsLabel" inherits="EventDescriptionTitleFont" justifyH="LEFT">
+                            <Size x="75" y="30" />
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="5" />
+                            </Anchors>
+                        </FontString>
                     </Layer>
                 </Layers>
-            </Frame>
-
-            <Frame name="CharacterFactionsContainer" inherits="BackdropTemplate">
-                <Size x="540" y="100" />
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CharacterFactionsLabelContainer" y="-5"/>
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_8_8_1111" type="global"/>
-                    <KeyValue key="backdropColor" value="BLACK_FONT_COLOR" type="global"/>
-                    <KeyValue key="backdropColorAlpha" value="0.9" type="number"/>
-                    <KeyValue key="backdropBorderColor" value="TOOLTIP_DEFAULT_COLOR" type="global"/>
-                </KeyValues>
 
                 <Frames>
-                    <Frame name="CharacterFactionsScrollFrame" parentKey="ScrollFrame">
-                        <Size x="500" y="100" />
+                    <Frame name="CharacterFactionsScrollFrame" parentKey="ScrollFrame" inherits="BackdropTemplate">
                         <Anchors>
-                            <Anchor point="CENTER"/>
+                            <Anchor point="TOPRIGHT" x="0" y="-30"/>
+                            <Anchor point="BOTTOMLEFT" x="0" y="0"/>
                         </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <Texture parentKey="Background" file="Interface\QuestionFrame\question-background" horizTile="true" vertTile="true">
+                                    <Anchors>
+                                        <Anchor point="TOP" y="-5"/>
+                                        <Anchor point="BOTTOM" y="5"/>
+                                        <Anchor point="LEFT" x="5"/>
+                                        <Anchor point="RIGHT" x="-5"/>
+                                    </Anchors>
+                                </Texture>
+                            </Layer>
+                        </Layers>
                         <Frames>
                             <Frame name="CharacterFactionsBlock1" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" x="15" y="-15" />
+                                    <Anchor point="TOPLEFT" x="20" y="-15"/>
                                 </Anchors>
                             </Frame>
                             <Frame name="CharacterFactionsBlock2" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock1" x="5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock1" x="10"/>
                                 </Anchors>
                             </Frame>
                             <Frame name="CharacterFactionsBlock3" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock2" x="5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock2" x="10"/>
                                 </Anchors>
                             </Frame>
-                            <!--<Frame name="CharacterFactionsBlock4" inherits="TextListItemTemplate">
+                            <Frame name="CharacterFactionsBlock4" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock3" y="-5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock3" x="10"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="CharacterFactionsBlock5" inherits="TextListItemTemplate">
+
+
+                             <Frame name="CharacterFactionsBlock5" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock4" y="-5"/>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock1" y="-5"/>
                                 </Anchors>
                             </Frame>
                             <Frame name="CharacterFactionsBlock6" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock5" y="-5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock5" x="10"/>
                                 </Anchors>
                             </Frame>
                             <Frame name="CharacterFactionsBlock7" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock6" y="-5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock6" x="10"/>
                                 </Anchors>
                             </Frame>
                             <Frame name="CharacterFactionsBlock8" inherits="TextListItemTemplate">
                                 <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock7" y="-5"/>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsBlock7" x="10"/>
                                 </Anchors>
                             </Frame>
-                            <Frame name="CharacterFactionsBlock9" inherits="TextListItemTemplate">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock8" y="-5"/>
-                                </Anchors>
-                            </Frame> -->
                         </Frames>
 
                         <Scripts>
@@ -404,9 +404,10 @@
                     </Frame>
 
                     <Slider name="CharacterFactionsScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
-                        <Size x="20" y="100"/>
+                        <Size x="20" />
                         <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharactersListScrollFrame" x="15" y="0" />
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="CharacterFactionsScrollFrame" x="0" y="-15" />
+                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeTo="CharacterFactionsScrollFrame" x="0" y="15" />
                         </Anchors>
                         <Scripts>
                             <OnLoad>
@@ -425,7 +426,7 @@
                                 self.scrollStep = 1;
                             </OnLoad>
                             <OnValueChanged>
-                                DisplayCharactersList(adjust_value(value, self.scrollStep));
+                                ChangeFactionsPage(adjust_value(value, self.scrollStep));
                             </OnValueChanged>
                         </Scripts>
                     </Slider>

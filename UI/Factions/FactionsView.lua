@@ -126,7 +126,7 @@ function Chronicles.UI.FactionsView:DisplayFactionList(page, force)
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
-                local lastIndex = firstIndex + 8
+                local lastIndex = firstIndex + pageSize - 1
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
