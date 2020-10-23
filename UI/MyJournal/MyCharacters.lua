@@ -37,7 +37,6 @@ function Chronicles.UI.MyCharacters:Init(isVisible)
     UIDropDownMenu_Initialize(MyCharactersDetailsTimelineDropDown, Init_MyCharacters_Timeline_Dropdown)
 
     Chronicles.UI.MyCharacters:HideFields()
-
     Chronicles.UI.MyCharacters:InitLocales()
 end
 
@@ -52,6 +51,8 @@ function Chronicles.UI.MyCharacters:InitLocales()
     MyCharactersDetailsNameLabel:SetText(Locale["Name_Field"] .. " :")
     MyCharactersDetailsBiographyLabel:SetText(Locale["Biography_Field"] .. " :")
     MyCharactersDetailsTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
+
+    MyCharacterFactionsLabel:SetText(Locale["Factions_List"] .. " :")
 end
 
 function Chronicles.UI.MyCharacters:HideAll()
@@ -120,6 +121,13 @@ function Chronicles.UI.MyCharacters:HideFields()
     MyCharactersDetailsBiographyContainer:Hide()
     MyCharactersDetailsSaveButton:Hide()
     MyCharactersDetailsRemoveCharacter:Hide()
+    MyCharacterFactionsLabel:Hide()
+    MyCharacterFactionsScrollBar:Hide()
+
+    Chronicles.UI.MyCharacters.SelectedCharacter = {}
+
+    Chronicles.UI.MyCharacters:HideAllFactions()
+    Chronicles.UI.MyCharacters:WipeAllFactions()
 end
 
 function Chronicles.UI.MyCharacters:ShowFields()
@@ -133,6 +141,8 @@ function Chronicles.UI.MyCharacters:ShowFields()
     MyCharactersDetailsBiographyContainer:Show()
     MyCharactersDetailsSaveButton:Show()
     MyCharactersDetailsRemoveCharacter:Show()
+    MyCharacterFactionsLabel:Show()
+    MyCharacterFactionsScrollBar:Show()
 end
 
 ------------------------------------------------------------------------------------------
@@ -278,6 +288,17 @@ end
 -- Details -------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
+-- function Chronicles.UI.MyCharacters:CleanSelectedCharacter()
+--     MyCharactersDetailsId:SetText("")
+--     MyCharactersDetailsName:SetText("")
+--     MyCharactersDetailsBiography:SetText("")
+
+--     Chronicles.UI.MyCharacters.SelectedCharacter = {}
+
+--     Chronicles.UI.MyCharacters:HideAllFactions()
+--     Chronicles.UI.MyCharacters:WipeAllFactions()
+-- end
+
 function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
     if (character == nil) then
         Chronicles.UI.MyCharacters:HideFields()
@@ -299,6 +320,9 @@ function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
 
     UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
     UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, Chronicles.constants.timelines[character.timeline])
+
+    Chronicles.UI.MyCharacters.SelectedCharacter.Factions = character.factions
+    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
 end
 
 function MyCharactersDetailsSave_Click()
@@ -368,4 +392,223 @@ function MyCharactersListNextButton_OnClick(self)
     else
         Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage + 1)
     end
+end
+
+------------------------------------------------------------------------------------------
+-- Factions ------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function MyCharacterFactionsPrevious_OnClick(self)
+    if (Chronicles.UI.MyCharacters.CurrentFactionsPage == nil) then
+        Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+    else
+        Chronicles.UI.MyCharacters:ChangeFactionsPage(Chronicles.UI.MyCharacters.CurrentFactionsPage - 1)
+    end
+end
+
+function MyCharacterFactionsNext_OnClick(self)
+    if (Chronicles.UI.MyCharacters.CurrentFactionsPage == nil) then
+        Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+    else
+        Chronicles.UI.MyCharacters:ChangeFactionsPage(Chronicles.UI.MyCharacters.CurrentFactionsPage + 1)
+    end
+end
+
+function MyCharacterFactionsScrollFrame_OnMouseWheel(self, value)
+    if (value > 0) then
+        MyCharacterFactionsPrevious_OnClick(self)
+    else
+        MyCharacterFactionsNext_OnClick(self)
+    end
+end
+
+function MyCharacterChangeFactionsPage(page)
+    Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
+end
+
+function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeFactionsPage " .. page)
+
+    -- MyCharacterFactionsPrevious:Hide()
+    -- MyCharacterFactionsNext:Hide()
+
+    if
+        (Chronicles.UI.MyCharacters.SelectedCharacter ~= nil and
+            Chronicles.UI.MyCharacters.SelectedCharacter.Factions ~= nil and
+            tablelength(Chronicles.UI.MyCharacters.SelectedCharacter.Factions) > 0)
+     then
+        if (page ~= nil) then
+            local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
+            local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.MyCharacters.SelectedCharacter.Factions)
+
+            local numberOfFactions = tablelength(factionsList)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfFactions " .. numberOfFactions)
+
+            if (numberOfFactions > 0) then
+                local maxPageValue = math.ceil(numberOfFactions / pageSize)
+                MyCharacterFactionsScrollBar:SetMinMaxValues(1, maxPageValue)
+
+                if (page > maxPageValue) then
+                    page = maxPageValue
+                end
+                if (page < 1) then
+                    page = 1
+                end
+
+                Chronicles.UI.MyCharacters:HideAllFactions()
+                Chronicles.UI.MyCharacters:WipeAllFactions()
+
+                if (numberOfFactions > pageSize) then
+                    MyCharacterFactionsScrollBar.ScrollUpButton:Enable()
+                    MyCharacterFactionsScrollBar.ScrollDownButton:Enable()
+                end
+
+                local firstIndex = 1 + ((page - 1) * pageSize)
+                local lastIndex = firstIndex + pageSize - 1
+
+                if (firstIndex <= 1) then
+                    firstIndex = 1
+                    MyCharacterFactionsScrollBar.ScrollUpButton:Disable()
+                    Chronicles.UI.MyCharacters.CurrentFactionsPage = 1
+                end
+
+                if ((firstIndex + pageSize - 1) >= numberOfFactions) then
+                    lastIndex = numberOfFactions
+                    MyCharacterFactionsScrollBar.ScrollDownButton:Disable()
+                end
+
+                Chronicles.UI.MyCharacters.CurrentFactionsPage = page
+                MyCharacterFactionsScrollBar:SetValue(Chronicles.UI.MyCharacters.CurrentFactionsPage)
+
+                if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex],
+                        MyCharacterFactionsBlock1
+                    )
+                end
+
+                if (((firstIndex + 1) > 0) and ((firstIndex + 1) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 1],
+                        MyCharacterFactionsBlock2
+                    )
+                end
+
+                if (((firstIndex + 2) > 0) and ((firstIndex + 2) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 2],
+                        MyCharacterFactionsBlock3
+                    )
+                end
+
+                if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 3],
+                        MyCharacterFactionsBlock4
+                    )
+                end
+
+                if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 4],
+                        MyCharacterFactionsBlock5
+                    )
+                end
+
+                if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 5],
+                        MyCharacterFactionsBlock6
+                    )
+                end
+
+                if (((firstIndex + 6) > 0) and ((firstIndex + 6) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 6],
+                        MyCharacterFactionsBlock7
+                    )
+                end
+
+                if (((firstIndex + 7) > 0) and ((firstIndex + 7) <= lastIndex)) then
+                    Chronicles.UI.MyCharacters:SetFactionTextToFrame(
+                        factionsList[firstIndex + 7],
+                        MyCharacterFactionsBlock8
+                    )
+                end
+            end
+        else
+            Chronicles.UI.MyCharacters:HideAllFactions()
+        end
+    else
+        Chronicles.UI.MyCharacters:HideAllFactions()
+    end
+end
+
+function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
+    if (frame.faction ~= nil) then
+        frame.faction = nil
+    end
+    frame:Hide()
+    if (faction ~= nil) then
+        --DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
+        frame.faction = faction
+        -- frame:SetScript(
+        --     "OnMouseDown",
+        --     function()
+        --         Chronicles.UI.MyCharacters:SetCharacterDetails(character)
+        --     end
+        -- )
+        frame:Show()
+    end
+end
+
+function Chronicles.UI.MyCharacters:HideAllFactions()
+    MyCharacterFactionsBlock1:Hide()
+    MyCharacterFactionsBlock2:Hide()
+    MyCharacterFactionsBlock3:Hide()
+    MyCharacterFactionsBlock4:Hide()
+    MyCharacterFactionsBlock5:Hide()
+    MyCharacterFactionsBlock6:Hide()
+    MyCharacterFactionsBlock7:Hide()
+    MyCharacterFactionsBlock8:Hide()
+
+    MyCharacterFactionsScrollBar.ScrollUpButton:Disable()
+    MyCharacterFactionsScrollBar.ScrollDownButton:Disable()
+end
+
+function Chronicles.UI.MyCharacters:WipeAllFactions()
+    if (CharactersListBlock1.faction ~= nil) then
+        CharactersListBlock1.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock2.faction ~= nil) then
+        MyCharacterFactionsBlock2.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock3.faction ~= nil) then
+        MyCharacterFactionsBlock3.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock4.faction ~= nil) then
+        MyCharacterFactionsBlock4.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock5.faction ~= nil) then
+        MyCharacterFactionsBlock5.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock6.faction ~= nil) then
+        MyCharacterFactionsBlock6.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock7.faction ~= nil) then
+        MyCharacterFactionsBlock7.faction = nil
+    end
+
+    if (MyCharacterFactionsBlock8.faction ~= nil) then
+        MyCharacterFactionsBlock8.faction = nil
+    end
+
+    Chronicles.UI.MyCharacters.CurrentFactionsPage = nil
 end

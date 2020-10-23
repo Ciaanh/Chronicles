@@ -222,7 +222,7 @@
                     <Frame name="MyCharactersDetailsBiographyLabelContainer">
                         <Size x="50" y="32" />
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsTimelineLabelContainer" y="-30"/>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsTimelineLabelContainer" y="0"/>
                         </Anchors>
                         <Layers>
                             <Layer level="OVERLAY">
@@ -232,7 +232,7 @@
                     </Frame>
 
                     <Frame name="MyCharactersDetailsBiographyContainer" inherits="BackdropTemplate">
-                        <Size x="400" y="300" />
+                        <Size x="475" y="250" />
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsBiographyLabel" y="-5"/>
                         </Anchors>
@@ -258,7 +258,7 @@
                                 </Scripts>
                                 <ScrollChild>
                                     <EditBox name="MyCharactersDetailsBiography" letters="0" multiline="true" autoFocus="false">
-                                        <Size x="390" y="290"/>
+                                        <Size x="450" y="180" />
                                         <Anchors>
                                             <Anchor point="CENTER" />
                                         </Anchors>
@@ -275,7 +275,101 @@
 
 
 
+                    <Frame name="MyCharacterFactionsLabelContainer">
+                        <Size x="50" y="32" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersDetailsBiographyContainer" y="0"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="OVERLAY">
+                                <FontString name="MyCharacterFactionsLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                            </Layer>
+                        </Layers>
+                    </Frame>
 
+                    <Frame name="MyCharacterFactionsScrollFrame" parentKey="ScrollFrame">
+                        <Size x="480" y="125" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharacterFactionsLabel" x="0" y="-5" />
+                        </Anchors>
+                        <Frames>
+                            <Frame name="MyCharacterFactionsBlock1" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="0" y="0"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock2" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock1" x="5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock3" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock2" x="5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock4" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock3" x="5"/>
+                                </Anchors>
+                            </Frame>
+
+
+                            <Frame name="MyCharacterFactionsBlock5" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyCharacterFactionsBlock1" y="-5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock6" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock5" x="5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock7" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock6" x="5"/>
+                                </Anchors>
+                            </Frame>
+                            <Frame name="MyCharacterFactionsBlock8" inherits="TextListItemTemplate">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsBlock7" x="5"/>
+                                </Anchors>
+                            </Frame>
+                        </Frames>
+
+                        <Scripts>
+                            <OnMouseWheel>
+                                        MyCharacterFactionsScrollFrame_OnMouseWheel(self, delta)
+                            </OnMouseWheel>
+                        </Scripts>
+                    </Frame>
+
+                    <Slider name="MyCharacterFactionsScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                        <Size x="20" y="50" />
+                        <Anchors>
+                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharacterFactionsScrollFrame" x="-5" y="30" />
+                        </Anchors>
+                        <Scripts>
+                            <OnLoad>
+                                        self.trackBG:SetVertexColor(0.2, 0.13, 0.08, 0.25);
+
+                                        self.ScrollUpButton:SetScript(
+                                            "OnClick",
+                                            function(source) MyCharacterFactionsPrevious_OnClick(source) end
+                                        );
+
+                                        self.ScrollDownButton:SetScript(
+                                            "OnClick",
+                                            function(source) MyCharacterFactionsNext_OnClick(source) end
+                                        );
+
+                                        self.scrollStep = 1;
+                            </OnLoad>
+                            <OnValueChanged>
+                                        MyCharacterChangeFactionsPage(adjust_value(value, self.scrollStep));
+                            </OnValueChanged>
+                        </Scripts>
+                    </Slider>
 
 
                     <Button name="MyCharactersDetailsSaveButton" inherits="UIPanelButtonTemplate">
