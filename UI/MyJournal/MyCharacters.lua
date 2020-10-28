@@ -35,7 +35,7 @@ function Chronicles.UI.MyCharacters:Init(isVisible)
     UIDropDownMenu_SetWidth(MyCharactersDetailsTimelineDropDown, 95)
     UIDropDownMenu_JustifyText(MyCharactersDetailsTimelineDropDown, "LEFT")
     UIDropDownMenu_Initialize(MyCharactersDetailsTimelineDropDown, Init_MyCharacters_Timeline_Dropdown)
-    
+
     Chronicles.UI.MyCharacters:InitLocales()
 
     InitFactionSearch()
@@ -659,37 +659,57 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ------------------------------------------------------------------------------------------
 -- Factions Autocomplete -----------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-local NUM_SEARCH_PREVIEWS = 5;
-local SHOW_ALL_RESULTS_INDEX = NUM_SEARCH_PREVIEWS + 1;
+local NUM_SEARCH_PREVIEWS = 5
+local SHOW_ALL_RESULTS_INDEX = NUM_SEARCH_PREVIEWS + 1
 
 function InitFactionSearch()
-    MyCharactersDetails.searchResults.scrollFrame.update = MyCharacterFactions_UpdateFullSearchResults;
-	MyCharactersDetails.searchResults.scrollFrame.scrollBar.doNotHide = true;
-	HybridScrollFrame_CreateButtons(MyCharactersDetails.searchResults.scrollFrame, "MyCharacterFactionsFullSearchResultsButton", 0, 0);
-end
+    MyCharactersDetails.searchResults.scrollFrame.update = MyCharacterFactions_UpdateFullSearchResults
+    MyCharactersDetails.searchResults.scrollFrame.scrollBar.doNotHide = true
+    HybridScrollFrame_CreateButtons(
+        MyCharactersDetails.searchResults.scrollFrame,
+        "MyCharacterFactions_FullSearchResultsButton",
+        0,
+        0
+    )
 
-function MyCharacterFactionsSearchBox_OnLoad(self)
-    SearchBoxTemplate_OnLoad(self)
-    
-    -- useful to display all results
-    self.HasStickyFocus = function()
-        local ancestry = self:GetParent().searchPreviewContainer
-        return DoesAncestryInclude(ancestry, GetMouseFocus())
+    SearchBoxTemplate_OnLoad(MyCharactersDetails.searchBox)
+    MyCharactersDetails.searchBox.HasStickyFocus = function()
+        -- local ancestry = self:GetParent().searchPreviewContainer
+        return DoesAncestryInclude(MyCharactersDetails.searchPreviewContainer, GetMouseFocus())
     end
 end
 
-function MyCharacterFactionsSearchBox_OnShow(self)
+function MyCharacterFactions_SearchBox_OnShow(self)
     self:SetFrameLevel(self:GetParent():GetFrameLevel() + 7)
     MyCharacterFactions_SetSearchPreviewSelection(1)
     self.fullSearchFinished = false
     self.searchPreviewUpdateDelay = 0
 end
 
-function MyCharacterFactionsSearchBox_OnEnterPressed(self)
+function MyCharacterFactions_SearchBox_OnEnterPressed(self)
     -- If the search is not finished yet we have to wait to show the full search results.
     if (not self.fullSearchFinished or strlen(self:GetText()) < MIN_CHARACTER_SEARCH) then
         return
@@ -708,7 +728,7 @@ function MyCharacterFactionsSearchBox_OnEnterPressed(self)
     end
 end
 
-function MyCharacterFactionsSearchBox_OnTextChanged(self)
+function MyCharacterFactions_SearchBox_OnTextChanged(self)
     SearchBoxTemplate_OnTextChanged(self)
 
     if (strlen(self:GetText()) >= MIN_CHARACTER_SEARCH) then
@@ -723,18 +743,18 @@ function MyCharacterFactionsSearchBox_OnTextChanged(self)
     end
 end
 
-function MyCharacterFactionsSearchBox_OnFocusLost(self)
+function MyCharacterFactions_SearchBox_OnFocusLost(self)
     SearchBoxTemplate_OnEditFocusLost(self)
     MyCharacterFactions_HideSearchPreview()
 end
 
-function MyCharacterFactionsSearchBox_OnFocusGained(self)
+function MyCharacterFactions_SearchBox_OnFocusGained(self)
     SearchBoxTemplate_OnEditFocusGained(self)
     MyCharactersDetails.searchResults:Hide()
     MyCharacterFactions_UpdateSearchPreview()
 end
 
-function MyCharacterFactionsSearchBox_OnKeyDown(self, key)
+function MyCharacterFactions_SearchBox_OnKeyDown(self, key)
     if (key == "UP") then
         MyCharacterFactions_SetSearchPreviewSelection(MyCharactersDetails.searchBox.selectedIndex - 1)
     elseif (key == "DOWN") then
@@ -766,9 +786,9 @@ function MyCharacterFactions_UpdateSearchPreview()
 
     MyCharactersDetails.searchBox.searchPreviewUpdateDelay = 0
 
-    if (MyCharactersDetails.searchBox:GetScript("OnUpdate") == nil) then
-        MyCharactersDetails.searchBox:SetScript("OnUpdate", MyCharacterFactionsSearchBox_OnUpdate)
-    end
+    -- if (MyCharactersDetails.searchBox:GetScript("OnUpdate") == nil) then
+    --     MyCharactersDetails.searchBox:SetScript("OnUpdate", MyCharacterFactions_SearchBox_OnUpdate)
+    -- end
 end
 
 function MyCharacterFactions_SetSearchPreviewSelection(selectedIndex)
@@ -859,7 +879,7 @@ function MyCharacterFactionsShowAllSearchResults_OnEnter()
     MyCharacterFactions_SetSearchPreviewSelection(SHOW_ALL_RESULTS_INDEX)
 end
 
-function MyCharacterFactionsFullSearchResultsButton_OnClick(self)
+function MyCharacterFactions_FullSearchResultsButton_OnClick(self)
     if (self.achievementID) then
         MyCharacterFactions_SelectSearchItem(self.achievementID)
         MyCharactersDetails.searchResults:Hide()
@@ -880,7 +900,7 @@ end
 -- There is a delay before the search is updated to avoid a search progress bar if the search
 -- completes within the grace period.
 local ACHIEVEMENT_SEARCH_PREVIEW_UPDATE_DELAY = 0.3
-function MyCharacterFactionsSearchBox_OnUpdate(self, elapsed)
+function MyCharacterFactions_SearchBox_OnUpdate(self, elapsed)
     if (self.fullSearchFinished) then
         MyCharacterFactions_ShowSearchPreviewResults()
         self.searchPreviewUpdateDelay = 0
@@ -932,99 +952,97 @@ function MyCharacterFactionsSearchProgressBar_OnUpdate(self, elapsed)
     end
 end
 
-
 function MyCharacterFactionsSearchPreviewButton_OnShow(self)
-	self:SetFrameLevel(self:GetParent():GetFrameLevel() + 10);
+    self:SetFrameLevel(self:GetParent():GetFrameLevel() + 10)
 end
 
-
 function MyCharacterFactionsSearchPreviewButton_OnLoad(self)
-	local searchPreviewContainer = MyCharactersDetails.searchPreviewContainer;
-	local searchPreviews = searchPreviewContainer.searchPreviews;
-	for index = 1, NUM_SEARCH_PREVIEWS do
-		if ( searchPreviews[index] == self ) then
-			self.previewIndex = index;
-			break;
-		end
-	end
+    local searchPreviewContainer = MyCharactersDetails.searchPreviewContainer
+    local searchPreviews = searchPreviewContainer.searchPreviews
+    for index = 1, NUM_SEARCH_PREVIEWS do
+        if (searchPreviews[index] == self) then
+            self.previewIndex = index
+            break
+        end
+    end
 end
 
 function MyCharacterFactionsSearchPreviewButton_OnEnter(self)
-	MyCharacterFactions_SetSearchPreviewSelection(self.previewIndex);
+    MyCharacterFactions_SetSearchPreviewSelection(self.previewIndex)
 end
 
 function MyCharacterFactionsSearchPreviewButton_OnClick(self)
-	if ( self.achievementID ) then
-		MyCharacterFactions_SelectSearchItem(self.achievementID);
-		MyCharactersDetails.searchResults:Hide();
-		MyCharacterFactions_HideSearchPreview();
-		MyCharactersDetails.searchBox:ClearFocus();
-	end
+    if (self.achievementID) then
+        MyCharacterFactions_SelectSearchItem(self.achievementID)
+        MyCharactersDetails.searchResults:Hide()
+        MyCharacterFactions_HideSearchPreview()
+        MyCharactersDetails.searchBox:ClearFocus()
+    end
 end
 
 function MyCharacterFactions_ShowFullSearch()
     -- MyCharacterFactions
     -- MyCharactersDetails
     -- AchievementFrame
-	MyCharacterFactions_UpdateFullSearchResults();
+    MyCharacterFactions_UpdateFullSearchResults()
 
-	if ( GetNumFilteredAchievements() == 0 ) then
-		MyCharactersDetails.searchResults:Hide();
-		return;
-	end
+    if (GetNumFilteredAchievements() == 0) then
+        MyCharactersDetails.searchResults:Hide()
+        return
+    end
 
-	MyCharacterFactions_HideSearchPreview();
-	MyCharactersDetails.searchBox:ClearFocus();
-	MyCharactersDetails.searchResults:Show();
+    MyCharacterFactions_HideSearchPreview()
+    MyCharactersDetails.searchBox:ClearFocus()
+    MyCharactersDetails.searchResults:Show()
 end
 
 function MyCharacterFactions_UpdateFullSearchResults()
-	local numResults = GetNumFilteredAchievements();
+    local numResults = GetNumFilteredAchievements()
 
-	local scrollFrame = MyCharactersDetails.searchResults.scrollFrame;
-	local offset = HybridScrollFrame_GetOffset(scrollFrame);
-	local results = scrollFrame.buttons;
-    local result, index;
-    
+    local scrollFrame = MyCharactersDetails.searchResults.scrollFrame
+    local offset = HybridScrollFrame_GetOffset(scrollFrame)
+    local results = scrollFrame.buttons
+    local result, index
 
+    for i = 1, #results do
+        result = results[i]
+        index = offset + i
+        if (index <= numResults) then
+            local achievementID = GetFilteredAchievementID(index)
+            local _, name, _, completed, _, _, _, description, _, icon, _, _, _, _ = GetAchievementInfo(achievementID)
 
-	for i = 1,#results do
-		result = results[i];
-		index = offset + i;
-		if ( index <= numResults ) then
-			local achievementID = GetFilteredAchievementID(index);
-			local _, name, _, completed, _, _, _, description, _, icon, _, _, _, _ = GetAchievementInfo(achievementID);
+            result.name:SetText(name)
+            result.icon:SetTexture(icon)
+            result.achievementID = achievementID
 
-			result.name:SetText(name);
-			result.icon:SetTexture(icon);
-			result.achievementID = achievementID;
+            if (completed) then
+                result.resultType:SetText(ACHIEVEMENTFRAME_FILTER_COMPLETED)
+            else
+                result.resultType:SetText(ACHIEVEMENTFRAME_FILTER_INCOMPLETE)
+            end
 
-			if ( completed ) then
-				result.resultType:SetText(ACHIEVEMENTFRAME_FILTER_COMPLETED);
-			else
-				result.resultType:SetText(ACHIEVEMENTFRAME_FILTER_INCOMPLETE);
-			end
-
-			local categoryID = GetAchievementCategory(achievementID);
-			local categoryName, parentCategoryID = GetCategoryInfo(categoryID);
-			path = categoryName;
-			while ( not (parentCategoryID == -1) ) do
-				categoryName, parentCategoryID = GetCategoryInfo(parentCategoryID);
-				path = categoryName.." > "..path;
-			end
+            local categoryID = GetAchievementCategory(achievementID)
+            local categoryName, parentCategoryID = GetCategoryInfo(categoryID)
+            path = categoryName
+            while (not (parentCategoryID == -1)) do
+                categoryName, parentCategoryID = GetCategoryInfo(parentCategoryID)
+                path = categoryName .. " > " .. path
+            end
 
             DEFAULT_CHAT_FRAME:AddMessage("-- path " .. path)
 
-			result.path:SetText(path);
+            result.path:SetText(path)
 
-			result:Show();
-		else
-			result:Hide();
-		end
-	end
+            result:Show()
+        else
+            result:Hide()
+        end
+    end
 
-	local totalHeight = numResults * 49;
-	HybridScrollFrame_Update(scrollFrame, totalHeight, 270);
+    local totalHeight = numResults * 49
+    HybridScrollFrame_Update(scrollFrame, totalHeight, 270)
 
-	MyCharactersDetails.searchResults.titleText:SetText(string.format(ENCOUNTER_JOURNAL_SEARCH_RESULTS, MyCharactersDetails.searchBox:GetText(), numResults));
+    MyCharactersDetails.searchResults.titleText:SetText(
+        string.format(ENCOUNTER_JOURNAL_SEARCH_RESULTS, MyCharactersDetails.searchBox:GetText(), numResults)
+    )
 end

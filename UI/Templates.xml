@@ -233,7 +233,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="MyCharacterFactionsFullSearchResultsButton" virtual="true">
+	<Button name="MyCharacterFactions_FullSearchResultsButton" virtual="true">
 		<Size x="575" y="49"/>
 		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="2">
@@ -281,7 +281,7 @@
 		<HighlightTexture atlas="search-highlight-large">
 		</HighlightTexture>
 		<Scripts>
-			<OnClick function="MyCharacterFactionsFullSearchResultsButton_OnClick"/>
+			<OnClick function="MyCharacterFactions_FullSearchResultsButton_OnClick"/>
 		</Scripts>
 	</Button>
 

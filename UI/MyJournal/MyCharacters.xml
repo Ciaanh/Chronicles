@@ -361,13 +361,13 @@
                             <Anchor point="LEFT" relativeTo="MyCharacterFactionsLabel" relativePoint="RIGHT" x="10" y="0"/>
                         </Anchors>
                         <Scripts>
-                            <OnLoad function="MyCharacterFactionsSearchBox_OnLoad"/>
-                            <OnShow function="MyCharacterFactionsSearchBox_OnShow"/>
-                            <OnEnterPressed function="MyCharacterFactionsSearchBox_OnEnterPressed"/>
-                            <OnTextChanged function="MyCharacterFactionsSearchBox_OnTextChanged"/>
-                            <OnEditFocusLost function="MyCharacterFactionsSearchBox_OnFocusLost"/>
-                            <OnEditFocusGained function="MyCharacterFactionsSearchBox_OnFocusGained"/>
-                            <OnKeyDown function="MyCharacterFactionsSearchBox_OnKeyDown"/>
+                            <OnShow function="MyCharacterFactions_SearchBox_OnShow"/>
+                            <OnUpdate function="MyCharacterFactions_SearchBox_OnUpdate"/>
+                            <OnEnterPressed function="MyCharacterFactions_SearchBox_OnEnterPressed"/>
+                            <OnTextChanged function="MyCharacterFactions_SearchBox_OnTextChanged"/>
+                            <OnEditFocusLost function="MyCharacterFactions_SearchBox_OnFocusLost"/>
+                            <OnEditFocusGained function="MyCharacterFactions_SearchBox_OnFocusGained"/>
+                            <OnKeyDown function="MyCharacterFactions_SearchBox_OnKeyDown"/>
                         </Scripts>
                     </EditBox>
 
