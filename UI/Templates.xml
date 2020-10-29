@@ -181,7 +181,7 @@
 
 
 
-	<Button name="MyCharacterFactionsSearchPreviewButton" parentArray="searchPreviews" virtual="true">
+	<Button name="MyCharacterFactions_SearchPreviewButton" parentArray="searchPreviews" virtual="true">
 		<Size x="206" y="27"/>
 		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="3">
@@ -226,10 +226,10 @@
 		</HighlightTexture>
 		-->
 		<Scripts>
-			<OnLoad function="MyCharacterFactionsSearchPreviewButton_OnLoad"/>
-			<OnShow function="MyCharacterFactionsSearchPreviewButton_OnShow"/>
-			<OnEnter function="MyCharacterFactionsSearchPreviewButton_OnEnter"/>
-			<OnClick function="MyCharacterFactionsSearchPreviewButton_OnClick"/>
+			<OnLoad function="MyCharacterFactions_SearchPreviewButton_OnLoad"/>
+			<OnShow function="MyCharacterFactions_SearchPreviewButton_OnShow"/>
+			<OnEnter function="MyCharacterFactions_SearchPreviewButton_OnEnter"/>
+			<OnClick function="MyCharacterFactions_SearchPreviewButton_OnClick"/>
 		</Scripts>
 	</Button>
 

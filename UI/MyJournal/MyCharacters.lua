@@ -55,7 +55,7 @@ function Chronicles.UI.MyCharacters:InitLocales()
     MyCharactersDetailsBiographyLabel:SetText(Locale["Biography_Field"] .. " :")
     MyCharactersDetailsTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
 
-    MyCharacterFactionsLabel:SetText(Locale["Factions_List"] .. " :")
+    MyCharacterFactions_Label:SetText(Locale["Factions_List"] .. " :")
 end
 
 function Chronicles.UI.MyCharacters:HideAll()
@@ -124,8 +124,8 @@ function Chronicles.UI.MyCharacters:HideFields()
     MyCharactersDetailsBiographyContainer:Hide()
     MyCharactersDetailsSaveButton:Hide()
     MyCharactersDetailsRemoveCharacter:Hide()
-    MyCharacterFactionsLabel:Hide()
-    MyCharacterFactionsScrollBar:Hide()
+    MyCharacterFactions_Label:Hide()
+    MyCharacterFactions_ScrollBar:Hide()
 
     MyCharactersDetails.searchBox:Hide()
     MyCharactersDetails.searchProgressBar:Hide()
@@ -147,8 +147,8 @@ function Chronicles.UI.MyCharacters:ShowFields()
     MyCharactersDetailsBiographyContainer:Show()
     MyCharactersDetailsSaveButton:Show()
     MyCharactersDetailsRemoveCharacter:Show()
-    MyCharacterFactionsLabel:Show()
-    MyCharacterFactionsScrollBar:Show()
+    MyCharacterFactions_Label:Show()
+    MyCharacterFactions_ScrollBar:Show()
 
     MyCharactersDetails.searchBox:Show()
     MyCharactersDetails.searchProgressBar:Show()
@@ -407,7 +407,7 @@ end
 -- Factions ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function MyCharacterFactionsPrevious_OnClick(self)
+function MyCharacterFactions_Previous_OnClick(self)
     if (Chronicles.UI.MyCharacters.CurrentFactionsPage == nil) then
         Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
     else
@@ -415,7 +415,7 @@ function MyCharacterFactionsPrevious_OnClick(self)
     end
 end
 
-function MyCharacterFactionsNext_OnClick(self)
+function MyCharacterFactions_Next_OnClick(self)
     if (Chronicles.UI.MyCharacters.CurrentFactionsPage == nil) then
         Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
     else
@@ -423,11 +423,11 @@ function MyCharacterFactionsNext_OnClick(self)
     end
 end
 
-function MyCharacterFactionsScrollFrame_OnMouseWheel(self, value)
+function MyCharacterFactions_ScrollFrame_OnMouseWheel(self, value)
     if (value > 0) then
-        MyCharacterFactionsPrevious_OnClick(self)
+        MyCharacterFactions_Previous_OnClick(self)
     else
-        MyCharacterFactionsNext_OnClick(self)
+        MyCharacterFactions_Next_OnClick(self)
     end
 end
 
@@ -438,8 +438,8 @@ end
 function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeFactionsPage " .. page)
 
-    -- MyCharacterFactionsPrevious:Hide()
-    -- MyCharacterFactionsNext:Hide()
+    -- MyCharacterFactions_Previous:Hide()
+    -- MyCharacterFactions_Next:Hide()
 
     if
         (Chronicles.UI.MyCharacters.SelectedCharacter ~= nil and
@@ -455,7 +455,7 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
 
             if (numberOfFactions > 0) then
                 local maxPageValue = math.ceil(numberOfFactions / pageSize)
-                MyCharacterFactionsScrollBar:SetMinMaxValues(1, maxPageValue)
+                MyCharacterFactions_ScrollBar:SetMinMaxValues(1, maxPageValue)
 
                 if (page > maxPageValue) then
                     page = maxPageValue
@@ -468,8 +468,8 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
                 Chronicles.UI.MyCharacters:WipeAllFactions()
 
                 if (numberOfFactions > pageSize) then
-                    MyCharacterFactionsScrollBar.ScrollUpButton:Enable()
-                    MyCharacterFactionsScrollBar.ScrollDownButton:Enable()
+                    MyCharacterFactions_ScrollBar.ScrollUpButton:Enable()
+                    MyCharacterFactions_ScrollBar.ScrollDownButton:Enable()
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
@@ -477,71 +477,71 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
-                    MyCharacterFactionsScrollBar.ScrollUpButton:Disable()
+                    MyCharacterFactions_ScrollBar.ScrollUpButton:Disable()
                     Chronicles.UI.MyCharacters.CurrentFactionsPage = 1
                 end
 
                 if ((firstIndex + pageSize - 1) >= numberOfFactions) then
                     lastIndex = numberOfFactions
-                    MyCharacterFactionsScrollBar.ScrollDownButton:Disable()
+                    MyCharacterFactions_ScrollBar.ScrollDownButton:Disable()
                 end
 
                 Chronicles.UI.MyCharacters.CurrentFactionsPage = page
-                MyCharacterFactionsScrollBar:SetValue(Chronicles.UI.MyCharacters.CurrentFactionsPage)
+                MyCharacterFactions_ScrollBar:SetValue(Chronicles.UI.MyCharacters.CurrentFactionsPage)
 
                 if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex],
-                        MyCharacterFactionsBlock1
+                        MyCharacterFactions_Block1
                     )
                 end
 
                 if (((firstIndex + 1) > 0) and ((firstIndex + 1) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 1],
-                        MyCharacterFactionsBlock2
+                        MyCharacterFactions_Block2
                     )
                 end
 
                 if (((firstIndex + 2) > 0) and ((firstIndex + 2) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 2],
-                        MyCharacterFactionsBlock3
+                        MyCharacterFactions_Block3
                     )
                 end
 
                 if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 3],
-                        MyCharacterFactionsBlock4
+                        MyCharacterFactions_Block4
                     )
                 end
 
                 if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 4],
-                        MyCharacterFactionsBlock5
+                        MyCharacterFactions_Block5
                     )
                 end
 
                 if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 5],
-                        MyCharacterFactionsBlock6
+                        MyCharacterFactions_Block6
                     )
                 end
 
                 if (((firstIndex + 6) > 0) and ((firstIndex + 6) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 6],
-                        MyCharacterFactionsBlock7
+                        MyCharacterFactions_Block7
                     )
                 end
 
                 if (((firstIndex + 7) > 0) and ((firstIndex + 7) <= lastIndex)) then
                     Chronicles.UI.MyCharacters:SetFactionTextToFrame(
                         factionsList[firstIndex + 7],
-                        MyCharacterFactionsBlock8
+                        MyCharacterFactions_Block8
                     )
                 end
             end
@@ -573,17 +573,17 @@ function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
 end
 
 function Chronicles.UI.MyCharacters:HideAllFactions()
-    MyCharacterFactionsBlock1:Hide()
-    MyCharacterFactionsBlock2:Hide()
-    MyCharacterFactionsBlock3:Hide()
-    MyCharacterFactionsBlock4:Hide()
-    MyCharacterFactionsBlock5:Hide()
-    MyCharacterFactionsBlock6:Hide()
-    MyCharacterFactionsBlock7:Hide()
-    MyCharacterFactionsBlock8:Hide()
+    MyCharacterFactions_Block1:Hide()
+    MyCharacterFactions_Block2:Hide()
+    MyCharacterFactions_Block3:Hide()
+    MyCharacterFactions_Block4:Hide()
+    MyCharacterFactions_Block5:Hide()
+    MyCharacterFactions_Block6:Hide()
+    MyCharacterFactions_Block7:Hide()
+    MyCharacterFactions_Block8:Hide()
 
-    MyCharacterFactionsScrollBar.ScrollUpButton:Disable()
-    MyCharacterFactionsScrollBar.ScrollDownButton:Disable()
+    MyCharacterFactions_ScrollBar.ScrollUpButton:Disable()
+    MyCharacterFactions_ScrollBar.ScrollDownButton:Disable()
 end
 
 function Chronicles.UI.MyCharacters:WipeAllFactions()
@@ -591,32 +591,32 @@ function Chronicles.UI.MyCharacters:WipeAllFactions()
         CharactersListBlock1.faction = nil
     end
 
-    if (MyCharacterFactionsBlock2.faction ~= nil) then
-        MyCharacterFactionsBlock2.faction = nil
+    if (MyCharacterFactions_Block2.faction ~= nil) then
+        MyCharacterFactions_Block2.faction = nil
     end
 
-    if (MyCharacterFactionsBlock3.faction ~= nil) then
-        MyCharacterFactionsBlock3.faction = nil
+    if (MyCharacterFactions_Block3.faction ~= nil) then
+        MyCharacterFactions_Block3.faction = nil
     end
 
-    if (MyCharacterFactionsBlock4.faction ~= nil) then
-        MyCharacterFactionsBlock4.faction = nil
+    if (MyCharacterFactions_Block4.faction ~= nil) then
+        MyCharacterFactions_Block4.faction = nil
     end
 
-    if (MyCharacterFactionsBlock5.faction ~= nil) then
-        MyCharacterFactionsBlock5.faction = nil
+    if (MyCharacterFactions_Block5.faction ~= nil) then
+        MyCharacterFactions_Block5.faction = nil
     end
 
-    if (MyCharacterFactionsBlock6.faction ~= nil) then
-        MyCharacterFactionsBlock6.faction = nil
+    if (MyCharacterFactions_Block6.faction ~= nil) then
+        MyCharacterFactions_Block6.faction = nil
     end
 
-    if (MyCharacterFactionsBlock7.faction ~= nil) then
-        MyCharacterFactionsBlock7.faction = nil
+    if (MyCharacterFactions_Block7.faction ~= nil) then
+        MyCharacterFactions_Block7.faction = nil
     end
 
-    if (MyCharacterFactionsBlock8.faction ~= nil) then
-        MyCharacterFactionsBlock8.faction = nil
+    if (MyCharacterFactions_Block8.faction ~= nil) then
+        MyCharacterFactions_Block8.faction = nil
     end
 
     Chronicles.UI.MyCharacters.CurrentFactionsPage = nil
@@ -732,6 +732,10 @@ function MyCharacterFactions_SearchBox_OnTextChanged(self)
     SearchBoxTemplate_OnTextChanged(self)
 
     if (strlen(self:GetText()) >= MIN_CHARACTER_SEARCH) then
+
+        -- search faction self:GetText()
+        -- MyCharacterFactions_ShowSearchPreviewResults( searchResults )
+
         MyCharactersDetails.searchBox.fullSearchFinished = SetAchievementSearchString(self:GetText())
         if (not MyCharactersDetails.searchBox.fullSearchFinished) then
             MyCharacterFactions_UpdateSearchPreview()
@@ -786,9 +790,9 @@ function MyCharacterFactions_UpdateSearchPreview()
 
     MyCharactersDetails.searchBox.searchPreviewUpdateDelay = 0
 
-    -- if (MyCharactersDetails.searchBox:GetScript("OnUpdate") == nil) then
-    --     MyCharactersDetails.searchBox:SetScript("OnUpdate", MyCharacterFactions_SearchBox_OnUpdate)
-    -- end
+    if (MyCharactersDetails.searchBox:GetScript("OnUpdate") == nil) then
+        MyCharactersDetails.searchBox:SetScript("OnUpdate", MyCharacterFactions_SearchBox_OnUpdate)
+    end
 end
 
 function MyCharacterFactions_SetSearchPreviewSelection(selectedIndex)
@@ -827,6 +831,59 @@ function MyCharacterFactions_SetSearchPreviewSelection(selectedIndex)
         searchPreviewContainer.searchPreviews[selectedIndex].selectedTexture:Show()
     end
 end
+
+
+
+
+
+
+-- function MyCharacterFactions_ShowSearchPreviewResults( searchResults)
+--     MyCharactersDetails.searchProgressBar:Hide()
+
+--     local numResults = tablelength(searchResults)
+
+--     if (numResults > 0) then
+--         MyCharacterFactions_SetSearchPreviewSelection(1)
+--     end
+
+--     local searchPreviewContainer = MyCharactersDetails.searchPreviewContainer
+--     local searchPreviews = searchPreviewContainer.searchPreviews
+--     local lastButton
+--     for index = 1, NUM_SEARCH_PREVIEWS do
+--         local searchPreview = searchPreviews[index]
+--         if (index <= numResults) then
+--             local achievementID = GetFilteredAchievementID(index)
+--             local _, name, _, _, _, _, _, description, _, icon, _, _, _, _ = GetAchievementInfo(achievementID)
+--             searchPreview.name:SetText(name)
+--             searchPreview.icon:SetTexture(icon)
+--             searchPreview.achievementID = achievementID
+--             searchPreview:Show()
+--             lastButton = searchPreview
+--         else
+--             searchPreview.achievementID = nil
+--             searchPreview:Hide()
+--         end
+--     end
+
+--     if (numResults > 5) then
+--         searchPreviewContainer.showAllSearchResults:Show()
+--         lastButton = searchPreviewContainer.showAllSearchResults
+--         searchPreviewContainer.showAllSearchResults.text:SetText(
+--             string.format(ENCOUNTER_JOURNAL_SHOW_SEARCH_RESULTS, numResults)
+--         )
+--     else
+--         searchPreviewContainer.showAllSearchResults:Hide()
+--     end
+
+--     if (lastButton) then
+--         searchPreviewContainer.borderAnchor:SetPoint("BOTTOM", lastButton, "BOTTOM", 0, -5)
+--         searchPreviewContainer.background:Hide()
+--         searchPreviewContainer:Show()
+--     else
+--         searchPreviewContainer:Hide()
+--     end
+-- end
+
 
 function MyCharacterFactions_ShowSearchPreviewResults()
     MyCharactersDetails.searchProgressBar:Hide()
@@ -875,7 +932,7 @@ function MyCharacterFactions_ShowSearchPreviewResults()
     end
 end
 
-function MyCharacterFactionsShowAllSearchResults_OnEnter()
+function MyCharacterFactions_ShowAllSearchResults_OnEnter()
     MyCharacterFactions_SetSearchPreviewSelection(SHOW_ALL_RESULTS_INDEX)
 end
 
@@ -889,12 +946,6 @@ end
 function MyCharacterFactions_SelectSearchItem(id)
     DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SelectSearchItem " .. tostring(id))
 
-    -- local isStatistic = select(15, GetAchievementInfo(id));
-    -- if ( isStatistic ) then
-    -- 	AchievementFrame_SelectStatisticByAchievementID(id, AchievementFrameComparison:IsShown());
-    -- else
-    -- 	AchievementFrame_SelectAchievement(id, true, AchievementFrameComparison:IsShown());
-    -- end
 end
 
 -- There is a delay before the search is updated to avoid a search progress bar if the search
@@ -916,7 +967,7 @@ function MyCharacterFactions_SearchBox_OnUpdate(self, elapsed)
 
         -- display search preview
         if (MyCharactersDetails.searchProgressBar:GetScript("OnUpdate") == nil) then
-            MyCharactersDetails.searchProgressBar:SetScript("OnUpdate", MyCharacterFactionsSearchProgressBar_OnUpdate)
+            MyCharactersDetails.searchProgressBar:SetScript("OnUpdate", MyCharacterFactions_SearchProgressBar_OnUpdate)
 
             local searchPreviewContainer = MyCharactersDetails.searchPreviewContainer
             local searchPreviews = searchPreviewContainer.searchPreviews
@@ -938,7 +989,7 @@ end
 
 -- If the searcher does not finish within the update delay then a search progress bar is displayed that
 -- will fill until the search is finished and then display the search preview results.
-function MyCharacterFactionsSearchProgressBar_OnUpdate(self, elapsed)
+function MyCharacterFactions_SearchProgressBar_OnUpdate(self, elapsed)
     local _, maxValue = self:GetMinMaxValues()
     local actualProgress = GetAchievementSearchProgress() / GetAchievementSearchSize() * maxValue
     local displayedProgress = self:GetValue()
@@ -952,11 +1003,11 @@ function MyCharacterFactionsSearchProgressBar_OnUpdate(self, elapsed)
     end
 end
 
-function MyCharacterFactionsSearchPreviewButton_OnShow(self)
+function MyCharacterFactions_SearchPreviewButton_OnShow(self)
     self:SetFrameLevel(self:GetParent():GetFrameLevel() + 10)
 end
 
-function MyCharacterFactionsSearchPreviewButton_OnLoad(self)
+function MyCharacterFactions_SearchPreviewButton_OnLoad(self)
     local searchPreviewContainer = MyCharactersDetails.searchPreviewContainer
     local searchPreviews = searchPreviewContainer.searchPreviews
     for index = 1, NUM_SEARCH_PREVIEWS do
@@ -967,11 +1018,11 @@ function MyCharacterFactionsSearchPreviewButton_OnLoad(self)
     end
 end
 
-function MyCharacterFactionsSearchPreviewButton_OnEnter(self)
+function MyCharacterFactions_SearchPreviewButton_OnEnter(self)
     MyCharacterFactions_SetSearchPreviewSelection(self.previewIndex)
 end
 
-function MyCharacterFactionsSearchPreviewButton_OnClick(self)
+function MyCharacterFactions_SearchPreviewButton_OnClick(self)
     if (self.achievementID) then
         MyCharacterFactions_SelectSearchItem(self.achievementID)
         MyCharactersDetails.searchResults:Hide()
@@ -981,7 +1032,7 @@ function MyCharacterFactionsSearchPreviewButton_OnClick(self)
 end
 
 function MyCharacterFactions_ShowFullSearch()
-    -- MyCharacterFactions
+    -- MyCharacterFactions_
     -- MyCharactersDetails
     -- AchievementFrame
     MyCharacterFactions_UpdateFullSearchResults()
