@@ -155,14 +155,20 @@ end
 
 -- Search factions ----------------------------------------------------------------------
 
-function Chronicles.DB:SearchFactions()
+function Chronicles.DB:SearchFactions(name)
     local foundFactions = {}
 
     for groupName, factionsGroup in pairs(self.Factions) do
         local factionGroupStatus = Chronicles.DB:GetGroupStatus(groupName)
         if (factionGroupStatus) then
             for factionIndex, faction in pairs(factionsGroup.data) do
-                table.insert(foundFactions, self:CleanFactionObject(faction, groupName))
+                if (name ~= nil and strlen(name) >= MIN_CHARACTER_SEARCH) then
+                    if (string.lower(faction.name):find(string.lower(name)) ~= nil) then
+                        table.insert(foundFactions, self:CleanFactionObject(faction, groupName))
+                    end
+                else
+                    table.insert(foundFactions, self:CleanFactionObject(faction, groupName))
+                end
             end
         end
     end
@@ -210,14 +216,20 @@ end
 
 -- Search characters --------------------------------------------------------------------
 
-function Chronicles.DB:SearchCharacters()
+function Chronicles.DB:SearchCharacters(name)
     local foundCharacters = {}
 
     for groupName, charactersGroup in pairs(self.Characters) do
         local characterGroupStatus = Chronicles.DB:GetGroupStatus(groupName)
         if (characterGroupStatus) then
             for characterIndex, character in pairs(charactersGroup.data) do
-                table.insert(foundCharacters, self:CleanCharacterObject(character, groupName))
+                if (name ~= nil and strlen(name) >= MIN_CHARACTER_SEARCH) then
+                    if (string.lower(character.name):find(string.lower(name)) ~= nil) then
+                        table.insert(foundCharacters, self:CleanCharacterObject(character, groupName))
+                    end
+                else
+                    table.insert(foundCharacters, self:CleanCharacterObject(character, groupName))
+                end
             end
         end
     end

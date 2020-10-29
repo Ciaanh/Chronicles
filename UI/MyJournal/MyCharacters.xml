@@ -362,8 +362,8 @@
                         </Anchors>
                         <Scripts>
                             <OnShow function="MyCharacterFactions_SearchBox_OnShow"/>
-                            <OnEnterPressed function="MyCharacterFactions_SearchBox_OnEnterPressed"/>
-                            <OnTextChanged function="MyCharacterFactions_SearchBox_OnTextChanged"/>
+                            <OnEnterPressed function="MyCharacterFactions_SearchBox_Refresh"/>
+                            <OnTextChanged function="MyCharacterFactions_SearchBox_Refresh"/>
                             <OnEditFocusLost function="MyCharacterFactions_SearchBox_OnFocusLost"/>
                             <OnEditFocusGained function="MyCharacterFactions_SearchBox_OnFocusGained"/>
                             <OnKeyDown function="MyCharacterFactions_SearchBox_OnKeyDown"/>
@@ -510,77 +510,10 @@
                         </Scripts>
                     </Frame>
 
-                    <StatusBar parentKey="searchProgressBar" hidden="false">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" relativeKey="$parent.searchPreviewContainer" relativePoint="TOPLEFT" x="20" y="-5"/>
-                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.searchPreviewContainer" relativePoint="BOTTOMRIGHT" x="-20" y="10"/>
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND">
-                                <Texture parentKey="bg">
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT"/>
-                                        <Anchor point="BOTTOMRIGHT"/>
-                                    </Anchors>
-                                    <Color r="0" g="0" b="0" a=".4"/>
-                                </Texture>
-                            </Layer>
-                            <Layer level="OVERLAY">
-                                <FontString parentKey="text" inherits="GameFontHighlightSmall" text="SEARCH_PROGRESS_BAR_TEXT" justifyV="TOP">
-                                    <Size x="0" y="0"/>
-                                    <Anchors>
-                                        <Anchor point="CENTER" x="0" y="0"/>
-                                    </Anchors>
-                                </FontString>
-                            </Layer>
-                            <Layer level="ARTWORK">
-                                <Texture parentKey="borderLeft" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
-                                    <Size x="16" y="0"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" x="-6" y="5"/>
-                                        <Anchor point="BOTTOMLEFT" x="-6" y="-5"/>
-                                    </Anchors>
-                                    <TexCoords left="0" right="0.0625" top="0" bottom="0.75"/>
-                                </Texture>
-                                <Texture parentKey="borderRight" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
-                                    <Size x="16" y="0"/>
-                                    <Anchors>
-                                        <Anchor point="TOPRIGHT" x="6" y="5"/>
-                                        <Anchor point="BOTTOMRIGHT" x="6" y="-5"/>
-                                    </Anchors>
-                                    <TexCoords left="0.812" right="0.8745" top="0" bottom="0.75"/>
-                                </Texture>
-                                <Texture parentKey="borderCenter" file="Interface\AchievementFrame\UI-Achievement-ProgressBar-Border">
-                                    <Size x="16"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativeKey="$parent.borderLeft" relativePoint="TOPRIGHT"/>
-                                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.borderRight" relativePoint="BOTTOMLEFT"/>
-                                    </Anchors>
-                                    <TexCoords left="0.0625" right="0.812" top="0" bottom="0.75"/>
-                                </Texture>
-                            </Layer>
-                        </Layers>
-                        <Scripts>
-                            <OnShow>
-						        self:SetFrameLevel(self:GetParent():GetFrameLevel() + 15);
-                            </OnShow>
-                            <OnLoad>
-                                self:SetStatusBarColor(0, .6, 0, 1);
-                                self:SetMinMaxValues(0, 1000);
-                                self:SetValue(0);
-                                self:GetStatusBarTexture():SetDrawLayer("BORDER");
-                            </OnLoad>
-                            <OnHide>
-						        self:SetScript("OnUpdate", nil);
-                            </OnHide>
-                        </Scripts>
-                        <BarTexture file="Interface\TargetingFrame\UI-StatusBar"/>
-                    </StatusBar>
-
                     <Frame parentKey="searchResults" hidden="true">
                         <Size x="600" y="382"/>
                         <Anchors>
-                            <Anchor point="BOTTOM" x="0" y="7"/>
+                            <Anchor point="BOTTOM" x="-50" y="30"/>
                         </Anchors>
                         <Layers>
                             <Layer level="BACKGROUND">
@@ -696,8 +629,8 @@
                                         </Anchors>
                                         <Scripts>
                                             <OnLoad>
-										self.trackBG:Show();
-										self.trackBG:SetVertexColor(0, 0, 0, 1);
+                                                self.trackBG:Show();
+                                                self.trackBG:SetVertexColor(0, 0, 0, 1);
                                             </OnLoad>
                                         </Scripts>
                                     </Slider>

@@ -265,13 +265,13 @@
 					</Anchors>
 					<Color r="0.66796875" g="0.51171875" b="0.3359375" a="1"/>
 				</FontString>
-				<FontString inherits="GameFontNormal" justifyH="RIGHT" parentKey="resultType" text="ACHIEVEMENT">
+				<!-- <FontString inherits="GameFontNormal" justifyH="RIGHT" parentKey="resultType" text="ACHIEVEMENT">
 					<Size x="140" y="0"/>
 					<Anchors>
 						<Anchor point="RIGHT" x="-14" y="0"/>
 					</Anchors>
 					<Color r="0.66796875" g="0.51171875" b="0.3359375" a="1"/>
-				</FontString>
+				</FontString> -->
 			</Layer>
 		</Layers>
 		<NormalTexture inherits="_SearchBarLg">
