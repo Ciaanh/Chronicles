@@ -236,6 +236,32 @@ function Chronicles.DB:SearchCharacters(name)
     return foundCharacters
 end
 
+function Chronicles.DB:FindCharacters(ids)
+    local foundCharacters = {}
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- FindFactions " .. tostring(ids))
+
+    for group, characterIds in pairs(ids) do
+        -- DEFAULT_CHAT_FRAME:AddMessage("---- group " .. group)
+        local characterGroupStatus = Chronicles.DB:GetGroupStatus(group)
+        if (characterGroupStatus) then
+            local charactersGroup = self.Characters[group]
+            -- DEFAULT_CHAT_FRAME:AddMessage("------ factionsGroup " .. tablelength(factionsGroup.data))
+            if (charactersGroup ~= nil and charactersGroup.data ~= nil and tablelength(charactersGroup.data) > 0) then
+                for characterIndex, character in pairs(charactersGroup.data) do
+                    for index, id in ipairs(characterIds) do
+                        -- DEFAULT_CHAT_FRAME:AddMessage("-------- faction.id " .. faction.id .. " id " .. id)
+                        if (character.id == id) then
+                            table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, group))
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return foundCharacters
+end
+
 function Chronicles.DB:CleanCharacterObject(character, groupName)
     if character ~= nil then
         return {

@@ -109,7 +109,12 @@ function copyTable(tableToCopy)
     if orig_type == "table" then
         copy = {}
         for orig_key, orig_value in pairs(tableToCopy) do
-            copy[orig_key] = orig_value
+            local orig_value_type = type(orig_value)
+            if (orig_value_type == "table") then
+                copy[orig_key] = copyTable(orig_value)
+            else
+                copy[orig_key] = orig_value
+            end
         end
     else -- number, string, boolean, etc
         copy = tableToCopy

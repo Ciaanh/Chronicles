@@ -37,7 +37,7 @@ function Chronicles.UI:Refresh()
     Chronicles.UI.EventDescription:Refresh()
     
     Chronicles.UI.CharactersView:Refresh()
-    -- Chronicles.UI.FactionsView:Refresh()
+    Chronicles.UI.FactionsView:Refresh()
 end
 
 function Chronicles.UI:DisplayWindow()

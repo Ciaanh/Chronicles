@@ -5,7 +5,8 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI.MyCharacters = {}
 Chronicles.UI.MyCharacters.CurrentPage = 1
-Chronicles.UI.MyCharacters.SelectedCharacter = {}
+Chronicles.UI.MyCharacters.SelectedCharacterId = nil
+Chronicles.UI.MyCharacters.SelectedCharacterFactions = {}
 
 function Chronicles.UI.MyCharacters:Init(isVisible)
     MyCharacters.List:SetBackdrop(
@@ -128,11 +129,12 @@ function Chronicles.UI.MyCharacters:HideFields()
     MyCharacterFactions_ScrollBar:Hide()
 
     MyCharactersDetails.searchBox:Hide()
+    MyCharactersDetails.searchBox:SetText("")
 
-    Chronicles.UI.MyCharacters.SelectedCharacter = {}
+    Chronicles.UI.MyCharacters.SelectedCharacterId = nil
+    Chronicles.UI.MyCharacters.SelectedCharacterFactions = nil
 
     Chronicles.UI.MyCharacters:HideAllFactions()
-    Chronicles.UI.MyCharacters:WipeAllFactions()
 end
 
 function Chronicles.UI.MyCharacters:ShowFields()
@@ -280,13 +282,14 @@ function MyCharactersListAddCharacter_OnClick()
     }
     Chronicles.DB:SetMyJournalCharacters(character)
     Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage, true)
-    Chronicles.UI:Refresh()
+    Chronicles.UI.CharactersView:Refresh()
 end
 
 function MyCharactersDetailsRemoveCharacter_OnClick()
-    Chronicles.DB:RemoveMyJournalCharacter(Chronicles.UI.MyCharacters.SelectedCharacter.id)
+    Chronicles.DB:RemoveMyJournalCharacter(Chronicles.UI.MyCharacters.SelectedCharacterId)
     Chronicles.UI.MyCharacters:HideFields()
-    Chronicles.UI.MyCharacters.SelectedCharacter = {}
+    Chronicles.UI.MyCharacters.SelectedCharacterId = nil
+    Chronicles.UI.MyCharacters.SelectedCharacterFactions = nil
     Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage, true)
     Chronicles.UI:Refresh()
 end
@@ -295,54 +298,48 @@ end
 -- Details -------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
--- function Chronicles.UI.MyCharacters:CleanSelectedCharacter()
---     MyCharactersDetailsId:SetText("")
---     MyCharactersDetailsName:SetText("")
---     MyCharactersDetailsBiography:SetText("")
-
---     Chronicles.UI.MyCharacters.SelectedCharacter = {}
-
---     Chronicles.UI.MyCharacters:HideAllFactions()
---     Chronicles.UI.MyCharacters:WipeAllFactions()
--- end
-
 function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
     if (character == nil) then
         Chronicles.UI.MyCharacters:HideFields()
     else
         Chronicles.UI.MyCharacters:ShowFields()
+
+        Chronicles.UI.MyCharacters.SelectedCharacterId = character.id
+
+        -- id=[integer],				-- Id of the character
+        -- name=[string], 				-- name of the character
+        -- biography=[string],			-- small biography
+        -- timeline=[integer],    		-- id of the timeline
+        -- factions=table[integer], 	-- concerned factions
+
+        MyCharactersDetailsId:SetText(character.id)
+        MyCharactersDetailsName:SetText(character.name)
+        MyCharactersDetailsBiography:SetText(character.biography)
+        MyCharactersDetails.searchBox:SetText("")
+
+        UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
+        UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, Chronicles.constants.timelines[character.timeline])
+
+        Chronicles.UI.MyCharacters.SelectedCharacterFactions = copyTable(character.factions)
+        Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
     end
-
-    Chronicles.UI.MyCharacters.SelectedCharacter.id = character.id
-
-    -- id=[integer],				-- Id of the character
-    -- name=[string], 				-- name of the character
-    -- biography=[string],			-- small biography
-    -- timeline=[integer],    		-- id of the timeline
-    -- factions=table[integer], 	-- concerned factions
-
-    MyCharactersDetailsId:SetText(character.id)
-    MyCharactersDetailsName:SetText(character.name)
-    MyCharactersDetailsBiography:SetText(character.biography)
-
-    UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
-    UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, Chronicles.constants.timelines[character.timeline])
-
-    Chronicles.UI.MyCharacters.SelectedCharacter.Factions = character.factions
-    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
 end
 
 function MyCharactersDetailsSave_Click()
+    -- DEFAULT_CHAT_FRAME:AddMessage(
+    --     "-- MyCharactersDetailsSave_Click " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
+    -- )
     local character = {
         id = tonumber(MyCharactersDetailsId:GetText()),
         name = MyCharactersDetailsName:GetText(),
         biography = MyCharactersDetailsBiography:GetText(),
-        timeline = MyCharactersDetailsTimelineDropDown.selectedID
+        timeline = MyCharactersDetailsTimelineDropDown.selectedID,
+        factions = copyTable(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
     }
 
     Chronicles.DB:SetMyJournalCharacters(character)
     Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage, true)
-    Chronicles.UI:Refresh()
+    Chronicles.UI.CharactersView:Refresh()
 end
 
 ------------------------------------------------------------------------------------------
@@ -436,20 +433,24 @@ end
 function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeFactionsPage " .. page)
 
-    -- MyCharacterFactions_Previous:Hide()
-    -- MyCharacterFactions_Next:Hide()
-
     if
-        (Chronicles.UI.MyCharacters.SelectedCharacter ~= nil and
-            Chronicles.UI.MyCharacters.SelectedCharacter.Factions ~= nil and
-            tablelength(Chronicles.UI.MyCharacters.SelectedCharacter.Factions) > 0)
+        (Chronicles.UI.MyCharacters.SelectedCharacterId ~= nil and
+            Chronicles.UI.MyCharacters.SelectedCharacterFactions ~= nil and
+            tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions) > 0)
      then
-        if (page ~= nil) then
-            local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
-            local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.MyCharacters.SelectedCharacter.Factions)
+        -- DEFAULT_CHAT_FRAME:AddMessage(
+        --     "-- ChangeFactionsPage " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
+        -- )
 
-            local numberOfFactions = tablelength(factionsList)
+        local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
+        local numberOfFactions = tablelength(factionsList)
+
+        if (page ~= nil and numberOfFactions > 0) then
+            local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
+
             -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfFactions " .. numberOfFactions)
+
+            Chronicles.UI.MyCharacters:HideAllFactions()
 
             if (numberOfFactions > 0) then
                 local maxPageValue = math.ceil(numberOfFactions / pageSize)
@@ -461,9 +462,6 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
                 if (page < 1) then
                     page = 1
                 end
-
-                Chronicles.UI.MyCharacters:HideAllFactions()
-                Chronicles.UI.MyCharacters:WipeAllFactions()
 
                 if (numberOfFactions > pageSize) then
                     MyCharacterFactions_ScrollBar.ScrollUpButton:Enable()
@@ -566,58 +564,64 @@ function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
         --         Chronicles.UI.MyCharacters:SetCharacterDetails(character)
         --     end
         -- )
+        frame.remove:Show()
+        frame.remove:SetScript(
+            "OnClick",
+            function()
+                Chronicles.UI.MyCharacters:RemoveFaction(faction)
+            end
+        )
+
         frame:Show()
+    else
+        frame.remove:SetScript("OnClick", nil)
+        frame.remove:Hide()
     end
+end
+
+function Chronicles.UI.MyCharacters:RemoveFaction(faction)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction " .. faction.name)
+    local indexToRemove = nil
+    for index, id in ipairs(Chronicles.UI.MyCharacters.SelectedCharacterFactions[faction.source]) do
+        if (faction.id == id) then
+            indexToRemove = index
+            break
+        end
+    end
+
+    if indexToRemove ~= nil then
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction index " .. indexToRemove)
+        table.remove(Chronicles.UI.MyCharacters.SelectedCharacterFactions[faction.source], indexToRemove)
+    end
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction MyCharacters " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions))
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction CharactersView " .. tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions))
+   
+
+    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+    Chronicles.UI.CharactersView:Refresh()
 end
 
 function Chronicles.UI.MyCharacters:HideAllFactions()
-    MyCharacterFactions_Block1:Hide()
-    MyCharacterFactions_Block2:Hide()
-    MyCharacterFactions_Block3:Hide()
-    MyCharacterFactions_Block4:Hide()
-    MyCharacterFactions_Block5:Hide()
-    MyCharacterFactions_Block6:Hide()
-    MyCharacterFactions_Block7:Hide()
-    MyCharacterFactions_Block8:Hide()
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block1)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block2)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block3)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block4)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block5)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block6)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block7)
+    Chronicles.UI.MyCharacters:HideFaction(MyCharacterFactions_Block8)
 
     MyCharacterFactions_ScrollBar.ScrollUpButton:Disable()
     MyCharacterFactions_ScrollBar.ScrollDownButton:Disable()
-end
-
-function Chronicles.UI.MyCharacters:WipeAllFactions()
-    if (CharactersListBlock1.faction ~= nil) then
-        CharactersListBlock1.faction = nil
-    end
-
-    if (MyCharacterFactions_Block2.faction ~= nil) then
-        MyCharacterFactions_Block2.faction = nil
-    end
-
-    if (MyCharacterFactions_Block3.faction ~= nil) then
-        MyCharacterFactions_Block3.faction = nil
-    end
-
-    if (MyCharacterFactions_Block4.faction ~= nil) then
-        MyCharacterFactions_Block4.faction = nil
-    end
-
-    if (MyCharacterFactions_Block5.faction ~= nil) then
-        MyCharacterFactions_Block5.faction = nil
-    end
-
-    if (MyCharacterFactions_Block6.faction ~= nil) then
-        MyCharacterFactions_Block6.faction = nil
-    end
-
-    if (MyCharacterFactions_Block7.faction ~= nil) then
-        MyCharacterFactions_Block7.faction = nil
-    end
-
-    if (MyCharacterFactions_Block8.faction ~= nil) then
-        MyCharacterFactions_Block8.faction = nil
-    end
 
     Chronicles.UI.MyCharacters.CurrentFactionsPage = nil
+end
+
+function Chronicles.UI.MyCharacters:HideFaction(frame)
+    frame:Hide()
+    frame.faction = nil
+    frame.remove:SetScript("OnClick", nil)
 end
 
 ------------------------------------------------------------------------------------------
@@ -745,8 +749,6 @@ function MyCharacterFactions_SetSearchPreviewSelection(selectedIndex)
 
     searchPreviewContainer.showAllSearchResults.selectedTexture:Hide()
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedIndex " .. tostring(selectedIndex))
-
     if (numShown <= 0) then
         -- Default to the first entry.
         selectedIndex = 1
@@ -783,7 +785,7 @@ function MyCharacterFactions_ShowSearchPreviewResults()
 
             searchPreview.name:SetText(faction.name)
             --searchPreview.icon:SetTexture(icon)
-            searchPreview.factionID = faction.id
+            searchPreview.factionID = {id = faction.id, group = faction.source}
             searchPreview:Show()
             lastButton = searchPreview
         else
@@ -822,8 +824,31 @@ function MyCharacterFactions_FullSearchResultsButton_OnClick(self)
     end
 end
 
-function MyCharacterFactions_SelectSearchItem(id)
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SelectSearchItem " .. tostring(id))
+function MyCharacterFactions_SelectSearchItem(factionID)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
+
+    local results =
+        Chronicles.DB:FindFactions(
+        {
+            [factionID.group] = {factionID.id}
+        }
+    )
+
+    if (results ~= nil and tablelength(results) > 0) then
+        if (Chronicles.UI.MyCharacters.SelectedCharacterFactions[factionID.group] ~= nil) then
+            for index, id in ipairs(Chronicles.UI.MyCharacters.SelectedCharacterFactions[factionID.group]) do
+                if (factionID.id == id) then
+                    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+                    return
+                end
+            end
+            table.insert(Chronicles.UI.MyCharacters.SelectedCharacterFactions[factionID.group], factionID.id)
+        else
+            Chronicles.UI.MyCharacters.SelectedCharacterFactions[factionID.group] = {factionID.id}
+        end
+    end
+    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+    Chronicles.UI.CharactersView:Refresh()
 end
 
 function MyCharacterFactions_SearchBox_OnUpdate(self)
@@ -862,7 +887,8 @@ function MyCharacterFactions_SearchPreviewButton_OnEnter(self)
 end
 
 function MyCharacterFactions_SearchPreviewButton_OnClick(self)
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick " .. tostring(self.factionID))
+    --DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick " .. tostring(self.factionID))
+
     if (self.factionID) then
         MyCharacterFactions_SelectSearchItem(self.factionID)
         MyCharactersDetails.searchResults:Hide()
@@ -872,7 +898,7 @@ function MyCharacterFactions_SearchPreviewButton_OnClick(self)
 end
 
 function MyCharacterFactions_ShowFullSearch()
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_ShowFullSearch ")
+    --DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_ShowFullSearch ")
 
     MyCharacterFactions_UpdateFullSearchResults()
 
@@ -909,13 +935,14 @@ function MyCharacterFactions_UpdateFullSearchResults()
 
             result.name:SetText(faction.name)
             -- result.icon:SetTexture(icon)
-            result.factionID = faction.id
+
+            result.factionID = {id = faction.id, group = faction.source}
 
             local size = 75
             if (string.lower(faction.description):find("<html>") == nil) then
-                result.path:SetText(faction.description:sub(0, size))
+                result.description:SetText(faction.description:sub(0, size))
             else
-                result.path:SetText("")
+                result.description:SetText("")
             end
 
             result:Show()
