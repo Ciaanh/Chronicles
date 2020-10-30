@@ -54,7 +54,7 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsDetailsAddDescriptionPage:SetText(Locale["AddPage"])
     MyEventsDetailsRemoveDescriptionPage:SetText(Locale["RemovePage"])
     MyEventsDetailsSaveButton:SetText(Locale["Save"])
-    MyEventsListAddEvent:SetText(Locale["AddEvent"])
+    MyEventsListAddEvent:SetText(Locale["Add"])
     MyEventsDetailsRemoveEvent:SetText(Locale["Delete"])
 
     MyEventsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")

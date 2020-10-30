@@ -48,7 +48,7 @@ function Chronicles.UI.MyCharacters:InitLocales()
     MyCharacters.Name:SetText(Locale[":My Characters"])
 
     MyCharactersDetailsSaveButton:SetText(Locale["Save"])
-    MyCharactersListAddCharacter:SetText(Locale["AddCharacter"])
+    MyCharactersListAddCharacter:SetText(Locale["Add"])
     MyCharactersDetailsRemoveCharacter:SetText(Locale["Delete"])
 
     MyCharactersDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
@@ -596,7 +596,6 @@ function Chronicles.UI.MyCharacters:RemoveFaction(faction)
 
     -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction MyCharacters " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions))
     -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction CharactersView " .. tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions))
-   
 
     Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
     Chronicles.UI.CharactersView:Refresh()

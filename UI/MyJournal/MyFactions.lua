@@ -45,7 +45,7 @@ function Chronicles.UI.MyFactions:InitLocales()
     MyFactions.Name:SetText(Locale[":My Factions"])
 
     MyFactionsDetailsSaveButton:SetText(Locale["Save"])
-    MyFactionsListAddFaction:SetText(Locale["AddFaction"])
+    MyFactionsListAddFaction:SetText(Locale["Add"])
     MyFactionsDetailsRemoveFaction:SetText(Locale["Delete"])
     
     MyFactionsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")

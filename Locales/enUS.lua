@@ -14,8 +14,7 @@ if L then
     L["AddPage"] = "Add page"
     L["RemovePage"] = "Remove last page"
     L["Save"] = "Save"
-
-    L["AddEvent"] = "Add event"
+    L["Add"] = "Add"
     L["Delete"] = "Delete"
 
     L["Id_Field"] = "Id"
