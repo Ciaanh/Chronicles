@@ -28,7 +28,7 @@ function Chronicles.UI.FactionsView:InitLocales()
     FactionTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
 end
 
-function Chronicles.UI.EventList:Refresh()
+function Chronicles.UI.FactionsView:Refresh()
     Chronicles.UI.FactionsView.CurrentPage = 1
     Chronicles.UI.FactionsView:DisplayFactionList(1, true)
 

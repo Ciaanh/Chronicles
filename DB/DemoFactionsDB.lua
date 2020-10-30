@@ -3,7 +3,7 @@ local Chronicles = private.Core
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-GlobalFactionsDB = {
+DemoFactionsDB = {
 	--[[ structure:
 		[factionId] = {
             id=[integer],				-- Id of the faction

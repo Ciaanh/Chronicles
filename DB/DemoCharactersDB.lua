@@ -3,7 +3,7 @@ local Chronicles = private.Core
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-GlobalCharactersDB = {
+DemoCharactersDB = {
 	--[[ structure:
 		[characterId] = {
  			id=[integer],				-- Id of the character
@@ -19,7 +19,7 @@ GlobalCharactersDB = {
 		biography = Locale["Norgannon biography"],
 		timeline = 2,
 		factions = {
-			["Global"] = {2, 1, 1, 1, 2, 2, 2},
+			["Demo"] = {2, 1, 1, 1, 2, 2, 2},
 			["myjournal"] = {1, 1, 1, 1, 1}
 		}
 	}

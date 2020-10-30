@@ -9,10 +9,14 @@ Chronicles.DB.Factions = {}
 Chronicles.DB.Characters = {}
 Chronicles.DB.RP = {}
 
+RPEventsDB={}
+
 function Chronicles.DB:Init()
-    self:RegisterEventDB("Global", GlobalEventsDB)
-    self:RegisterFactionDB("Global", GlobalFactionsDB)
-    self:RegisterCharacterDB("Global", GlobalCharactersDB)
+    self:RegisterEventDB("RP", RPEventsDB)
+
+    self:RegisterEventDB("Demo", DemoEventsDB)
+    self:RegisterFactionDB("Demo", DemoFactionsDB)
+    self:RegisterCharacterDB("Demo", DemoCharactersDB)
 
     -- load data for my journal
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
@@ -29,12 +33,12 @@ end
 function Chronicles.DB:AvailableDbId(db)
 end
 
-function Chronicles.DB:AddGlobalEvent(event)
+function Chronicles.DB:AddRPEvent(event)
     -- check max index and set it to event
     if (event.id == nil) then
-        event.id = table.maxn(GlobalEventsDB) + 1
+        event.id = table.maxn(RPEventsDB) + 1
     end
-    table.insert(GlobalEventsDB, event.id, self:CleanEventObject(event, "Global"))
+    table.insert(RPEventsDB, event.id, self:CleanEventObject(event, "RP"))
 end
 
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
@@ -580,7 +584,7 @@ end
 -- RP addons tools ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:LoadRolePlayProfile()
-    if (GlobalEventsDB[0] ~= nil) then
+    if (RPEventsDB[0] ~= nil) then
         return
     end
 
@@ -616,7 +620,7 @@ function Chronicles.DB.RP:RegisterBirth(age, name, addon)
         yearEnd = birth,
         eventType = 5
     }
-    Chronicles.DB:AddGlobalEvent(event)
+    Chronicles.DB:AddRPEvent(event)
 end
 
 function Chronicles.DB.RP:MRP_GetRoleplayingName()

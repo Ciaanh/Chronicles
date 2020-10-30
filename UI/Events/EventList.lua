@@ -18,9 +18,9 @@ function Chronicles.UI.EventList:Init()
 end
 
 function Chronicles.UI.EventList:Refresh()
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
-    Chronicles.UI.EventList.CurrentPage = 1
-    Chronicles.UI.EventList:DisplayEventList(1, true)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
+    Chronicles.UI.EventList:HideAll()
+    Chronicles.UI.EventList:WipeAll()
 end
 
 function Chronicles.UI.EventList:FilterEvents(events)
