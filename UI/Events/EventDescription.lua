@@ -8,7 +8,7 @@ Chronicles.UI.EventDescription.CurrentPage = nil
 Chronicles.UI.EventDescription.CurrentEvent = nil
 
 function Chronicles.UI.EventDescription:Refresh()
-    if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
+    --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
         self.CurrentEvent = nil
         self.CurrentPage = nil
 
@@ -19,7 +19,7 @@ function Chronicles.UI.EventDescription:Refresh()
         EventDescriptionPrevious:Hide()
         EventDescriptionNext:Hide()
         EventDescriptionPager:Hide()
-    end
+    --end
 end
 
 function Chronicles.UI.EventDescription:DrawEventDescription(event)

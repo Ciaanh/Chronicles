@@ -5,6 +5,8 @@ if L then
     L["Chronicles"] = true
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
+    L["CurrentYear"] = "Current year is "
+    L["AfterDP"] = " after the Dark Portal"
     L["start"] = "Start"
     L["end"] = "End"
     L["year"] = "Year"
