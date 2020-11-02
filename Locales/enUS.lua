@@ -33,4 +33,7 @@ if L then
 
     L["ErrorYearAsNumber"] = "A year must be a number"
     L["ErrorYearOrder"] = "Event ends before it's started"
+
+    L["Mythos"] = "Mythos"
+    L["Futur"] = "Futur"
 end

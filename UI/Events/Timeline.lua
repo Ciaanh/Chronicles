@@ -1,6 +1,8 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Core
 
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
+
 Chronicles.UI.Timeline = {}
 
 Chronicles.UI.Timeline.MaxStepIndex = 3
@@ -239,7 +241,7 @@ function GetBounds(blockIndex, stepValue)
             return {
                 lower = Chronicles.constants.config.currentYear + 1,
                 upper = 999999,
-                text = "Events to come"
+                text = Locale["Futur"]
             }
         else
             -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue < currentYear ")
@@ -254,7 +256,7 @@ function GetBounds(blockIndex, stepValue)
             return {
                 lower = -999999,
                 upper = Chronicles.constants.config.historyStartYear - 1,
-                text = "Mythos"
+                text = Locale["Mythos"]
             }
         else
             -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue > historyStartYear ")
@@ -268,7 +270,6 @@ function GetBounds(blockIndex, stepValue)
         text = nil
     }
 end
-
 
 function GetIndex(year)
     local selectedYear = year
@@ -381,15 +382,19 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
         frameEvent.upperBound = dateBlock.upperBound
 
         if (dateBlock.text ~= nil) then
-            DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text Event " .. dateBlock.text)
-            frameNoEvent.LabelText:SetText(dateBlock.text)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text Event " .. dateBlock.text)
+            frameEvent.LabelText:SetText(dateBlock.text)
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText("")
             frameNoEvent.LabelStart:SetText("")
             frameNoEvent.LabelEnd:SetText("")
         else
+            frameEvent.LabelText:SetText("")
             frameEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
             frameEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+
             frameNoEvent.LabelStart:SetText("")
             frameNoEvent.LabelEnd:SetText("")
             frameNoEvent.LabelText:SetText("")
@@ -411,14 +416,19 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
 
         if (dateBlock.text ~= nil) then
             DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text NoEvent " .. dateBlock.text)
-            frameNoEvent.LabelText:SetText(dateBlock.text)
+            frameEvent.LabelText:SetText("")
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText(dateBlock.text)
             frameNoEvent.LabelStart:SetText("")
             frameNoEvent.LabelEnd:SetText("")
         else
+            frameEvent.LabelText:SetText("")
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText("")
             frameNoEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
             frameNoEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
         end
