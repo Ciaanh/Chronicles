@@ -54,11 +54,15 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsDetailsAddDescriptionPage:SetText(Locale["AddPage"])
     MyEventsDetailsRemoveDescriptionPage:SetText(Locale["RemovePage"])
     MyEventsDetailsSaveButton:SetText(Locale["Save"])
-    MyEventsListAddEvent:SetText(Locale["Add"])
+    MyEvents.List.AddButton:SetText(Locale["Add"])
     MyEventsDetailsRemoveEvent:SetText(Locale["Delete"])
 
-    MyEventsDetailsIdLabel:SetText(Locale["Id_Field"] .. " :")
-    MyEventsDetailsTitleLabel:SetText(Locale["Title_Field"] .. " :")
+    MyEventsDetailsFactionsCharactersHide:SetText(Locale["FactionsCharacters"])
+    MyEventsDetailsFactionsCharactersShow:SetText(Locale["FactionsCharacters"])
+
+    MyEvents.Details.IdContainer.Label:SetText(Locale["Id_Field"] .. " :")
+    MyEvents.Details.TitleLabelContainer.TitleLabel:SetText(Locale["Title_Field"] .. " :")
+
     MyEventsDetailsYearStartLabel:SetText(Locale["YearStart_Field"] .. " :")
     MyEventsDetailsYearEndLabel:SetText(Locale["YearEnd_Field"] .. " :")
     MyEventsDetailsDescriptionsLabel:SetText(Locale["Description_Field"] .. " :")
@@ -77,8 +81,8 @@ function Chronicles.UI.MyEvents:HideAll()
     MyEventListBlock8:Hide()
     MyEventListBlock9:Hide()
 
-    MyEventsListScrollBar.ScrollUpButton:Disable()
-    MyEventsListScrollBar.ScrollDownButton:Disable()
+    MyEvents.List.ScrollBar.ScrollUpButton:Disable()
+    MyEvents.List.ScrollBar.ScrollDownButton:Disable()
 end
 
 function Chronicles.UI.MyEvents:WipeAll()
@@ -126,54 +130,32 @@ function Chronicles.UI.MyEvents:WipeAll()
 end
 
 function Chronicles.UI.MyEvents:HideFields()
-    MyEventsDetailsIdLabel:Hide()
-    MyEventsDetailsId:Hide()
-    MyEventsDetailsTitleLabel:Hide()
-    MyEventsDetailsYearStartLabel:Hide()
-    MyEventsDetailsYearEndLabel:Hide()
-    MyEventsDetailsDescriptionsLabel:Hide()
-    MyEventsDetailsDescriptionPager:Hide()
-    MyEventsDetailsEventTypeLabel:Hide()
-    MyEventsDetailsTimelineLabel:Hide()
-    MyEventsDetailsTypeDropDown:Hide()
-    MyEventsDetailsTimelineDropDown:Hide()
-    MyEventsDetailsTitle:Hide()
-    MyEventsDetailsYearStart:Hide()
-    MyEventsDetailsYearEnd:Hide()
-    MyEventsDetailsDescriptionContainer:Hide()
-    MyEventsDetailsDescriptionPrevious:Hide()
-    MyEventsDetailsDescriptionNext:Hide()
-    MyEventsDetailsSaveButton:Hide()
-    MyEventsDetailsAddDescriptionPage:Hide()
-    MyEventsDetailsRemoveDescriptionPage:Hide()
-    MyEventsDetailsRemoveEvent:Hide()
+    MyEvents.Details.IdContainer.Id:Hide()
+    MyEvents.Details.IdContainer.Label:Hide()
+
+    MyEvents.Details.TitleLabelContainer.TitleLabel:Hide()
+    MyEvents.Details.Title:Hide()
+
+    MyEvents.Details.Fields:Hide()
+
     MyEventsDetailsYearStartErrorContainer:Hide()
     MyEventsDetailsYearEndErrorContainer:Hide()
     MyEventsDetailsYearOrderErrorContainer:Hide()
+    MyEventsDetailsFactionsCharactersShow:Hide()
+
+    MyEvents.Details.FactionsCharacters:Hide()
 end
 
 function Chronicles.UI.MyEvents:ShowFields()
-    MyEventsDetailsIdLabel:Show()
-    MyEventsDetailsId:Show()
-    MyEventsDetailsTitleLabel:Show()
-    MyEventsDetailsYearStartLabel:Show()
-    MyEventsDetailsYearEndLabel:Show()
-    MyEventsDetailsDescriptionsLabel:Show()
-    MyEventsDetailsDescriptionPager:Show()
-    MyEventsDetailsEventTypeLabel:Show()
-    MyEventsDetailsTimelineLabel:Show()
-    MyEventsDetailsTypeDropDown:Show()
-    MyEventsDetailsTimelineDropDown:Show()
-    MyEventsDetailsTitle:Show()
-    MyEventsDetailsYearStart:Show()
-    MyEventsDetailsYearEnd:Show()
-    MyEventsDetailsDescriptionContainer:Show()
-    MyEventsDetailsDescriptionPrevious:Show()
-    MyEventsDetailsDescriptionNext:Show()
-    MyEventsDetailsSaveButton:Show()
-    MyEventsDetailsAddDescriptionPage:Show()
-    MyEventsDetailsRemoveDescriptionPage:Show()
-    MyEventsDetailsRemoveEvent:Show()
+    MyEvents.Details.IdContainer.Id:Show()
+    MyEvents.Details.IdContainer.Label:Show()
+
+    MyEvents.Details.TitleLabelContainer.TitleLabel:Show()
+    MyEvents.Details.Title:Show()
+
+    MyEvents.Details.Fields:Show()
+
+    MyEventsDetailsFactionsCharactersShow:Show()
 end
 
 ------------------------------------------------------------------------------------------
@@ -210,7 +192,7 @@ function Chronicles.UI.MyEvents:DisplayEventList(page, force)
 
         if (numberOfEvents > 0) then
             local maxPageValue = math.ceil(numberOfEvents / pageSize)
-            MyEventsListScrollBar:SetMinMaxValues(1, maxPageValue)
+            MyEvents.List.ScrollBar:SetMinMaxValues(1, maxPageValue)
 
             if (page > maxPageValue) then
                 page = maxPageValue
@@ -224,8 +206,8 @@ function Chronicles.UI.MyEvents:DisplayEventList(page, force)
                 Chronicles.UI.MyEvents:WipeAll()
 
                 if (numberOfEvents > pageSize) then
-                    MyEventsListScrollBar.ScrollUpButton:Enable()
-                    MyEventsListScrollBar.ScrollDownButton:Enable()
+                    MyEvents.List.ScrollBar.ScrollUpButton:Enable()
+                    MyEvents.List.ScrollBar.ScrollDownButton:Enable()
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
@@ -233,17 +215,17 @@ function Chronicles.UI.MyEvents:DisplayEventList(page, force)
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
-                    MyEventsListScrollBar.ScrollUpButton:Disable()
+                    MyEvents.List.ScrollBar.ScrollUpButton:Disable()
                     Chronicles.UI.MyEvents.CurrentPage = 1
                 end
 
                 if ((firstIndex + pageSize - 1) >= numberOfEvents) then
                     lastIndex = numberOfEvents
-                    MyEventsListScrollBar.ScrollDownButton:Disable()
+                    MyEvents.List.ScrollBar.ScrollDownButton:Disable()
                 end
 
                 Chronicles.UI.MyEvents.CurrentPage = page
-                MyEventsListScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentPage)
+                MyEvents.List.ScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentPage)
 
                 if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
                     Chronicles.UI.MyEvents:SetTextToFrame(eventList[firstIndex], MyEventListBlock1)
@@ -383,11 +365,8 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     -- eventType = 2,
     -- timeline = 2
 
-    MyEventsDetailsId:SetText(event.id)
-    MyEventsDetailsTitle:SetText(event.label)
-
-    -- MyEventsDetails.YearStart:SetText(event.yearStart)
-    -- MyEventsDetails.YearEnd:SetText(event.yearEnd)
+    MyEvents.Details.IdContainer.Id:SetText(event.id)
+    MyEvents.Details.Title:SetText(event.label)
 
     MyEventsDetailsYearStart:SetNumber(event.yearStart)
     MyEventsDetailsYearEnd:SetNumber(event.yearEnd)
@@ -469,8 +448,8 @@ function MyEventsDetailsSave_Click()
     end
 
     local event = {
-        id = tonumber(MyEventsDetailsId:GetText()),
-        label = MyEventsDetailsTitle:GetText(),
+        id = tonumber(MyEvents.Details.Fields.Id:GetText()),
+        label = MyEvents.Details.Fields.Title:GetText(),
         description = copyTable(Chronicles.UI.MyEvents.SelectedEvent.description),
         yearStart = MyEventsDetailsYearStart:GetNumber(),
         yearEnd = MyEventsDetailsYearEnd:GetNumber(),
@@ -632,4 +611,18 @@ function MyEventListNextButton_OnClick(self)
     else
         Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage + 1)
     end
+end
+
+------------------------------------------------------------------------------------------
+-- Factions and Characters ---------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function MyEventsDetailsFactionsCharactersShow_Click(self)
+    MyEvents.Details.FactionsCharacters:Show()
+    MyEvents.Details.Fields:Hide()
+end
+
+function MyEventsDetailsFactionsCharactersHide_Click(self)
+    MyEvents.Details.FactionsCharacters:Hide()
+    MyEvents.Details.Fields:Show()
 end

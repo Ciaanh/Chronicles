@@ -18,6 +18,7 @@ if L then
     L["Save"] = "Save"
     L["Add"] = "Add"
     L["Delete"] = "Delete"
+    L["FactionsCharacters"] = "Factions/Characters"
 
     L["Id_Field"] = "Id"
     L["Title_Field"] = "Title"
