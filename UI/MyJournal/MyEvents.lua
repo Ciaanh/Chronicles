@@ -56,9 +56,7 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsDetailsSaveButton:SetText(Locale["Save"])
     MyEvents.List.AddButton:SetText(Locale["Add"])
     MyEventsDetailsRemoveEvent:SetText(Locale["Delete"])
-
-    MyEventsDetailsFactionsCharactersHide:SetText(Locale["FactionsCharacters"])
-    MyEventsDetailsFactionsCharactersShow:SetText(Locale["FactionsCharacters"])
+    MyEventsDetailsFactionsCharactersToggle:SetText(Locale["FactionsCharacters"])
 
     MyEvents.Details.IdContainer.Label:SetText(Locale["Id_Field"] .. " :")
     MyEvents.Details.TitleLabelContainer.TitleLabel:SetText(Locale["Title_Field"] .. " :")
@@ -141,7 +139,10 @@ function Chronicles.UI.MyEvents:HideFields()
     MyEventsDetailsYearStartErrorContainer:Hide()
     MyEventsDetailsYearEndErrorContainer:Hide()
     MyEventsDetailsYearOrderErrorContainer:Hide()
-    MyEventsDetailsFactionsCharactersShow:Hide()
+    MyEventsDetailsFactionsCharactersToggle:Hide()
+
+    MyEventsDetailsSaveButton:Hide()
+    MyEventsDetailsRemoveEvent:Hide()
 
     MyEvents.Details.FactionsCharacters:Hide()
 end
@@ -155,7 +156,11 @@ function Chronicles.UI.MyEvents:ShowFields()
 
     MyEvents.Details.Fields:Show()
 
-    MyEventsDetailsFactionsCharactersShow:Show()
+    MyEventsDetailsFactionsCharactersToggle:Show()
+
+    MyEventsDetailsSaveButton:Show()
+    MyEventsDetailsRemoveEvent:Show()
+
 end
 
 ------------------------------------------------------------------------------------------
@@ -448,8 +453,8 @@ function MyEventsDetailsSave_Click()
     end
 
     local event = {
-        id = tonumber(MyEvents.Details.Fields.Id:GetText()),
-        label = MyEvents.Details.Fields.Title:GetText(),
+        id = tonumber(MyEvents.Details.IdContainer.Id:GetText()),
+        label = MyEvents.Details.Title:GetText(),
         description = copyTable(Chronicles.UI.MyEvents.SelectedEvent.description),
         yearStart = MyEventsDetailsYearStart:GetNumber(),
         yearEnd = MyEventsDetailsYearEnd:GetNumber(),
@@ -617,12 +622,14 @@ end
 -- Factions and Characters ---------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function MyEventsDetailsFactionsCharactersShow_Click(self)
-    MyEvents.Details.FactionsCharacters:Show()
-    MyEvents.Details.Fields:Hide()
-end
-
-function MyEventsDetailsFactionsCharactersHide_Click(self)
-    MyEvents.Details.FactionsCharacters:Hide()
-    MyEvents.Details.Fields:Show()
+function MyEventsDetailsFactionsCharactersToggle_Click(self)
+    if (self.displayed == true) then
+        MyEvents.Details.FactionsCharacters:Hide()
+        MyEvents.Details.Fields:Show()
+        self.displayed = false
+    else
+        MyEvents.Details.FactionsCharacters:Show()
+        MyEvents.Details.Fields:Hide()
+        self.displayed = true
+    end
 end

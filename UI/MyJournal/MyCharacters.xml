@@ -827,7 +827,7 @@
                     <Button name="MyCharactersDetailsRemoveCharacter" inherits="UIPanelButtonTemplate">
                         <Size x="70" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPRIGHT" x="5" y="5" />
+                            <Anchor point="TOPLEFT" x="25" y="5" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyCharactersDetailsRemoveCharacter_OnClick" />

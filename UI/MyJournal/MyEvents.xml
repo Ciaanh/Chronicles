@@ -270,51 +270,15 @@
 
 
                     <Frame parentKey="Fields" inherits="BackdropTemplate" hidde="true">
-                        <Size x="540" y="460"/>
+                        <Size x="490" y="460"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIdContainer" />
                         </Anchors>
                         <Frames>
-                            <Frame name="$parentEventTypeLabelContainer" parentKey="EventTypeLabelContainer">
-                                <Size x="75" y="32" />
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" />
-                                </Anchors>
-                                <Layers>
-                                    <Layer level="OVERLAY">
-                                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
-                                    </Layer>
-                                </Layers>
-                            </Frame>
-
-                            <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
-                                <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentEventTypeLabelContainer" x="10" y="-5"/>
-                                </Anchors>
-                            </Frame>
-
-                            <Frame name="MyEventsDetailsTimelineLabelContainer">
-                                <Size x="75" y="32" />
-                                <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTypeDropDown" y="5"/>
-                                </Anchors>
-                                <Layers>
-                                    <Layer level="OVERLAY">
-                                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
-                                    </Layer>
-                                </Layers>
-                            </Frame>
-
-                            <Frame name="MyEventsDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
-                                <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTimelineLabelContainer" y="-5" />
-                                </Anchors>
-                            </Frame>
-
                             <Frame name="MyEventsDetailsYearStartLabelContainer">
                                 <Size x="75" y="32" />
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentEventTypeLabelContainer" y="-5" />
+                                    <Anchor point="TOPLEFT" />
                                 </Anchors>
                                 <Layers>
                                     <Layer level="OVERLAY">
@@ -409,10 +373,54 @@
                                 </Layers>
                             </Frame>
 
+
+
+                            <Frame name="$parentEventTypeLabelContainer" parentKey="EventTypeLabelContainer">
+                                <Size x="75" y="32" />
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabelContainer" y="-5" />
+                                </Anchors>
+                                <Layers>
+                                    <Layer level="OVERLAY">
+                                        <FontString name="MyEventsDetailsEventTypeLabel" inherits="EventDescriptionFont" justifyH="LEFT" />
+                                    </Layer>
+                                </Layers>
+                            </Frame>
+
+                            <Frame name="MyEventsDetailsTypeDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentEventTypeLabelContainer" x="10" y="-5"/>
+                                </Anchors>
+                            </Frame>
+
+
+
+                            <Frame name="MyEventsDetailsTimelineLabelContainer">
+                                <Size x="75" y="32" />
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTypeDropDown" x="10" y="5"/>
+                                </Anchors>
+                                <Layers>
+                                    <Layer level="OVERLAY">
+                                        <FontString name="MyEventsDetailsTimelineLabel" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                                    </Layer>
+                                </Layers>
+                            </Frame>
+
+                            <Frame name="MyEventsDetailsTimelineDropDown" inherits="UIDropDownMenuTemplate" enableMouse="true">
+                                <Anchors>
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsTimelineLabelContainer" y="-5" />
+                                </Anchors>
+                            </Frame>
+
+
+
+
+
                             <Frame name="MyEventsDetailsDescriptionsLabelContainer">
                                 <Size x="90" y="32" />
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsDetailsYearEndLabelContainer"/>
+                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentEventTypeLabelContainer"/>
                                 </Anchors>
                                 <Layers>
                                     <Layer level="OVERLAY">
@@ -420,17 +428,6 @@
                                     </Layer>
                                 </Layers>
                             </Frame>
-
-                            <Button name="MyEventsDetailsFactionsCharactersShow" inherits="UIPanelButtonTemplate">
-                                <Size x="150" y="30"/>
-                                <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsDetailsDescriptionsLabelContainer" x="180" y="5"  />
-                                </Anchors>
-                                <Scripts>
-                                    <OnClick function="MyEventsDetailsFactionsCharactersShow_Click" />
-                                </Scripts>
-                            </Button>
-
 
                             <Frame name="MyEventsDetailsDescriptionContainer" inherits="BackdropTemplate">
                                 <Size x="400" y="300" />
@@ -549,22 +546,29 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     <Frame parentKey="FactionsCharacters" inherits="BackdropTemplate" hidde="true">
                         <Size x="540" y="460"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIdContainer" />
                         </Anchors>
                         <Frames>
-
-                            <Button name="MyEventsDetailsFactionsCharactersHide" inherits="UIPanelButtonTemplate">
-                                <Size x="150" y="30"/>
-                                <Anchors>
-                                    <Anchor point="BOTTOMLEFT" x="15" y="15" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnClick function="MyEventsDetailsFactionsCharactersHide_Click" />
-                                </Scripts>
-                            </Button>
 
                         </Frames>
                     </Frame>
@@ -625,12 +629,23 @@
                     <Button name="MyEventsDetailsRemoveEvent" inherits="UIPanelButtonTemplate">
                         <Size x="70" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPRIGHT" x="5" y="5" />
+                            <Anchor point="TOPLEFT" x="25" y="5" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyEventsDetailsRemoveEvent_OnClick" />
                         </Scripts>
                     </Button>
+
+                    <Button name="MyEventsDetailsFactionsCharactersToggle" inherits="UIPanelButtonTemplate">
+                        <Size x="150" y="30"/>
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" x="5" y="5" />
+                        </Anchors>
+                        <Scripts>
+                            <OnClick function="MyEventsDetailsFactionsCharactersToggle_Click" />
+                        </Scripts>
+                    </Button>
+
                 </Frames>
             </Frame>
 
