@@ -428,6 +428,8 @@ function Chronicles.UI.MyEvents:ChangeEventDescriptionPage(page)
 end
 
 function MyEventsDetailsSave_Click()
+    Chronicles.UI.MyEvents:SaveDescriptionPage()
+    
     local yearStartNumber = tonumber(MyEventsDetailsYearStart:GetText())
     local yearEndNumber = tonumber(MyEventsDetailsYearEnd:GetText())
 

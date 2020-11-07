@@ -128,7 +128,7 @@
                     <Button name="MyCharactersListAddCharacter" inherits="UIPanelButtonTemplate">
                         <Size x="75" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyCharactersListScrollFrame" x="0" y="0" />
+                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="MyCharactersListScrollFrame" x="0" y="0" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyCharactersListAddCharacter_OnClick" />

@@ -9,16 +9,16 @@ Chronicles.UI.EventDescription.CurrentEvent = nil
 
 function Chronicles.UI.EventDescription:Refresh()
     --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
-        self.CurrentEvent = nil
-        self.CurrentPage = nil
+    self.CurrentEvent = nil
+    self.CurrentPage = nil
 
-        EventTitle:SetText("")
-        EventDescriptionHTML:SetText("")
-        EventDescriptionBounds:SetText("")
+    EventTitle:SetText("")
+    EventDescriptionHTML:SetText("")
+    EventDescriptionBounds:SetText("")
 
-        EventDescriptionPrevious:Hide()
-        EventDescriptionNext:Hide()
-        EventDescriptionPager:Hide()
+    EventDescriptionPrevious:Hide()
+    EventDescriptionNext:Hide()
+    EventDescriptionPager:Hide()
     --end
 end
 
@@ -41,7 +41,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
 end
 
 function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to ChangeEventDescriptionPage " .. page)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeEventDescriptionPage " .. page)
 
     local event = self.CurrentEvent
     if (event ~= nil and event.description ~= nil) then

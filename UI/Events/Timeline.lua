@@ -29,7 +29,6 @@ function Chronicles.UI.Timeline:Init()
 
     TimelineScrollBar:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
-    Chronicles.UI.Timeline.CurrentPage = 1
     Chronicles.UI.Timeline:Refresh()
 end
 
@@ -45,47 +44,47 @@ end
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
     --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
+    Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
-    if (pageIndex ~= nil) then
-        Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
+    local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    if (numberOfCells == 0) then
+        TimelineScrollBar:SetMinMaxValues(1, 1)
+        ChangeCurrentPage(1)
+        TimelinePreviousButton:Disable()
+        TimelineNextButton:Disable()
+        HideAllTimelineBlocks()
+        return
+    end
 
-        local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    local pageSize = Chronicles.constants.config.timeline.pageSize
+    local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-        if (numberOfCells == 0) then
-            TimelineScrollBar:SetMinMaxValues(1, 1)
-            ChangeCurrentPage(1)
+    if (pageIndex == nil) then
+        pageIndex = maxPageValue
+    end
+
+    if (pageIndex < 1) then
+        pageIndex = 1
+    end
+    if (pageIndex > maxPageValue) then
+        pageIndex = maxPageValue
+    end
+
+    if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
+        TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
+        ChangeCurrentPage(pageIndex)
+
+        if (numberOfCells <= pageSize) then
             TimelinePreviousButton:Disable()
             TimelineNextButton:Disable()
-            HideAllTimelineBlocks()
-            return
+        else
+            TimelinePreviousButton:Enable()
+            TimelineNextButton:Enable()
         end
 
-        local pageSize = Chronicles.constants.config.timeline.pageSize
-        local maxPageValue = math.ceil(numberOfCells / pageSize)
+        TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
 
-        if (pageIndex < 1) then
-            pageIndex = 1
-        end
-        if (pageIndex > maxPageValue) then
-            pageIndex = maxPageValue
-        end
-
-        if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
-            TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
-            ChangeCurrentPage(pageIndex)
-
-            if (numberOfCells <= pageSize) then
-                TimelinePreviousButton:Disable()
-                TimelineNextButton:Disable()
-            else
-                TimelinePreviousButton:Enable()
-                TimelineNextButton:Enable()
-            end
-
-            TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
-
-            BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
-        end
+        BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
     end
 end
 
@@ -153,12 +152,15 @@ function ChangeCurrentPage(currentPageIndex)
     Chronicles.UI.Timeline.CurrentPage = currentPageIndex
 end
 
-function GetNumberOfTimelineBlock(stepValue)
+function GetTimelineDetails(stepValue)
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
 
+    local isOverlapping = false
     local pastEvents = false
     local futurEvents = false
+    local before = nil
+    local after = nil
 
     if (minYear < Chronicles.constants.config.historyStartYear) then
         minYear = Chronicles.constants.config.historyStartYear
@@ -170,55 +172,59 @@ function GetNumberOfTimelineBlock(stepValue)
     end
 
     if (minYear < 0 and maxYear > 0) then
+        isOverlapping = true
+
         local beforeLength = math.abs(minYear)
         local afterLength = math.abs(maxYear)
 
-        local before = math.ceil((beforeLength) / stepValue)
-        local after = math.ceil((afterLength) / stepValue)
+        before = math.ceil((beforeLength) / stepValue)
+        after = math.ceil((afterLength) / stepValue)
+    end
 
-        local result = before + after
-        if (pastEvents == true) then
+    return {
+        isOverlapping = isOverlapping,
+        pastEvents = pastEvents,
+        futurEvents = futurEvents,
+        before = before,
+        after = after,
+        minYear = minYear,
+        maxYear = maxYear
+    }
+end
+
+function GetNumberOfTimelineBlock(stepValue)
+    local details = GetTimelineDetails(stepValue)
+
+    if (details.isOverlapping) then
+        local result = details.before + details.after
+        if (details.pastEvents == true) then
             result = result + 1
         end
-        if (futurEvents == true) then
+        if (details.futurEvents == true) then
             result = result + 1
         end
         return result
+    else
+        local length = math.abs(details.minYear - details.maxYear)
+        return math.ceil(length / stepValue)
     end
-
-    local length = math.abs(minYear - maxYear)
-    return math.ceil(length / stepValue)
 end
 
 function GetBounds(blockIndex, stepValue)
-    local minEventYear = Chronicles.DB:MinEventYear()
-    local maxEventYear = Chronicles.DB:MaxEventYear()
-
-    local pastEvents = false
-    local futurEvents = false
-
-    if (minEventYear < Chronicles.constants.config.historyStartYear) then
-        minEventYear = Chronicles.constants.config.historyStartYear
-        pastEvents = true
-    end
-    if (maxEventYear > Chronicles.constants.config.currentYear) then
-        maxEventYear = Chronicles.constants.config.currentYear
-        futurEvents = true
-    end
+    local details = GetTimelineDetails(stepValue)
 
     local minValue = 0
     local maxValue = 0
 
-    if (minEventYear < 0 and maxEventYear > 0) then
-        local beforeLength = math.abs(minEventYear)
-        local afterLength = math.abs(maxEventYear)
+    if (details.isOverlapping) then
+        local before = details.before
+        local after = details.after
 
-        local before = math.ceil((beforeLength) / stepValue)
-        if (pastEvents == true) then
+        if (details.pastEvents == true) then
             before = before + 1
         end
-        local after = math.ceil((afterLength) / stepValue)
-        if (futurEvents == true) then
+
+        if (details.futurEvents == true) then
             after = after + 1
         end
 
@@ -230,36 +236,30 @@ function GetBounds(blockIndex, stepValue)
             maxValue = ((blockIndex - before) * stepValue) - 1
         end
     else
-        minValue = minEventYear + ((blockIndex - 1) * stepValue) + 1
-        maxValue = minEventYear + (blockIndex * stepValue)
+        minValue = details.minYear + ((blockIndex - 1) * stepValue) + 1
+        maxValue = details.minYear + (blockIndex * stepValue)
     end
 
     if (maxValue > Chronicles.constants.config.currentYear) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("---- maxValue > currentYear ")
         if (minValue > Chronicles.constants.config.currentYear) then
-            -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue > currentYear ")
             return {
                 lower = Chronicles.constants.config.currentYear + 1,
                 upper = 999999,
                 text = Locale["Futur"]
             }
         else
-            -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue < currentYear ")
             maxValue = Chronicles.constants.config.currentYear
         end
     end
 
     if (maxValue < Chronicles.constants.config.historyStartYear) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("---- maxValue < historyStartYear ")
         if (minValue < Chronicles.constants.config.historyStartYear) then
-            -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue < historyStartYear ")
             return {
                 lower = -999999,
                 upper = Chronicles.constants.config.historyStartYear - 1,
                 text = Locale["Mythos"]
             }
         else
-            -- DEFAULT_CHAT_FRAME:AddMessage("---- minValue > historyStartYear ")
             maxValue = Chronicles.constants.config.historyStartYear
         end
     end

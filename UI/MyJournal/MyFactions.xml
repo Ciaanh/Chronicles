@@ -128,7 +128,7 @@
                     <Button name="MyFactionsListAddFaction" inherits="UIPanelButtonTemplate">
                         <Size x="75" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyFactionsListScrollFrame" x="0" y="0" />
+                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="MyFactionsListScrollFrame" x="0" y="0" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyFactionsListAddFaction_OnClick" />
