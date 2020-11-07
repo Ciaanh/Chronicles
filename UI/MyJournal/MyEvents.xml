@@ -165,7 +165,7 @@
                     <Button parentKey="AddButton" inherits="UIPanelButtonTemplate">
                         <Size x="75" y="30"/>
                         <Anchors>
-                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentScrollFrame" x="0" y="0" />
+                            <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="3" y="13" />
                         </Anchors>
                         <Scripts>
                             <OnClick function="MyEventsListAddEvent_OnClick" />
