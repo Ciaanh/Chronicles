@@ -185,10 +185,7 @@
 
 
 
-
-
-
-    <Button name="MyCharacterFactions_SearchPreviewButton" parentArray="searchPreviews" virtual="true">
+    <Button name="SearchPreviewButton" parentArray="searchPreviews" virtual="true">
         <Size x="206" y="27"/>
         <Layers>
             <Layer level="OVERLAY" textureSubLevel="3">
@@ -228,10 +225,9 @@
         </NormalTexture>
         <PushedTexture atlas="_search-rowbg">
         </PushedTexture>
-        <!-- This is highlighted by hand so that we can use arrow keys to move the highlight.
-		<HighlightTexture atlas="search-highlight">
-		</HighlightTexture>
-		-->
+    </Button>
+
+    <Button name="MyCharacterFactions_SearchPreviewButton" inherits="SearchPreviewButton" virtual="true">
         <Scripts>
             <OnLoad function="MyCharacterFactions_SearchPreviewButton_OnLoad"/>
             <OnShow function="MyCharacterFactions_SearchPreviewButton_OnShow"/>
@@ -240,7 +236,20 @@
         </Scripts>
     </Button>
 
-    <Button name="MyCharacterFactions_FullSearchResultsButton" virtual="true">
+    <Button name="MyEvents_Factions_SearchPreviewButton" inherits="SearchPreviewButton" virtual="true">
+        <Scripts>
+            <OnLoad function="MyEvents_Factions_SearchPreviewButton_OnLoad"/>
+            <OnShow function="MyEvents_Factions_SearchPreviewButton_OnShow"/>
+            <OnEnter function="MyEvents_Factions_SearchPreviewButton_OnEnter"/>
+            <OnClick function="MyEvents_Factions_SearchPreviewButton_OnClick"/>
+        </Scripts>
+    </Button>
+
+
+
+
+
+    <Button name="FullSearchResultsButton" virtual="true">
         <Size x="575" y="49"/>
         <Layers>
             <Layer level="OVERLAY" textureSubLevel="2">
@@ -287,8 +296,18 @@
         </PushedTexture>
         <HighlightTexture atlas="search-highlight-large">
         </HighlightTexture>
+    </Button>
+
+
+    <Button name="MyCharacterFactions_FullSearchResultsButton" inherits="FullSearchResultsButton" virtual="true">
         <Scripts>
             <OnClick function="MyCharacterFactions_FullSearchResultsButton_OnClick"/>
+        </Scripts>
+    </Button>
+
+    <Button name="MyEvents_Factions_FullSearchResultsButton" inherits="FullSearchResultsButton" virtual="true">
+        <Scripts>
+            <OnClick function="MyEvents_Factions_FullSearchResultsButton_OnClick"/>
         </Scripts>
     </Button>
 
