@@ -5,6 +5,8 @@ if L then
     L["Chronicles"] = true
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
+    L["CurrentYear"] = "Current year is "
+    L["AfterDP"] = " after the Dark Portal"
     L["start"] = "Start"
     L["end"] = "End"
     L["year"] = "Year"
@@ -16,6 +18,7 @@ if L then
     L["Save"] = "Save"
     L["Add"] = "Add"
     L["Delete"] = "Delete"
+    L["FactionsCharacters"] = "Factions/Characters"
 
     L["Id_Field"] = "Id"
     L["Title_Field"] = "Title"
@@ -31,4 +34,7 @@ if L then
 
     L["ErrorYearAsNumber"] = "A year must be a number"
     L["ErrorYearOrder"] = "Event ends before it's started"
+
+    L["Mythos"] = "Mythos"
+    L["Futur"] = "Futur"
 end

@@ -1,6 +1,8 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Core
 
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
+
 Chronicles.UI.Timeline = {}
 
 Chronicles.UI.Timeline.MaxStepIndex = 3
@@ -27,7 +29,6 @@ function Chronicles.UI.Timeline:Init()
 
     TimelineScrollBar:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
-    Chronicles.UI.Timeline.CurrentPage = 1
     Chronicles.UI.Timeline:Refresh()
 end
 
@@ -35,56 +36,55 @@ function Chronicles.UI.Timeline:Refresh()
     Chronicles.UI.Timeline:DisplayTimeline(Chronicles.UI.Timeline.CurrentPage, true)
 end
 
+function DisplayTimeline(pageIndex, force)
+    Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
+end
+
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
-    DisplayTimeline(pageIndex, force)
-end
-
-function DisplayTimeline(pageIndex, force)
     --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
+    Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
-    if (pageIndex ~= nil) then
-        --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
-        Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
+    local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    if (numberOfCells == 0) then
+        TimelineScrollBar:SetMinMaxValues(1, 1)
+        ChangeCurrentPage(1)
+        TimelinePreviousButton:Disable()
+        TimelineNextButton:Disable()
+        HideAllTimelineBlocks()
+        return
+    end
 
-        local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    local pageSize = Chronicles.constants.config.timeline.pageSize
+    local maxPageValue = math.ceil(numberOfCells / pageSize)
 
-        if (numberOfCells == 0) then
-            TimelineScrollBar:SetMinMaxValues(1, 1)
-            ChangeCurrentPage(1)
+    if (pageIndex == nil) then
+        pageIndex = maxPageValue
+    end
+
+    if (pageIndex < 1) then
+        pageIndex = 1
+    end
+    if (pageIndex > maxPageValue) then
+        pageIndex = maxPageValue
+    end
+
+    if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
+        TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
+        ChangeCurrentPage(pageIndex)
+
+        if (numberOfCells <= pageSize) then
             TimelinePreviousButton:Disable()
             TimelineNextButton:Disable()
-            HideAllTimelineBlocks()
-            return
+        else
+            TimelinePreviousButton:Enable()
+            TimelineNextButton:Enable()
         end
 
-        local pageSize = Chronicles.constants.config.timeline.pageSize
-        local maxPageValue = math.ceil(numberOfCells / pageSize)
+        TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
 
-        if (pageIndex < 1) then
-            pageIndex = 1
-        end
-        if (pageIndex > maxPageValue) then
-            pageIndex = maxPageValue
-        end
-
-        if (Chronicles.UI.Timeline.CurrentPage ~= pageIndex or force) then
-            TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
-            ChangeCurrentPage(pageIndex)
-
-            if (numberOfCells <= pageSize) then
-                TimelinePreviousButton:Disable()
-                TimelineNextButton:Disable()
-            else
-                TimelinePreviousButton:Enable()
-                TimelineNextButton:Enable()
-            end
-
-            TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
-
-            BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
-        end
+        BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
     end
 end
 
@@ -93,67 +93,54 @@ function GetDisplayableTimeFrames()
     local stepValue = Chronicles.UI.Timeline.CurrentStepValue
 
     local numberOfCells = GetNumberOfTimelineBlock(stepValue)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
 
     local dateSteps = {}
-    for i = 1, numberOfCells do
-        local lowerBoundValue = GetLowerBound(i, stepValue)
-        local upperBoundValue = GetUpperBound(i, stepValue)
 
+    for i = 1, numberOfCells do
+        local bounds = GetBounds(i, stepValue)
         dateSteps[i] = {
-            lowerBound = lowerBoundValue,
-            upperBound = upperBoundValue
+            lowerBound = bounds.lower,
+            upperBound = bounds.upper,
+            text = bounds.text
         }
     end
 
-    for j = 1, numberOfCells - 1 do
+    for j = 1, numberOfCells do
         local block = dateSteps[j]
         local nextBlock = dateSteps[j + 1]
 
         local hasEvents = Chronicles.DB:HasEvents(block.lowerBound, block.upperBound)
-        local nextHasEvents = Chronicles.DB:HasEvents(nextBlock.lowerBound, nextBlock.upperBound)
+        if (nextBlock ~= nil) then
+            local nextHasEvents = Chronicles.DB:HasEvents(nextBlock.lowerBound, nextBlock.upperBound)
 
-        if (hasEvents == true or (hasEvents == false and nextHasEvents == true)) then
+            if (hasEvents == true or (hasEvents == false and nextHasEvents == true)) then
+                table.insert(
+                    displayableTimeFrames,
+                    {
+                        lowerBound = block.lowerBound,
+                        upperBound = block.upperBound,
+                        text = block.text,
+                        hasEvents = hasEvents
+                    }
+                )
+            end
+
+            if (hasEvents == false and nextHasEvents == false) then
+                nextBlock.lowerBound = block.lowerBound
+            end
+        else
             table.insert(
                 displayableTimeFrames,
                 {
                     lowerBound = block.lowerBound,
                     upperBound = block.upperBound,
+                    text = block.text,
                     hasEvents = hasEvents
                 }
             )
         end
-
-        if (hasEvents == false and nextHasEvents == false) then
-            nextBlock.lowerBound = block.lowerBound
-        end
     end
-
-    local last = dateSteps[numberOfCells]
-    local lastHasEvents = Chronicles.DB:HasEvents(last.lowerBound, last.upperBound)
-    if (lastHasEvents == true) then
-        table.insert(
-            displayableTimeFrames,
-            {
-                lowerBound = last.lowerBound,
-                upperBound = last.upperBound,
-                hasEvents = true
-            }
-        )
-    end
-
-    --DEFAULT_CHAT_FRAME:AddMessage("-- displayable timeframes " .. tostring(tablelength(displayableTimeFrames)))
-
-    if (tablelength(displayableTimeFrames) > 0) then
-        local first = displayableTimeFrames[1]
-        local firstHasEvents = Chronicles.DB:HasEvents(first.lowerBound, first.upperBound)
-        if (firstHasEvents == false) then
-            table.remove(displayableTimeFrames, 1)
-        end
-    else
-        return
-    end
-
     return displayableTimeFrames
 end
 
@@ -165,42 +152,169 @@ function ChangeCurrentPage(currentPageIndex)
     Chronicles.UI.Timeline.CurrentPage = currentPageIndex
 end
 
+function GetTimelineDetails(stepValue)
+    local minYear = Chronicles.DB:MinEventYear()
+    local maxYear = Chronicles.DB:MaxEventYear()
+
+    local isOverlapping = false
+    local pastEvents = false
+    local futurEvents = false
+    local before = nil
+    local after = nil
+
+    if (minYear < Chronicles.constants.config.historyStartYear) then
+        minYear = Chronicles.constants.config.historyStartYear
+        pastEvents = true
+    end
+    if (maxYear > Chronicles.constants.config.currentYear) then
+        maxYear = Chronicles.constants.config.currentYear
+        futurEvents = true
+    end
+
+    if (minYear < 0 and maxYear > 0) then
+        isOverlapping = true
+
+        local beforeLength = math.abs(minYear)
+        local afterLength = math.abs(maxYear)
+
+        before = math.ceil((beforeLength) / stepValue)
+        after = math.ceil((afterLength) / stepValue)
+    end
+
+    return {
+        isOverlapping = isOverlapping,
+        pastEvents = pastEvents,
+        futurEvents = futurEvents,
+        before = before,
+        after = after,
+        minYear = minYear,
+        maxYear = maxYear
+    }
+end
+
 function GetNumberOfTimelineBlock(stepValue)
-    local length = math.abs(GetMinYear() - GetMaxYear())
+    local details = GetTimelineDetails(stepValue)
 
-    return math.ceil(length / stepValue)
-end
-
-function GetMinYear()
-    return Chronicles.DB:MinEventYear()
-end
-
-function GetMaxYear()
-    return Chronicles.DB:MaxEventYear()
-end
-
-function GetLowerBound(blockIndex, stepValue)
-    local minYear = GetMinYear()
-    local value = minYear + ((blockIndex - 1) * stepValue)
-
-    if (value < minYear) then
-        return minYear
+    if (details.isOverlapping) then
+        local result = details.before + details.after
+        if (details.pastEvents == true) then
+            result = result + 1
+        end
+        if (details.futurEvents == true) then
+            result = result + 1
+        end
+        return result
+    else
+        local length = math.abs(details.minYear - details.maxYear)
+        return math.ceil(length / stepValue)
     end
-    return value
 end
 
-function GetUpperBound(blockIndex, stepValue)
-    local maxYear = GetMaxYear()
-    local value = GetMinYear() + (blockIndex * stepValue) - 1
-    if (value > maxYear) then
-        return maxYear
+function GetBounds(blockIndex, stepValue)
+    local details = GetTimelineDetails(stepValue)
+
+    local minValue = 0
+    local maxValue = 0
+
+    if (details.isOverlapping) then
+        local before = details.before
+        local after = details.after
+
+        if (details.pastEvents == true) then
+            before = before + 1
+        end
+
+        if (details.futurEvents == true) then
+            after = after + 1
+        end
+
+        if (blockIndex <= before) then
+            minValue = -((before - blockIndex + 1) * stepValue)
+            maxValue = -((before - blockIndex) * stepValue) - 1
+        else
+            minValue = ((blockIndex - before - 1) * stepValue)
+            maxValue = ((blockIndex - before) * stepValue) - 1
+        end
+    else
+        minValue = details.minYear + ((blockIndex - 1) * stepValue) + 1
+        maxValue = details.minYear + (blockIndex * stepValue)
     end
-    return value
+
+    if (maxValue > Chronicles.constants.config.currentYear) then
+        if (minValue > Chronicles.constants.config.currentYear) then
+            return {
+                lower = Chronicles.constants.config.currentYear + 1,
+                upper = 999999,
+                text = Locale["Futur"]
+            }
+        else
+            maxValue = Chronicles.constants.config.currentYear
+        end
+    end
+
+    if (maxValue < Chronicles.constants.config.historyStartYear) then
+        if (minValue < Chronicles.constants.config.historyStartYear) then
+            return {
+                lower = -999999,
+                upper = Chronicles.constants.config.historyStartYear - 1,
+                text = Locale["Mythos"]
+            }
+        else
+            maxValue = Chronicles.constants.config.historyStartYear
+        end
+    end
+
+    return {
+        lower = minValue,
+        upper = maxValue,
+        text = nil
+    }
+end
+
+function GetIndex(year)
+    local selectedYear = year
+
+    if (selectedYear == nil) then
+        local page = Chronicles.UI.Timeline.CurrentPage
+        local pageSize = Chronicles.constants.config.timeline.pageSize
+        local numberOfCells = GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
+
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- GetIndex " .. numberOfCells)
+
+        if (page == nil) then
+            page = 1
+        end
+
+        local firstIndex = 1 + ((page - 1) * pageSize)
+
+        if (firstIndex <= 1) then
+            firstIndex = 1
+        end
+        if ((firstIndex + pageSize - 1) >= numberOfCells) then
+            firstIndex = numberOfCells - (pageSize - 1)
+        end
+
+        local firstIndexBounds = GetBounds(firstIndex, Chronicles.UI.Timeline.CurrentStepValue)
+        local lastIndexBounds = GetBounds(firstIndex + (pageSize - 1), Chronicles.UI.Timeline.CurrentStepValue)
+
+        local lowerBoundYear = firstIndexBounds.lower
+        local upperBoundYear = lastIndexBounds.upper
+
+        selectedYear = (lowerBoundYear + upperBoundYear) / 2
+    end
+
+    local minYear = Chronicles.DB:MinEventYear()
+    local length = math.abs(minYear - selectedYear)
+    local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)
+    local result = yearIndex - (yearIndex % Chronicles.constants.config.timeline.pageSize)
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- GetIndex " .. length .. " " .. yearIndex .. " " .. result)
+
+    return result
 end
 
 function BuildTimelineBlocks(page, pageSize, numberOfCells, maxPageValue)
     local firstIndex = 1 + ((page - 1) * pageSize)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- FirstIndex " .. firstIndex)
 
     if (firstIndex <= 1) then
         firstIndex = 1
@@ -257,7 +371,6 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
     if (dateBlock == nil) then
         frameNoEvent:Hide()
         frameEvent:Hide()
-
         return
     end
 
@@ -267,11 +380,25 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
 
         frameEvent.lowerBound = dateBlock.lowerBound
         frameEvent.upperBound = dateBlock.upperBound
-        frameEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
-        frameEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
-        frameNoEvent.LabelStart:SetText("")
-        frameNoEvent.LabelEnd:SetText("")
 
+        if (dateBlock.text ~= nil) then
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text Event " .. dateBlock.text)
+            frameEvent.LabelText:SetText(dateBlock.text)
+            frameEvent.LabelStart:SetText("")
+            frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText("")
+            frameNoEvent.LabelStart:SetText("")
+            frameNoEvent.LabelEnd:SetText("")
+        else
+            frameEvent.LabelText:SetText("")
+            frameEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
+            frameEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+
+            frameNoEvent.LabelStart:SetText("")
+            frameNoEvent.LabelEnd:SetText("")
+            frameNoEvent.LabelText:SetText("")
+        end
         frameEvent:SetScript(
             "OnMouseDown",
             function()
@@ -286,11 +413,25 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
 
         frameEvent.lowerBound = nil
         frameEvent.upperBound = nil
-        frameEvent.LabelStart:SetText("")
-        frameEvent.LabelEnd:SetText("")
-        frameNoEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
-        frameNoEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
 
+        if (dateBlock.text ~= nil) then
+            DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text NoEvent " .. dateBlock.text)
+            frameEvent.LabelText:SetText("")
+            frameEvent.LabelStart:SetText("")
+            frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText(dateBlock.text)
+            frameNoEvent.LabelStart:SetText("")
+            frameNoEvent.LabelEnd:SetText("")
+        else
+            frameEvent.LabelText:SetText("")
+            frameEvent.LabelStart:SetText("")
+            frameEvent.LabelEnd:SetText("")
+
+            frameNoEvent.LabelText:SetText("")
+            frameNoEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
+            frameNoEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+        end
         frameEvent:SetScript(
             "OnMouseDown",
             function()
@@ -333,6 +474,10 @@ function SetTimelineBlockUp(frame)
     -- frame.LabelEnd
     frame.LabelEnd:ClearAllPoints()
     frame.LabelEnd:SetPoint("RIGHT", -8, 32)
+
+    -- frame.LabelText
+    frame.LabelText:ClearAllPoints()
+    frame.LabelText:SetPoint("CENTER", 0, 28)
 end
 
 function SetTimelineBlockDown(frame)
@@ -360,6 +505,10 @@ function SetTimelineBlockDown(frame)
     -- frame.LabelEnd
     frame.LabelEnd:ClearAllPoints()
     frame.LabelEnd:SetPoint("RIGHT", -8, -32)
+
+    -- frame.LabelText
+    frame.LabelText:ClearAllPoints()
+    frame.LabelText:SetPoint("CENTER", 0, -28)
 end
 
 ------------------------------------------------------------------------------------------
@@ -374,52 +523,6 @@ function GetStepValueIndex(stepValue)
     return index[stepValue]
 end
 
-function FindYearIndexOnTimeline(year)
-    local selectedYear = year
-
-    if (selectedYear == nil) then
-        local page = Chronicles.UI.Timeline.CurrentPage
-        local pageSize = Chronicles.constants.config.timeline.pageSize
-        local numberOfCells = GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
-
-        if (page == nil) then
-            page = 1
-        end
-
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear nil " .. page)
-
-        local firstIndex = 1 + ((page - 1) * pageSize)
-
-        if (firstIndex <= 1) then
-            firstIndex = 1
-        end
-        if ((firstIndex + pageSize - 1) >= numberOfCells) then
-            firstIndex = numberOfCells - 7
-        end
-
-        local lowerBoundYear = GetLowerBound(firstIndex, Chronicles.UI.Timeline.CurrentStepValue)
-        local upperBoundYear = GetUpperBound(firstIndex + 7, Chronicles.UI.Timeline.CurrentStepValue)
-
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- lowerBoundYear " .. lowerBoundYear)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- upperBoundYear " .. upperBoundYear)
-
-        selectedYear = (lowerBoundYear + upperBoundYear) / 2
-    end
-
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- selectedYear " .. selectedYear)
-
-    local length = math.abs(GetMinYear() - selectedYear)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- length " .. length)
-
-    local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- yearIndex " .. yearIndex)
-
-    local result = yearIndex - (yearIndex % Chronicles.constants.config.timeline.pageSize)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- result " .. result)
-
-    return result
-end
-
 function Timeline_ZoomIn()
     local CurrentStepValueValue = Chronicles.UI.Timeline.CurrentStepValue
     local curentStepIndex = GetStepValueIndex(CurrentStepValueValue)
@@ -427,11 +530,8 @@ function Timeline_ZoomIn()
     if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then
         return
     end
-
-    --DEFAULT_CHAT_FRAME:AddMessage("-- ZoomIn ")
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[curentStepIndex + 1])
-
-    Chronicles.UI.Timeline:DisplayTimeline(FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear), true)
+    Chronicles.UI.Timeline:DisplayTimeline(GetIndex(Chronicles.UI.Timeline.SelectedYear), true)
 end
 
 function Timeline_ZoomOut()
@@ -441,12 +541,8 @@ function Timeline_ZoomOut()
     if (curentStepIndex == 1) then
         return
     end
-
-    --DEFAULT_CHAT_FRAME:AddMessage("-- ZoomOut ")
-
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[curentStepIndex - 1])
-
-    Chronicles.UI.Timeline:DisplayTimeline(FindYearIndexOnTimeline(Chronicles.UI.Timeline.SelectedYear), true)
+    Chronicles.UI.Timeline:DisplayTimeline(GetIndex(Chronicles.UI.Timeline.SelectedYear), true)
 end
 
 ------------------------------------------------------------------------------------------

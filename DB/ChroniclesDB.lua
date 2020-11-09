@@ -9,7 +9,7 @@ Chronicles.DB.Factions = {}
 Chronicles.DB.Characters = {}
 Chronicles.DB.RP = {}
 
-RPEventsDB={}
+RPEventsDB = {}
 
 function Chronicles.DB:Init()
     self:RegisterEventDB("RP", RPEventsDB)
@@ -78,7 +78,6 @@ function Chronicles.DB:MinEventYear()
             end
         end
     end
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MinEventYear " .. MinEventYear)
     return MinEventYear
 end
 
@@ -96,7 +95,6 @@ function Chronicles.DB:MaxEventYear()
             end
         end
     end
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MaxEventYear " .. MaxEventYear)
     return MaxEventYear
 end
 

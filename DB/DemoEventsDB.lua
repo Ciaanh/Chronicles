@@ -22,8 +22,8 @@ DemoEventsDB = {
 		id = 1,
 		label = Locale["The War of the Ancients label"],
 		description = {Locale["The War of the Ancients page 1"], Locale["The War of the Ancients page 2"]},
-		yearStart = -10000,
-		yearEnd = -10000,
+		yearStart = -10051,
+		yearEnd = -10050,
 		eventType = 2,
 		timeline = 2
 	},
@@ -180,13 +180,12 @@ DemoEventsDB = {
 		eventType = 6,
 		timeline = 2
 	},
-
 	[19] = {
 		id = 19,
 		label = Locale["Example event"],
 		description = {Locale["Example event page 1"], Locale["Example event page 2"]},
-		yearStart = 0,
-		yearEnd = 0,
+		yearStart = -151001,
+		yearEnd = -151000,
 		eventType = 6,
 		timeline = 2
 	}

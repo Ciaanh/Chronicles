@@ -50,6 +50,9 @@ function Chronicles:OnInitialize()
             end,
             OnTooltipShow = function(tt)
                 tt:AddLine(Locale["Chronicles"], 1, 1, 1)
+                local yearText = Locale["CurrentYear"] .. Chronicles.constants.config.currentYear .. Locale["AfterDP"]
+                tt:AddLine(yearText)
+                tt:AddLine(" ")
                 tt:AddLine(Locale["Icon tooltip"])
             end
         }
