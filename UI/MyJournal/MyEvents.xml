@@ -559,37 +559,37 @@
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIdContainer" />
                         </Anchors>
                         <Frames>
-                            <Frame name="MyEvents_Factions_LabelContainer">
+                            <Frame name="MyEventsFactions_LabelContainer">
                                 <Size x="50" y="32" />
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="0" y="0"/>
                                 </Anchors>
                                 <Layers>
                                     <Layer level="OVERLAY">
-                                        <FontString name="MyEvents_Factions_Label" inherits="EventDescriptionFont" justifyH="LEFT"/>
+                                        <FontString name="MyEventsFactions_Label" inherits="EventDescriptionFont" justifyH="LEFT"/>
                                     </Layer>
                                 </Layers>
                             </Frame>
 
-                            <EditBox parentKey="factionSearchBox" inherits="SearchBoxTemplate" letters="40" hidden="true">
+                            <EditBox parentKey="factionSearchBox" inherits="SearchBoxTemplate" letters="40">
                                 <Size x="107" y="30"/>
                                 <Anchors>
-                                    <Anchor point="LEFT" relativeTo="MyEvents_Factions_LabelContainer" relativePoint="RIGHT" x="10" y="0"/>
+                                    <Anchor point="LEFT" relativeTo="MyEventsFactions_LabelContainer" relativePoint="RIGHT" x="10" y="0"/>
                                 </Anchors>
                                 <Scripts>
-                                    <OnShow function="MyEvents_Factions_SearchBox_OnShow"/>
-                                    <OnEnterPressed function="MyEvents_Factions_SearchBox_Refresh"/>
-                                    <OnTextChanged function="MyEvents_Factions_SearchBox_Refresh"/>
-                                    <OnEditFocusLost function="MyEvents_Factions_SearchBox_OnFocusLost"/>
-                                    <OnEditFocusGained function="MyEvents_Factions_SearchBox_OnFocusGained"/>
-                                    <OnKeyDown function="MyEvents_Factions_SearchBox_OnKeyDown"/>
+                                    <OnShow function="MyEventsFactions_SearchBox_OnShow"/>
+                                    <OnEnterPressed function="MyEventsFactions_SearchBox_Refresh"/>
+                                    <OnTextChanged function="MyEventsFactions_SearchBox_Refresh"/>
+                                    <OnEditFocusLost function="MyEventsFactions_SearchBox_OnFocusLost"/>
+                                    <OnEditFocusGained function="MyEventsFactions_SearchBox_OnFocusGained"/>
+                                    <OnKeyDown function="MyEventsFactions_SearchBox_OnKeyDown"/>
                                 </Scripts>
                             </EditBox>
 
                             <Frame parentKey="factionSearchPreviewContainer" hidden="true">
                                 <Size x="206" y="27"/>
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" relativeKey="$parent.searchBox" relativePoint="BOTTOMLEFT" x="-4" y="3"/>
+                                    <Anchor point="TOPLEFT" relativeKey="$parent.factionSearchBox" relativePoint="BOTTOMLEFT" x="-4" y="3"/>
                                 </Anchors>
                                 <Layers>
                                     <Layer level="BACKGROUND">
@@ -643,27 +643,27 @@
 
 
 
-                                    <Button inherits="MyEvents_Factions_SearchPreviewButton" parentKey="searchPreview1" hidden="true">
+                                    <Button inherits="MyEventsFactions_SearchPreviewButton" parentKey="searchPreview1" hidden="true">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
                                         </Anchors>
                                     </Button>
-                                    <Button inherits="MyEvents_Factions_SearchPreviewButton" parentKey="searchPreview2" hidden="true">
+                                    <Button inherits="MyEventsFactions_SearchPreviewButton" parentKey="searchPreview2" hidden="true">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" relativeKey="$parent.searchPreview1" relativePoint="BOTTOMLEFT"/>
                                         </Anchors>
                                     </Button>
-                                    <Button inherits="MyEvents_Factions_SearchPreviewButton" parentKey="searchPreview3" hidden="true">
+                                    <Button inherits="MyEventsFactions_SearchPreviewButton" parentKey="searchPreview3" hidden="true">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" relativeKey="$parent.searchPreview2" relativePoint="BOTTOMLEFT"/>
                                         </Anchors>
                                     </Button>
-                                    <Button inherits="MyEvents_Factions_SearchPreviewButton" parentKey="searchPreview4" hidden="true">
+                                    <Button inherits="MyEventsFactions_SearchPreviewButton" parentKey="searchPreview4" hidden="true">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" relativeKey="$parent.searchPreview3" relativePoint="BOTTOMLEFT"/>
                                         </Anchors>
                                     </Button>
-                                    <Button inherits="MyEvents_Factions_SearchPreviewButton" parentKey="searchPreview5" hidden="true">
+                                    <Button inherits="MyEventsFactions_SearchPreviewButton" parentKey="searchPreview5" hidden="true">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" relativeKey="$parent.searchPreview4" relativePoint="BOTTOMLEFT"/>
                                         </Anchors>
@@ -706,10 +706,10 @@
 								                self:SetFrameLevel(self:GetParent():GetFrameLevel() + 10);
                                             </OnShow>
                                             <OnClick>
-                                                MyEvents_Factions_ShowFullSearch();
+                                                MyEventsFactions_ShowFullSearch();
                                                 PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
                                             </OnClick>
-                                            <OnEnter function="MyEvents_Factions_ShowAllSearchResults_OnEnter"/>
+                                            <OnEnter function="MyEventsFactions_ShowAllSearchResults_OnEnter"/>
                                         </Scripts>
                                     </Button>
                                 </Frames>
@@ -859,67 +859,67 @@
                                 </Scripts>
                             </Frame>
 
-                            <Frame name="MyEvents_Factions_ScrollFrame" parentKey="ScrollFrame">
+                            <Frame name="MyEventsFactions_ScrollFrame" parentKey="ScrollFrame">
                                 <Size x="480" y="125" />
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEvents_Factions_LabelContainer" x="0" y="-15" />
+                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsFactions_LabelContainer" x="0" y="-15" />
                                 </Anchors>
                                 <Frames>
-                                    <Frame name="MyEvents_Factions_Block1" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block1" inherits="TextListItemTemplate">
                                         <Anchors>
                                             <Anchor point="TOPLEFT" x="0" y="0"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block2" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block2" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block1" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block1" x="5"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block3" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block3" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block2" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block2" x="5"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block4" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block4" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block3" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block3" x="5"/>
                                         </Anchors>
                                     </Frame>
 
 
-                                    <Frame name="MyEvents_Factions_Block5" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block5" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEvents_Factions_Block1" y="-5"/>
+                                            <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="MyEventsFactions_Block1" y="-5"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block6" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block6" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block5" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block5" x="5"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block7" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block7" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block6" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block6" x="5"/>
                                         </Anchors>
                                     </Frame>
-                                    <Frame name="MyEvents_Factions_Block8" inherits="TextListItemTemplate">
+                                    <Frame name="MyEventsFactions_Block8" inherits="TextListItemTemplate">
                                         <Anchors>
-                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_Block7" x="5"/>
+                                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_Block7" x="5"/>
                                         </Anchors>
                                     </Frame>
                                 </Frames>
 
                                 <Scripts>
                                     <OnMouseWheel>
-                                        MyEvents_Factions_ScrollFrame_OnMouseWheel(self, delta)
+                                        MyEventsFactions_ScrollFrame_OnMouseWheel(self, delta)
                                     </OnMouseWheel>
                                 </Scripts>
                             </Frame>
 
-                            <Slider name="MyEvents_Factions_ScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
+                            <Slider name="MyEventsFactions_ScrollBar" parentKey="ScrollBar" inherits="MinimalScrollBarTemplate">
                                 <Size x="20" y="50" />
                                 <Anchors>
-                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEvents_Factions_ScrollFrame" x="-5" y="30" />
+                                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsFactions_ScrollFrame" x="-5" y="30" />
                                 </Anchors>
                                 <Scripts>
                                     <OnLoad>
@@ -927,18 +927,18 @@
 
                                         self.ScrollUpButton:SetScript(
                                             "OnClick",
-                                            function(source) MyEvents_Factions_Previous_OnClick(source) end
+                                            function(source) MyEventsFactions_Previous_OnClick(source) end
                                         );
 
                                         self.ScrollDownButton:SetScript(
                                             "OnClick",
-                                            function(source) MyEvents_Factions_Next_OnClick(source) end
+                                            function(source) MyEventsFactions_Next_OnClick(source) end
                                         );
 
                                         self.scrollStep = 1;
                                     </OnLoad>
                                     <OnValueChanged>
-                                        MyEvents_Factions_ChangePage(adjust_value(value, self.scrollStep));
+                                        MyEventsFactions_ChangePage(adjust_value(value, self.scrollStep));
                                     </OnValueChanged>
                                 </Scripts>
                             </Slider>

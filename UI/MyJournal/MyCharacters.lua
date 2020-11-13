@@ -37,10 +37,9 @@ function Chronicles.UI.MyCharacters:Init(isVisible)
     UIDropDownMenu_JustifyText(MyCharactersDetailsTimelineDropDown, "LEFT")
     UIDropDownMenu_Initialize(MyCharactersDetailsTimelineDropDown, Init_MyCharacters_Timeline_Dropdown)
 
+    Chronicles.UI.MyCharacters:InitFactionSearch()
+
     Chronicles.UI.MyCharacters:InitLocales()
-
-    InitFactionSearch()
-
     Chronicles.UI.MyCharacters:HideFields()
 end
 
@@ -666,15 +665,11 @@ end
 local NUM_SEARCH_PREVIEWS = 5
 local SHOW_ALL_RESULTS_INDEX = NUM_SEARCH_PREVIEWS + 1
 
-function InitFactionSearch()
-    MyCharactersDetails.searchResults.scrollFrame.update = MyCharacterFactions_UpdateFullSearchResults
-    MyCharactersDetails.searchResults.scrollFrame.scrollBar.doNotHide = true
-    HybridScrollFrame_CreateButtons(
-        MyCharactersDetails.searchResults.scrollFrame,
-        "MyCharacterFactions_FullSearchResultsButton",
-        5,
-        0
-    )
+function Chronicles.UI.MyCharacters:InitFactionSearch()
+    local scrollFrame = MyCharactersDetails.searchResults.scrollFrame
+    scrollFrame.update = MyCharacterFactions_UpdateFullSearchResults
+    scrollFrame.scrollBar.doNotHide = true
+    HybridScrollFrame_CreateButtons(scrollFrame, "MyCharacterFactions_FullSearchResultsButton", 5, 0)
 
     SearchBoxTemplate_OnLoad(MyCharactersDetails.searchBox)
     MyCharactersDetails.searchBox.HasStickyFocus = function()
@@ -700,6 +695,7 @@ end
 function MyCharacterFactions_SearchBox_OnFocusLost(self)
     SearchBoxTemplate_OnEditFocusLost(self)
     MyCharacterFactions_HideSearchPreview()
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchBox_OnFocusLost ")
 end
 
 function MyCharacterFactions_SearchBox_OnFocusGained(self)
@@ -886,7 +882,7 @@ function MyCharacterFactions_SearchPreviewButton_OnEnter(self)
 end
 
 function MyCharacterFactions_SearchPreviewButton_OnClick(self)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick " .. tostring(self.factionID))
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick ")
 
     if (self.factionID) then
         MyCharacterFactions_SelectSearchItem(self.factionID)

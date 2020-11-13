@@ -8,6 +8,8 @@ Chronicles.UI.MyEvents.CurrentPage = 1
 Chronicles.UI.MyEvents.SelectedEvent = {}
 Chronicles.UI.MyEvents.SelectedEvent_Factions = {}
 Chronicles.UI.MyEvents.CurrentFactionsPage = 1
+Chronicles.UI.MyEvents.SelectedEvent_Characters = {}
+Chronicles.UI.MyEvents.CurrentCharactersPage = 1
 
 function Chronicles.UI.MyEvents:Init(isVisible)
     MyEvents.List:SetBackdrop(
@@ -42,8 +44,9 @@ function Chronicles.UI.MyEvents:Init(isVisible)
     UIDropDownMenu_JustifyText(MyEventsDetailsTimelineDropDown, "LEFT")
     UIDropDownMenu_Initialize(MyEventsDetailsTimelineDropDown, Init_Timeline_Dropdown)
 
-    Chronicles.UI.MyEvents:HideFields()
+    Chronicles.UI.MyEvents:InitFactionSearch()
 
+    Chronicles.UI.MyEvents:HideFields()
     Chronicles.UI.MyEvents:InitLocales()
 end
 
@@ -60,7 +63,7 @@ function Chronicles.UI.MyEvents:InitLocales()
     MyEventsDetailsRemoveEvent:SetText(Locale["Delete"])
     MyEventsDetailsFactionsCharactersToggle:SetText(Locale["FactionsCharacters"])
 
-    MyEvents_Factions_Label:SetText(Locale["Factions_List"])
+    MyEventsFactions_Label:SetText(Locale["Factions_List"])
 
     MyEvents.Details.IdContainer.Label:SetText(Locale["Id_Field"] .. " :")
     MyEvents.Details.TitleLabelContainer.TitleLabel:SetText(Locale["Title_Field"] .. " :")
@@ -149,6 +152,7 @@ function Chronicles.UI.MyEvents:HideFields()
     MyEventsDetailsRemoveEvent:Hide()
 
     MyEvents.Details.FactionsCharacters:Hide()
+    MyEventsDetailsFactionsCharactersToggle.displayed = false
 end
 
 function Chronicles.UI.MyEvents:ShowFields()
@@ -164,6 +168,9 @@ function Chronicles.UI.MyEvents:ShowFields()
 
     MyEventsDetailsSaveButton:Show()
     MyEventsDetailsRemoveEvent:Show()
+
+    MyEvents.Details.FactionsCharacters:Hide()
+    MyEventsDetailsFactionsCharactersToggle.displayed = false
 end
 
 ------------------------------------------------------------------------------------------
@@ -328,6 +335,8 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     MyEventsDetailsYearEndErrorContainer:Hide()
     MyEventsDetailsYearOrderErrorContainer:Hide()
 
+    MyEvents.Details.FactionsCharacters.factionSearchBox:SetText("")
+
     if (Chronicles.UI.MyEvents.SelectedEvent.id ~= nil) then
         if (event.id == Chronicles.UI.MyEvents.SelectedEvent.id) then
             return
@@ -384,6 +393,11 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
 
     UIDropDownMenu_SetSelectedID(MyEventsDetailsTimelineDropDown, event.timeline)
     UIDropDownMenu_SetText(MyEventsDetailsTimelineDropDown, Chronicles.constants.timelines[event.timeline])
+
+    Chronicles.UI.MyEvents.SelectedEvent_Factions = copyTable(event.factions)
+    Chronicles.UI.MyEvents:ChangeFactionsPage(1)
+    -- Chronicles.UI.MyEvents.SelectedEvent_Characters= copyTable(event.characters)
+    -- Chronicles.UI.MyEvents:ChangeCharactersPage(1)
 end
 
 function Chronicles.UI.MyEvents:ChangeEventDescriptionPage(page)
@@ -679,7 +693,7 @@ end
 -- Factions ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
-function MyEvents_Factions_Previous_OnClick(self)
+function MyEventsFactions_Previous_OnClick(self)
     if (Chronicles.UI.MyEvents.CurrentFactionsPage == nil) then
         Chronicles.UI.MyEvents:ChangeFactionsPage(1)
     else
@@ -687,7 +701,7 @@ function MyEvents_Factions_Previous_OnClick(self)
     end
 end
 
-function MyEvents_Factions_Next_OnClick(self)
+function MyEventsFactions_Next_OnClick(self)
     if (Chronicles.UI.MyEvents.CurrentFactionsPage == nil) then
         Chronicles.UI.MyEvents:ChangeFactionsPage(1)
     else
@@ -695,15 +709,15 @@ function MyEvents_Factions_Next_OnClick(self)
     end
 end
 
-function MyEvents_Factions_ScrollFrame_OnMouseWheel(self, value)
+function MyEventsFactions_ScrollFrame_OnMouseWheel(self, value)
     if (value > 0) then
-        MyEvents_Factions_Previous_OnClick(self)
+        MyEventsFactions_Previous_OnClick(self)
     else
-        MyEvents_Factions_Next_OnClick(self)
+        MyEventsFactions_Next_OnClick(self)
     end
 end
 
-function MyEvents_Factions_ChangePage(page)
+function MyEventsFactions_ChangePage(page)
     Chronicles.UI.MyEvents:ChangeFactionsPage(page)
 end
 
@@ -722,7 +736,7 @@ function Chronicles.UI.MyEvents:ChangeFactionsPage(page)
 
             if (numberOfFactions > 0) then
                 local maxPageValue = math.ceil(numberOfFactions / pageSize)
-                MyEvents_Factions_ScrollBar:SetMinMaxValues(1, maxPageValue)
+                MyEventsFactions_ScrollBar:SetMinMaxValues(1, maxPageValue)
 
                 if (page > maxPageValue) then
                     page = maxPageValue
@@ -732,8 +746,8 @@ function Chronicles.UI.MyEvents:ChangeFactionsPage(page)
                 end
 
                 if (numberOfFactions > pageSize) then
-                    MyEvents_Factions_ScrollBar.ScrollUpButton:Enable()
-                    MyEvents_Factions_ScrollBar.ScrollDownButton:Enable()
+                    MyEventsFactions_ScrollBar.ScrollUpButton:Enable()
+                    MyEventsFactions_ScrollBar.ScrollDownButton:Enable()
                 end
 
                 local firstIndex = 1 + ((page - 1) * pageSize)
@@ -741,48 +755,48 @@ function Chronicles.UI.MyEvents:ChangeFactionsPage(page)
 
                 if (firstIndex <= 1) then
                     firstIndex = 1
-                    MyEvents_Factions_ScrollBar.ScrollUpButton:Disable()
+                    MyEventsFactions_ScrollBar.ScrollUpButton:Disable()
                     Chronicles.UI.MyEvents.CurrentFactionsPage = 1
                 end
 
                 if ((firstIndex + pageSize - 1) >= numberOfFactions) then
                     lastIndex = numberOfFactions
-                    MyEvents_Factions_ScrollBar.ScrollDownButton:Disable()
+                    MyEventsFactions_ScrollBar.ScrollDownButton:Disable()
                 end
 
                 Chronicles.UI.MyEvents.CurrentFactionsPage = page
-                MyEvents_Factions_ScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentFactionsPage)
+                MyEventsFactions_ScrollBar:SetValue(Chronicles.UI.MyEvents.CurrentFactionsPage)
 
                 if ((firstIndex > 0) and (firstIndex <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex], MyEvents_Factions_Block1)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex], MyEventsFactions_Block1)
                 end
 
                 if (((firstIndex + 1) > 0) and ((firstIndex + 1) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 1], MyEvents_Factions_Block2)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 1], MyEventsFactions_Block2)
                 end
 
                 if (((firstIndex + 2) > 0) and ((firstIndex + 2) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 2], MyEvents_Factions_Block3)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 2], MyEventsFactions_Block3)
                 end
 
                 if (((firstIndex + 3) > 0) and ((firstIndex + 3) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 3], MyEvents_Factions_Block4)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 3], MyEventsFactions_Block4)
                 end
 
                 if (((firstIndex + 4) > 0) and ((firstIndex + 4) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 4], MyEvents_Factions_Block5)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 4], MyEventsFactions_Block5)
                 end
 
                 if (((firstIndex + 5) > 0) and ((firstIndex + 5) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 5], MyEvents_Factions_Block6)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 5], MyEventsFactions_Block6)
                 end
 
                 if (((firstIndex + 6) > 0) and ((firstIndex + 6) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 6], MyEvents_Factions_Block7)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 6], MyEventsFactions_Block7)
                 end
 
                 if (((firstIndex + 7) > 0) and ((firstIndex + 7) <= lastIndex)) then
-                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 7], MyEvents_Factions_Block8)
+                    Chronicles.UI.MyEvents:SetFactionTextToFrame(factionsList[firstIndex + 7], MyEventsFactions_Block8)
                 end
             end
         else
@@ -834,17 +848,17 @@ function Chronicles.UI.MyEvents:RemoveFaction(faction)
 end
 
 function Chronicles.UI.MyEvents:HideAllFactions()
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block1)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block2)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block3)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block4)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block5)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block6)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block7)
-    Chronicles.UI.MyEvents:HideFaction(MyEvents_Factions_Block8)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block1)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block2)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block3)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block4)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block5)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block6)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block7)
+    Chronicles.UI.MyEvents:HideFaction(MyEventsFactions_Block8)
 
-    MyEvents_Factions_ScrollBar.ScrollUpButton:Disable()
-    MyEvents_Factions_ScrollBar.ScrollDownButton:Disable()
+    MyEventsFactions_ScrollBar.ScrollUpButton:Disable()
+    MyEventsFactions_ScrollBar.ScrollDownButton:Disable()
 
     Chronicles.UI.MyEvents.CurrentFactionsPage = nil
 end
@@ -862,16 +876,11 @@ end
 local NUM_SEARCH_PREVIEWS = 5
 local SHOW_ALL_RESULTS_INDEX = NUM_SEARCH_PREVIEWS + 1
 
-function InitFactionSearch()
-    MyEvents.Details.FactionsCharacters.factionSearchResults.scrollFrame.update =
-        MyEvents_Factions_UpdateFullSearchResults
-    MyEvents.Details.FactionsCharacters.factionSearchResults.scrollFrame.scrollBar.doNotHide = true
-    HybridScrollFrame_CreateButtons(
-        MyEvents.Details.FactionsCharacters.factionSearchResults.scrollFrame,
-        "MyEvents_Factions_FullSearchResultsButton",
-        5,
-        0
-    )
+function Chronicles.UI.MyEvents:InitFactionSearch()
+    local scrollFrame = MyEvents.Details.FactionsCharacters.factionSearchResults.scrollFrame
+    scrollFrame.update = MyEventsFactions_UpdateFullSearchResults
+    scrollFrame.scrollBar.doNotHide = true
+    HybridScrollFrame_CreateButtons(scrollFrame, "MyEventsFactions_FullSearchResultsButton", 5, 0)
 
     SearchBoxTemplate_OnLoad(MyEvents.Details.FactionsCharacters.factionSearchBox)
     MyEvents.Details.FactionsCharacters.factionSearchBox.HasStickyFocus = function()
@@ -879,46 +888,49 @@ function InitFactionSearch()
     end
 end
 
-function MyEvents_Factions_SearchBox_OnShow(self)
+function MyEventsFactions_SearchBox_OnShow(self)
     self:SetFrameLevel(self:GetParent():GetFrameLevel() + 7)
-    MyEvents_Factions_SetSearchPreviewSelection(1)
+    MyEventsFactions_SetSearchPreviewSelection(1)
 end
 
-function MyEvents_Factions_SearchBox_Refresh(self)
+function MyEventsFactions_SearchBox_Refresh(self)
     SearchBoxTemplate_OnTextChanged(self)
 
     if (strlen(self:GetText()) >= MIN_CHARACTER_SEARCH) then
-        MyEvents_Factions_ShowSearchPreviewResults()
+        MyEventsFactions_ShowSearchPreviewResults()
     else
-        MyEvents_Factions_HideSearchPreview()
+        DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchBox_Refresh ")
+        MyEventsFactions_HideSearchPreview()
     end
 end
 
-function MyEvents_Factions_SearchBox_OnFocusLost(self)
+function MyEventsFactions_SearchBox_OnFocusLost(self)
     SearchBoxTemplate_OnEditFocusLost(self)
-    MyEvents_Factions_HideSearchPreview()
+    MyEventsFactions_HideSearchPreview()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchBox_OnFocusLost ")
 end
 
-function MyEvents_Factions_SearchBox_OnFocusGained(self)
+function MyEventsFactions_SearchBox_OnFocusGained(self)
     SearchBoxTemplate_OnEditFocusGained(self)
     MyEvents.Details.FactionsCharacters.factionSearchResults:Hide()
 
-    MyEvents_Factions_SearchBox_Refresh(self)
+    MyEventsFactions_SearchBox_Refresh(self)
 end
 
-function MyEvents_Factions_SearchBox_OnKeyDown(self, key)
+function MyEventsFactions_SearchBox_OnKeyDown(self, key)
     if (key == "UP") then
-        MyEvents_Factions_SetSearchPreviewSelection(
+        MyEventsFactions_SetSearchPreviewSelection(
             MyEvents.Details.FactionsCharacters.factionSearchBox.selectedIndex - 1
         )
     elseif (key == "DOWN") then
-        MyEvents_Factions_SetSearchPreviewSelection(
+        MyEventsFactions_SetSearchPreviewSelection(
             MyEvents.Details.FactionsCharacters.factionSearchBox.selectedIndex + 1
         )
     end
 end
 
-function MyEvents_Factions_HideSearchPreview()
+function MyEventsFactions_HideSearchPreview()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_HideSearchPreview ")
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     factionSearchPreviewContainer:Hide()
@@ -930,7 +942,9 @@ function MyEvents_Factions_HideSearchPreview()
     factionSearchPreviewContainer.showAllSearchResults:Hide()
 end
 
-function MyEvents_Factions_SetSearchPreviewSelection(selectedIndex)
+function MyEventsFactions_SetSearchPreviewSelection(selectedIndex)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SetSearchPreviewSelection " .. tostring(selectedIndex))
+
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     local numShown = 0
@@ -965,19 +979,24 @@ function MyEvents_Factions_SetSearchPreviewSelection(selectedIndex)
     end
 end
 
-function MyEvents_Factions_ShowSearchPreviewResults()
+function MyEventsFactions_ShowSearchPreviewResults()
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowSearchPreviewResults ")
+
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
     local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
 
     local numResults = tablelength(factionSearchResults)
 
+    -- DEFAULT_CHAT_FRAME:AddMessage("---- numResults " .. numResults)
     if (numResults > 0) then
-        MyEvents_Factions_SetSearchPreviewSelection(1)
+        MyEventsFactions_SetSearchPreviewSelection(1)
     end
 
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     local lastButton
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowSearchPreviewResults " .. tablelength(searchPreviews))
     for index = 1, NUM_SEARCH_PREVIEWS do
         local searchPreview = searchPreviews[index]
         if (index <= numResults) then
@@ -1013,18 +1032,20 @@ function MyEvents_Factions_ShowSearchPreviewResults()
     end
 end
 
-function MyEvents_Factions_ShowAllSearchResults_OnEnter()
-    MyEvents_Factions_SetSearchPreviewSelection(SHOW_ALL_RESULTS_INDEX)
+function MyEventsFactions_ShowAllSearchResults_OnEnter()
+    MyEventsFactions_SetSearchPreviewSelection(SHOW_ALL_RESULTS_INDEX)
 end
 
-function MyEvents_Factions_FullSearchResultsButton_OnClick(self)
+function MyEventsFactions_FullSearchResultsButton_OnClick(self)
     if (self.factionID) then
-        MyEvents_Factions_SelectSearchItem(self.factionID)
+        MyEventsFactions_SelectSearchItem(self.factionID)
         MyEvents.Details.FactionsCharacters.factionSearchResults:Hide()
     end
 end
 
-function MyEvents_Factions_SelectSearchItem(factionID)
+function MyEventsFactions_SelectSearchItem(factionID)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SelectSearchItem " .. tostring(factionID))
+
     local results =
         Chronicles.DB:FindFactions(
         {
@@ -1036,7 +1057,7 @@ function MyEvents_Factions_SelectSearchItem(factionID)
         if (Chronicles.UI.MyEvents.SelectedEvent_Factions[factionID.group] ~= nil) then
             for index, id in ipairs(Chronicles.UI.MyEvents.SelectedEvent_Factions[factionID.group]) do
                 if (factionID.id == id) then
-                    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+                    Chronicles.UI.MyEvents:ChangeFactionsPage(1)
                     return
                 end
             end
@@ -1045,11 +1066,11 @@ function MyEvents_Factions_SelectSearchItem(factionID)
             Chronicles.UI.MyEvents.SelectedEvent_Factions[factionID.group] = {factionID.id}
         end
     end
-    Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
+    Chronicles.UI.MyEvents:ChangeFactionsPage(1)
     Chronicles.UI.FactionsView:Refresh()
 end
 
-function MyEvents_Factions_SearchBox_OnUpdate(self)
+function MyEventsFactions_SearchBox_OnUpdate(self)
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     for index = 1, NUM_SEARCH_PREVIEWS do
@@ -1063,11 +1084,11 @@ function MyEvents_Factions_SearchBox_OnUpdate(self)
     factionSearchPreviewContainer:Show()
 end
 
-function MyEvents_Factions_SearchPreviewButton_OnShow(self)
+function MyEventsFactions_SearchPreviewButton_OnShow(self)
     self:SetFrameLevel(self:GetParent():GetFrameLevel() + 10)
 end
 
-function MyEvents_Factions_SearchPreviewButton_OnLoad(self)
+function MyEventsFactions_SearchPreviewButton_OnLoad(self)
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     for index = 1, NUM_SEARCH_PREVIEWS do
@@ -1078,21 +1099,25 @@ function MyEvents_Factions_SearchPreviewButton_OnLoad(self)
     end
 end
 
-function MyEvents_Factions_SearchPreviewButton_OnEnter(self)
-    MyEvents_Factions_SetSearchPreviewSelection(self.previewIndex)
+function MyEventsFactions_SearchPreviewButton_OnEnter(self)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchPreviewButton_OnEnter ")
+    MyEventsFactions_SetSearchPreviewSelection(self.previewIndex)
 end
 
-function MyEvents_Factions_SearchPreviewButton_OnClick(self)
+function MyEventsFactions_SearchPreviewButton_OnClick(self)
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchPreviewButton_OnClick " .. tostring(self.factionID))
+
     if (self.factionID) then
-        MyEvents_Factions_SelectSearchItem(self.factionID)
+        MyEventsFactions_SelectSearchItem(self.factionID)
         MyEvents.Details.FactionsCharacters.factionSearchResults:Hide()
-        MyEvents_Factions_HideSearchPreview()
+        MyEventsFactions_HideSearchPreview()
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchPreviewButton_OnClick ")
         MyEvents.Details.FactionsCharacters.factionSearchBox:ClearFocus()
     end
 end
 
-function MyEvents_Factions_ShowFullSearch()
-    MyEvents_Factions_UpdateFullSearchResults()
+function MyEventsFactions_ShowFullSearch()
+    MyEventsFactions_UpdateFullSearchResults()
 
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
     local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
@@ -1103,12 +1128,13 @@ function MyEvents_Factions_ShowFullSearch()
         return
     end
 
-    MyEvents_Factions_HideSearchPreview()
+    MyEventsFactions_HideSearchPreview()
+    DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowFullSearch ")
     MyEvents.Details.FactionsCharacters.factionSearchBox:ClearFocus()
     MyEvents.Details.FactionsCharacters.factionSearchResults:Show()
 end
 
-function MyEvents_Factions_UpdateFullSearchResults()
+function MyEventsFactions_UpdateFullSearchResults()
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
     local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
 

@@ -415,7 +415,6 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
         frameEvent.upperBound = nil
 
         if (dateBlock.text ~= nil) then
-            DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text NoEvent " .. dateBlock.text)
             frameEvent.LabelText:SetText("")
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")

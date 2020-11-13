@@ -107,6 +107,10 @@ function tablelength(T)
 end
 
 function copyTable(tableToCopy)
+    if (tableToCopy == nil) then
+        return {}
+    end
+    
     local orig_type = type(tableToCopy)
     local copy
     if orig_type == "table" then
