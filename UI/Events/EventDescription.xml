@@ -103,6 +103,17 @@
 			</Button>
 
 
+
+			<Button name="EventFactions" parentKey="Factions" inherits="TextButtonTemplate">
+				<!-- <Size x="100" y="20"/> -->
+				<Anchors>
+					<Anchor point="BOTTOM" x="0" y="0"/>
+				</Anchors>
+				<!-- <Scripts>
+					<OnClick function="EventDescriptionNextButton_OnClick"/>
+					<OnLoad function="SetNextButtonText"/>
+				</Scripts> -->
+			</Button>
 		</Frames>
 	</Frame>
 

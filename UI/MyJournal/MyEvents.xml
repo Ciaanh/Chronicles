@@ -574,7 +574,7 @@
                             <EditBox parentKey="factionSearchBox" inherits="SearchBoxTemplate" letters="40">
                                 <Size x="107" y="30"/>
                                 <Anchors>
-                                    <Anchor point="LEFT" relativeTo="MyEventsFactions_LabelContainer" relativePoint="RIGHT" x="10" y="0"/>
+                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsFactions_LabelContainer"  x="0" y="0"/>
                                 </Anchors>
                                 <Scripts>
                                     <OnShow function="MyEventsFactions_SearchBox_OnShow"/>
@@ -862,7 +862,7 @@
                             <Frame name="MyEventsFactions_ScrollFrame" parentKey="ScrollFrame">
                                 <Size x="480" y="125" />
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="MyEventsFactions_LabelContainer" x="0" y="-15" />
+                                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.factionSearchBox"  x="0" y="-15" />
                                 </Anchors>
                                 <Frames>
                                     <Frame name="MyEventsFactions_Block1" inherits="TextListItemTemplate">
