@@ -1160,10 +1160,10 @@ function MyEventsFactions_UpdateFullSearchResults()
             result.factionID = {id = faction.id, group = faction.source}
 
             local size = 75
-            if (string.lower(faction.description):find("<html>") == nil) then
-                result.description:SetText(faction.description:sub(0, size))
-            else
+            if (containsHTML(faction.description)) then
                 result.description:SetText("")
+            else
+                result.description:SetText(faction.description:sub(0, size))
             end
 
             result:Show()

@@ -110,7 +110,7 @@ function copyTable(tableToCopy)
     if (tableToCopy == nil) then
         return {}
     end
-    
+
     local orig_type = type(tableToCopy)
     local copy
     if orig_type == "table" then
@@ -170,6 +170,14 @@ function cleanHTML(text)
         text = ""
     end
     return text
+end
+
+function containsHTML(text)
+    if (string.lower(text):find("<html>") == nil) then
+        return false
+    else
+        return true
+    end
 end
 
 -----------------------------------------------------------------------------------------

@@ -7,10 +7,13 @@ Chronicles.UI.EventDescription = {}
 Chronicles.UI.EventDescription.CurrentPage = nil
 Chronicles.UI.EventDescription.CurrentEvent = nil
 
+Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = {}
+
 function Chronicles.UI.EventDescription:Refresh()
     --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
     self.CurrentEvent = nil
     self.CurrentPage = nil
+    self.CurrentFactionsCharactersResults = {}
 
     EventTitle:SetText("")
     EventDescriptionHTML:SetText("")
@@ -19,6 +22,9 @@ function Chronicles.UI.EventDescription:Refresh()
     EventDescriptionPrevious:Hide()
     EventDescriptionNext:Hide()
     EventDescriptionPager:Hide()
+
+    EventDescription.FactionsButton:Hide()
+    EventDescription.CharactersButton:Hide()
     --end
 end
 
@@ -26,6 +32,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventDescription " .. event.label)
     self.CurrentEvent = event
     self.CurrentPage = 1
+    self.CurrentFactionsCharactersResults = {}
 
     EventTitle:SetText(adjustTextLength(event.label, 45, EventTitleContainer))
     EventDescriptionHTML:SetText(event.description[1])
@@ -38,6 +45,14 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
 
     self:SetDescriptionPager(1, tablelength(event.description))
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Display description " .. event.description[1])
+
+    if (tablelength(event.factions) > 0) then
+        EventDescription.FactionsButton:Show()
+    end
+
+    if (tablelength(event.characters) > 0) then
+        EventDescription.CharactersButton:Show()
+    end
 end
 
 function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
@@ -106,4 +121,123 @@ end
 
 function SetNextButtonText()
     EventDescriptionNext:SetText(">")
+end
+
+function EventFactionsButton_OnClick(self)
+    DEFAULT_CHAT_FRAME:AddMessage("-- EventFactionsButton_OnClick ")
+    local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
+
+    if (currentEvent ~= nil and currentEvent.factions and tablelength(currentEvent.factions) > 0) then
+        local factionsList = Chronicles.DB:FindFactions(currentEvent.factions)
+
+        Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = MapFactionsToItems(factionsList)
+
+        EventDescription.FactionsCharactersResults:Show()
+    else
+        EventDescription.FactionsCharactersResults:Hide()
+    end
+end
+
+function MapFactionsToItems(factions)
+    local maxDescriptionLength = 75
+
+    local results = {}
+
+    for index, faction in ipairs(factions) do
+        local item = {
+            name = faction.name,
+            description = ""
+        }
+
+        if (not containsHTML(faction.description)) then
+            item.description = faction.description:sub(0, maxDescriptionLength)
+        end
+        table.insert(results, item)
+    end
+
+    return results
+end
+
+function EventFactionsButton_OnLoad(self)
+    self.label:SetText(Locale["Factions_List"])
+end
+
+function EventCharactersButton_OnClick(self)
+    DEFAULT_CHAT_FRAME:AddMessage("-- EventCharactersButton_OnClick ")
+    -- local charactersList = Chronicles.DB:FindCharacters(event.characters)
+
+    local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
+
+    if (currentEvent ~= nil and currentEvent.characters and tablelength(currentEvent.characters) > 0) then
+        local charactersList = Chronicles.DB:FindCharacters(currentEvent.characters)
+
+        Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = MapCharactersToItems(charactersList)
+
+        EventDescription.FactionsCharactersResults:Show()
+    else
+        EventDescription.FactionsCharactersResults:Hide()
+    end
+end
+
+function MapCharactersToItems(characters)
+    local maxDescriptionLength = 75
+
+    local results = {}
+
+    for index, character in ipairs(characters) do
+        local item = {
+            name = character.name,
+            description = ""
+        }
+
+        if (not containsHTML(character.biography)) then
+            item.description = character.description:sub(0, maxDescriptionLength)
+        end
+        table.insert(results, item)
+    end
+
+    return results
+end
+
+function EventCharactersButton_OnLoad(self)
+    self.label:SetText(Locale["Characters_List"])
+end
+
+function EventDescriptionButton_OnLoad(self)
+    local scrollFrame = EventDescription.FactionsCharactersResults.scrollFrame
+    scrollFrame.update = EventDescription_FactionsCharactersResults
+    scrollFrame.scrollBar.doNotHide = true
+    HybridScrollFrame_CreateButtons(scrollFrame, "FullSearchResultsButton", 5, 0)
+end
+
+function EventDescription_FactionsCharactersResults()
+    local numResults = tablelength(Chronicles.UI.EventDescription.CurrentFactionsCharactersResults)
+
+    local scrollFrame = EventDescription.FactionsCharactersResults.scrollFrame
+    local offset = HybridScrollFrame_GetOffset(scrollFrame)
+    local results = scrollFrame.buttons
+    local result, index
+
+    for i = 1, #results do
+        result = results[i]
+        index = offset + i
+        if (index <= numResults) then
+            local item = Chronicles.UI.EventDescription.CurrentFactionsCharactersResults[index]
+
+            result.name:SetText(item.name)
+            -- result.icon:SetTexture(icon)
+            result.description:SetText(item.description)
+
+            result:Show()
+        else
+            result:Hide()
+        end
+    end
+
+    local totalHeight = numResults * 49
+    HybridScrollFrame_Update(scrollFrame, totalHeight, 270)
+
+    EventDescription.FactionsCharactersResults.titleText:SetText(
+        string.format(ENCOUNTER_JOURNAL_SEARCH_RESULTS, searchtext, numResults)
+    )
 end

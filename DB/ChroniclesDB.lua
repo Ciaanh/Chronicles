@@ -150,6 +150,8 @@ function Chronicles.DB:CleanEventObject(event, groupName)
             yearEnd = event.yearEnd,
             description = description,
             eventType = event.eventType,
+            factions = event.factions,
+            characters = event.characters,
             source = groupName
         }
     end
