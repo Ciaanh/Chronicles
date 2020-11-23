@@ -882,7 +882,7 @@ function MyCharacterFactions_SearchPreviewButton_OnEnter(self)
 end
 
 function MyCharacterFactions_SearchPreviewButton_OnClick(self)
-    DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick ")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick ")
 
     if (self.factionID) then
         MyCharacterFactions_SelectSearchItem(self.factionID)

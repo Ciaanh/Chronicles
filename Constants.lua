@@ -58,6 +58,8 @@ constants.config = {
 		factionListPageSize = 9,
 		characterListPageSize = 9,
 		characterFactionsPageSize = 8,
+		eventFactionsPageSize = 8,
+		eventCharactersPageSize = 8
 	}
 }
 

@@ -236,6 +236,15 @@
         </Scripts>
     </Button>
 
+    <Button name="MyEventsCharacters_SearchPreviewButton" parentArray="searchPreviews" inherits="SearchPreviewButton" virtual="true">
+        <Scripts>
+            <OnLoad function="MyEventsCharacters_SearchPreviewButton_OnLoad"/>
+            <OnShow function="MyEventsCharacters_SearchPreviewButton_OnShow"/>
+            <OnEnter function="MyEventsCharacters_SearchPreviewButton_OnEnter"/>
+            <OnClick function="MyEventsCharacters_SearchPreviewButton_OnClick"/>
+        </Scripts>
+    </Button>
+
     <Button name="MyCharacterFactions_SearchPreviewButton" parentArray="searchPreviews" inherits="SearchPreviewButton" virtual="true">
         <Scripts>
             <OnLoad function="MyCharacterFactions_SearchPreviewButton_OnLoad"/>
@@ -306,6 +315,12 @@
     <Button name="MyEventsFactions_FullSearchResultsButton" inherits="FullSearchResultsButton" virtual="true">
         <Scripts>
             <OnClick function="MyEventsFactions_FullSearchResultsButton_OnClick"/>
+        </Scripts>
+    </Button>
+
+        <Button name="MyEventsCharacters_FullSearchResultsButton" inherits="FullSearchResultsButton" virtual="true">
+        <Scripts>
+            <OnClick function="MyEventsCharacters_FullSearchResultsButton_OnClick"/>
         </Scripts>
     </Button>
 

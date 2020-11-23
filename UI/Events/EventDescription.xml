@@ -273,26 +273,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		</Frames>
 		<Scripts>
 			<OnLoad function="EventDescriptionButton_OnLoad" />

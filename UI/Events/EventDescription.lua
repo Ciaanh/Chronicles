@@ -126,37 +126,8 @@ function SetNextButtonText()
     EventDescriptionNext:SetText(">")
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function EventFactionsButton_OnClick(self)
-    DEFAULT_CHAT_FRAME:AddMessage("-- EventFactionsButton_OnClick ")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- EventFactionsButton_OnClick ")
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
 
     if (currentEvent ~= nil and currentEvent.factions and tablelength(currentEvent.factions) > 0) then
@@ -185,7 +156,7 @@ function MapFactionsToItems(factions)
         if (not containsHTML(faction.description)) then
             item.description = faction.description:sub(0, maxDescriptionLength)
         end
-        DEFAULT_CHAT_FRAME:AddMessage("-- MapFactionsToItems " .. item.name .. " " .. item.description)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- MapFactionsToItems " .. item.name .. " " .. item.description)
         table.insert(results, item)
     end
 
@@ -197,7 +168,7 @@ function EventFactionsButton_OnLoad(self)
 end
 
 function EventCharactersButton_OnClick(self)
-    DEFAULT_CHAT_FRAME:AddMessage("-- EventCharactersButton_OnClick ")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- EventCharactersButton_OnClick ")
     -- local charactersList = Chronicles.DB:FindCharacters(event.characters)
 
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
@@ -232,7 +203,7 @@ function MapCharactersToItems(characters)
             item.description = character.description:sub(0, maxDescriptionLength)
         end
 
-        DEFAULT_CHAT_FRAME:AddMessage("-- MapCharactersToItems " .. item.name .. " " .. item.description)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- MapCharactersToItems " .. item.name .. " " .. item.description)
         table.insert(results, item)
     end
 

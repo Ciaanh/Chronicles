@@ -31,6 +31,7 @@ if L then
     L["Biography_Field"] = "Biography"
 
     L["Factions_List"] = "Factions"
+    L["Characters_List"] = "Characters"    
 
     L["ErrorYearAsNumber"] = "A year must be a number"
     L["ErrorYearOrder"] = "Event ends before it's started"
