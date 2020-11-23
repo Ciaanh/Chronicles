@@ -18,6 +18,11 @@ function Chronicles.DB:Init()
     self:RegisterFactionDB("Demo", DemoFactionsDB)
     self:RegisterCharacterDB("Demo", DemoCharactersDB)
 
+
+    self:RegisterEventDB(Chronicles.constants.modules.mythos, MythosEventsDB)
+    self:RegisterFactionDB(Chronicles.constants.modules.mythos, MythosFactionsDB)
+    self:RegisterCharacterDB(Chronicles.constants.modules.mythos, MythosCharactersDB)
+
     -- load data for my journal
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())

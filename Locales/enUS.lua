@@ -38,4 +38,19 @@ if L then
 
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
+
+
+
+     L["mythos"] = "Mythos"
+	 L["beforedarkportal"] = "Before the Dark Portal"
+	 L["threewars"] = "The Three Great Wars"
+	 L["vanilla"] = "Vanilla"
+	 L["burningcrusade"] = "The Burning Crusade"
+	 L["lichking"] = "Wrath of the Lich King"
+	 L["cataclysm"] = "Cataclysm"
+	 L["pandaria"] = "Mists of Pandaria"
+	 L["warlords"] = "Warlords of Draenor"
+	 L["legion"] = "Legion"
+	 L["battleforazeroth"] = "Battle for Azeroth"
+	 L["shadowlands"] = "Shadowlands"
 end
