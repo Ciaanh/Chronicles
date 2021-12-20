@@ -5,21 +5,21 @@
     "data": [{
         "id": "01",
         "name": "Mythos",
-        "Characters": {
-            "DB": "MythosCharactersDB",
-            "Locale": {
+        "characters": {
+            "db": "MythosCharactersDB",
+            "locales": {
                 "enUS": "mythos_characters_enUS"
             }
         },
-        "Events": {
-            "DB": "MythosEventsDB",
-            "Locale": {
+        "events": {
+            "db": "MythosEventsDB",
+            "locales": {
                 "enUS": "mythos_events_enUS"
             }
         },
-        "Factions": {
-            "DB": "MythosFactionsDB",
-            "Locale": {
+        "factions": {
+            "db": "MythosFactionsDB",
+            "locales": {
                 "enUS": "mythos_factions_enUS"
             }
         }
