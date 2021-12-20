@@ -1,28 +1,27 @@
 {
-  "dbRoot": "DB",
-  "localeRoot": "Locales",
-  "data": [
-    {
-      "id": "01",
-      "name": "Mythos",
-      "Characters": {
-        "DB": "MythosCharactersDB",
-        "Locale": {
-          "enUS": "mythos_characters_enUS"
+    "name": "Chronicles",
+    "dbRoot": "DB",
+    "localeRoot": "Locales",
+    "data": [{
+        "id": "01",
+        "name": "Mythos",
+        "Characters": {
+            "DB": "MythosCharactersDB",
+            "Locale": {
+                "enUS": "mythos_characters_enUS"
+            }
+        },
+        "Events": {
+            "DB": "MythosEventsDB",
+            "Locale": {
+                "enUS": "mythos_events_enUS"
+            }
+        },
+        "Factions": {
+            "DB": "MythosFactionsDB",
+            "Locale": {
+                "enUS": "mythos_factions_enUS"
+            }
         }
-      },
-      "Events": {
-        "DB": "MythosEventsDB",
-        "Locale": {
-          "enUS": "mythos_events_enUS"
-        }
-      },
-      "Factions": {
-        "DB": "MythosFactionsDB",
-        "Locale": {
-          "enUS": "mythos_factions_enUS"
-        }
-      }
-    }
-  ]
+    }]
 }
