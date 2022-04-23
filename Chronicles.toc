@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90200
 
 ## Title: Chronicles
 ## Notes: Simple timeline of wow historical events
