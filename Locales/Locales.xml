@@ -4,24 +4,6 @@
 
 	<Script file="enUS.lua"/>
 
-	<Script file="01_Mythos\mythos_events_enUS.lua" />
-	<Script file="01_Mythos\mythos_factions_enUS.lua" />
-	<Script file="01_Mythos\mythos_characters_enUS.lua" />
-
-	<!-- 
-		02_BeforeDarkPortal
-		03_TheThreeWars
-		04_Vanilla
-		05_BurningCrusade
-		06_LichKing
-		07_Cataclysm
-		08_Pandaria
-		09_Warlords
-		10_Legion
-		11_BattleForAzeroth
-		12_Shadowlands 
-	-->
-
 	<Script file="demo_events_enUS.lua"/>
 	<Script file="demo_factions_enUS.lua"/>
 	<Script file="demo_characters_enUS.lua"/>

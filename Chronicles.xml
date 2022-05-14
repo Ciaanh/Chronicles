@@ -1,14 +1,20 @@
-<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ../../FrameXML/UI.xsd" xmlns="http://www.blizzard.com/wow/ui/">
-	
-	<Include file="Libs\Libs.xml"/>
-    <Include file="Locales\Locales.xml"/>
-	
+<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ../../FrameXML/UI.xsd"
+    xmlns="http://www.blizzard.com/wow/ui/">
+
+    <Include file="Libs\Libs.xml"/>
+
     <Script file="Constants.lua"/>
-    
+    <Script file="CustomConstants.lua"/>
+
+    <Include file="Locales\CustomLocales.xml"/>
+    <Include file="Locales\Locales.xml"/>
+
     <Script file="Chronicles.lua"/>
 
+    <Include file="DB\CustomChroniclesDB.xml"/>
     <Include file="DB\ChroniclesDB.xml"/>
 
-	<Include file="UI\ChroniclesUI.xml"/>
+    <Include file="UI\ChroniclesUI.xml"/>
 
 </Ui>
