@@ -18,58 +18,14 @@ function Chronicles.DB:Init()
     self:RegisterFactionDB("Demo", DemoFactionsDB)
     self:RegisterCharacterDB("Demo", DemoCharactersDB)
 
-    self:RegisterEventDB(Chronicles.constants.modules.mythos, MythosEventsDB)
-    self:RegisterFactionDB(Chronicles.constants.modules.mythos, MythosFactionsDB)
-    self:RegisterCharacterDB(Chronicles.constants.modules.mythos, MythosCharactersDB)
-	
-    -- self:RegisterEventDB(Chronicles.constants.modules.beforedarkportal, BeforeDarkPortalEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.beforedarkportal, BeforeDarkPortalFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.beforedarkportal, BeforeDarkPortalCharactersDB)
-	
-    -- self:RegisterEventDB(Chronicles.constants.modules.threewars, ThreeWarsEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.threewars, ThreeWarsFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.threewars, ThreeWarsCharactersDB)
-	
-    -- self:RegisterEventDB(Chronicles.constants.modules.vanilla, VanillaEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.vanilla, VanillaFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.vanilla, VanillaCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.burningcrusade, BCEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.burningcrusade, BCFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.burningcrusade, BCCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.lichking, WOTLKEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.lichking, WOTLKFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.lichking, WOTLKCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.cataclysm, CataclysmEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.cataclysm, CataclysmFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.cataclysm, CataclysmCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.pandaria, MOPEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.pandaria, MOPFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.pandaria, MOPCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.warlords, WODEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.warlords, WODFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.warlords, WODCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.legion, LegionEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.legion, LegionFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.legion, LegionCharactersDB)
-        
-    -- self:RegisterEventDB(Chronicles.constants.modules.battleforazeroth, BFAEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.battleforazeroth, BFAFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.battleforazeroth, BFACharactersDB)
-	
-    -- self:RegisterEventDB(Chronicles.constants.modules.shadowlands, ShadowlandsEventsDB)
-    -- self:RegisterFactionDB(Chronicles.constants.modules.shadowlands, ShadowlandsFactionsDB)
-    -- self:RegisterCharacterDB(Chronicles.constants.modules.shadowlands, ShadowlandsCharactersDB)
-
     -- load data for my journal
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())
     self:RegisterCharacterDB("myjournal", Chronicles.DB:GetMyJournalCharacters())
+
+    if (Chronicles.Custom ~= nil and Chronicles.Custom.DB ~= nil) then
+        Chronicles.Custom.DB:Init()
+    end
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

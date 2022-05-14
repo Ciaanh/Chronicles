@@ -20,6 +20,6 @@
 		12_Shadowlands 
 	-->
 
-	<Script file="CustomChroniclesDB.lua" />
+	<Script file="ChroniclesDB.lua" />
 
 </Ui>
