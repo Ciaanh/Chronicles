@@ -52,13 +52,13 @@ end
 function DisplayEventList(page, force)
     if (page ~= nil) then
         local pageSize = Chronicles.constants.config.eventList.pageSize
-        --DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
         if (Chronicles.UI.EventList.Data ~= nil and Chronicles.UI.EventList.Data.events ~= nil) then
             local eventList = Chronicles.UI.EventList:FilterEvents(Chronicles.UI.EventList.Data.events)
 
             local numberOfEvents = tablelength(eventList)
-            --DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
             if (numberOfEvents > 0) then
                 local maxPageValue = math.ceil(numberOfEvents / pageSize)

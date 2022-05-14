@@ -5,16 +5,14 @@
     <Include file="Libs\Libs.xml"/>
 
     <Script file="Constants.lua"/>
-    <Script file="Custom\Constants.lua"/>
 
-    <Include file="Custom\Locales\Locales.xml"/>
     <Include file="Locales\Locales.xml"/>
+    <Include file="Custom\Locales\Locales.xml"/>
 
     <Script file="Chronicles.lua"/>
 
-    <Include file="Custom\DB\ChroniclesDB.xml"/>
     <Include file="DB\ChroniclesDB.xml"/>
+    <Include file="Custom\DB\ChroniclesDB.xml"/>
 
     <Include file="UI\ChroniclesUI.xml"/>
-
 </Ui>

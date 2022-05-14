@@ -28,5 +28,4 @@ MythosEventsDB = {
 		eventType = 2,
 		timeline = 2
 	},
-	
 }

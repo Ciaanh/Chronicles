@@ -500,7 +500,7 @@ end
 ------------------------------------------------------------------------------------------
 
 function Init_EventType_Dropdown()
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
 
     for key, value in ipairs(Chronicles.constants.eventType) do
         local info = UIDropDownMenu_CreateInfo()
@@ -516,7 +516,7 @@ function Init_EventType_Dropdown()
         info.checked = false
         info.disabled = false
 
-        --DEFAULT_CHAT_FRAME:AddMessage("-- event type " .. info.text .. " " .. info.value)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- event type " .. info.text .. " " .. info.value)
 
         UIDropDownMenu_AddButton(info)
     end
@@ -543,7 +543,7 @@ end
 
 function Set_DropdownValue(self, frame, data)
     local index = self:GetID()
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
     UIDropDownMenu_SetSelectedID(frame, index)
     UIDropDownMenu_SetText(frame, data[index])
 end

@@ -433,7 +433,7 @@ function Chronicles.UI.CharactersView:SetFactionTextToFrame(faction, frame)
     end
     frame:Hide()
     if (faction ~= nil) then
-        --DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
         frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
         frame.faction = faction
         -- frame:SetScript(
