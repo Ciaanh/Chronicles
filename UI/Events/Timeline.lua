@@ -27,7 +27,7 @@ function Chronicles.UI.Timeline:Init()
         }
     )
 
-    TimelineScrollBar:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
+    TimelineScrollBar:SetBackdropColor(0.8, 0.65, 0.39)
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
     Chronicles.UI.Timeline:Refresh()
 end
