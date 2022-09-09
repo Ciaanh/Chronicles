@@ -409,7 +409,7 @@
                                 </KeyValues>
 
                                 <Frames>
-                                    <ScrollFrame name="MyEventsDetailsDescriptionScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                                    <ScrollFrame name="MyEventsDetailsDescriptionScrollFrame" inherits="MultilineInputTemplate">
                                         <Anchors>
                                             <Anchor point="TOP" x="0" y="-5"/>
                                             <Anchor point="RIGHT" x="-5" y="0"/>
@@ -422,7 +422,7 @@
                                             </OnMouseDown>
                                         </Scripts>
                                         <ScrollChild>
-                                            <EditBox name="MyEventsDetailsDescription" letters="500" multiline="true" autoFocus="false">
+                                            <EditBox name="MyEventsDetailsDescription" letters="500" multiline="true" enableMouse="true" autoFocus="false">
                                                 <Size x="390" y="290"/>
                                                 <Anchors>
                                                     <Anchor point="CENTER" />
