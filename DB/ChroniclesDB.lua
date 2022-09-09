@@ -593,17 +593,17 @@ function Chronicles.DB:LoadRolePlayProfile()
     end
 
     if (_G["TRP3_API"]) then
-        local age = Chronicles.DB.RP:TRP_GetAge()
+        local age = tonumber(Chronicles.DB.RP:TRP_GetAge())
         local name = Chronicles.DB.RP:TRP_GetRoleplayingName()
 
         if (age ~= nil and name ~= nil) then
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
+            --DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
             self.RP:RegisterBirth(age, name, "TotalRP")
         end
     end
 
     if (_G["mrp"]) then
-        local age = Chronicles.DB.RP:MRP_GetAge()
+        local age = tonumber(Chronicles.DB.RP:MRP_GetAge())
         local name = Chronicles.DB.RP:MRP_GetRoleplayingName()
 
         if (age ~= nil and name ~= nil) then
