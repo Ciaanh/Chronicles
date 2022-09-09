@@ -1,9 +1,10 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Core
+local modules = Chronicles.Custom.Modules
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-DemoCharactersDB = {
+MythosCharactersDB = {
 	--[[ structure:
 		[characterId] = {
  			id=[integer],				-- Id of the character
@@ -13,5 +14,13 @@ DemoCharactersDB = {
             factions=table[integer], 	-- concerned factions
 		},
 	--]]
-	
+	[1] = {
+		id = 1,
+		name = Locale["Norgannon"],
+		biography = Locale["Norgannon biography"],
+		timeline = 2,
+		factions = {
+			[modules.mythos] = {1},
+		}
+	}
 }

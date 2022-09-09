@@ -22,6 +22,10 @@ function Chronicles.DB:Init()
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())
     self:RegisterCharacterDB("myjournal", Chronicles.DB:GetMyJournalCharacters())
+
+    if (Chronicles.Custom ~= nil and Chronicles.Custom.DB ~= nil) then
+        Chronicles.Custom.DB:Init()
+    end
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -287,7 +291,7 @@ end
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:RegisterEventDB(groupName, db)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Events.")
     else
@@ -305,7 +309,7 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
 end
 
 function Chronicles.DB:RegisterCharacterDB(groupName, db)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Characters[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Characters.")
     else
@@ -323,7 +327,7 @@ function Chronicles.DB:RegisterCharacterDB(groupName, db)
 end
 
 function Chronicles.DB:RegisterFactionDB(groupName, db)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
     if self.Factions[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Factions.")
     else
@@ -480,12 +484,12 @@ function Chronicles.DB:GetGroupStatus(groupName)
 end
 
 function Chronicles.DB:SetEventTypeStatus(eventType, status)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
     Chronicles.storage.global.EventTypesStatuses[eventType] = status
 end
 
 function Chronicles.DB:GetEventTypeStatus(eventType)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- GetEventTypeStatus " .. tostring(eventType))
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- GetEventTypeStatus " .. tostring(eventType))
     local isActive = Chronicles.storage.global.EventTypesStatuses[eventType]
     if (isActive == nil) then
         isActive = true

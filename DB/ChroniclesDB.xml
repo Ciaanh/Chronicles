@@ -5,6 +5,7 @@
 	<Script file="DemoEventsDB.lua" />
 	<Script file="DemoFactionsDB.lua" />
 	<Script file="DemoCharactersDB.lua" />
+
 	<Script file="ChroniclesDB.lua" />
 
 </Ui>

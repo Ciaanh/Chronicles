@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+	<Script file="01_Mythos\mythos_events_enUS.lua" />
+	<Script file="01_Mythos\mythos_factions_enUS.lua" />
+	<Script file="01_Mythos\mythos_characters_enUS.lua" />
+
+	<!-- 
+		02_BeforeDarkPortal
+		03_TheThreeWars
+		04_Vanilla
+		05_BurningCrusade
+		06_LichKing
+		07_Cataclysm
+		08_Pandaria
+		09_Warlords
+		10_Legion
+		11_BattleForAzeroth
+		12_Shadowlands 
+	-->
+</Ui>

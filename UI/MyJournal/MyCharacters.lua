@@ -554,7 +554,7 @@ function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
     end
     frame:Hide()
     if (faction ~= nil) then
-        --DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
         frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
         frame.faction = faction
         -- frame:SetScript(
@@ -893,7 +893,7 @@ function MyCharacterFactions_SearchPreviewButton_OnClick(self)
 end
 
 function MyCharacterFactions_ShowFullSearch()
-    --DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_ShowFullSearch ")
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_ShowFullSearch ")
 
     MyCharacterFactions_UpdateFullSearchResults()
 

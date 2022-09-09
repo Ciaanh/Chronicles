@@ -27,7 +27,7 @@ function Chronicles.UI.Timeline:Init()
         }
     )
 
-    TimelineScrollBar:SetBackdropColor(CreateColor(0.8, 0.65, 0.39))
+    TimelineScrollBar:SetBackdropColor(0.8, 0.65, 0.39)
     ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[1])
     Chronicles.UI.Timeline:Refresh()
 end
@@ -43,7 +43,7 @@ end
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
-    --DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- DisplayTimeline " .. pageIndex)
     Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
     local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
@@ -98,7 +98,7 @@ function GetDisplayableTimeFrames()
     local dateSteps = {}
 
     for i = 1, numberOfCells do
-        local bounds = GetBounds(i, stepValue)
+        local bounds = GetBounds(i, stepValue, numberOfCells)
         dateSteps[i] = {
             lowerBound = bounds.lower,
             upperBound = bounds.upper,
@@ -210,17 +210,19 @@ function GetNumberOfTimelineBlock(stepValue)
     end
 end
 
-function GetBounds(blockIndex, stepValue)
+function GetBounds(blockIndex, stepValue, numberOfCells)
     local details = GetTimelineDetails(stepValue)
 
     local minValue = 0
     local maxValue = 0
 
     if (details.isOverlapping) then
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- is overlaping ")
         local before = details.before
         local after = details.after
 
         if (details.pastEvents == true) then
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- past events ")
             before = before + 1
         end
 
@@ -236,8 +238,20 @@ function GetBounds(blockIndex, stepValue)
             maxValue = ((blockIndex - before) * stepValue) - 1
         end
     else
-        minValue = details.minYear + ((blockIndex - 1) * stepValue) + 1
-        maxValue = details.minYear + (blockIndex * stepValue)
+        if (details.pastEvents == true and blockIndex == 1) then
+            minValue = details.minYear - 2
+            maxValue = details.minYear - 1
+
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- pastEvents " .. blockIndex .. " " .. maxValue .. " " .. minValue)
+        elseif (details.futurEvents == true and blockIndex == numberOfCells) then
+            minValue = details.maxYear + 1
+            maxValue = details.maxYear + 2
+
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- futurEvents " .. blockIndex .. " " .. maxValue .. " " .. minValue)
+        else
+            minValue = details.minYear + ((blockIndex - 1) * stepValue) + 1
+            maxValue = details.minYear + (blockIndex * stepValue)
+        end
     end
 
     if (maxValue > Chronicles.constants.config.currentYear) then
@@ -252,6 +266,7 @@ function GetBounds(blockIndex, stepValue)
         end
     end
 
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- past events " .. maxValue .. " " .. minValue)
     if (maxValue < Chronicles.constants.config.historyStartYear) then
         if (minValue < Chronicles.constants.config.historyStartYear) then
             return {

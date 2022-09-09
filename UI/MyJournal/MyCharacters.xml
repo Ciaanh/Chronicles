@@ -244,7 +244,7 @@
                         </KeyValues>
 
                         <Frames>
-                            <ScrollFrame name="MyCharactersDetailsBiographyScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                            <ScrollFrame name="MyCharactersDetailsBiographyScrollFrame" inherits="MultilineInputTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" x="0" y="-5"/>
                                     <Anchor point="RIGHT" x="-5" y="0"/>
