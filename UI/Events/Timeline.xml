@@ -173,7 +173,7 @@
 
                     <Frame name="TimelineBlock3" inherits="TimelineBlockTemplate" enableMouse="true">
                         <Anchors>
-                            <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlock2"/>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlock2"/>
                         </Anchors>
                     </Frame>
 
@@ -222,7 +222,7 @@
 
                     <Frame name="TimelineBlockNoEvent3" inherits="TimelineBlockNoEventTemplate" enableMouse="true">
                         <Anchors>
-                            <Anchor point="TOPLEFT" enableMouse="true" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent2"/>
+                            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="TimelineBlockNoEvent2"/>
                         </Anchors>
                     </Frame>
 
@@ -264,7 +264,7 @@
                 </Scripts>
             </Frame>
 
-            <Slider name="TimelineScrollBar" parentKey="ScrollBar" orientation="HORIZONTAL" enableMouse="true" enableMouseWheel="true" inherits="BackdropTemplate">
+            <Slider name="TimelineScrollBar" parentKey="ScrollBar" orientation="HORIZONTAL" enableMouse="true" inherits="BackdropTemplate">
                 <Size y="20"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TimelineScrollFrame" />

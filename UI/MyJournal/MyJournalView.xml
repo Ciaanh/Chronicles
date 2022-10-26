@@ -18,7 +18,7 @@
         </Layers>
         <Frames>
 
-            <Button name="MyEventsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
+            <Button name="MyEventsTabButton" inherits="PanelTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="400" y="45"></Anchor>
                 </Anchors>
@@ -26,7 +26,7 @@
                     <OnClick function="MyEventsTabButton_Click"/>
                 </Scripts>
             </Button>
-            <Button name="MyCharactersTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2">
+            <Button name="MyCharactersTabButton" inherits="PanelTabButtonTemplate" parentKey="tab2" id="2">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyEventsTabButton"></Anchor>
                 </Anchors>
@@ -34,7 +34,7 @@
                     <OnClick function="MyCharactersTabButton_Click"/>
                 </Scripts>
             </Button>
-            <Button name="MyFactionsTabButton" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3">
+            <Button name="MyFactionsTabButton" inherits="PanelTabButtonTemplate" parentKey="tab3" id="3">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="MyCharactersTabButton"></Anchor>
                 </Anchors>

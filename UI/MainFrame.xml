@@ -100,7 +100,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="EventsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab1" id="1">
+            <Button name="EventsViewShow" inherits="PanelTabButtonTemplate" parentKey="tab1" id="1">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
                         <Offset>
@@ -113,7 +113,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="CharactersViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab2" id="2">
+            <Button name="CharactersViewShow" inherits="PanelTabButtonTemplate" parentKey="tab2" id="2">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="EventsViewShow"></Anchor>
                 </Anchors>
@@ -122,7 +122,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="FactionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab3" id="3">
+            <Button name="FactionsViewShow" inherits="PanelTabButtonTemplate" parentKey="tab3" id="3">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharactersViewShow"></Anchor>
                 </Anchors>
@@ -131,7 +131,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="OptionsViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab4" id="4">
+            <Button name="OptionsViewShow" inherits="PanelTabButtonTemplate" parentKey="tab4" id="4">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="FactionsViewShow"></Anchor>
                 </Anchors>
@@ -140,7 +140,7 @@
                 </Scripts>
             </Button>
 
-            <Button name="MyJournalViewShow" inherits="CharacterFrameTabButtonTemplate" parentKey="tab5" id="5">
+            <Button name="MyJournalViewShow" inherits="PanelTabButtonTemplate" parentKey="tab5" id="5">
                 <Anchors>
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="OptionsViewShow"></Anchor>
                 </Anchors>

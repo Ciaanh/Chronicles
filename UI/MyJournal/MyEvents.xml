@@ -236,7 +236,7 @@
                         </Layers>
                     </Frame>
 
-                    <Frame parentKey="Fields" inherits="BackdropTemplate" hidde="true">
+                    <Frame parentKey="Fields" inherits="BackdropTemplate" hidden="true">
                         <Size x="490" y="460"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIdContainer" />
@@ -553,7 +553,7 @@
 
 
 
-                    <Frame parentKey="FactionsCharacters" inherits="BackdropTemplate" hidde="true">
+                    <Frame parentKey="FactionsCharacters" inherits="BackdropTemplate" hidden="true">
                         <Size x="490" y="460"/>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIdContainer" />
