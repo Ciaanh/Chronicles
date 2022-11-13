@@ -22,6 +22,7 @@ constants.defaults = {
 constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
 
 constants.eventType = {
+	[0] = "undefined",
 	[1] = "era",
 	[2] = "war",
 	[3] = "battle",
@@ -31,11 +32,11 @@ constants.eventType = {
 }
 
 constants.timelines = {
-	[1] = "undefined",
-	[2] = "main",
-	[3] = "dreanor",
-	[4] = "eot",
-	[5] = "wota"
+	[0] = "undefined",
+	[1] = "main",
+	[2] = "dreanor",
+	[3] = "eot",
+	[4] = "wota"
 }
 
 constants.config = {
