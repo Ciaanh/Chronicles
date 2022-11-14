@@ -23,12 +23,13 @@ constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
 
 constants.eventType = {
 	[0] = "undefined",
-	[1] = "era",
-	[2] = "war",
-	[3] = "battle",
-	[4] = "death",
-	[5] = "birth",
-	[6] = "other"
+	[1] = "event",
+	[2] = "era",
+	[3] = "war",
+	[4] = "battle",
+	[5] = "death",
+	[6] = "birth",
+	[7] = "other"
 }
 
 constants.timelines = {
@@ -40,7 +41,7 @@ constants.timelines = {
 }
 
 constants.config = {
-	currentYear = 33,
+	currentYear = 40,
 	historyStartYear = -150000,
 	timeline = {
 		pageSize = 8

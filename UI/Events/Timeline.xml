@@ -66,6 +66,14 @@
             <Anchor point="TOP" x="0" y="-30" />
         </Anchors>
         <Layers>
+            <Layer level="OVERLAY">
+                <FontString name="TimelineStep" inherits="EventDescriptionDatesFont" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="0" y="0"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+
             <Layer level="ARTWORK">
                 <Texture parentKey="TimelineFrameTopRight" file="Interface\QuestionFrame\Question-Main">
                     <Size x="220" y="42"/>
@@ -156,6 +164,7 @@
                             <TexCoords left="0.00000000" right="1.00000000" top="0.00000000" bottom="1.00000000"/>
                         </Texture>
                     </Layer>
+
                 </Layers>
 
                 <Frames>
@@ -270,6 +279,7 @@
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="TimelineScrollFrame" />
                     <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="TimelineScrollFrame"/>
                 </Anchors>
+
                 <Frames>
 
                     <Button name="TimelinePreviousButton" parentKey="PreviousButton">

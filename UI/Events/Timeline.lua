@@ -5,7 +5,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI.Timeline = {}
 
-Chronicles.UI.Timeline.MaxStepIndex = 3
+Chronicles.UI.Timeline.MaxStepIndex = 8
 
 Chronicles.UI.Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 5, 1}
 Chronicles.UI.Timeline.CurrentStepValue = nil
@@ -47,6 +47,8 @@ function Chronicles.UI.Timeline:DisplayTimeline(pageIndex, force)
     Chronicles.UI.Timeline.TimeFrames = GetDisplayableTimeFrames()
 
     local numberOfCells = tablelength(Chronicles.UI.Timeline.TimeFrames)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfCells " .. numberOfCells)
+
     if (numberOfCells == 0) then
         TimelineScrollBar:SetMinMaxValues(1, 1)
         ChangeCurrentPage(1)
@@ -92,6 +94,7 @@ function GetDisplayableTimeFrames()
     local displayableTimeFrames = {}
     local stepValue = Chronicles.UI.Timeline.CurrentStepValue
 
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- stepValue " .. stepValue)
     local numberOfCells = GetNumberOfTimelineBlock(stepValue)
     -- DEFAULT_CHAT_FRAME:AddMessage("-- Number of cells " .. numberOfCells)
 
@@ -104,6 +107,7 @@ function GetDisplayableTimeFrames()
             upperBound = bounds.upper,
             text = bounds.text
         }
+        -- DEFAULT_CHAT_FRAME:AddMessage("-- cell " .. i .. " " .. bounds.lower .. " " .. bounds.upper)
     end
 
     for j = 1, numberOfCells do
@@ -145,6 +149,17 @@ function GetDisplayableTimeFrames()
 end
 
 function ChangeCurrentStepValue(stepValue)
+    if (stepValue == nil) then
+        stepValue = Chronicles.UI.Timeline.StepValues[1]
+    end
+
+    local stepText = Locale["currentstep"] .. stepValue .. Locale["years"]
+    if (stepValue == 1) then
+        stepText = Locale["currentstep"] .. stepValue .. Locale["year"]
+    end
+
+    TimelineStep:SetText(stepText)
+
     Chronicles.UI.Timeline.CurrentStepValue = stepValue
 end
 
@@ -166,10 +181,14 @@ function GetTimelineDetails(stepValue)
         minYear = Chronicles.constants.config.historyStartYear
         pastEvents = true
     end
+
     if (maxYear > Chronicles.constants.config.currentYear) then
         maxYear = Chronicles.constants.config.currentYear
         futurEvents = true
     end
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- minYear " .. minYear)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- maxYear " .. maxYear)
 
     if (minYear < 0 and maxYear > 0) then
         isOverlapping = true
@@ -193,21 +212,27 @@ function GetTimelineDetails(stepValue)
 end
 
 function GetNumberOfTimelineBlock(stepValue)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- stepValue " .. stepValue)
+
     local details = GetTimelineDetails(stepValue)
 
+    local result = 0
     if (details.isOverlapping) then
-        local result = details.before + details.after
-        if (details.pastEvents == true) then
-            result = result + 1
-        end
-        if (details.futurEvents == true) then
-            result = result + 1
-        end
-        return result
+        result = details.before + details.after
     else
         local length = math.abs(details.minYear - details.maxYear)
-        return math.ceil(length / stepValue)
+        result = math.ceil(length / stepValue)
     end
+
+    if (details.pastEvents == true) then
+        result = result + 1
+    end
+    if (details.futurEvents == true) then
+        result = result + 1
+    end
+
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- NumberOfTimelineBlock " .. stepValue)
+    return result
 end
 
 function GetBounds(blockIndex, stepValue, numberOfCells)
@@ -239,16 +264,15 @@ function GetBounds(blockIndex, stepValue, numberOfCells)
         end
     else
         if (details.pastEvents == true and blockIndex == 1) then
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- pastEvents " .. blockIndex .. " " .. minValue .. " " .. maxValue)
             minValue = details.minYear - 2
             maxValue = details.minYear - 1
-
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- pastEvents " .. blockIndex .. " " .. maxValue .. " " .. minValue)
         elseif (details.futurEvents == true and blockIndex == numberOfCells) then
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- futurEvents " .. blockIndex .. " " .. minValue .. " " .. maxValue)
             minValue = details.maxYear + 1
             maxValue = details.maxYear + 2
-
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- futurEvents " .. blockIndex .. " " .. maxValue .. " " .. minValue)
         else
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- events " .. blockIndex .. " " .. minValue .. " " .. maxValue)
             minValue = details.minYear + ((blockIndex - 1) * stepValue) + 1
             maxValue = details.minYear + (blockIndex * stepValue)
         end
