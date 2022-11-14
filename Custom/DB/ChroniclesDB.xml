@@ -4,24 +4,4 @@
 
 	<Script file="ChroniclesDB.lua" />
 
-	<Script file="01_Mythos\MythosEventsDB.lua" />
-	<Script file="01_Mythos\MythosFactionsDB.lua" />
-	<Script file="01_Mythos\MythosCharactersDB.lua" />
-
-	<!-- 
-		02_BeforeDarkPortal
-		03_TheThreeWars
-		04_Vanilla
-		05_BurningCrusade
-		06_LichKing
-		07_Cataclysm
-		08_Pandaria
-		09_Warlords
-		10_Legion
-		11_BattleForAzeroth
-		12_Shadowlands 
-	-->
-
-
-
 </Ui>

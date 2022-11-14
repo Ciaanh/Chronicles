@@ -14,10 +14,6 @@ RPEventsDB = {}
 function Chronicles.DB:Init()
     self:RegisterEventDB("RP", RPEventsDB)
 
-    self:RegisterEventDB("Demo", DemoEventsDB)
-    self:RegisterFactionDB("Demo", DemoFactionsDB)
-    self:RegisterCharacterDB("Demo", DemoCharactersDB)
-
     -- load data for my journal
     self:RegisterEventDB("myjournal", Chronicles.DB:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.DB:GetMyJournalFactions())

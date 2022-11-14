@@ -4,7 +4,4 @@
 
 	<Script file="enUS.lua"/>
 
-	<Script file="demo_events_enUS.lua"/>
-	<Script file="demo_factions_enUS.lua"/>
-	<Script file="demo_characters_enUS.lua"/>
 </Ui>
