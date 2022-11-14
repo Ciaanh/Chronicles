@@ -69,6 +69,34 @@
         <Color r="1" g=".82" b="0"/>
     </Font>
 
+
+    <FontFamily name="TimelineFontFamily_Medium" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\MORPHEUS.ttf" height="14"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\K_Pagetext.ttf" height="14" spacing="8"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="14"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\blei00d.ttf" height="14"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="14"/>
+        </Member>
+    </FontFamily>
+    <Font name="TimelineStepInfoFont" inherits="TimelineFontFamily_Medium" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
+
     <Font name="ChroniclesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
         <Shadow>
             <Offset>

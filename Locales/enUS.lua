@@ -6,7 +6,7 @@ if L then
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
     L["CurrentYear"] = "Current year is "
-    L["currentstep"] = "Current step is "
+    L["currentstep"] = "Step: "
     L["year"] = " year"
     L["years"] = " years"
     L["AfterDP"] = " after the Dark Portal"

@@ -31,6 +31,7 @@
             </Layer>
         </Layers>
     </Frame>
+
     <Frame name="TimelineBlockNoEventTemplate" enableMouse="true" virtual="true">
         <Size x="85" y="80"/>
         <Layers>
@@ -67,9 +68,9 @@
         </Anchors>
         <Layers>
             <Layer level="OVERLAY">
-                <FontString name="TimelineStep" inherits="EventDescriptionDatesFont" justifyH="CENTER">
+                <FontString name="TimelineStep" inherits="TimelineStepInfoFont" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="0" y="0"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" x="-30" y="5"/>
                     </Anchors>
                 </FontString>
             </Layer>
