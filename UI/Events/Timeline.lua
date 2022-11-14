@@ -430,9 +430,15 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
             frameNoEvent.LabelStart:SetText("")
             frameNoEvent.LabelEnd:SetText("")
         else
-            frameEvent.LabelText:SetText("")
-            frameEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
-            frameEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+            if (dateBlock.lowerBound == dateBlock.upperBound) then
+                frameEvent.LabelText:SetText(dateBlock.lowerBound)
+                frameEvent.LabelStart:SetText("")
+                frameEvent.LabelEnd:SetText("")
+            else
+                frameEvent.LabelText:SetText("")
+                frameEvent.LabelStart:SetText(dateBlock.lowerBound)
+                frameEvent.LabelEnd:SetText(dateBlock.upperBound)
+            end
 
             frameNoEvent.LabelStart:SetText("")
             frameNoEvent.LabelEnd:SetText("")
@@ -466,9 +472,15 @@ function SetDateToBlock(index, frameEvent, frameNoEvent)
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")
 
-            frameNoEvent.LabelText:SetText("")
-            frameNoEvent.LabelStart:SetText("" .. dateBlock.lowerBound)
-            frameNoEvent.LabelEnd:SetText("" .. dateBlock.upperBound)
+            if (dateBlock.lowerBound == dateBlock.upperBound) then
+                frameNoEvent.LabelText:SetText(dateBlock.lowerBound)
+                frameNoEvent.LabelStart:SetText("")
+                frameNoEvent.LabelEnd:SetText("")
+            else
+                frameNoEvent.LabelText:SetText("")
+                frameNoEvent.LabelStart:SetText(dateBlock.lowerBound)
+                frameNoEvent.LabelEnd:SetText(dateBlock.upperBound)
+            end
         end
         frameEvent:SetScript(
             "OnMouseDown",
