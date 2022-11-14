@@ -200,7 +200,7 @@ function MapCharactersToItems(characters)
         }
 
         if (not containsHTML(character.biography)) then
-            item.description = character.description:sub(0, maxDescriptionLength)
+            item.description = character.biography:sub(0, maxDescriptionLength)
         end
 
         -- DEFAULT_CHAT_FRAME:AddMessage("-- MapCharactersToItems " .. item.name .. " " .. item.description)
