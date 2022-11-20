@@ -487,7 +487,8 @@ function MyEventsDetailsSave_Click()
         eventType = MyEventsDetailsTypeDropDown.selectedID,
         timeline = MyEventsDetailsTimelineDropDown.selectedID,
         factions = copyTable(Chronicles.UI.MyEvents.SelectedEvent_Factions),
-        characters = copyTable(Chronicles.UI.MyEvents.SelectedEvent_Characters)
+        characters = copyTable(Chronicles.UI.MyEvents.SelectedEvent_Characters),
+        order = 0
     }
 
     Chronicles.DB:SetMyJournalEvents(event)

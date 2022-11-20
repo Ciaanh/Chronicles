@@ -39,6 +39,9 @@ function Chronicles.UI.EventList:FilterEvents(events)
     table.sort(
         foundEvents,
         function(a, b)
+            if (a.yearStart == b.yearStart) then
+                return a.order < b.order
+            end
             return a.yearStart < b.yearStart
         end
     )
