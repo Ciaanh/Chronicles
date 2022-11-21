@@ -38,7 +38,12 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     EventDescription.CharactersButton:Hide()
 
     EventTitle:SetText(adjustTextLength(event.label, 45, EventTitleContainer))
-    EventDescriptionHTML:SetText(event.description[1])
+    local firstPage = event.description[1]
+    if (firstPage ~= nil) then
+        EventDescriptionHTML:SetText(firstPage)
+    else
+        EventDescriptionHTML:SetText("")
+    end
 
     local eventDates = Locale["start"] .. " : " .. event.yearStart .. "    " .. Locale["end"] .. " : " .. event.yearEnd
     if (event.yearStart == event.yearEnd) then
