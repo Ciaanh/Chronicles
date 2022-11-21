@@ -101,7 +101,6 @@ end
 -- Search events ------------------------------------------------------------------------
 
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
-    local nbFoundEvents = 0
     local foundEvents = {}
 
     if (yearStart <= yearEnd) then
@@ -110,7 +109,6 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
 
             for eventIndex, event in pairs(pluginEvents) do
                 table.insert(foundEvents, self:CleanEventObject(event, groupName))
-                nbFoundEvents = nbFoundEvents + 1
             end
         end
     end
@@ -143,7 +141,7 @@ function Chronicles.DB:CleanEventObject(event, groupName)
     if event then
         local description = event.description or UNKNOWN
 
-        return {
+        local formatedEvent = {
             id = event.id,
             label = event.label,
             yearStart = event.yearStart,
@@ -155,6 +153,14 @@ function Chronicles.DB:CleanEventObject(event, groupName)
             source = groupName,
             order = event.order
         }
+        if (event.order == nil) then
+            formatedEvent.order = 0
+            -- DEFAULT_CHAT_FRAME:AddMessage("-- event " .. tostring(event.id) .. " --")
+            -- DEFAULT_CHAT_FRAME:AddMessage("order: " .. tostring(event.order))
+            -- DEFAULT_CHAT_FRAME:AddMessage("label: " .. tostring(event.label))
+        end
+
+        return formatedEvent
     end
 end
 
@@ -619,7 +625,8 @@ function Chronicles.DB.RP:RegisterBirth(age, name, addon)
         description = {"Birth of " .. name .. " \n\nImported from " .. addon},
         yearStart = birth,
         yearEnd = birth,
-        eventType = 5
+        eventType = 5,
+        order = 0,
     }
     Chronicles.DB:AddRPEvent(event)
 end
