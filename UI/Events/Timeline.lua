@@ -147,10 +147,15 @@ function Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 
         timelineConfig.before = math.ceil((beforeLength) / stepValue)
     end
+
     if (timelineConfig.maxYear > 0) then
         local afterLength = math.abs(timelineConfig.maxYear)
 
         timelineConfig.after = math.ceil((afterLength) / stepValue)
+
+        if (maxYear == Chronicles.constants.config.currentYear and stepValue < Chronicles.constants.config.currentYear) then
+            timelineConfig.after = timelineConfig.after + 1
+        end
     end
 
     -- Define the total number of timeline blocks

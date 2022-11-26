@@ -62,39 +62,17 @@ function Chronicles.DB:GetEventsDates()
         if (isActive) then
             for _, event in pairs(eventsGroup.data) do
                 if (event ~= nil) then
-                    local startProfile = computeDateProfile(self, event.yearStart)
-                    local endProfile = computeDateProfile(self, event.yearEnd)
+                    for i = event.yearStart, event.yearEnd, 1 do
+                        local dateProfile = computeDateProfile(self, i)
 
-                    -- if (event.yearStart == 25 or event.yearStart == -3) then
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod1000 " .. startProfile.mod1000)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod500 " .. startProfile.mod500)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod250 " .. startProfile.mod250)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod100 " .. startProfile.mod100)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod50 " .. startProfile.mod50)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod10 " .. startProfile.mod10)
-                    --     DEFAULT_CHAT_FRAME:AddMessage("-- mod1 " .. startProfile.mod1)
-                    -- end
-
-                    dates.mod1000[startProfile.mod1000] = true
-                    dates.mod1000[endProfile.mod1000] = true
-
-                    dates.mod500[startProfile.mod500] = true
-                    dates.mod500[endProfile.mod500] = true
-
-                    dates.mod250[startProfile.mod250] = true
-                    dates.mod250[endProfile.mod250] = true
-
-                    dates.mod100[startProfile.mod100] = true
-                    dates.mod100[endProfile.mod100] = true
-
-                    dates.mod50[startProfile.mod50] = true
-                    dates.mod50[endProfile.mod50] = true
-
-                    dates.mod10[startProfile.mod10] = true
-                    dates.mod10[endProfile.mod10] = true
-
-                    dates.mod1[startProfile.mod1] = true
-                    dates.mod1[endProfile.mod1] = true
+                        dates.mod1000[dateProfile.mod1000] = true
+                        dates.mod500[dateProfile.mod500] = true
+                        dates.mod250[dateProfile.mod250] = true
+                        dates.mod100[dateProfile.mod100] = true
+                        dates.mod50[dateProfile.mod50] = true
+                        dates.mod10[dateProfile.mod10] = true
+                        dates.mod1[dateProfile.mod1] = true
+                    end
                 end
             end
         end
@@ -231,9 +209,17 @@ function Chronicles.DB:IsInRange(event, yearStart, yearEnd)
     if (yearStart <= event.yearStart and event.yearStart <= yearEnd) then
         return true
     end
+
     if (yearStart <= event.yearEnd and event.yearEnd <= yearEnd) then
         return true
     end
+
+    if (yearStart == yearEnd) then
+        if (event.yearStart <= yearStart and yearStart <= event.yearEnd) then
+            return true
+        end
+    end
+
     return false
 end
 
