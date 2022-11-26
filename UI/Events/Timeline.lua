@@ -195,7 +195,7 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
     local insert = table.insert
     local timelineBlocks = {}
 
-    DEFAULT_CHAT_FRAME:AddMessage("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
+    -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
 
     for blockIndex = 1, timelineConfig.numberOfTimelineBlock do
         local minValue = 0
@@ -247,12 +247,12 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
             end
         end
 
-        if (blockIndex == timelineConfig.numberOfTimelineBlock) then
-            DEFAULT_CHAT_FRAME:AddMessage(
-                "-- blockIndex " .. blockIndex .. "-- minValue " .. minValue .. "-- maxValue " .. maxValue
-            )
-            DEFAULT_CHAT_FRAME:AddMessage("-- lower " .. block.lowerBound .. "-- upper " .. block.upperBound)
-        end
+        -- if (blockIndex == timelineConfig.numberOfTimelineBlock) then
+        --     DEFAULT_CHAT_FRAME:AddMessage(
+        --         "-- blockIndex " .. blockIndex .. "-- minValue " .. minValue .. "-- maxValue " .. maxValue
+        --     )
+        --     DEFAULT_CHAT_FRAME:AddMessage("-- lower " .. block.lowerBound .. "-- upper " .. block.upperBound)
+        -- end
 
         block.hasEvents = Chronicles.UI.Timeline:HasEvents(block)
 
@@ -263,9 +263,9 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
     for j, value in ipairs(timelineBlocks) do
         local nextValue = timelineBlocks[j + 1]
 
-        if (value.lowerBound == 40) then
-            DEFAULT_CHAT_FRAME:AddMessage("-- value.lowerBound " .. value.lowerBound)
-        end
+        -- if (value.lowerBound == 40) then
+        --     DEFAULT_CHAT_FRAME:AddMessage("-- value.lowerBound " .. value.lowerBound)
+        -- end
 
         if (nextValue ~= nil) then
             if (value.hasEvents == true or (value.hasEvents == false and nextValue.hasEvents == true)) then

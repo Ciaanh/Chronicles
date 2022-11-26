@@ -1,6 +1,8 @@
 
 v1.3
-- Populate data
+- Populate basic data for the period before the Dark Portal
+- Fix bugs and performance issue for timeline with 10 or 1 year time period
+- Update for 10.0.2
 
 v1.2
 -  Fix issues for Dragonflight 10.0 release.
