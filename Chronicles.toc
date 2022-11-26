@@ -4,7 +4,7 @@
 ## Notes: Simple timeline of wow historical events
 
 ## Author: ciaanh
-## Version: v1.3
+## Version: v1.3.1
 ## DefaultState: enabled
 ## SavedVariables: ChroniclesDB
 ## OptionalDeps: totalRP3, MyRolePlay
