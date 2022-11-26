@@ -330,7 +330,7 @@
                         self.scrollStep = 1;
                     </OnLoad>
                     <OnValueChanged>
-                        DisplayTimeline(adjust_value(value, self.scrollStep));
+                        TimelineScrollBar_OnValueChanged(value, self.scrollStep);
                     </OnValueChanged>
                 </Scripts>
             </Slider>

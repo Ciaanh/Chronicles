@@ -18,7 +18,6 @@ function Chronicles.UI.EventList:Init()
 end
 
 function Chronicles.UI.EventList:Refresh()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Refresh event list " .. Chronicles.UI.Timeline.CurrentPage)
     Chronicles.UI.EventList:HideAll()
     Chronicles.UI.EventList:WipeAll()
 end
@@ -49,24 +48,16 @@ function Chronicles.UI.EventList:FilterEvents(events)
 end
 
 function Chronicles.UI.EventList:DisplayEventList(page, force)
-    DisplayEventList(page, force)
-end
-
-function DisplayEventList(page, force)
     if (page ~= nil) then
         local pageSize = Chronicles.constants.config.eventList.pageSize
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- asked page " .. page)
 
         if (Chronicles.UI.EventList.Data ~= nil and Chronicles.UI.EventList.Data.events ~= nil) then
             local eventList = Chronicles.UI.EventList:FilterEvents(Chronicles.UI.EventList.Data.events)
-
             local numberOfEvents = tablelength(eventList)
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfEvents " .. numberOfEvents)
 
             if (numberOfEvents > 0) then
                 local maxPageValue = math.ceil(numberOfEvents / pageSize)
                 EventListScrollBar:SetMinMaxValues(1, maxPageValue)
-                -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue .. " asked page " .. page)
 
                 if (page > maxPageValue) then
                     page = maxPageValue
@@ -133,6 +124,10 @@ function DisplayEventList(page, force)
     end
 end
 
+function DisplayEventList(page, force)
+    Chronicles.UI.EventList:DisplayEventList(page, force)
+end
+
 function Chronicles.UI.EventList:HideAll()
     EventListBlock1:Hide()
     EventListBlock2:Hide()
@@ -178,13 +173,10 @@ function Chronicles.UI.EventList:WipeAll()
 end
 
 function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventList)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to SetEventListData " .. lowerBound .. " " .. upperBound)
-
     if (eventList == nil) then
         self:HideAll()
         self:WipeAll()
     else
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetEventListData numberOfEvents " .. numberOfEvents)
         local numberOfEvents = tablelength(eventList)
 
         if (numberOfEvents == 0) then
@@ -203,24 +195,12 @@ function Chronicles.UI.EventList:SetEventListData(lowerBound, upperBound, eventL
     end
 end
 
---[[ structure:
-    [eventId] = {
-        id=[integer],				-- Id of the event
-        label=[string], 			-- label: text that'll be the label
-        description=table[string], 	-- description: text that give informations about the event
-        yearStart=[integer],		-- 
-        yearEnd=[integer],			-- 
-        eventType=[string],			-- type of event defined in constants
-    },
---]]
 function Chronicles.UI.EventList:SetTextToFrame(event, frame)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Render frame")
     if (frame.event ~= nil) then
         frame.event = nil
     end
     frame:Hide()
     if (event ~= nil) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- event not nil " .. event.label)
         local label = _G[frame:GetName() .. "Text"]
         label:SetText(event.label)
 
