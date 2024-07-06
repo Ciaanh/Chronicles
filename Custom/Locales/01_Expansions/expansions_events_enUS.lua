@@ -44,3 +44,7 @@ local L = AceLocale:NewLocale("Chronicles", "enUS", true, true)
         L["22_dragonflight"] = "Dragonflight"
 
         L["23_dragonflight"] = "Dragonflight"
+
+        L["205_the_war_within"] = "The War Within"
+
+        L["206_the_war_within"] = "The War Within"

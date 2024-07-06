@@ -66,6 +66,13 @@ function Chronicles:OnInitialize()
         end
     )
 
+    self:RegisterChatCommand(
+        "ct",
+        function()
+            self.UITest:DisplayWindow()
+        end
+    )
+
     Chronicles.UI.EventFilter:Init()
     Chronicles.DB:Init()
     Chronicles.UI:Init()

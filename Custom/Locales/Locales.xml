@@ -3,4 +3,5 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
     <Script file="01_Expansions\expansions_events_enUS.lua" />
     <Script file="02_Origins\origins_events_enUS.lua" />
+    <Script file="15_Warwithin\warwithin_events_enUS.lua" />
 </Ui>

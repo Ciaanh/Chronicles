@@ -15,4 +15,5 @@
     <Include file="Custom\DB\ChroniclesDB.xml"/>
 
     <Include file="UI\ChroniclesUI.xml"/>
+    <Include file="test-ui\ChroniclesUI.xml"/>
 </Ui>

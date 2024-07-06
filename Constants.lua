@@ -41,7 +41,7 @@ constants.timelines = {
 }
 
 constants.config = {
-	currentYear = 40,
+	currentYear = 42,
 	historyStartYear = -150000,
 	timeline = {
 		pageSize = 8

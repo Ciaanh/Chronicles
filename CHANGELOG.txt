@@ -1,3 +1,5 @@
+v2.0
+- redesign UI using The War Within assets
 
 v1.3
 - Populate basic data for the period before the Dark Portal
