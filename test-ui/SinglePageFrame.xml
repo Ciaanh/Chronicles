@@ -1,21 +1,25 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+	<Script file="SinglePageFrame.lua"/>
 
-
-	<Frame name="SinglePageFrameTemplate" virtual="true">
+	<Frame name="SinglePageFrameTemplate" mixin="SinglePageFrameMixin" virtual="true">
+		<!-- <KeyValues>
+			<KeyValue key="view1YOffset" value="-65" type="number" />
+			<KeyValue key="view1MinimizedXOffset" value="75" type="number" />
+		</KeyValues> -->
 		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="1">
 				<Texture parentKey="BookBGHalved" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
 					<Anchors>
-						<Anchor point="TOPLEFT" y="0"/>
+						<Anchor point="TOPLEFT"/>
 						<Anchor point="BOTTOMRIGHT"/>
 					</Anchors>
 				</Texture>
 			</Layer>
 			<Layer level="BACKGROUND" textureSubLevel="2">
-				<Texture parentKey="BookCornerFlipbook" atlas="spellbook-corner-flipbook-evergreen" useAtlasSize="false">
-					<Size x="150" y="155"/>
+				<Texture parentKey="SinglePageBookCornerFlipbook" atlas="spellbook-corner-flipbook-evergreen" useAtlasSize="false">
+					<Size x="75" y="77"/>
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" x="-15" y="6"/>
 					</Anchors>
@@ -26,32 +30,32 @@
 					</Animations>
 				</Texture>
 			</Layer>
+
 		</Layers>
 		<Frames>
 			<Frame parentKey="PagedSinglePageFrame" inherits="PagedCondensedVerticalGridContentFrameTemplate">
 				<KeyValues>
-					<KeyValue key="viewsPerPage" value="2" type="number"/>
+					<KeyValue key="viewsPerPage" value="1" type="number"/>
 					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
-					<KeyValue key="spacerSize" value="20" type="number"/>
 					<KeyValue key="xPadding" value="15" type="number"/>
-					<KeyValue key="yPadding" value="10" type="number"/>
-					<KeyValue key="columnsPerRow" value="3" type="number"/>
+					<KeyValue key="columnsPerRow" value="1" type="number"/>
 					<KeyValue key="autoExpandElements" value="true" type="boolean"/>
+					<KeyValue key="viewWidth" value="500" type="number"/>
 				</KeyValues>
 				<Anchors>
-					<Anchor point="TOPLEFT" y="-50"/>
-					<Anchor point="BOTTOMRIGHT"/>
+					<Anchor point="TOPLEFT" x="50" y="-50"/>
+					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
 				</Anchors>
 				<Frames>
 					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-						<Size x="680" y="650"/>
 						<Anchors>
-							<Anchor point="TOPLEFT" x="75" y="-65" />
+							<Anchor point="TOPLEFT" />
+							<Anchor point="BOTTOMRIGHT" />
 						</Anchors>
 					</Frame>
 					<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
 						<Anchors>
-							<Anchor point="BOTTOMRIGHT" x="-75" y="40"/>
+							<Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
 						</Anchors>
 						<KeyValues>
 							<KeyValue key="fontName" value="SystemFont_Med3" type="string" />
@@ -64,5 +68,11 @@
 				</Frames>
 			</Frame>
 		</Frames>
+		<Scripts>
+			<OnLoad method="OnLoad"/>
+			<OnShow method="OnShow"/>
+			<OnHide method="OnHide"/>
+			<OnEvent method="OnEvent"/>
+		</Scripts>
 	</Frame>
 </Ui>

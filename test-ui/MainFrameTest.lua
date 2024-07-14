@@ -5,25 +5,11 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UITest = {}
 function Chronicles.UITest:DisplayWindow()
-	-- if DISALLOW_FRAME_TOGGLING then
-	-- 	return
-	-- end
-
-	-- CheckLoadPlayerSpellsFrame()
-
 	local alreadyShowing = MainFrameTest:IsShown()
 
 	if alreadyShowing then
 		HideUIPanel(MainFrameTest)
 	else
-		-- SetOrClearInspectUnit(inspectUnit)
-
-		-- if MainFrameTest:TrySetTab(PlayerSpellsUtil.FrameTabs.SpellBook) then
-		-- 	if not spellBookCategory or PlayerSpellsFrame.SpellBookFrame:TrySetCategory(spellBookCategory) then
-		-- 		ShowUIPanel(PlayerSpellsFrame)
-		-- 	end
-		-- end
-
 		ShowUIPanel(MainFrameTest)
 	end
 end
@@ -41,6 +27,11 @@ MainFrameTestUtil.FrameTabs = {
 	Third = 3
 }
 
+function MainFrameTestMixin:OnCustomEvent(arg1, arg2)
+	print(arg1)
+	print(arg2)
+end
+
 function MainFrameTestMixin:OnLoad()
 	TabSystemOwnerMixin.OnLoad(self)
 	self:SetTabSystem(self.TabSystem)
@@ -55,6 +46,8 @@ function MainFrameTestMixin:OnLoad()
 	}
 
 	--self:SetFrameLevelsFromBaseLevel(5000)
+
+	EventRegistry:RegisterCallback("Chronicles.MyCustomEvent", self.OnCustomEvent, self)
 end
 
 function MainFrameTestMixin:OnShow()
@@ -71,9 +64,6 @@ function MainFrameTestMixin:OnHide()
 end
 
 function MainFrameTestMixin:OnEvent(event)
-	-- if event == "PLAYER_SPECIALIZATION_CHANGED" then
-	-- 	self:UpdateTabs();
-	-- end
 end
 
 function MainFrameTestMixin:UpdateTabs()
@@ -92,12 +82,12 @@ function MainFrameTestMixin:UpdateTabs()
 end
 
 function MainFrameTestMixin:SetToDefaultAvailableTab()
-	if (self:IsTabAvailable(self.firstTabID)) then
-		self:SetTab(self.firstTabID)
+	if (self:IsTabAvailable(self.thirdTabID)) then
+		self:SetTab(self.thirdTabID)
 	elseif (self:IsTabAvailable(self.secondTabID)) then
 		self:SetTab(self.secondTabID)
-	elseif (self:IsTabAvailable(self.thirdTabID)) then
-		self:SetTab(self.thirdTabID)
+	elseif (self:IsTabAvailable(self.firstTabID)) then
+		self:SetTab(self.firstTabID)
 	else
 		self:SetTab(self.firstTabID)
 	end

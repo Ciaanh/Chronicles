@@ -1,6 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
+    <Script file="CharactersView.lua"/>
+
+
     <Frame name="CharactersView" parent="MainFrame" hidden="true">
         <Size x="740" y="540"/>
         <Anchors>
@@ -374,7 +377,7 @@
                             </Frame>
 
 
-                             <Frame name="CharacterFactionsBlock5" inherits="TextListItemTemplate">
+                            <Frame name="CharacterFactionsBlock5" inherits="TextListItemTemplate">
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="CharacterFactionsBlock1" y="-5"/>
                                 </Anchors>
@@ -432,42 +435,6 @@
                     </Slider>
                 </Frames>
             </Frame>
-
-            <!-- <Button name="CharacterFactionsPrevious">
-                        <Size>
-                            <AbsDimension x="32" y="32"/>
-                        </Size>
-                        <Anchors>
-                            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="CharacterFactionsContainer" x="0" y="0" />
-                        </Anchors>
-                        <Scripts>
-                            <OnClick function="CharacterFactionsPrevious_OnClick"/>
-                        </Scripts>
-                        <NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
-                        <PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
-                        <DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-                    </Button>
-
-                    <Button name="CharacterFactionsNext">
-                        <Size>
-                            <AbsDimension x="32" y="32"/>
-                        </Size>
-                        <Anchors>
-                            <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="CharacterFactionsPrevious" x="50" y="0" />
-                        </Anchors>
-                        <Scripts>
-                            <OnClick function="CharacterFactionsNext_OnClick"/>
-                        </Scripts>
-                        <NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
-                        <PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
-                        <DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
-                        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
-                    </Button>
-            -->
-
-
-
         </Frames>
     </Frame>
 </Ui>

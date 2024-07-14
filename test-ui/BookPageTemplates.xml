@@ -1,0 +1,83 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+    <Script file="BookPageTemplates.lua"/>
+
+    <Frame name="ChapterHeaderTemplate" mixin="ChapterHeaderMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="50"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="SystemFont_Huge2" setAllPoints="true" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="10" y="-5"/>
+                        <Anchor point="TOPRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+                <Texture parentKey="Border" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size y="10"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="10" y="5"/>
+                        <Anchor point="BOTTOMRIGHT" x="-10"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="ChapterLineTemplate" mixin="ChapterLineMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="25"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-5"/>
+                        <Anchor point="TOPRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="HtmlPageTemplate" mixin="HtmlPageMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="500"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Frames>
+            <ScrollFrame parentKey="ScrollFrame"  mixin="ScrollFrameMixin">
+                <KeyValues>
+                    <KeyValue key="scrollOnMouse" value="false" type="boolean"/>
+                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarX" value="14" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-25" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="25" type="number"/>
+                </KeyValues>
+                <Size x="500" y="480"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-20" />
+                </Anchors>
+                <ScrollChild>
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true">
+                        <Size x="500" y="480" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <FontString inherits="SystemFont_Med3"/>
+                    </SimpleHTML>
+                </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+</Ui>

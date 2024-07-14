@@ -29,14 +29,8 @@ function Chronicles.UI.CharactersView:Init()
 
     Chronicles.UI.CharactersView:CleanSelectedCharacter()
 
-    Chronicles.UI.CharactersView:InitLocales()
-end
-
-function Chronicles.UI.CharactersView:InitLocales()
     CharactersView.Title:SetText(Locale["Characters"])
-
     CharacterTimelineLabel:SetText(Locale["Timeline_Field"] .. " :")
-
     CharacterFactionsLabel:SetText(Locale["Factions_List"] .. " :")
 end
 

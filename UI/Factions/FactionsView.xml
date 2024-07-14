@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 
+    <Script file="FactionsView.lua"/>
+
     <Frame name="FactionsView" parent="MainFrame" hidden="true">
         <Size x="740" y="540"/>
         <Anchors>

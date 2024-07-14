@@ -2,8 +2,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
     <Script file="MainFrameTest.lua"/>
 
-
-
     <Frame name="MainFrameTest" mixin="MainFrameTestMixin" inherits="DefaultPanelFlatTemplate, TabSystemOwnerTemplate" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
         <Size x="1618" y="883"/>
         <Anchors>
@@ -12,11 +10,11 @@
         <Frames>
             <Button name="CloseButton" inherits="UIPanelCloseButtonDefaultAnchors"/>
 
-            <Frame parentKey="MaximizeMinimizeButton" inherits="MaximizeMinimizeButtonFrameTemplate" frameLevel="5510">
+            <!-- <Frame parentKey="MaximizeMinimizeButton" inherits="MaximizeMinimizeButtonFrameTemplate" frameLevel="5510">
                 <Anchors>
                     <Anchor point="RIGHT" relativeTo="CloseButton" relativePoint="LEFT" x="0" y="0"/>
                 </Anchors>
-            </Frame>
+            </Frame> -->
 
             <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
                 <KeyValues>
@@ -32,12 +30,12 @@
             <Frame parentKey="TestFrame" frameLevel="100" hidden="true">
                 <Size x="1612" y="856"/>
                 <Anchors>
-                    <Anchor point="BOTTOM" x="0" y="4"/>
+                    <Anchor point="BOTTOM" x="2" y="4"/>
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND" textureSubLevel="0">
                         <Texture parentKey="BlackBG" setAllPoints="true">
-                            <Color r="0.0" g="0.0" b="0.0"/>
+                            <Color r="255.0" g="0.0" b="0.0"/>
                         </Texture>
                     </Layer>
                 </Layers>
@@ -46,7 +44,7 @@
             <Frame parentKey="BookFrame" inherits="BookFrameTemplate" frameLevel="100" hidden="true">
                 <Size x="1612" y="856"/>
                 <Anchors>
-                    <Anchor point="BOTTOM" x="0" y="4"/>
+                    <Anchor point="BOTTOM" x="2" y="4"/>
                 </Anchors>
                 <Frames>
 
@@ -54,9 +52,9 @@
             </Frame>
 
             <Frame parentKey="SinglePageFrame" inherits="SinglePageFrameTemplate" frameLevel="100" hidden="true">
-                <Size x="604" y="642"/>
+                <Size x="600" y="650"/>
                 <Anchors>
-                    <Anchor point="BOTTOM" x="0" y="4"/>
+                    <Anchor point="BOTTOM" y="100"/>
                 </Anchors>
                 <Frames>
 

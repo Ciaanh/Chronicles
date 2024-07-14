@@ -1,5 +1,3 @@
-local _G = getfenv(0)
-
 local FOLDER_NAME, private = ...
 private.addon_name = "Chronicles"
 

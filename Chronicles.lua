@@ -1,11 +1,10 @@
 local FOLDER_NAME, private = ...
 
--- Init libs ---------------------------------------------------------------------------
-local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-local Icon = LibStub("LibDBIcon-1.0")
-
 local Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
 private.Core = Chronicles
+
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
+local Icon = LibStub("LibDBIcon-1.0")
 
 -----------------------------------------------------------------------------------------
 -- Init ---------------------------------------------------------------------------------
@@ -73,6 +72,13 @@ function Chronicles:OnInitialize()
         end
     )
 
+    self:RegisterChatCommand(
+        "ct2",
+        function()
+            self.UITest2:DisplayWindow()
+        end
+    )
+
     Chronicles.UI.EventFilter:Init()
     Chronicles.DB:Init()
     Chronicles.UI:Init()
@@ -89,102 +95,6 @@ end
 
 function get_locale(value)
     return Locale[value]
-end
-
-function adjust_value(value, step)
-    local valueFloor = math.floor(value)
-    local valueMiddle = valueFloor + (step / 2)
-
-    if (value < valueMiddle) then
-        return valueFloor
-    end
-    return valueFloor + step
-end
-
-function tablelength(T)
-    if (T == nil) then
-        return 0
-    end
-
-    local count = 0
-    for _ in pairs(T) do
-        count = count + 1
-    end
-    return count
-end
-
-function copyTable(tableToCopy)
-    if (tableToCopy == nil) then
-        return {}
-    end
-
-    local orig_type = type(tableToCopy)
-    local copy
-    if orig_type == "table" then
-        copy = {}
-        for orig_key, orig_value in pairs(tableToCopy) do
-            local orig_value_type = type(orig_value)
-            if (orig_value_type == "table") then
-                copy[orig_key] = copyTable(orig_value)
-            else
-                copy[orig_key] = orig_value
-            end
-        end
-    else -- number, string, boolean, etc
-        copy = tableToCopy
-    end
-    return copy
-end
-
-function adjustTextLength(text, size, frame)
-    local adjustedText = text
-    if (text:len() > size) then
-        adjustedText = text:sub(0, size)
-
-        frame:SetScript(
-            "OnEnter",
-            function()
-                GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMRIGHT", -5, 30)
-                GameTooltip:SetText(text, nil, nil, nil, nil, true)
-            end
-        )
-        frame:SetScript(
-            "OnLeave",
-            function()
-                GameTooltip:Hide()
-            end
-        )
-    else
-        frame:SetScript(
-            "OnEnter",
-            function()
-            end
-        )
-        frame:SetScript(
-            "OnLeave",
-            function()
-            end
-        )
-    end
-    return adjustedText
-end
-
-function cleanHTML(text)
-    if (text ~= nil) then
-        text = string.gsub(text, "||", "|")
-        text = string.gsub(text, "\\\\", "\\")
-    else
-        text = ""
-    end
-    return text
-end
-
-function containsHTML(text)
-    if (string.lower(text):find("<html>") == nil) then
-        return false
-    else
-        return true
-    end
 end
 
 -----------------------------------------------------------------------------------------

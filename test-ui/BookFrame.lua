@@ -5,51 +5,30 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UITest = {}
 
-local function GenerateClosureInternal(generatorArray, f, ...)
-	local count = select("#", ...);
-	local generator = generatorArray[count + 1];
-	if generator then
-		return generator(f, ...);
-	end
-
-	assertsafe("Closure generation does not support more than " .. (#generatorArray - 1) .. " parameters");
-	return nil;
-end
-
--- Syntactic sugar for function(...) return f(a, b, c, ...); end
-function GenerateClosure(f, ...)
-	return GenerateClosureInternal(s_passThroughClosureGenerators, f, ...);
-end
-
 -----------------------------------------------------------------------------------------
 -- UI Fonctions -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 BookFrameMixin = {}
+local Templates = {
+	["HEADER"] = {template = "SimpleHTML"},
+	["CONTENT"] = {template = "SimpleHTML"}
+}
+
+function BookFrameMixin:GetContent()
+	dataGroup.header = {
+		templateKey = "HEADER",
+		text = "Toto"
+	}
+
+	dataGroup.elements = {
+		templateKey = "CONTENT",
+		text = "Content of the page"
+	}
+end
 
 function BookFrameMixin:OnLoad()
-	-- TabSystemOwnerMixin.OnLoad(self);
-	-- self:SetTabSystem(self.CategoryTabSystem);
-
-	-- self.categoryMixins = {
-	-- 	CreateAndInitFromMixin(SpellBookClassCategoryMixin, self);
-	-- 	CreateAndInitFromMixin(SpellBookGeneralCategoryMixin, self);
-	-- 	CreateAndInitFromMixin(SpellBookPetCategoryMixin, self);
-	-- };
-
-	-- for _, categoryMixin in ipairs(self.categoryMixins) do
-	-- 	categoryMixin:SetTabID(self:AddNamedTab(categoryMixin:GetName()));
-	-- end
-
-	-- self.PagedBookFrame:SetElementTemplateData(Templates);
+	self.PagedBookFrame:SetElementTemplateData(Templates)
 	-- self.PagedBookFrame:RegisterCallback(PagedContentFrameBaseMixin.Event.OnUpdate, self.OnPagedSpellsUpdate, self);
-
-	-- local initialHidePassives = GetCVarBool("spellBookHidePassives");
-	-- local isUserInput = false;
-	-- self.HidePassivesCheckButton:SetControlChecked(initialHidePassives, isUserInput);
-	-- self.HidePassivesCheckButton:SetCallback(GenerateClosure(self.OnHidePassivesToggled, self));
-
-	-- FrameUtil.RegisterFrameForEvents(self, SpellBookLifetimeEvents);
-	-- EventRegistry:RegisterCallback("ClickBindingFrame.UpdateFrames", self.OnClickBindingUpdate, self);
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
@@ -57,15 +36,14 @@ function BookFrameMixin:OnLoad()
 
 	-- Start the page corner flipbook to sit on its first frame while not playing
 	self.BookCornerFlipbook.Anim:Play()
-	self.BookCornerFlipbook.Anim:Pause()
+	--self.BookCornerFlipbook.Anim:Pause()
 
 	-- SpellBookFrameTutorialsMixin.OnLoad(self);
 	-- self:InitializeSearch();
 
-		self.PagedSpellsFrame.ViewFrames[2]:Show();
-		self.PagedSpellsFrame.ViewFrames[1]:SetPoint("TOPLEFT", self.view1MaximizedXOffset, self.view1YOffset);
-		self.PagedSpellsFrame:SetViewsPerPage(2, true);
-
+	self.PagedBookFrame.ViewFrames[2]:Show()
+	--self.PagedBookFrame.ViewFrames[1]:SetPoint("TOPLEFT", self.view1MaximizedXOffset, self.view1YOffset)
+	self.PagedBookFrame:SetViewsPerPage(2, true)
 end
 
 function BookFrameMixin:OnShow()

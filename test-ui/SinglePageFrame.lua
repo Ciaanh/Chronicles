@@ -5,28 +5,81 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UITest = {}
 
-local function GenerateClosureInternal(generatorArray, f, ...)
-	local count = select("#", ...);
-	local generator = generatorArray[count + 1];
-	if generator then
-		return generator(f, ...);
-	end
-
-	assertsafe("Closure generation does not support more than " .. (#generatorArray - 1) .. " parameters");
-	return nil;
-end
-
--- Syntactic sugar for function(...) return f(a, b, c, ...); end
-function GenerateClosure(f, ...)
-	return GenerateClosureInternal(s_passThroughClosureGenerators, f, ...);
-end
-
 -----------------------------------------------------------------------------------------
 -- UI Fonctions -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 SinglePageFrameMixin = {}
+local Templates = {
+	["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
+	["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
+	["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init},
+}
+
+local textToDisplay =
+	"The orcs begin launching sporadic attacks against draenei hunting parties. \nThe draenei, assuming that the orcs have simply been agitated by the elemental turmoil, begin organizing and constructing new defenses.\n\nNer'zhul's apprehension about the war with the draenei grows. \nKil'jaeden appears to him in the form of Rulkan and tells him of powerful beings who could aid the orcs, and the night after Kil'jaeden appears again as a radiant elemental entity and urges him to push the Horde to victory and exterminate the draenei. \n\nNer'zhul secretly embarks on a journey to Oshu'gun to seek the guidance of the ancestors, but Kil'jaeden is aware of his plans and tells Gul'dan to gather allies to control the Shadowmoon, since Ner'zhul can no longer be relied upon. Gul'dan recruits Teron'gor and several other shaman and begin teaching them fel magic.\n\nAt Oshu'gun, the real Rulkan and the other ancestors tell Ner'zhul that he was being manipulated by Kil'jaeden and condemn the shaman for having been used by the demon lord. \n\nNer'zhul falls into despair and is captured by Gul'dan's followers, who treat him as little more than a slave.\nThe orcs begin launching sporadic attacks against draenei hunting parties. \nThe draenei, assuming that the orcs have simply been agitated by the elemental turmoil, begin organizing and constructing new defenses."
+
+local textToDisplayHTML =
+	'<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'
+
+local textToDisplayHTMLlong =
+	'<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'
+
+function SinglePageFrameMixin:GetItemData()
+	local returnData = {}
+
+	-- for each chapter
+	-- for _, spellGroup in ipairs(self.spellGroups) do
+	local dataGroup = {elements = {}}
+
+	dataGroup.header = {
+		templateKey = "HEADER",
+		text = "Chapter title"
+	}
+
+	local texts = {
+		textToDisplay,
+		textToDisplayHTML,
+		textToDisplayHTMLlong
+	}
+
+	for key, text in pairs(texts) do
+		if (containsHTML(text)) then
+			table.insert(
+				dataGroup.elements,
+				{
+					templateKey = "HTMLCONTENT",
+					text = cleanHTML(text)
+				}
+			)
+		else
+			-- transform text => adjust line to width
+			-- then for each line add itemEntry
+			local lines = SplitTextToFitWidth(textToDisplay, 400)
+			for i, value in ipairs(lines) do
+				local line = {
+					templateKey = "TEXTCONTENT",
+					text = value
+				}
+
+				table.insert(dataGroup.elements, line)
+			end
+		end
+	end
+	table.insert(returnData, dataGroup)
+
+	return returnData
+end
 
 function SinglePageFrameMixin:OnLoad()
+	print("OnLoad")
+	self.PagedSinglePageFrame:SetElementTemplateData(Templates)
+
+	local data = self.GetItemData()
+
+	local categoryDataProvider = CreateDataProvider(data)
+	self.PagedSinglePageFrame:SetDataProvider(categoryDataProvider, not resetCurrentPage)
+	-- self.PagedSinglePageFrame:RegisterCallback(PagedContentFrameBaseMixin.Event.OnUpdate, self.OnPagedSpellsUpdate, self);
+
 	-- TabSystemOwnerMixin.OnLoad(self);
 	-- self:SetTabSystem(self.CategoryTabSystem);
 
@@ -56,21 +109,20 @@ function SinglePageFrameMixin:OnLoad()
 	self.PagedSinglePageFrame.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
 
 	-- Start the page corner flipbook to sit on its first frame while not playing
-	self.BookCornerFlipbook.Anim:Play()
-	self.BookCornerFlipbook.Anim:Pause()
+	self.SinglePageBookCornerFlipbook.Anim:Play()
+	self.SinglePageBookCornerFlipbook.Anim:Pause()
 
 	-- SpellBookFrameTutorialsMixin.OnLoad(self);
 	-- self:InitializeSearch();
 
-		self.PagedSpellsFrame.ViewFrames[1]:SetPoint("TOPLEFT", self.view1MinimizedXOffset, self.view1YOffset);
-		self.PagedSpellsFrame:SetViewsPerPage(1, true);
-		self.PagedSpellsFrame.ViewFrames[2]:Hide();
+	--self.PagedSinglePageFrame.ViewFrames[1]:SetPoint("TOPLEFT", self.view1MinimizedXOffset, self.view1YOffset)
+	self.PagedSinglePageFrame:SetViewsPerPage(1, true)
 
-		self.SearchBox:ClearAllPoints();
-		self.SearchBox:SetPoint("RIGHT", self.HidePassivesCheckButton, "LEFT", -15, 0);
-		self.SearchBox:SetPoint("LEFT", self.CategoryTabSystem, "RIGHT", 10, 10);
+	-- self.SearchBox:ClearAllPoints()
+	-- self.SearchBox:SetPoint("RIGHT", self.HidePassivesCheckButton, "LEFT", -15, 0)
+	-- self.SearchBox:SetPoint("LEFT", self.CategoryTabSystem, "RIGHT", 10, 10)
 
-		self:SetWidth(self.minimizedWidth);
+	-- self:SetWidth(self.minimizedWidth)
 end
 
 function SinglePageFrameMixin:OnShow()
@@ -172,10 +224,10 @@ end
 -- end
 
 function SinglePageFrameMixin:OnPagingButtonEnter()
-	self.BookCornerFlipbook.Anim:Play()
+	self.SinglePageBookCornerFlipbook.Anim:Play()
 end
 
 function SinglePageFrameMixin:OnPagingButtonLeave()
 	local reverse = true
-	self.BookCornerFlipbook.Anim:Play(reverse)
+	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
