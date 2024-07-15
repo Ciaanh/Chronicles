@@ -5,6 +5,7 @@
     <Include file="Libs\_Includes.xml"/>
 
     <Script file="Constants.lua"/>
+    <Script file="Events.lua"/>
     <Script file="Functions.lua"/>
     
     <Include file="Locales\Locales.xml"/>

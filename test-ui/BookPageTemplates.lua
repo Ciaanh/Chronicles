@@ -1,3 +1,10 @@
+BookTitleMixin = {}
+function BookTitleMixin:Init(elementData)
+    if elementData.text then
+        self.Text:SetText(elementData.text)
+    end
+end
+
 ChapterHeaderMixin = {}
 function ChapterHeaderMixin:Init(elementData)
     if elementData.text then
@@ -89,7 +96,6 @@ function ScrollFrameMixin:InitScrollFrameWithScrollBar()
 
     scrollFrame:SetScript("OnScrollRangeChanged", onScrollRangeChanged)
 
-    print(self.scrollOnMouse)
     if self.scrollOnMouse then
         local onMouseWheel = function(scrollFrame, value)
             scrollBar:ScrollStepInDirection(-value)

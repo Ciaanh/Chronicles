@@ -3,6 +3,30 @@
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
     <Script file="BookPageTemplates.lua"/>
 
+
+    <Frame name="BookTitleTemplate" mixin="BookTitleMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="150"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="10" y="-50"/>
+                        <Anchor point="TOPRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="255.0" g="0.0" b="0.0"/>
+                </Texture>
+            </Layer> -->
+        </Layers>
+    </Frame>
+
     <Frame name="ChapterHeaderTemplate" mixin="ChapterHeaderMixin" virtual="true">
         <Size x="$parent.viewWidth" y="50"/>
         <Anchors>
@@ -25,6 +49,11 @@
                     </Anchors>
                 </Texture>
             </Layer>
+            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="255.0" b="0.0"/>
+                </Texture>
+            </Layer> -->
         </Layers>
     </Frame>
 
@@ -43,6 +72,11 @@
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
             </Layer>
+            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="0.0" b="255.0"/>
+                </Texture>
+            </Layer> -->
         </Layers>
     </Frame>
 
@@ -52,7 +86,7 @@
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Frames>
-            <ScrollFrame parentKey="ScrollFrame"  mixin="ScrollFrameMixin">
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin">
                 <KeyValues>
                     <KeyValue key="scrollOnMouse" value="false" type="boolean"/>
                     <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>

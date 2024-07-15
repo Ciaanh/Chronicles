@@ -36,16 +36,12 @@ function MainFrameTestMixin:OnLoad()
 	TabSystemOwnerMixin.OnLoad(self)
 	self:SetTabSystem(self.TabSystem)
 	self.firstTabID = self:AddNamedTab("FirstTab", self.TestFrame)
-	self.secondTabID = self:AddNamedTab("SecondTab", self.BookFrame)
-	self.thirdTabID = self:AddNamedTab("ThirdTab", self.SinglePageFrame)
+	self.secondTabID = self:AddNamedTab("SecondTab", self.SinglePageFrame)
 
 	self.frameTabsToTabID = {
 		[MainFrameTestUtil.FrameTabs.First] = self.firstTabID,
 		[MainFrameTestUtil.FrameTabs.Second] = self.secondTabID,
-		[MainFrameTestUtil.FrameTabs.Third] = self.thirdTabID
 	}
-
-	--self:SetFrameLevelsFromBaseLevel(5000)
 
 	EventRegistry:RegisterCallback("Chronicles.MyCustomEvent", self.OnCustomEvent, self)
 end
@@ -69,11 +65,9 @@ end
 function MainFrameTestMixin:UpdateTabs()
 	local firstTabAvailable = self:IsTabAvailable(self.firstTabID)
 	local secondTabAvailable = self:IsTabAvailable(self.secondTabID)
-	local thirdTabAvailable = self:IsTabAvailable(self.thirdTabID)
 
 	self.TabSystem:SetTabShown(self.firstTabID, firstTabAvailable)
 	self.TabSystem:SetTabShown(self.secondTabID, secondTabAvailable)
-	self.TabSystem:SetTabShown(self.thirdTabID, thirdTabAvailable)
 
 	local currentTab = self:GetTab()
 	if not currentTab or not self:IsTabAvailable(currentTab) then
@@ -82,12 +76,8 @@ function MainFrameTestMixin:UpdateTabs()
 end
 
 function MainFrameTestMixin:SetToDefaultAvailableTab()
-	if (self:IsTabAvailable(self.thirdTabID)) then
-		self:SetTab(self.thirdTabID)
-	elseif (self:IsTabAvailable(self.secondTabID)) then
+if (self:IsTabAvailable(self.secondTabID)) then
 		self:SetTab(self.secondTabID)
-	elseif (self:IsTabAvailable(self.firstTabID)) then
-		self:SetTab(self.firstTabID)
 	else
 		self:SetTab(self.firstTabID)
 	end
@@ -100,8 +90,6 @@ function MainFrameTestMixin:UpdateFrameTitle()
 		self:SetTitle("First Tab")
 	elseif tabID == self.secondTabID then
 		self:SetTitle("Second Tab")
-	elseif tabID == self.thirdTabID then
-		self:SetTitle("Third Tab")
 	else --if tabID == self.spellBookTabID
 		self:SetTitle("Unknown Tab")
 	end

@@ -72,12 +72,6 @@ function Chronicles:OnInitialize()
         end
     )
 
-    self:RegisterChatCommand(
-        "ct2",
-        function()
-            self.UITest2:DisplayWindow()
-        end
-    )
 
     Chronicles.UI.EventFilter:Init()
     Chronicles.DB:Init()

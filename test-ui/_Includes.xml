@@ -5,8 +5,6 @@
 	<Include file="BookPageTemplates.xml" />
 
 	<Include file="SinglePageFrame.xml" />
-	<Include file="BookFrame.xml" />
 	<Include file="MainFrameTest.xml" />
-	<Include file="TestBookFrame.xml" />
 
 </Ui>

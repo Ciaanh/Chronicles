@@ -41,16 +41,6 @@
                 </Layers>
             </Frame>
 
-            <Frame parentKey="BookFrame" inherits="BookFrameTemplate" frameLevel="100" hidden="true">
-                <Size x="1612" y="856"/>
-                <Anchors>
-                    <Anchor point="BOTTOM" x="2" y="4"/>
-                </Anchors>
-                <Frames>
-
-                </Frames>
-            </Frame>
-
             <Frame parentKey="SinglePageFrame" inherits="SinglePageFrameTemplate" frameLevel="100" hidden="true">
                 <Size x="600" y="650"/>
                 <Anchors>
@@ -60,6 +50,7 @@
 
                 </Frames>
             </Frame>
+            
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>
