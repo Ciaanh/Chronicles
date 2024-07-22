@@ -2,9 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-	<Include file="BookPageTemplates.xml" />
+	<Include file="EventList\EventListTemplate.xml" />
 
-	<Include file="SinglePageFrame.xml" />
-	<Include file="MainFrameTest.xml" />
+	<Include file="EventDetails\BookPageTemplates.xml" />
+	<Include file="EventDetails\EventDetailPageTemplate.xml" />
+
+	<Include file="Timeline\TimelineTemplate.xml" />
+
+	<Include file="MainFrameUI.xml" />
 
 </Ui>

@@ -1,46 +1,46 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
-local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-
-SinglePageFrameMixin = {}
+EventDetailPageMixin = {}
 local Templates = {
 	["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
+	["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
+	["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
 	["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
 	["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
 	["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
 }
 
-function SinglePageFrameMixin:OnLoad()
-	self.PagedSinglePageFrame:SetElementTemplateData(Templates)
+function EventDetailPageMixin:OnLoad()
+	self.PagedEventDetailPage:SetElementTemplateData(Templates)
 
-	EventRegistry:RegisterCallback(private.events.SinglePageFrameEventSelected, self.OnEventSelected, self)
+	EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnEventSelected, self)
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
-	self.PagedSinglePageFrame.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
+	self.PagedEventDetailPage.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
 
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 	self.SinglePageBookCornerFlipbook.Anim:Pause()
 end
 
-function SinglePageFrameMixin:OnPagingButtonEnter()
+function EventDetailPageMixin:OnPagingButtonEnter()
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 end
 
-function SinglePageFrameMixin:OnPagingButtonLeave()
+function EventDetailPageMixin:OnPagingButtonLeave()
 	local reverse = true
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
 
-function SinglePageFrameMixin:OnEventSelected(eventData)
+function EventDetailPageMixin:OnEventSelected(eventData)
 	self:ShowEvent(eventData)
 end
 
-function SinglePageFrameMixin:ShowEvent(data)
-	local content = TransformEventToBook(data)
+function EventDetailPageMixin:ShowEvent(data)
+	local content = private.Core.Events.TransformEventToBook(data)
 
 	local dataProvider = CreateDataProvider(content)
 	local retainScrollPosition = false
-	self.PagedSinglePageFrame:SetDataProvider(dataProvider, retainScrollPosition)
+	self.PagedEventDetailPage:SetDataProvider(dataProvider, retainScrollPosition)
 end

@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -35,7 +35,7 @@ function Chronicles.UI.CharactersView:Init()
 end
 
 function Chronicles.UI.CharactersView:Refresh()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Chronicles.UI.CharactersView:Refresh ")
+    -- print("-- Chronicles.UI.CharactersView:Refresh ")
 
     Chronicles.UI.CharactersView.CurrentPage = 1
     Chronicles.UI.CharactersView:DisplayCharacterList(1, true)
@@ -242,7 +242,7 @@ end
 ------------------------------------------------------------------------------------------
 
 function Chronicles.UI.CharactersView:CleanSelectedCharacter()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- CleanSelectedCharacter ")
+    -- print("-- CleanSelectedCharacter ")
 
     CharacterTimelineLabel:Hide()
     CharacterTitle:SetText("")
@@ -271,7 +271,7 @@ function Chronicles.UI.CharactersView:SetCharacterDetails(character)
     CharacterBiographyHTML:SetText(cleanHTML(character.biography))
     CharacterTimeline:SetText(Chronicles.constants.timelines[character.timeline])
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- SetCharacterDetails " .. tablelength(character.factions))
+    -- print("-- SetCharacterDetails " .. tablelength(character.factions))
 
     Chronicles.UI.CharactersView.SelectedCharacterFactions = copyTable(character.factions)
     Chronicles.UI.CharactersView:ChangeFactionsPage(1)
@@ -306,7 +306,7 @@ function ChangeFactionsPage(page)
 end
 
 function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
-    -- DEFAULT_CHAT_FRAME:AddMessage(
+    -- print(
     --     "-- ChangeFactionsPage " .. tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions)
     -- )
 
@@ -320,7 +320,7 @@ function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
         if (page ~= nil and numberOfFactions > 0) then
             local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
 
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfFactions " .. numberOfFactions)
+            -- print("-- numberOfFactions " .. numberOfFactions)
 
             if (numberOfFactions > 0) then
                 local maxPageValue = math.ceil(numberOfFactions / pageSize)
@@ -427,7 +427,7 @@ function Chronicles.UI.CharactersView:SetFactionTextToFrame(faction, frame)
     end
     frame:Hide()
     if (faction ~= nil) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        -- print("-- SetFactionTextToFrame " .. faction.name)
         frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
         frame.faction = faction
         -- frame:SetScript(

@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -29,13 +29,15 @@ function Chronicles.UI:Init()
     Chronicles.UI.FactionsView:Init()
     Chronicles.UI.OptionsView:Init()
     Chronicles.UI.MyJournalView:Init()
+
+    EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
 end
 
 function Chronicles.UI:Refresh()
     Chronicles.UI.EventList:Refresh()
     Chronicles.UI.Timeline:Refresh()
     Chronicles.UI.EventDescription:Refresh()
-    
+
     Chronicles.UI.CharactersView:Refresh()
     Chronicles.UI.FactionsView:Refresh()
 end

@@ -4,19 +4,20 @@
 
     <Include file="Libs\_Includes.xml"/>
 
-    <Script file="Constants.lua"/>
-    <Script file="Events.lua"/>
-    <Script file="Functions.lua"/>
-    
     <Include file="Locales\Locales.xml"/>
     <Include file="Custom\Locales\Locales.xml"/>
 
+    <Script file="Constants.lua"/>
+
+    <Script file="Functions.lua"/>
+
     <Script file="Chronicles.lua"/>
+
+    <Include file="Core\_Includes.xml"/>
+
 
     <Include file="DB\ChroniclesDB.xml"/>
     <Include file="Custom\DB\ChroniclesDB.xml"/>
-
-    <Include file="Core\_Includes.xml"/>
 
     <Include file="UI\_Includes.xml"/>
     <Include file="test-ui\_Includes.xml"/>

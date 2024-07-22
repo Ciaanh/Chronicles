@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -175,7 +175,7 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local searchEventsInDB = Chronicles.DB.SearchEventsInDB
     local cleanEventObject = Chronicles.DB.CleanEventObject
 
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Chronicles.DB:SearchEvents start " .. GetTime())
+    --print("-- Chronicles.DB:SearchEvents start " .. GetTime())
     if (yearStart <= yearEnd) then
         for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
             local pluginEvents = searchEventsInDB(self, yearStart, yearEnd, eventsGroup.data)
@@ -185,7 +185,7 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
             end
         end
     end
-    --DEFAULT_CHAT_FRAME:AddMessage("-- Chronicles.DB:SearchEvents finish " .. GetTime())
+    --print("-- Chronicles.DB:SearchEvents finish " .. GetTime())
     return foundEvents
 end
 
@@ -251,9 +251,9 @@ function Chronicles.DB:CleanEventObject(event, groupName)
         }
         if (event.order == nil) then
             formatedEvent.order = 0
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- event " .. tostring(event.id) .. " --")
-        -- DEFAULT_CHAT_FRAME:AddMessage("order: " .. tostring(event.order))
-        -- DEFAULT_CHAT_FRAME:AddMessage("label: " .. tostring(event.label))
+        -- print("-- event " .. tostring(event.id) .. " --")
+        -- print("order: " .. tostring(event.order))
+        -- print("label: " .. tostring(event.label))
         end
 
         return formatedEvent
@@ -348,18 +348,18 @@ end
 function Chronicles.DB:FindCharacters(ids)
     local foundCharacters = {}
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- FindFactions " .. tostring(ids))
+    -- print("-- FindFactions " .. tostring(ids))
 
     for group, characterIds in pairs(ids) do
-        -- DEFAULT_CHAT_FRAME:AddMessage("---- group " .. group)
+        -- print("---- group " .. group)
         local characterGroupStatus = Chronicles.DB:GetGroupStatus(group)
         if (characterGroupStatus) then
             local charactersGroup = Chronicles.DB.Characters[group]
-            -- DEFAULT_CHAT_FRAME:AddMessage("------ factionsGroup " .. tablelength(factionsGroup.data))
+            -- print("------ factionsGroup " .. tablelength(factionsGroup.data))
             if (charactersGroup ~= nil and charactersGroup.data ~= nil and tablelength(charactersGroup.data) > 0) then
                 for characterIndex, character in pairs(charactersGroup.data) do
                     for index, id in ipairs(characterIds) do
-                        -- DEFAULT_CHAT_FRAME:AddMessage("-------- faction.id " .. faction.id .. " id " .. id)
+                        -- print("-------- faction.id " .. faction.id .. " id " .. id)
                         if (character.id == id) then
                             table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, group))
                         end
@@ -392,7 +392,7 @@ end
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 function Chronicles.DB:RegisterEventDB(groupName, db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- print("-- Asked to register group " .. groupName)
     if Chronicles.DB.Events[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Events.")
     else
@@ -410,7 +410,7 @@ function Chronicles.DB:RegisterEventDB(groupName, db)
 end
 
 function Chronicles.DB:RegisterCharacterDB(groupName, db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- print("-- Asked to register group " .. groupName)
     if Chronicles.DB.Characters[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Characters.")
     else
@@ -428,7 +428,7 @@ function Chronicles.DB:RegisterCharacterDB(groupName, db)
 end
 
 function Chronicles.DB:RegisterFactionDB(groupName, db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Asked to register group " .. groupName)
+    -- print("-- Asked to register group " .. groupName)
     if Chronicles.DB.Factions[groupName] ~= nil then
         error(groupName .. " is already registered by another plugin in Factions.")
     else
@@ -589,12 +589,12 @@ function Chronicles.DB:GetGroupStatus(groupName)
 end
 
 function Chronicles.DB:SetEventTypeStatus(eventType, status)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
+    -- print("-- SetGroupStatus " .. groupName .. " " .. tostring(status))
     Chronicles.storage.global.EventTypesStatuses[eventType] = status
 end
 
 function Chronicles.DB:GetEventTypeStatus(eventType)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- GetEventTypeStatus " .. tostring(eventType))
+    -- print("-- GetEventTypeStatus " .. tostring(eventType))
     local isActive = Chronicles.storage.global.EventTypesStatuses[eventType]
     if (isActive == nil) then
         isActive = true
@@ -642,7 +642,7 @@ function Chronicles.DB:RemoveMyJournalCharacter(characterId)
 end
 
 function Chronicles.DB:AvailableDbId(db)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId ")
+    -- print("-- AvailableDbId ")
     local ids = {}
 
     for key, value in pairs(db) do
@@ -656,14 +656,14 @@ function Chronicles.DB:AvailableDbId(db)
     local maxId = 1
 
     for key, value in ipairs(ids) do
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- key " .. key .. " , value " .. value .. " , maxid " .. maxId)
+        -- print("-- key " .. key .. " , value " .. value .. " , maxid " .. maxId)
         if (value > maxId + 1) then
             return maxId + 1
         end
         maxId = maxId + 1
     end
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- AvailableDbId maxId " .. maxId)
+    -- print("-- AvailableDbId maxId " .. maxId)
     return maxId -- table.maxn(db) + 1
 end
 
@@ -702,7 +702,7 @@ function Chronicles.DB:LoadRolePlayProfile()
         local name = Chronicles.DB.RP:TRP_GetRoleplayingName()
 
         if (age ~= nil and name ~= nil) then
-            --DEFAULT_CHAT_FRAME:AddMessage("-- trp " .. age .. " " .. name)
+            --print("-- trp " .. age .. " " .. name)
             Chronicles.DB.RP:RegisterBirth(age, name, "TotalRP")
         end
     end
@@ -712,7 +712,7 @@ function Chronicles.DB:LoadRolePlayProfile()
         local name = Chronicles.DB.RP:MRP_GetRoleplayingName()
 
         if (age ~= nil and name ~= nil) then
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- mrp " .. age .. " " .. name)
+            -- print("-- mrp " .. age .. " " .. name)
             Chronicles.DB.RP:RegisterBirth(age, name, "MyRolePlay")
         end
     end

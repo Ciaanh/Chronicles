@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -325,7 +325,7 @@ function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
 end
 
 function MyCharactersDetailsSave_Click()
-    -- DEFAULT_CHAT_FRAME:AddMessage(
+    -- print(
     --     "-- MyCharactersDetailsSave_Click " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
     -- )
     local character = {
@@ -430,14 +430,14 @@ function MyCharacterChangeFactionsPage(page)
 end
 
 function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeFactionsPage " .. page)
+    -- print("-- ChangeFactionsPage " .. page)
 
     if
         (Chronicles.UI.MyCharacters.SelectedCharacterId ~= nil and
             Chronicles.UI.MyCharacters.SelectedCharacterFactions ~= nil and
             tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions) > 0)
      then
-        -- DEFAULT_CHAT_FRAME:AddMessage(
+        -- print(
         --     "-- ChangeFactionsPage " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
         -- )
 
@@ -447,7 +447,7 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
         if (page ~= nil and numberOfFactions > 0) then
             local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
 
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfFactions " .. numberOfFactions)
+            -- print("-- numberOfFactions " .. numberOfFactions)
 
             Chronicles.UI.MyCharacters:HideAllFactions()
 
@@ -554,7 +554,7 @@ function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
     end
     frame:Hide()
     if (faction ~= nil) then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- SetFactionTextToFrame " .. faction.name)
+        -- print("-- SetFactionTextToFrame " .. faction.name)
         frame.Text:SetText(adjustTextLength(faction.name, 13, frame))
         frame.faction = faction
         -- frame:SetScript(
@@ -579,7 +579,7 @@ function Chronicles.UI.MyCharacters:SetFactionTextToFrame(faction, frame)
 end
 
 function Chronicles.UI.MyCharacters:RemoveFaction(faction)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction " .. faction.name)
+    -- print("-- RemoveFaction " .. faction.name)
     local indexToRemove = nil
     for index, id in ipairs(Chronicles.UI.MyCharacters.SelectedCharacterFactions[faction.source]) do
         if (faction.id == id) then
@@ -589,12 +589,12 @@ function Chronicles.UI.MyCharacters:RemoveFaction(faction)
     end
 
     if indexToRemove ~= nil then
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction index " .. indexToRemove)
+        -- print("-- RemoveFaction index " .. indexToRemove)
         table.remove(Chronicles.UI.MyCharacters.SelectedCharacterFactions[faction.source], indexToRemove)
     end
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction MyCharacters " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions))
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- RemoveFaction CharactersView " .. tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions))
+    -- print("-- RemoveFaction MyCharacters " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions))
+    -- print("-- RemoveFaction CharactersView " .. tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions))
 
     Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
     Chronicles.UI.CharactersView:Refresh()
@@ -695,7 +695,7 @@ end
 function MyCharacterFactions_SearchBox_OnFocusLost(self)
     SearchBoxTemplate_OnEditFocusLost(self)
     MyCharacterFactions_HideSearchPreview()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchBox_OnFocusLost ")
+    -- print("-- MyCharacterFactions_SearchBox_OnFocusLost ")
 end
 
 function MyCharacterFactions_SearchBox_OnFocusGained(self)
@@ -820,7 +820,7 @@ function MyCharacterFactions_FullSearchResultsButton_OnClick(self)
 end
 
 function MyCharacterFactions_SelectSearchItem(factionID)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
+    -- print("-- MyCharacterFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
 
     local results =
         Chronicles.DB:FindFactions(
@@ -859,7 +859,7 @@ function MyCharacterFactions_SearchBox_OnUpdate(self)
     searchPreviewContainer.background:Show()
     searchPreviewContainer:Show()
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchBox_OnUpdate ")
+    -- print("-- MyCharacterFactions_SearchBox_OnUpdate ")
 end
 
 function MyCharacterFactions_SearchPreviewButton_OnShow(self)
@@ -882,7 +882,7 @@ function MyCharacterFactions_SearchPreviewButton_OnEnter(self)
 end
 
 function MyCharacterFactions_SearchPreviewButton_OnClick(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_SearchPreviewButton_OnClick ")
+    -- print("-- MyCharacterFactions_SearchPreviewButton_OnClick ")
 
     if (self.factionID) then
         MyCharacterFactions_SelectSearchItem(self.factionID)
@@ -893,7 +893,7 @@ function MyCharacterFactions_SearchPreviewButton_OnClick(self)
 end
 
 function MyCharacterFactions_ShowFullSearch()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyCharacterFactions_ShowFullSearch ")
+    -- print("-- MyCharacterFactions_ShowFullSearch ")
 
     MyCharacterFactions_UpdateFullSearchResults()
 

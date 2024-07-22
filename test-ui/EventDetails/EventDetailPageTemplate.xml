@@ -1,14 +1,21 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
-	<Script file="SinglePageFrame.lua"/>
+	<Script file="EventDetailPageTemplate.lua"/>
 
-	<Frame name="SinglePageFrameTemplate" mixin="SinglePageFrameMixin" virtual="true">
+	<Frame name="EventDetailPageTemplate" mixin="EventDetailPageMixin" virtual="true">
+		<Size x="1200" y="650"/>
 		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="1">
-				<Texture parentKey="BookBGHalved" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
+				<Texture parentKey="BookBGLeft" atlas="spellbook-background-evergreen-left" useAtlasSize="false">
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM"/>
+					</Anchors>
+				</Texture>
+				<Texture parentKey="BookBGRight" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOP"/>
 						<Anchor point="BOTTOMRIGHT"/>
 					</Anchors>
 				</Texture>
@@ -26,12 +33,16 @@
 					</Animations>
 				</Texture>
 			</Layer>
-
+			<!-- <Layer level="BACKGROUND" textureSubLevel="1000">
+				<Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+					<Color r="255.0" g="0.0" b="0.0"/>
+				</Texture>
+			</Layer> -->
 		</Layers>
 		<Frames>
-			<Frame parentKey="PagedSinglePageFrame" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+			<Frame parentKey="PagedEventDetailPage" inherits="PagedCondensedVerticalGridContentFrameTemplate">
 				<KeyValues>
-					<KeyValue key="viewsPerPage" value="1" type="number"/>
+					<KeyValue key="viewsPerPage" value="2" type="number"/>
 					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
 					<KeyValue key="xPadding" value="15" type="number"/>
 					<KeyValue key="columnsPerRow" value="1" type="number"/>
@@ -42,13 +53,42 @@
 					<Anchor point="TOPLEFT" x="50" y="-50"/>
 					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
 				</Anchors>
+				<!-- <Layers>
+					<Layer level="BACKGROUND" textureSubLevel="1000">
+						<Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+							<Color r="0.0" g="255.0" b="0.0"/>
+						</Texture>
+					</Layer>
+				</Layers> -->
 				<Frames>
+
 					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
 						<Anchors>
 							<Anchor point="TOPLEFT" />
-							<Anchor point="BOTTOMRIGHT" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM" x="-50" />
 						</Anchors>
+						<!-- <Layers>
+							<Layer level="BACKGROUND" textureSubLevel="1000">
+								<Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+									<Color r="0.0" g="0.0" b="255.0"/>
+								</Texture>
+							</Layer>
+						</Layers> -->
 					</Frame>
+					<Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+						<Anchors>
+							<Anchor point="TOPRIGHT" />
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM" x="50" />
+						</Anchors>
+						<!-- <Layers>
+							<Layer level="BACKGROUND" textureSubLevel="1000">
+								<Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+									<Color r="0.0" g="0.0" b="255.0"/>
+								</Texture>
+							</Layer>
+						</Layers> -->
+					</Frame>
+
 					<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
 						<Anchors>
 							<Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>

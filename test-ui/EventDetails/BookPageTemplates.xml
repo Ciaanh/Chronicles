@@ -5,7 +5,7 @@
 
 
     <Frame name="BookTitleTemplate" mixin="BookTitleMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="150"/>
+        <Size x="$parent.viewWidth" y="500"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
@@ -13,17 +13,47 @@
             <Layer level="ARTWORK">
                 <FontString parentKey="Text" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="10" y="-50"/>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="EmptyTemplate" mixin="EmptyMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="25"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Border" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size y="10"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="10" y="5"/>
+                        <Anchor point="BOTTOMRIGHT" x="-10"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="AuthorTemplate" mixin="AuthorMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="25"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-5"/>
                         <Anchor point="TOPRIGHT"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
             </Layer>
-            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="255.0" g="0.0" b="0.0"/>
-                </Texture>
-            </Layer> -->
         </Layers>
     </Frame>
 
@@ -49,11 +79,6 @@
                     </Anchors>
                 </Texture>
             </Layer>
-            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="255.0" b="0.0"/>
-                </Texture>
-            </Layer> -->
         </Layers>
     </Frame>
 
@@ -72,16 +97,11 @@
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
             </Layer>
-            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="0.0" b="255.0"/>
-                </Texture>
-            </Layer> -->
         </Layers>
     </Frame>
 
     <Frame name="HtmlPageTemplate" mixin="HtmlPageMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="500"/>
+        <Size x="$parent.viewWidth" y="450"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
@@ -108,9 +128,6 @@
                         <FontString inherits="SystemFont_Med3"/>
                     </SimpleHTML>
                 </ScrollChild>
-                <Scripts>
-                    <OnLoad method="OnLoad"/>
-                </Scripts>
             </ScrollFrame>
         </Frames>
     </Frame>

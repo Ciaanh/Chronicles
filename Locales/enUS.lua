@@ -34,7 +34,7 @@ if L then
     L["Biography_Field"] = "Biography"
 
     L["Factions_List"] = "Factions"
-    L["Characters_List"] = "Characters"    
+    L["Characters_List"] = "Characters"
 
     L["ErrorYearAsNumber"] = "A year must be a number"
     L["ErrorYearOrder"] = "Event ends before it's started"
@@ -42,18 +42,18 @@ if L then
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
 
+    L["mythos"] = "Mythos"
+    L["beforedarkportal"] = "Before the Dark Portal"
+    L["threewars"] = "The Three Great Wars"
+    L["vanilla"] = "Vanilla"
+    L["burningcrusade"] = "The Burning Crusade"
+    L["lichking"] = "Wrath of the Lich King"
+    L["cataclysm"] = "Cataclysm"
+    L["pandaria"] = "Mists of Pandaria"
+    L["warlords"] = "Warlords of Draenor"
+    L["legion"] = "Legion"
+    L["battleforazeroth"] = "Battle for Azeroth"
+    L["shadowlands"] = "Shadowlands"
 
-
-     L["mythos"] = "Mythos"
-	 L["beforedarkportal"] = "Before the Dark Portal"
-	 L["threewars"] = "The Three Great Wars"
-	 L["vanilla"] = "Vanilla"
-	 L["burningcrusade"] = "The Burning Crusade"
-	 L["lichking"] = "Wrath of the Lich King"
-	 L["cataclysm"] = "Cataclysm"
-	 L["pandaria"] = "Mists of Pandaria"
-	 L["warlords"] = "Warlords of Draenor"
-	 L["legion"] = "Legion"
-	 L["battleforazeroth"] = "Battle for Azeroth"
-	 L["shadowlands"] = "Shadowlands"
+    L["Author"] = "by "
 end

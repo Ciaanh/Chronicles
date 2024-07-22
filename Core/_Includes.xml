@@ -3,6 +3,7 @@
 
     <Script file="Characters.lua"/>
     <Script file="Events.lua"/>
+    <Script file="Timeline.lua"/>
     <Script file="Factions.lua"/>
     <Script file="Options.lua"/>
 </Ui>

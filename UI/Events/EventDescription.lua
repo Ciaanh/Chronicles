@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -29,7 +29,7 @@ function Chronicles.UI.EventDescription:Refresh()
 end
 
 function Chronicles.UI.EventDescription:DrawEventDescription(event)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Call to DrawEventDescription " .. event.label)
+    -- print("-- Call to DrawEventDescription " .. event.label)
     self.CurrentEvent = event
     self.CurrentPage = 1
     self.CurrentFactionsCharactersResults = {}
@@ -52,7 +52,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     EventDescriptionBounds:SetText(eventDates)
 
     self:SetDescriptionPager(1, tablelength(event.description))
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Display description " .. event.description[1])
+    -- print("-- Display description " .. event.description[1])
 
     if (event.factions ~= nil and tablelength(Chronicles.DB:FindFactions(event.factions)) > 0) then
         EventDescription.FactionsButton:Show()
@@ -64,7 +64,7 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
 end
 
 function Chronicles.UI.EventDescription:ChangeEventDescriptionPage(page)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- ChangeEventDescriptionPage " .. page)
+    -- print("-- ChangeEventDescriptionPage " .. page)
 
     local event = self.CurrentEvent
     if (event ~= nil and event.description ~= nil) then
@@ -132,7 +132,7 @@ function SetNextButtonText()
 end
 
 function EventFactionsButton_OnClick(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- EventFactionsButton_OnClick ")
+    -- print("-- EventFactionsButton_OnClick ")
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
 
     if (currentEvent ~= nil and currentEvent.factions and tablelength(currentEvent.factions) > 0) then
@@ -161,7 +161,7 @@ function MapFactionsToItems(factions)
         if (not containsHTML(faction.description)) then
             item.description = faction.description:sub(0, maxDescriptionLength)
         end
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- MapFactionsToItems " .. item.name .. " " .. item.description)
+        -- print("-- MapFactionsToItems " .. item.name .. " " .. item.description)
         table.insert(results, item)
     end
 
@@ -173,7 +173,7 @@ function EventFactionsButton_OnLoad(self)
 end
 
 function EventCharactersButton_OnClick(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- EventCharactersButton_OnClick ")
+    -- print("-- EventCharactersButton_OnClick ")
     -- local charactersList = Chronicles.DB:FindCharacters(event.characters)
 
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
@@ -208,7 +208,7 @@ function MapCharactersToItems(characters)
             item.description = character.biography:sub(0, maxDescriptionLength)
         end
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- MapCharactersToItems " .. item.name .. " " .. item.description)
+        -- print("-- MapCharactersToItems " .. item.name .. " " .. item.description)
         table.insert(results, item)
     end
 

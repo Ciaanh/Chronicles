@@ -1,7 +1,5 @@
 local FOLDER_NAME, private = ...
-
-local Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
-private.Core = Chronicles
+private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
@@ -9,7 +7,7 @@ local Icon = LibStub("LibDBIcon-1.0")
 -----------------------------------------------------------------------------------------
 -- Init ---------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
+local Chronicles = private.Chronicles
 Chronicles.descName = Locale["Chronicles"]
 Chronicles.description = Locale["Description"]
 
@@ -68,10 +66,9 @@ function Chronicles:OnInitialize()
     self:RegisterChatCommand(
         "ct",
         function()
-            self.UITest:DisplayWindow()
+            self.NewUi.DisplayWindow()
         end
     )
-
 
     Chronicles.UI.EventFilter:Init()
     Chronicles.DB:Init()

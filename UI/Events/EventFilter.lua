@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 Chronicles.UI.EventFilter = {}
 Chronicles.UI.EventFilter.Displayed = false

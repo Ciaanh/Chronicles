@@ -1,6 +1,8 @@
 local FOLDER_NAME, private = ...
 private.addon_name = "Chronicles"
 
+private.Core = {}
+
 local constants = {}
 private.constants = constants
 
@@ -16,8 +18,9 @@ constants.defaults = {
 	}
 }
 
--- Define the default icon here
 constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
+
+constants.viewWidth = 425
 
 constants.eventType = {
 	[0] = "undefined",
@@ -65,4 +68,17 @@ constants.config = {
 
 constants.configurationName = {
 	myjournal = "myjournal"
+}
+
+constants.events = {
+	TimelineInit = "TIMELINE_INIT",
+	EventDetailPageEventSelected = "EVENT_SELECTED",
+	TimelinePeriodSelected = "TIMELINE_PERIOD_SELECTED",
+
+	DisplayTimelineLabel="DisplayTimelineLabel",
+	DisplayTimelinePeriod="DisplayTimelinePeriod",
+
+	TabUITabSet = "TabUI.TabSet",
+	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
+	MainFrameUICloseFrame = "MainFrameUI.CloseFrame"
 }

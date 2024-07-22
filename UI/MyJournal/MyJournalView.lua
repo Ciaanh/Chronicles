@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -8,7 +8,7 @@ Chronicles.UI.MyJournalView = {}
 function Chronicles.UI.MyJournalView:Init()
     MyJournalView.Title:SetText(Locale["My Journal"])
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- init MyJournalView")
+    -- print("-- init MyJournalView")
 
     Chronicles.UI.MyEvents:Init(true)
     Chronicles.UI.MyCharacters:Init(false)

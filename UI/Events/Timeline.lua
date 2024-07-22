@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -43,7 +43,7 @@ end
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
 function Chronicles.UI.Timeline:DisplayTimeline(debounceIndex)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Chronicles.UI.Timeline:DisplayTimeline " .. GetTime())
+    -- print("-- Chronicles.UI.Timeline:DisplayTimeline " .. GetTime())
 
     local stepValue = Chronicles.UI.Timeline.CurrentStepValue
     local pageIndex = Chronicles.UI.Timeline.CurrentPage
@@ -76,9 +76,9 @@ function Chronicles.UI.Timeline:DisplayTimeline(debounceIndex)
         pageIndex = maxPageValue
     end
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- pageIndex " .. pageIndex)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- maxPageValue " .. maxPageValue)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfCells " .. numberOfCells)
+    -- print("-- pageIndex " .. pageIndex)
+    -- print("-- maxPageValue " .. maxPageValue)
+    -- print("-- numberOfCells " .. numberOfCells)
 
     TimelineScrollBar:SetMinMaxValues(1, maxPageValue)
     Chronicles.UI.Timeline.CurrentPage = pageIndex
@@ -93,7 +93,7 @@ function Chronicles.UI.Timeline:DisplayTimeline(debounceIndex)
 
     TimelineScrollBar:SetValue(Chronicles.UI.Timeline.CurrentPage)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- size of TimeFrames " .. #Chronicles.UI.Timeline.Periods)
+    -- print("-- size of TimeFrames " .. #Chronicles.UI.Timeline.Periods)
 
     Chronicles.UI.Timeline:BuildTimelineBlocks(pageIndex, pageSize, numberOfCells, maxPageValue)
 end
@@ -187,15 +187,15 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- minYear " .. minYear)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- maxYear " .. maxYear)
+    -- print("-- minYear " .. minYear)
+    -- print("-- maxYear " .. maxYear)
 
     local timelineConfig = Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 
     local insert = table.insert
     local timelineBlocks = {}
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
+    -- print("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
 
     for blockIndex = 1, timelineConfig.numberOfTimelineBlock do
         local minValue = 0
@@ -248,10 +248,10 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
         end
 
         -- if (blockIndex == timelineConfig.numberOfTimelineBlock) then
-        --     DEFAULT_CHAT_FRAME:AddMessage(
+        --     print(
         --         "-- blockIndex " .. blockIndex .. "-- minValue " .. minValue .. "-- maxValue " .. maxValue
         --     )
-        --     DEFAULT_CHAT_FRAME:AddMessage("-- lower " .. block.lowerBound .. "-- upper " .. block.upperBound)
+        --     print("-- lower " .. block.lowerBound .. "-- upper " .. block.upperBound)
         -- end
 
         block.hasEvents = Chronicles.UI.Timeline:HasEvents(block)
@@ -264,7 +264,7 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
         local nextValue = timelineBlocks[j + 1]
 
         -- if (value.lowerBound == 40) then
-        --     DEFAULT_CHAT_FRAME:AddMessage("-- value.lowerBound " .. value.lowerBound)
+        --     print("-- value.lowerBound " .. value.lowerBound)
         -- end
 
         if (nextValue ~= nil) then
@@ -297,7 +297,7 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
     end
 
     -- for i, v in ipairs(displayableTimeFrames) do
-    --     DEFAULT_CHAT_FRAME:AddMessage(
+    --     print(
     --         "-- block " ..
     --             i .. --" " .. #displayableTimeFrames ..
     --                 " " .. tostring(v) .. " " .. tostring(v.lowerBound) .. " " .. tostring(v.upperBound)
@@ -308,7 +308,7 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
 
     -- end
 
-    -- DEFAULT_CHAT_FRAME:AddMessage(
+    -- print(
     --     "-- block " .. #timelineBlocks ..
     --     " " .. #displayableTimeFrames ..
     --     " " .. tostring(displayableTimeFrames[24]) ..
@@ -331,16 +331,16 @@ function Chronicles.UI.Timeline:HasEvents(block)
     local gap = math.abs(upperDateIndex - lowerDateIndex)
 
     -- if (block.lowerBound == 0) then
-    --     DEFAULT_CHAT_FRAME:AddMessage(
+    --     print(
     --         "-- upperDateIndex " .. upperDateIndex .. " " .. tostring(eventDates[upperDateIndex])
     --     )
-    --     DEFAULT_CHAT_FRAME:AddMessage(
+    --     print(
     --         "-- lowerDateIndex " .. lowerDateIndex .. " " .. tostring(eventDates[lowerDateIndex])
     --     )
     -- end
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- lowerBound " .. lowerBound .. " step " .. Chronicles.UI.Timeline.CurrentStepValue)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- lowerDateIndex " .. lowerDateIndex)
+    -- print("-- lowerBound " .. lowerBound .. " step " .. Chronicles.UI.Timeline.CurrentStepValue)
+    -- print("-- lowerDateIndex " .. lowerDateIndex)
 
     if (gap > 1) then
         for i = lowerDateIndex, upperDateIndex, 1 do
@@ -353,20 +353,20 @@ function Chronicles.UI.Timeline:HasEvents(block)
         local lowerEventsDate = eventDates[lowerDateIndex]
         local upperEventsDate = eventDates[upperDateIndex]
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- size of TimeFrames " .. #Chronicles.UI.Timeline.Periods)
+        -- print("-- size of TimeFrames " .. #Chronicles.UI.Timeline.Periods)
 
         -- if (block.lowerBound == 0) then
-        --     DEFAULT_CHAT_FRAME:AddMessage(
+        --     print(
         --         "-- upperDateIndex " .. upperDateIndex .. " " .. tostring(eventDates[upperDateIndex])
         --     )
-        --     DEFAULT_CHAT_FRAME:AddMessage(
+        --     print(
         --         "-- lowerDateIndex " .. lowerDateIndex .. " " .. tostring(eventDates[lowerDateIndex])
         --     )
         -- end
 
         if (lowerEventsDate ~= nil and lowerEventsDate) then
             -- if (block.lowerBound == 0) then
-            --     DEFAULT_CHAT_FRAME:AddMessage(
+            --     print(
             --         "-- lowerDateIndex " .. lowerDateIndex .. " " .. tostring(eventDates[lowerDateIndex])
             --     )
             -- end
@@ -374,7 +374,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
         end
         if (upperEventsDate ~= nil and upperEventsDate) then
             -- if (block.lowerBound == 0) then
-            --     DEFAULT_CHAT_FRAME:AddMessage(
+            --     print(
             --         "-- upperDateIndex " .. upperDateIndex .. " " .. tostring(eventDates[upperDateIndex])
             --     )
             -- end
@@ -423,7 +423,7 @@ function Chronicles.UI.Timeline:GetCurrentStepEventDates()
 end
 
 function Chronicles.UI.Timeline:GetIndex(year)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- GetIndex " .. GetTime())
+    -- print("-- GetIndex " .. GetTime())
     local selectedYear = year
 
     if (selectedYear == nil) then
@@ -432,7 +432,7 @@ function Chronicles.UI.Timeline:GetIndex(year)
         -- local numberOfCells = Chronicles.UI.Timeline:GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
         local numberOfCells = #Chronicles.UI.Timeline.Periods
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- GetIndex " .. numberOfCells)
+        -- print("-- GetIndex " .. numberOfCells)
 
         if (page == nil) then
             page = 1
@@ -449,9 +449,9 @@ function Chronicles.UI.Timeline:GetIndex(year)
             lastIndex = numberOfCells - 1
         end
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- firstIndex " .. firstIndex)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- lastIndex " .. lastIndex)
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- Size " .. #Chronicles.UI.Timeline.Periods)
+        -- print("-- firstIndex " .. firstIndex)
+        -- print("-- lastIndex " .. lastIndex)
+        -- print("-- Size " .. #Chronicles.UI.Timeline.Periods)
 
         local firstIndexBounds = Chronicles.UI.Timeline.Periods[firstIndex]
         local lastIndexBounds = Chronicles.UI.Timeline.Periods[lastIndex]
@@ -471,7 +471,7 @@ function Chronicles.UI.Timeline:GetIndex(year)
     local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)
     local result = yearIndex - (yearIndex % Chronicles.constants.config.timeline.pageSize)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- GetIndex " .. length .. " " .. yearIndex .. " " .. result)
+    -- print("-- GetIndex " .. length .. " " .. yearIndex .. " " .. result)
 
     return result
 end
@@ -492,7 +492,7 @@ function Chronicles.UI.Timeline:BuildTimelineBlocks(page, pageSize, numberOfCell
     end
 
     Chronicles.UI.Timeline:LoadTimelineDatesToBlock(firstIndex)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- LoadTimelineDatesToBlock end " .. GetTime())
+    -- print("-- LoadTimelineDatesToBlock end " .. GetTime())
 end
 
 function Chronicles.UI.Timeline:LoadTimelineDatesToBlock(firstIndex)
@@ -539,7 +539,7 @@ function Chronicles.UI.Timeline:SetDateToBlock(index, frameEvent, frameNoEvent)
     end
 
     -- if (dateBlock.lowerBound == 0) then
-    --     DEFAULT_CHAT_FRAME:AddMessage(
+    --     print(
     --         "-- SetDateToBlock " .. dateBlock.lowerBound .. " " .. tostring(dateBlock.hasEvents) .. " " .. index
     --     )
     -- end
@@ -552,7 +552,7 @@ function Chronicles.UI.Timeline:SetDateToBlock(index, frameEvent, frameNoEvent)
         frameEvent.upperBound = dateBlock.upperBound
 
         if (dateBlock.text ~= nil) then
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- dateBlock.text Event " .. dateBlock.text)
+            -- print("-- dateBlock.text Event " .. dateBlock.text)
             frameEvent.LabelText:SetText(dateBlock.text)
             frameEvent.LabelStart:SetText("")
             frameEvent.LabelEnd:SetText("")
@@ -715,7 +715,7 @@ function Timeline_ZoomIn()
 
     Chronicles.UI.Timeline.CurrentPage = Chronicles.UI.Timeline:GetIndex(Chronicles.UI.Timeline.SelectedYear)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Timeline_ZoomIn " .. GetTime())
+    -- print("-- Timeline_ZoomIn " .. GetTime())
     Chronicles.UI.Timeline:DisplayTimeline()
 end
 
@@ -730,7 +730,7 @@ function Timeline_ZoomOut()
 
     Chronicles.UI.Timeline.CurrentPage = Chronicles.UI.Timeline:GetIndex(Chronicles.UI.Timeline.SelectedYear)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Timeline_ZoomOut " .. GetTime())
+    -- print("-- Timeline_ZoomOut " .. GetTime())
     Chronicles.UI.Timeline:DisplayTimeline()
 end
 
@@ -738,7 +738,7 @@ end
 -- Scroll Page ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function TimelineScrollFrame_OnMouseWheel(self, value)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- TimelineScrollFrame_OnMouseWheel " .. value)
+    -- print("-- TimelineScrollFrame_OnMouseWheel " .. value)
     if (value > 0) then
         TimelineScrollPreviousButton_OnClick(self)
     else
@@ -747,13 +747,13 @@ function TimelineScrollFrame_OnMouseWheel(self, value)
 end
 
 function TimelineScrollPreviousButton_OnClick(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- TimelineScrollPreviousButton_OnClick " .. GetTime())
+    -- print("-- TimelineScrollPreviousButton_OnClick " .. GetTime())
     Chronicles.UI.Timeline.CurrentPage = Chronicles.UI.Timeline.CurrentPage - 1
     Chronicles.UI.Timeline:DisplayTimeline()
 end
 
 function TimelineScrollNextButton_OnClick(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- TimelineScrollNextButton_OnClick " .. GetTime())
+    -- print("-- TimelineScrollNextButton_OnClick " .. GetTime())
     Chronicles.UI.Timeline.CurrentPage = Chronicles.UI.Timeline.CurrentPage + 1
     Chronicles.UI.Timeline:DisplayTimeline()
 end

@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 Chronicles.UI.EventList = {}
 Chronicles.UI.EventList.Data = nil
@@ -209,7 +209,7 @@ function Chronicles.UI.EventList:SetTextToFrame(event, frame)
             "OnMouseDown",
             function()
                 Chronicles.UI.EventDescription:DrawEventDescription(frame.event)
-                EventRegistry:TriggerEvent(private.events.SinglePageFrameEventSelected, event)
+                EventRegistry:TriggerEvent(private.constants.events.EventDetailPageEventSelected, event)
             end
         )
         frame:Show()
@@ -220,7 +220,7 @@ end
 -- Scroll Page ---------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function EventListScrollFrame_OnMouseWheel(self, value)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- scroll " .. value)
+    -- print("-- scroll " .. value)
     if (value > 0) then
         EventListPreviousButton_OnClick(self)
     else

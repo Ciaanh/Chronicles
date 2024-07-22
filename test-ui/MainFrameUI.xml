@@ -1,0 +1,121 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <Script file="MainFrameUI.lua"/>
+
+    <Frame name="TabUITemplate" inherits="TabSystemOwnerTemplate" mixin="TabUIMixin" virtual="true">
+        <Size x="1200" y="850"/>
+        <!-- <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="255.0" g="0.0" b="0.0"/>
+                </Texture>
+            </Layer>
+        </Layers> -->
+        <Frames>
+            <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
+                <KeyValues>
+                    <KeyValue key="minTabWidth" value="100" type="number"/>
+                    <KeyValue key="maxTabWidth" value="150" type="number"/>
+                    <KeyValue key="tabSelectSound" value="SOUNDKIT.UI_CLASS_TALENT_TAB" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="22" y="-650"/>
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="EventDetails" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <!-- <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="0">
+                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                            <Color r="0.0" g="0.0" b="255.0"/>
+                        </Texture>
+                    </Layer>
+                </Layers> -->
+                <Frames>
+                    <Frame parentKey="Book" inherits="EventDetailPageTemplate">
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="Timeline" inherits="TimelineTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplateTemplate">
+                        <Anchors>
+                            <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-50" />
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+
+            <Frame parentKey="Options" frameLevel="100" hidden="true">
+                <KeyValues>
+                    <KeyValue key="layoutType" value="BFAMissionAlliance" type="string"/>
+                </KeyValues>
+                <Size x="1200" y="650"/>
+                <Anchors>
+                    <Anchor point="TOP"/>
+                </Anchors>
+                <!-- <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="0">
+                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                            <Color r="0.0" g="0.0" b="255.0"/>
+                        </Texture>
+                    </Layer>
+                </Layers> -->
+                <Frames>
+                    <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+                </Frames>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+
+
+
+
+
+    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+            <Anchor point="BOTTOMRIGHT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.6">
+                    <Color r="0.0" g="0.0" b="0.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Button name="CloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="CENTER" x="600" y="450"/>
+                </Anchors>
+            </Button>
+
+            <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
+                <Anchors>
+                    <Anchor point="TOP" relativePoint="CENTER" y="450"/>
+                </Anchors>
+            </Frame>
+
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+            <OnHide method="OnHide"/>
+        </Scripts>
+    </Frame>
+
+</Ui>

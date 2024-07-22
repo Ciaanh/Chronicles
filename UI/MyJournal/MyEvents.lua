@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Core
+local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
@@ -363,7 +363,7 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     if (Chronicles.UI.MyEvents.SelectedEvent.description ~= nil) then
         local nbDescriptionPage = tablelength(Chronicles.UI.MyEvents.SelectedEvent.description)
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- Pages " .. nbDescriptionPage)
+        -- print("-- Pages " .. nbDescriptionPage)
 
         Chronicles.UI.MyEvents.SelectedEvent.MaxDescriptionPages = nbDescriptionPage
         if (nbDescriptionPage > 0) then
@@ -423,7 +423,7 @@ function Chronicles.UI.MyEvents:ChangeEventDescriptionPage(page)
         if (Chronicles.UI.MyEvents.SelectedEvent.description[page] ~= nil) then
             Chronicles.UI.MyEvents.SelectedEvent.CurrentDescriptionPage = page
 
-            -- DEFAULT_CHAT_FRAME:AddMessage("-- Set description " .. page)
+            -- print("-- Set description " .. page)
 
             MyEventsDetailsDescription:SetText(Chronicles.UI.MyEvents.SelectedEvent.description[page])
 
@@ -501,7 +501,7 @@ end
 ------------------------------------------------------------------------------------------
 
 function Init_EventType_Dropdown()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
+    -- print("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
 
     for key, value in ipairs(Chronicles.constants.eventType) do
         local info = UIDropDownMenu_CreateInfo()
@@ -517,7 +517,7 @@ function Init_EventType_Dropdown()
         info.checked = false
         info.disabled = false
 
-        -- DEFAULT_CHAT_FRAME:AddMessage("-- event type " .. info.text .. " " .. info.value)
+        -- print("-- event type " .. info.text .. " " .. info.value)
 
         UIDropDownMenu_AddButton(info)
     end
@@ -544,7 +544,7 @@ end
 
 function Set_DropdownValue(self, frame, data)
     local index = self:GetID()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- Set_DropdownValue " .. index .. " " .. data[index])
+    -- print("-- Set_DropdownValue " .. index .. " " .. data[index])
     UIDropDownMenu_SetSelectedID(frame, index)
     UIDropDownMenu_SetText(frame, data[index])
 end
@@ -570,7 +570,7 @@ function MyEventsDetailsAddDescriptionPage_OnClick()
 
     local maxIndex = Chronicles.UI.MyEvents.SelectedEvent.MaxDescriptionPages + 1
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsDetailsAddDescriptionPage_OnClick " .. maxIndex)
+    -- print("-- MyEventsDetailsAddDescriptionPage_OnClick " .. maxIndex)
 
     Chronicles.UI.MyEvents.SelectedEvent.MaxDescriptionPages = maxIndex
     Chronicles.UI.MyEvents.SelectedEvent.description[maxIndex] = ""
@@ -950,7 +950,7 @@ function MyEventsFactions_HideSearchPreview()
 end
 
 function MyEventsFactions_SetSearchPreviewSelection(selectedIndex)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SetSearchPreviewSelection " .. tostring(selectedIndex))
+    -- print("-- MyEventsFactions_SetSearchPreviewSelection " .. tostring(selectedIndex))
 
     local factionSearchPreviewContainer = MyEvents.Details.FactionsCharacters.factionSearchPreviewContainer
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
@@ -987,14 +987,14 @@ function MyEventsFactions_SetSearchPreviewSelection(selectedIndex)
 end
 
 function MyEventsFactions_ShowSearchPreviewResults()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowSearchPreviewResults ")
+    -- print("-- MyEventsFactions_ShowSearchPreviewResults ")
 
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
     local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
 
     local numResults = tablelength(factionSearchResults)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("---- numResults " .. numResults)
+    -- print("---- numResults " .. numResults)
     if (numResults > 0) then
         MyEventsFactions_SetSearchPreviewSelection(1)
     end
@@ -1003,7 +1003,7 @@ function MyEventsFactions_ShowSearchPreviewResults()
     local searchPreviews = factionSearchPreviewContainer.searchPreviews
     local lastButton
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowSearchPreviewResults " .. tablelength(searchPreviews))
+    -- print("-- MyEventsFactions_ShowSearchPreviewResults " .. tablelength(searchPreviews))
     for index = 1, NUM_SEARCH_PREVIEWS do
         local searchPreview = searchPreviews[index]
         if (index <= numResults) then
@@ -1051,7 +1051,7 @@ function MyEventsFactions_FullSearchResultsButton_OnClick(self)
 end
 
 function MyEventsFactions_SelectSearchItem(factionID)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
+    -- print("-- MyEventsFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
 
     local results =
         Chronicles.DB:FindFactions(
@@ -1060,7 +1060,7 @@ function MyEventsFactions_SelectSearchItem(factionID)
         }
     )
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("---- results " .. tablelength(results))
+    -- print("---- results " .. tablelength(results))
 
     if (results ~= nil and tablelength(results) > 0) then
         if (Chronicles.UI.MyEvents.SelectedEvent_Factions[factionID.group] ~= nil) then
@@ -1109,7 +1109,7 @@ function MyEventsFactions_SearchPreviewButton_OnLoad(self)
 end
 
 function MyEventsFactions_SearchPreviewButton_OnEnter(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_SearchPreviewButton_OnEnter ")
+    -- print("-- MyEventsFactions_SearchPreviewButton_OnEnter ")
     MyEventsFactions_SetSearchPreviewSelection(self.previewIndex)
 end
 
@@ -1135,7 +1135,7 @@ function MyEventsFactions_ShowFullSearch()
     end
 
     MyEventsFactions_HideSearchPreview()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsFactions_ShowFullSearch ")
+    -- print("-- MyEventsFactions_ShowFullSearch ")
     MyEvents.Details.FactionsCharacters.factionSearchBox:ClearFocus()
     MyEvents.Details.FactionsCharacters.factionSearchResults:Show()
 end
@@ -1455,7 +1455,7 @@ function MyEventsCharacters_HideSearchPreview()
 end
 
 function MyEventsCharacters_SetSearchPreviewSelection(selectedIndex)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_SetSearchPreviewSelection " .. tostring(selectedIndex))
+    -- print("-- MyEventsCharacters_SetSearchPreviewSelection " .. tostring(selectedIndex))
 
     local characterSearchPreviewContainer = MyEvents.Details.FactionsCharacters.characterSearchPreviewContainer
     local searchPreviews = characterSearchPreviewContainer.searchPreviews
@@ -1492,14 +1492,14 @@ function MyEventsCharacters_SetSearchPreviewSelection(selectedIndex)
 end
 
 function MyEventsCharacters_ShowSearchPreviewResults()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_ShowSearchPreviewResults ")
+    -- print("-- MyEventsCharacters_ShowSearchPreviewResults ")
 
     local searchtext = MyEvents.Details.FactionsCharacters.characterSearchBox:GetText()
     local characterSearchResults = Chronicles.DB:SearchCharacters(searchtext)
 
     local numResults = tablelength(characterSearchResults)
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("---- numResults " .. numResults)
+    -- print("---- numResults " .. numResults)
     if (numResults > 0) then
         MyEventsCharacters_SetSearchPreviewSelection(1)
     end
@@ -1508,7 +1508,7 @@ function MyEventsCharacters_ShowSearchPreviewResults()
     local searchPreviews = characterSearchPreviewContainer.searchPreviews
     local lastButton
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_ShowSearchPreviewResults " .. tablelength(searchPreviews))
+    -- print("-- MyEventsCharacters_ShowSearchPreviewResults " .. tablelength(searchPreviews))
     for index = 1, NUM_SEARCH_PREVIEWS do
         local searchPreview = searchPreviews[index]
         if (index <= numResults) then
@@ -1556,7 +1556,7 @@ function MyEventsCharacters_FullSearchResultsButton_OnClick(self)
 end
 
 function MyEventsCharacters_SelectSearchItem(characterID)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_SelectSearchItem " .. characterID.id .. " " .. characterID.group)
+    -- print("-- MyEventsCharacters_SelectSearchItem " .. characterID.id .. " " .. characterID.group)
 
     local results =
         Chronicles.DB:FindCharacters(
@@ -1565,7 +1565,7 @@ function MyEventsCharacters_SelectSearchItem(characterID)
         }
     )
 
-    -- DEFAULT_CHAT_FRAME:AddMessage("---- results " .. tablelength(results))
+    -- print("---- results " .. tablelength(results))
 
     if (results ~= nil and tablelength(results) > 0) then
         if (Chronicles.UI.MyEvents.SelectedEvent_Characters[characterID.group] ~= nil) then
@@ -1614,7 +1614,7 @@ function MyEventsCharacters_SearchPreviewButton_OnLoad(self)
 end
 
 function MyEventsCharacters_SearchPreviewButton_OnEnter(self)
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_SearchPreviewButton_OnEnter ")
+    -- print("-- MyEventsCharacters_SearchPreviewButton_OnEnter ")
     MyEventsCharacters_SetSearchPreviewSelection(self.previewIndex)
 end
 
@@ -1640,7 +1640,7 @@ function MyEventsCharacters_ShowFullSearch()
     end
 
     MyEventsCharacters_HideSearchPreview()
-    -- DEFAULT_CHAT_FRAME:AddMessage("-- MyEventsCharacters_ShowFullSearch ")
+    -- print("-- MyEventsCharacters_ShowFullSearch ")
     MyEvents.Details.FactionsCharacters.characterSearchBox:ClearFocus()
     MyEvents.Details.FactionsCharacters.characterSearchResults:Show()
 end
