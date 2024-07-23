@@ -2,17 +2,26 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
 EventDetailPageMixin = {}
-local Templates = {
-	["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
-	["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
-	["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
-	["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
-	["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
-	["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
-}
+-- local Templates = {
+-- 	["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
+-- 	["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
+-- 	["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
+-- 	["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
+-- 	["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
+-- 	["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
+-- }
 
 function EventDetailPageMixin:OnLoad()
-	self.PagedEventDetailPage:SetElementTemplateData(Templates)
+	self.PagedEventDetailPage:SetElementTemplateData(
+		{
+			["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
+			["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
+			["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
+			["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
+			["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
+			["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
+		}
+	)
 
 	EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnEventSelected, self)
 
@@ -33,14 +42,11 @@ function EventDetailPageMixin:OnPagingButtonLeave()
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
 
-function EventDetailPageMixin:OnEventSelected(eventData)
-	self:ShowEvent(eventData)
-end
-
-function EventDetailPageMixin:ShowEvent(data)
+function EventDetailPageMixin:OnEventSelected(data)
 	local content = private.Core.Events.TransformEventToBook(data)
 
 	local dataProvider = CreateDataProvider(content)
 	local retainScrollPosition = false
 	self.PagedEventDetailPage:SetDataProvider(dataProvider, retainScrollPosition)
 end
+

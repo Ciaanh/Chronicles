@@ -5,7 +5,7 @@
 
 
     <Frame name="BookTitleTemplate" mixin="BookTitleMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="500"/>
+        <Size x="$parent.viewWidth" y="510"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>

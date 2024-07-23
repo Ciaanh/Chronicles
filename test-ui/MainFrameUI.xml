@@ -36,7 +36,7 @@
                     </Layer>
                 </Layers> -->
                 <Frames>
-                    <Frame parentKey="Book" inherits="EventDetailPageTemplate">
+                    <Frame name="EventBook" parentKey="Book" inherits="EventDetailPageTemplate">
                         <Anchors>
                             <Anchor point="TOP" />
                         </Anchors>
@@ -48,9 +48,9 @@
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="EventList" inherits="EventListTemplateTemplate">
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
                         <Anchors>
-                            <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-50" />
+                            <Anchor point="BOTTOMRIGHT" relativeTo="EventBook" relativePoint="BOTTOMLEFT" x="-50" />
                         </Anchors>
                     </Frame>
                 </Frames>

@@ -53,13 +53,6 @@
 					<Anchor point="TOPLEFT" x="50" y="-50"/>
 					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
 				</Anchors>
-				<!-- <Layers>
-					<Layer level="BACKGROUND" textureSubLevel="1000">
-						<Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-							<Color r="0.0" g="255.0" b="0.0"/>
-						</Texture>
-					</Layer>
-				</Layers> -->
 				<Frames>
 
 					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
@@ -95,7 +88,7 @@
 						</Anchors>
 						<KeyValues>
 							<KeyValue key="fontName" value="SystemFont_Med3" type="string" />
-							<KeyValue key="fontColor" value="Event_FONT_COLOR" type="global" />
+							<KeyValue key="fontColor" value="SPELLBOOK_FONT_COLOR" type="global" />
 							<KeyValue key="spacing" value="8" type="number"/>
 							<KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
 							<KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>

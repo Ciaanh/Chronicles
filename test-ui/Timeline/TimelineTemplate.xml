@@ -4,20 +4,20 @@
 
 
     <Frame name="TimelineLabelTemplate" mixin="TimelineLabelMixin" virtual="true">
-        <Size x="85" y="80"/>
+        <Size x="120" y="25"/>
         <Layers>
-            <!-- <Layer level="BACKGROUND">
+            <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r=".0" g="0.0" b="255.0"/>
+                    <Color r=".0" g="255.0" b="0.0"/>
                 </Texture>
-            </Layer> -->
+            </Layer>
             <Layer level="ARTWORK">
                 <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT"/>
                     </Anchors>
-                    <Color color="SPELLBOOK_FONT_COLOR" />
+                    <Color color="WHITE_FONT_COLOR" />
                 </FontString>
             </Layer>
         </Layers>
@@ -27,7 +27,7 @@
     </Frame>
 
     <Button name="TimelinePeriodTemplate" mixin="TimelinePeriodMixin" virtual="true">
-        <Size x="85" y="80"/>
+        <Size x="120" y="75"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
@@ -64,16 +64,6 @@ TooltipDefaultDarkLayout
 TooltipGluesLayout
 -->
 
-        <!-- <Anchors>
-            <Anchor point="TOP" x="0" y="-41"/>
-        </Anchors> -->
-        <!-- <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="0">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="0.0" b="255.0"/>
-                </Texture>
-            </Layer>
-        </Layers> -->
         <Frames>
             <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
                 <Anchors>
@@ -86,7 +76,7 @@ TooltipGluesLayout
 
             <Frame name="Label1" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" x="20" y="10"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="1" type="number"/>
@@ -159,7 +149,7 @@ TooltipGluesLayout
 
             <Button name="Period1" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label1" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="1" type="number"/>
@@ -167,7 +157,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period2" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period1" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label2" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="2" type="number"/>
@@ -175,7 +165,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period3" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period2" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label3" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="3" type="number"/>
@@ -183,7 +173,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period4" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period3" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label4" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="4" type="number"/>
@@ -191,7 +181,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period5" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period4" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label5" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="5" type="number"/>
@@ -199,7 +189,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period6" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period5" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label6" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="6" type="number"/>
@@ -207,7 +197,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period7" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period6" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label7" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="7" type="number"/>
@@ -215,7 +205,7 @@ TooltipGluesLayout
             </Button>
             <Button name="Period8" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Period7" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label8" relativePoint="TOP" x="5" y="0"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="8" type="number"/>

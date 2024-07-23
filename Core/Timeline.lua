@@ -17,6 +17,10 @@ Timeline.CurrentPage = nil
 Timeline.SelectedYear = nil
 Timeline.Periods = {}
 
+function private.Core.Timeline:SetYear(year)
+    Timeline.SelectedYear = year
+end
+
 function private.Core.Timeline.ComputeTimelinePeriods()
     local stepValue = Timeline.CurrentStepValue
     if (stepValue == nil) then

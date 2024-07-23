@@ -243,11 +243,13 @@ function Chronicles.DB:CleanEventObject(event, groupName)
             yearStart = start,
             yearEnd = finish,
             description = description,
+            chapters = event.chapters,
             eventType = event.eventType,
             factions = event.factions,
             characters = event.characters,
             source = groupName,
-            order = event.order
+            order = event.order,
+            author = event.author
         }
         if (event.order == nil) then
             formatedEvent.order = 0
