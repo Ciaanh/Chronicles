@@ -59,10 +59,24 @@
 TooltipAzeriteLayout 
 TooltipDefaultDarkLayout
 TooltipGluesLayout
+
+TooltipCorruptedLayout
+TooltipMawLayout
+DarkmoonBasicSmallContainerLayout
+TooltipMixedLayout
+
+Runeforge
+AdventuresMissionComplete
+CharacterCreateDropdown
+WoodenNeutralFrameTemplate
+GenericMetal
+DragonflightMissionFrame
+CovenantMissionFrame
+BFAMissionAlliance
+BFAMissionHorde
 -->
 
         <Frames>
-
             <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="7" y="-6"/>
@@ -81,8 +95,8 @@ TooltipGluesLayout
                     <KeyValue key="autoExpandElements" value="true" type="boolean"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="0" y="0"/>
-                    <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                    <Anchor point="TOPLEFT" x="5" y="-5"/>
+                    <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
                 </Anchors>
                 <Frames>
 

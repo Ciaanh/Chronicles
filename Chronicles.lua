@@ -39,11 +39,13 @@ function Chronicles:OnInitialize()
             text = Locale["Chronicles"],
             icon = "Interface\\ICONS\\Inv_scroll_04",
             OnClick = function(self, button, down)
-                if (MainFrame:IsVisible()) then
-                    Chronicles.UI:HideWindow()
-                else
-                    Chronicles.UI:DisplayWindow()
-                end
+                -- if (MainFrame:IsVisible()) then
+                --     Chronicles.UI:HideWindow()
+                -- else
+                --     Chronicles.UI:DisplayWindow()
+                -- end
+
+                Chronicles.NewUi:DisplayWindow()
             end,
             OnTooltipShow = function(tt)
                 tt:AddLine(Locale["Chronicles"], 1, 1, 1)
@@ -59,14 +61,14 @@ function Chronicles:OnInitialize()
     self:RegisterChatCommand(
         "chronicles",
         function()
-            self.UI:DisplayWindow()
+            self.NewUi:DisplayWindow()
         end
     )
 
     self:RegisterChatCommand(
         "ct",
         function()
-            self.NewUi.DisplayWindow()
+            self.UI.DisplayWindow()
         end
     )
 
