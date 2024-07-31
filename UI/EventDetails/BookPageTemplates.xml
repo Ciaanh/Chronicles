@@ -11,9 +11,15 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                <FontString name="Title" parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+                <FontString name="Dates" parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Title" x="0" y="-20"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
@@ -101,12 +107,12 @@
     </Frame>
 
     <Frame name="HtmlPageTemplate" mixin="HtmlPageMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="450"/>
+        <Size x="$parent.viewWidth" y="460"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Frames>
-            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin">
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="false">
                 <KeyValues>
                     <KeyValue key="scrollOnMouse" value="false" type="boolean"/>
                     <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
@@ -114,20 +120,22 @@
                     <KeyValue key="scrollBarTopY" value="-25" type="number"/>
                     <KeyValue key="scrollBarBottomY" value="25" type="number"/>
                 </KeyValues>
-                <Size x="500" y="480"/>
+                <Size x="500" y="460"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" y="-20" />
                 </Anchors>
                 <ScrollChild>
-                    <SimpleHTML parentKey="HTML" resizeToFitContents="true">
-                        <Size x="500" y="480" />
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
+                        <Size x="500" />
                         <Anchors>
-                            <Anchor point="TOPLEFT"/>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <FontString inherits="SystemFont_Med3"/>
                     </SimpleHTML>
                 </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
             </ScrollFrame>
         </Frames>
     </Frame>

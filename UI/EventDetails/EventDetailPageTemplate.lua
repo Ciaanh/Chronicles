@@ -2,14 +2,6 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
 EventDetailPageMixin = {}
--- local Templates = {
--- 	["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
--- 	["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
--- 	["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
--- 	["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
--- 	["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
--- 	["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
--- }
 
 function EventDetailPageMixin:OnLoad()
 	self.PagedEventDetails:SetElementTemplateData(

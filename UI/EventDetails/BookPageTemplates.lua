@@ -4,7 +4,13 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 BookTitleMixin = {}
 function BookTitleMixin:Init(elementData)
     if elementData.text then
-        self.Text:SetText(elementData.text)
+        self.Title:SetText(elementData.text)
+    end
+
+    if elementData.yearStart == elementData.yearEnd then
+        self.Dates:SetText(elementData.yearStart)
+    else
+        self.Dates:SetText(tostring(elementData.yearStart) .. " - " .. tostring(elementData.yearEnd))
     end
 end
 

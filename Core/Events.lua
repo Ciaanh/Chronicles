@@ -68,7 +68,9 @@ function private.Core.Events.TransformEventToBook(event)
 		local title = {
 			header = {
 				templateKey = "TITLE",
-				text = event.label
+				text = event.label,
+				yearStart = event.yearStart,
+				yearEnd = event.yearEnd
 			},
 			elements = {}
 		}
