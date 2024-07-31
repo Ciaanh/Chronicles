@@ -25,7 +25,7 @@
         </Layers>
     </Frame>
 
-    <Button name="EventListItemTemplate" mixin="EventListItemMixin">
+    <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
         <Size x="50" y="30"/>
         <Layers>
             <Layer level="BACKGROUND">
@@ -44,6 +44,7 @@
             </Layer>
         </Layers>
         <Scripts>
+
             <OnClick method="OnClick"/>
         </Scripts>
     </Button>

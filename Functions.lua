@@ -8,7 +8,7 @@ measureFrame:Hide()
 local measureText = measureFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 measureText:SetPoint("LEFT")
 
--- Function to split text into lines that fit within a given width
+-- Function to split text into lines that fit within a given frame width
 function SplitTextToFitWidth(textToSplit, width)
 	local text = textToSplit:gsub("\n", " \n ")
 	text = text:gsub("  ", " ")
@@ -33,59 +33,12 @@ function SplitTextToFitWidth(textToSplit, width)
 				line = line .. " " .. word
 			end
 		end
+		line = Trim(line):gsub("<tab>", "  ")
 	end
 
 	table.insert(lines, line)
 
 	return lines
-end
-
-local s_passThroughClosureGenerators = {
-	function(f)
-		return function(...)
-			return f(...)
-		end
-	end,
-	function(f, a)
-		return function(...)
-			return f(a, ...)
-		end
-	end,
-	function(f, a, b)
-		return function(...)
-			return f(a, b, ...)
-		end
-	end,
-	function(f, a, b, c)
-		return function(...)
-			return f(a, b, c, ...)
-		end
-	end,
-	function(f, a, b, c, d)
-		return function(...)
-			return f(a, b, c, d, ...)
-		end
-	end,
-	function(f, a, b, c, d, e)
-		return function(...)
-			return f(a, b, c, d, e, ...)
-		end
-	end
-}
-function GenerateClosureInternal(generatorArray, f, ...)
-	local count = select("#", ...)
-	local generator = generatorArray[count + 1]
-	if generator then
-		return generator(f, ...)
-	end
-
-	assertsafe("Closure generation does not support more than " .. (#generatorArray - 1) .. " parameters")
-	return nil
-end
-
--- Syntactic sugar for function(...) return f(a, b, c, ...); end
-function GenerateClosure(f, ...)
-	return GenerateClosureInternal(s_passThroughClosureGenerators, f, ...)
 end
 
 function cleanHTML(text)

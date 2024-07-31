@@ -12,7 +12,7 @@ EventDetailPageMixin = {}
 -- }
 
 function EventDetailPageMixin:OnLoad()
-	self.PagedEventDetailPage:SetElementTemplateData(
+	self.PagedEventDetails:SetElementTemplateData(
 		{
 			["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
 			["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
@@ -27,7 +27,7 @@ function EventDetailPageMixin:OnLoad()
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
-	self.PagedEventDetailPage.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
+	self.PagedEventDetails.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
 
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 	self.SinglePageBookCornerFlipbook.Anim:Pause()
@@ -47,6 +47,6 @@ function EventDetailPageMixin:OnEventSelected(data)
 
 	local dataProvider = CreateDataProvider(content)
 	local retainScrollPosition = false
-	self.PagedEventDetailPage:SetDataProvider(dataProvider, retainScrollPosition)
+	self.PagedEventDetails:SetDataProvider(dataProvider, retainScrollPosition)
 end
 

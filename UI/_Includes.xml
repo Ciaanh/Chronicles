@@ -3,25 +3,14 @@
 ..\FrameXML\UI.xsd">
 
 	<Include file="Fonts.xml" />
-	<Include file="Textures.xml" />
-	<Include file="Templates.xml" />
+	
+	<Include file="EventList\EventListTemplate.xml" />
 
-	<Include file="MainFrame.xml" />
+	<Include file="EventDetails\BookPageTemplates.xml" />
+	<Include file="EventDetails\EventDetailPageTemplate.xml" />
 
-	<Include file="Events/EventsView.xml" />
-	<Include file="Events/Timeline.xml" />
-	<Include file="Events/EventList.xml" />
-	<Include file="Events/EventFilter.xml" />
-	<Include file="Events/EventDescription.xml" />
+	<Include file="Timeline\TimelineTemplate.xml" />
 
-	<Include file="Characters/CharactersView.xml" />
+	<Include file="MainFrameUI.xml" />
 
-	<Include file="Factions/FactionsView.xml" />
-
-	<Include file="Options/OptionsView.xml" />
-
-	<Include file="MyJournal/MyJournalView.xml" />
-	<Include file="MyJournal/MyEvents.xml" />
-	<Include file="MyJournal/MyCharacters.xml" />
-	<Include file="MyJournal/MyFactions.xml" />
 </Ui>

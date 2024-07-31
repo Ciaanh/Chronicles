@@ -6,20 +6,22 @@ local Chronicles = private.Chronicles
 -----------------------------------------------------------------------------------------
 
 EventListItemMixin = {}
-function EventListItemMixin:Init(text)
+function EventListItemMixin:Init(eventData)
 	print("EventListItemMixin:Init")
 
-	self.Text:SetText(text)
+	self.Text:SetText(eventData.text)
+	self.Event = eventData.event
 end
 
 function EventListItemMixin:OnClick()
-	print("EventListItemMixin:OnClick")
+	print("EventListItemMixin:OnClick " .. tostring(self.Event.Id))
+	EventRegistry:TriggerEvent(private.constants.events.EventDetailPageEventSelected, self.Event)
 end
 
 EventListTitleMixin = {}
-function EventListTitleMixin:Init(text)
-	if text ~= nil then
-		self.Text:SetText(text)
+function EventListTitleMixin:Init(eventData)
+	if eventData.text ~= nil then
+		self.Text:SetText(eventData.text)
 	end
 end
 
@@ -38,14 +40,14 @@ function EventListMixin:OnLoad()
 
 	self.PagedEventList:SetElementTemplateData(
 		{
-			["TITLE"] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
-			["ITEM"] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init}
+			["PERIOD_TITLE"] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
+			["EVENT"] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init}
 		}
 	)
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
-	print("EventListMixin:OnTimelinePeriodSelected " .. tostring(period.lower) .. " " .. tostring(period.upper))
+	-- print("EventListMixin:OnTimelinePeriodSelected " .. tostring(period.lower) .. " " .. tostring(period.upper))
 	local data = {}
 
 	local eventList = Chronicles.DB:SearchEvents(period.lower, period.upper)
@@ -53,23 +55,24 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 
 	local content = {
 		header = {
-			templateKey = "TITLE",
+			templateKey = "PERIOD_TITLE",
 			text = tostring(period.lower) .. " " .. tostring(period.upper)
 		},
 		elements = {}
 	}
 
 	local filteredEvents = private.Core.Events.FilterEvents(eventList)
-	print(tostring(#filteredEvents))
+	-- print(tostring(#filteredEvents))
 	for key, event in pairs(filteredEvents) do
-		print(event.label)
-		table.insert(
-			content.elements,
-			{
-				templateKey = "ITEM",
-				text = event.label
-			}
-		)
+		-- print(event.label)
+		local eventSummary = {
+			templateKey = "EVENT",
+			text = event.label,
+			event = event
+		}
+		-- print(eventSummary.templateKey .. " " .. eventSummary.text)
+
+		table.insert(content.elements, eventSummary)
 	end
 
 	table.insert(data, content)

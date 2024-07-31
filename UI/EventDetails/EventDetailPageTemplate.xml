@@ -40,7 +40,7 @@
 			</Layer> -->
 		</Layers>
 		<Frames>
-			<Frame parentKey="PagedEventDetailPage" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+			<Frame parentKey="PagedEventDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
 				<KeyValues>
 					<KeyValue key="viewsPerPage" value="2" type="number"/>
 					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>

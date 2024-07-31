@@ -72,7 +72,7 @@ function private.Core.Events.TransformEventToBook(event)
 			},
 			elements = {}
 		}
-		
+
 		if (event.author ~= nil) then
 			table.insert(
 				title.elements,
@@ -92,9 +92,18 @@ function private.Core.Events.TransformEventToBook(event)
 		end
 		table.insert(data, title)
 
-		for key, description in pairs(event.description) do
-			local chapter = CreateChapter(nil, {description})
-			table.insert(data, chapter)
+		-- local descriptionLength = #event.description
+		local chaptersLength = #event.chapters
+		if chaptersLength <= 0 then
+			for key, description in pairs(event.description) do
+				local chapter = CreateChapter(nil, {description})
+				table.insert(data, chapter)
+			end
+		else
+			for key, chapter in pairs(event.chapters) do
+				local bookChapter = CreateChapter(chapter.header, chapter.pages)
+				table.insert(data, bookChapter)
+			end
 		end
 
 		return data
@@ -110,28 +119,27 @@ end
 -- local textToDisplayHTMLlong =
 -- 	'<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'
 
-
 function private.Core.Events.FilterEvents(events)
-    local foundEvents = {}
-    for eventIndex in pairs(events) do
-        local event = events[eventIndex]
+	local foundEvents = {}
+	for eventIndex in pairs(events) do
+		local event = events[eventIndex]
 
-        local eventGroupStatus = private.Chronicles.DB:GetGroupStatus(event.source)
-        local eventTypeStatus = private.Chronicles.DB:GetEventTypeStatus(event.eventType)
+		local eventGroupStatus = private.Chronicles.DB:GetGroupStatus(event.source)
+		local eventTypeStatus = private.Chronicles.DB:GetEventTypeStatus(event.eventType)
 
-        if eventGroupStatus and eventTypeStatus then
-            table.insert(foundEvents, event)
-        end
-    end
+		if eventGroupStatus and eventTypeStatus then
+			table.insert(foundEvents, event)
+		end
+	end
 
-    table.sort(
-        foundEvents,
-        function(a, b)
-            if (a.yearStart == b.yearStart) then
-                return a.order < b.order
-            end
-            return a.yearStart < b.yearStart
-        end
-    )
-    return foundEvents
+	table.sort(
+		foundEvents,
+		function(a, b)
+			if (a.yearStart == b.yearStart) then
+				return a.order < b.order
+			end
+			return a.yearStart < b.yearStart
+		end
+	)
+	return foundEvents
 end
