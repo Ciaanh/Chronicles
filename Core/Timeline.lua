@@ -11,7 +11,7 @@ local Chronicles = private.Chronicles
 -----------------------------------------------------------------------------------------
 local Timeline = {}
 Timeline.MaxStepIndex = 7
-Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 1}
+Timeline.StepValues = { 1000, 500, 250, 100, 50, 10, 1 }
 Timeline.CurrentStepValue = nil
 Timeline.CurrentPage = nil
 Timeline.SelectedYear = nil
@@ -301,7 +301,7 @@ end
 
 -- pageIndex goes from 1 to math.floor(numberOfCells / pageSize)
 -- index should go from 1 to GetNumberOfTimelineBlock
-function private.Core.Timeline.ComputeDisplayedTimeline(debounceIndex)
+function private.Core.Timeline.DefineDisplayedTimelinePage(debounceIndex)
     local pageIndex = Timeline.CurrentPage
     local pageSize = Chronicles.constants.config.timeline.pageSize
 
@@ -373,8 +373,8 @@ function private.Core.Timeline.ComputeDisplayedTimeline(debounceIndex)
     }
 end
 
-function private.Core.Timeline.ComputeTimelineWindow()
-    -- print("ComputeTimelineWindow")
+function private.Core.Timeline.DisplayTimelineWindow()
+    -- print("DisplayTimelineWindow")
     local pageIndex = Timeline.CurrentPage
     local pageSize = Chronicles.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
@@ -385,16 +385,25 @@ function private.Core.Timeline.ComputeTimelineWindow()
     if (firstIndex <= 1) then
         firstIndex = 1
         -- TimelinePreviousButton:Disable()
-        -- print("Set current page" .. tostring(1))
+        print("Set current page" .. tostring(1))
         Timeline.CurrentPage = 1
+
+        EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, false)
+    else
+        EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, true)
     end
 
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
         firstIndex = numberOfCells - 7
         -- TimelineNextButton:Disable()
-        -- print("Set current page" .. tostring(maxPageValue))
+        print("Set current page" .. tostring(maxPageValue))
         Timeline.CurrentPage = maxPageValue
+
+        EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, false)
+    else
+        EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, true)
     end
+
 
     print("First index " .. tostring(firstIndex))
     print("Current page " .. tostring(Timeline.CurrentPage))

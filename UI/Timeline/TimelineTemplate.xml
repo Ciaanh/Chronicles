@@ -1,44 +1,46 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-    <Script file="TimelineTemplate.lua"/>
+    <Script file="TimelineTemplate.lua" />
 
 
     <Frame name="TimelineLabelTemplate" mixin="TimelineLabelMixin" virtual="true">
-        <Size x="120" y="25"/>
+        <Size x="130" y="25" />
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r=".0" g="255.0" b="0.0"/>
+                    <Color r=".0" g="255.0" b="0.0" />
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true"
+                    justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
-                        <Anchor point="BOTTOMRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
             </Layer>
         </Layers>
         <Scripts>
-            <OnLoad method="OnLoad"/>
+            <OnLoad method="OnLoad" />
         </Scripts>
     </Frame>
 
     <Button name="TimelinePeriodTemplate" mixin="TimelinePeriodMixin" virtual="true">
-        <Size x="120" y="75"/>
+        <Size x="130" y="75" />
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r=".0" g="0.0" b="255.0"/>
+                    <Color r=".0" g="0.0" b="255.0" />
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
+                    justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
-                        <Anchor point="BOTTOMRIGHT"/>
+                        <Anchor point="BOTTOMRIGHT" />
                     </Anchors>
                     <!-- <Color color="SPELLBOOK_FONT_COLOR" />-->
                     <!-- SystemFont_Med3 ChroniclesFont -->
@@ -46,16 +48,16 @@
             </Layer>
         </Layers>
         <Scripts>
-            <OnLoad method="OnLoad"/>
-            <OnClick method="OnClick"/>
+            <OnLoad method="OnLoad" />
+            <OnClick method="OnClick" />
         </Scripts>
     </Button>
 
 
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
-        <Size x="1200" y="125"/>
+        <Size x="1200" y="125" />
         <KeyValues>
-            <KeyValue key="layoutType" value="TooltipAzeriteLayout" type="string"/>
+            <KeyValue key="layoutType" value="TooltipAzeriteLayout" type="string" />
         </KeyValues>
 
         <!-- 
@@ -67,154 +69,204 @@ TooltipGluesLayout
         <Frames>
             <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="7" y="-6"/>
-                    <Anchor point="BOTTOMRIGHT" x="-7" y="6"/>
+                    <Anchor point="TOPLEFT" x="7" y="-6" />
+                    <Anchor point="BOTTOMRIGHT" x="-7" y="6" />
                 </Anchors>
             </Frame>
 
-            <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+            <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate" />
+
+            <Button parentKey="Previous">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="RIGHT" relativePoint="LEFT" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                            <Color r="255.0" g="0.0" b="0.0" />
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
+                            justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" />
+                                <Anchor point="BOTTOMRIGHT" />
+                            </Anchors>
+                            <!-- <Color color="SPELLBOOK_FONT_COLOR" />-->
+                            <!-- SystemFont_Med3 ChroniclesFont -->
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Button>
+            <Button parentKey="Next">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                            <Color r="255.0" g="0.0" b="0.0" />
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
+                            justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" />
+                                <Anchor point="BOTTOMRIGHT" />
+                            </Anchors>
+                            <!-- <Color color="SPELLBOOK_FONT_COLOR" />-->
+                            <!-- SystemFont_Med3 ChroniclesFont -->
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Button>
+
 
             <Frame name="Label1" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" x="20" y="10"/>
+                    <Anchor point="BOTTOMLEFT" x="15" y="10" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="1" type="number"/>
+                    <KeyValue key="index" value="1" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label2" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label1" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label1" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="2" type="number"/>
+                    <KeyValue key="index" value="2" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label3" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label2" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label2" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="3" type="number"/>
+                    <KeyValue key="index" value="3" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label4" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label3" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label3" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="4" type="number"/>
+                    <KeyValue key="index" value="4" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label5" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label4" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label4" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="5" type="number"/>
+                    <KeyValue key="index" value="5" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label6" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label5" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label5" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="6" type="number"/>
+                    <KeyValue key="index" value="6" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label7" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label6" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label6" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="7" type="number"/>
+                    <KeyValue key="index" value="7" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label8" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label7" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label7" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="8" type="number"/>
+                    <KeyValue key="index" value="8" type="number" />
                 </KeyValues>
             </Frame>
             <Frame name="Label9" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label8" relativePoint="RIGHT" x="10" y="0"/>
+                    <Anchor point="LEFT" relativeTo="Label8" relativePoint="RIGHT" x="0" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="9" type="number"/>
+                    <KeyValue key="index" value="9" type="number" />
                 </KeyValues>
             </Frame>
 
             <Button name="Period1" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label1" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label1" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="1" type="number"/>
+                    <KeyValue key="index" value="1" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period2" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label2" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label2" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="2" type="number"/>
+                    <KeyValue key="index" value="2" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period3" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label3" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label3" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="3" type="number"/>
+                    <KeyValue key="index" value="3" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period4" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label4" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label4" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="4" type="number"/>
+                    <KeyValue key="index" value="4" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period5" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label5" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label5" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="5" type="number"/>
+                    <KeyValue key="index" value="5" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period6" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label6" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label6" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="6" type="number"/>
+                    <KeyValue key="index" value="6" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period7" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label7" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label7" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="7" type="number"/>
+                    <KeyValue key="index" value="7" type="number" />
                 </KeyValues>
             </Button>
             <Button name="Period8" inherits="TimelinePeriodTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label8" relativePoint="TOP" x="5" y="0"/>
+                    <Anchor point="BOTTOMLEFT" relativeTo="Label8" relativePoint="TOP" x="5" y="0" />
                 </Anchors>
                 <KeyValues>
-                    <KeyValue key="index" value="8" type="number"/>
+                    <KeyValue key="index" value="8" type="number" />
                 </KeyValues>
             </Button>
 
         </Frames>
         <Scripts>
-            <OnLoad method="OnLoad"/>
+            <OnLoad method="OnLoad" />
         </Scripts>
     </Frame>
 
