@@ -21,9 +21,6 @@ function TimelineMixin:OnLoad()
         .OnTimelinePreviousVisible, self)
     EventRegistry:RegisterCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
     EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
-
-    self.Previous:SetScript("OnClick", self.TimelinePrevious)
-    self.Next:SetScript("OnClick", self.TimelineNext)
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
@@ -39,13 +36,13 @@ function TimelineMixin:OnTimelineInit(eventData)
     private.Core.Timeline.DisplayTimelineWindow()
 
     -- scrollFrame:SetScript("OnMouseWheel", onMouseWheel)
+    self.Previous:SetScript("OnClick", self.TimelinePrevious)
+    self.Next:SetScript("OnClick", self.TimelineNext)
 end
 
 function TimelineMixin:TimelinePrevious()
     print("TimelineMixin:TimelinePrevious")
-    private.Core.Timeline.CurrentPage = private.Core.Timeline.CurrentPage - 1
-
-    private.Core.Timeline.DisplayTimelineWindow()
+    private.Core.Timeline:ChangePage(-1)
 end
 
 function TimelineMixin:OnTimelinePreviousVisible(isVisible)
@@ -61,9 +58,7 @@ end
 
 function TimelineMixin:TimelineNext()
     print("TimelineMixin:TimelineNext")
-    private.Core.Timeline.CurrentPage = private.Core.Timeline.CurrentPage + 1
-
-    private.Core.Timeline.DisplayTimelineWindow()
+    private.Core.Timeline:ChangePage(1)
 end
 
 function TimelineMixin:OnTimelineNextVisible(isVisible)

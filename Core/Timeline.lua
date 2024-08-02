@@ -17,6 +17,15 @@ Timeline.CurrentPage = nil
 Timeline.SelectedYear = nil
 Timeline.Periods = {}
 
+function private.Core.Timeline:ChangePage(value)
+    print("CurrentPage " .. tostring(Timeline.CurrentPage))
+    print("Value " .. tostring(value))
+
+    Timeline.DefineDisplayedTimelinePage(Timeline.CurrentPage + value)
+
+    Timeline.DisplayTimelineWindow()
+end
+
 function private.Core.Timeline:SetYear(year)
     Timeline.SelectedYear = year
 end
@@ -374,13 +383,15 @@ function private.Core.Timeline.DefineDisplayedTimelinePage(debounceIndex)
 end
 
 function private.Core.Timeline.DisplayTimelineWindow()
-    -- print("DisplayTimelineWindow")
+    print("DisplayTimelineWindow")
     local pageIndex = Timeline.CurrentPage
     local pageSize = Chronicles.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
     local firstIndex = 1 + ((pageIndex - 1) * pageSize)
+
+    print("Current page" .. tostring(pageIndex))
 
     if (firstIndex <= 1) then
         firstIndex = 1
