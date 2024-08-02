@@ -15,6 +15,9 @@ TimelineMixin = {}
 -- ui color ideas UI-Tuskarr-Highlight-Middle
 
 function TimelineMixin:OnLoad()
+    self.Previous:SetScript("OnClick", self.TimelinePrevious)
+    self.Next:SetScript("OnClick", self.TimelineNext)
+
     EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
 
     EventRegistry:RegisterCallback(private.constants.events.TimelinePreviousButtonVisible, self
@@ -36,48 +39,54 @@ function TimelineMixin:OnTimelineInit(eventData)
     private.Core.Timeline.DisplayTimelineWindow()
 
     -- scrollFrame:SetScript("OnMouseWheel", onMouseWheel)
-    self.Previous:SetScript("OnClick", self.TimelinePrevious)
-    self.Next:SetScript("OnClick", self.TimelineNext)
 end
 
 function TimelineMixin:TimelinePrevious()
-    print("TimelineMixin:TimelinePrevious")
+    -- print("TimelineMixin:TimelinePrevious")
     private.Core.Timeline:ChangePage(-1)
 end
 
 function TimelineMixin:OnTimelinePreviousVisible(isVisible)
-    print("TimelineMixin:OnTimelinePreviousVisible " .. tostring(isVisible))
+    -- print("TimelineMixin:OnTimelinePreviousVisible " .. tostring(isVisible))
     if isVisible then
-        print("Previous Enabled")
+        -- print("Previous Enabled")
         self.Previous:Enable()
     else
-        print("Previous Disabled")
+        -- print("Previous Disabled")
         self.Previous:Disable()
     end
 end
 
 function TimelineMixin:TimelineNext()
-    print("TimelineMixin:TimelineNext")
+    -- print("TimelineMixin:TimelineNext")
     private.Core.Timeline:ChangePage(1)
 end
 
 function TimelineMixin:OnTimelineNextVisible(isVisible)
-    print("TimelineMixin:OnTimelineNextVisible " .. tostring(isVisible))
+    -- print("TimelineMixin:OnTimelineNextVisible " .. tostring(isVisible))
     if isVisible then
-        print("Next Enabled")
+        -- print("Next Enabled")
         self.Next:Enable()
     else
-        print("Next Disabled")
+        -- print("Next Disabled")
         self.Next:Disable()
+    end
+end
+
+function TimelineMixin:OnMouseWheel(value)
+    if (value > 0) then
+        private.Core.Timeline:ChangePage(-1)
+    else
+        private.Core.Timeline:ChangePage(1)
     end
 end
 
 function TimelineMixin:OnTimelineStepChanged(eventData)
 end
 
-function TimelineMixin:OnClick()
-    print("TimelineMixin:OnClick")
-end
+-- function TimelineMixin:OnClick()
+--     print("TimelineMixin:OnClick")
+-- end
 
 -----------------------------------------------------------------------------------------
 -- TimelineLabel ------------------------------------------------------------------------

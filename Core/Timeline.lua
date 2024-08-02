@@ -18,12 +18,10 @@ Timeline.SelectedYear = nil
 Timeline.Periods = {}
 
 function private.Core.Timeline:ChangePage(value)
-    print("CurrentPage " .. tostring(Timeline.CurrentPage))
-    print("Value " .. tostring(value))
-
-    Timeline.DefineDisplayedTimelinePage(Timeline.CurrentPage + value)
-
-    Timeline.DisplayTimelineWindow()
+    -- print("CurrentPage " .. tostring(Timeline.CurrentPage))
+    -- print("Value " .. tostring(value))
+    self.DefineDisplayedTimelinePage(Timeline.CurrentPage + value)
+    self.DisplayTimelineWindow()
 end
 
 function private.Core.Timeline:SetYear(year)
@@ -383,7 +381,7 @@ function private.Core.Timeline.DefineDisplayedTimelinePage(debounceIndex)
 end
 
 function private.Core.Timeline.DisplayTimelineWindow()
-    print("DisplayTimelineWindow")
+    -- print("DisplayTimelineWindow")
     local pageIndex = Timeline.CurrentPage
     local pageSize = Chronicles.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
@@ -391,12 +389,12 @@ function private.Core.Timeline.DisplayTimelineWindow()
 
     local firstIndex = 1 + ((pageIndex - 1) * pageSize)
 
-    print("Current page" .. tostring(pageIndex))
+    -- print("Current page" .. tostring(pageIndex))
 
     if (firstIndex <= 1) then
         firstIndex = 1
         -- TimelinePreviousButton:Disable()
-        print("Set current page" .. tostring(1))
+        -- print("Set current page" .. tostring(1))
         Timeline.CurrentPage = 1
 
         EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, false)
@@ -407,7 +405,7 @@ function private.Core.Timeline.DisplayTimelineWindow()
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
         firstIndex = numberOfCells - 7
         -- TimelineNextButton:Disable()
-        print("Set current page" .. tostring(maxPageValue))
+        -- print("Set current page" .. tostring(maxPageValue))
         Timeline.CurrentPage = maxPageValue
 
         EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, false)
@@ -415,9 +413,8 @@ function private.Core.Timeline.DisplayTimelineWindow()
         EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, true)
     end
 
-
-    print("First index " .. tostring(firstIndex))
-    print("Current page " .. tostring(Timeline.CurrentPage))
+    -- print("First index " .. tostring(firstIndex))
+    -- print("Current page " .. tostring(Timeline.CurrentPage))
 
     for labelIndex = 1, pageSize + 1, 1 do
         -- print(tostring(labelIndex)) -- crash on index 1
