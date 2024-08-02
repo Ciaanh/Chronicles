@@ -18,8 +18,6 @@ Timeline.SelectedYear = nil
 Timeline.Periods = {}
 
 function private.Core.Timeline:ChangePage(value)
-    -- print("CurrentPage " .. tostring(Timeline.CurrentPage))
-    -- print("Value " .. tostring(value))
     self.DefineDisplayedTimelinePage(Timeline.CurrentPage + value)
     self.DisplayTimelineWindow()
 end
@@ -37,16 +35,9 @@ function private.Core.Timeline.ComputeTimelinePeriods()
 
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
-
-    -- print("-- minYear " .. minYear)
-    -- print("-- maxYear " .. maxYear)
-
     local timelineConfig = GetTimelineConfig(minYear, maxYear, stepValue)
 
-    local insert = table.insert
     local timelineBlocks = {}
-
-    -- print("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
 
     for blockIndex = 1, timelineConfig.numberOfTimelineBlock do
         local minValue = 0
@@ -73,7 +64,7 @@ function private.Core.Timeline.ComputeTimelinePeriods()
             end
         end
 
-        local block = {
+        local period = {
             lowerBound = minValue,
             upperBound = maxValue,
             text = nil,
@@ -82,32 +73,25 @@ function private.Core.Timeline.ComputeTimelinePeriods()
 
         if (maxValue > private.constants.config.currentYear) then
             if (minValue > private.constants.config.currentYear) then
-                block.lowerBound = private.constants.config.currentYear + 1
-                block.upperBound = 999999
-                block.text = Locale["Futur"]
+                period.lowerBound = private.constants.config.currentYear + 1
+                period.upperBound = 999999
+                period.text = Locale["Futur"]
             else
-                block.upperBound = private.constants.config.currentYear
+                period.upperBound = private.constants.config.currentYear
             end
         elseif (maxValue < private.constants.config.historyStartYear) then
             if (minValue < private.constants.config.historyStartYear) then
-                block.lowerBound = -999999
-                block.upperBound = private.constants.config.historyStartYear - 1
-                block.text = Locale["Mythos"]
+                period.lowerBound = -999999
+                period.upperBound = private.constants.config.historyStartYear - 1
+                period.text = Locale["Mythos"]
             else
-                block.upperBound = private.constants.config.historyStartYear
+                period.upperBound = private.constants.config.historyStartYear
             end
         end
 
-        -- if (blockIndex == timelineConfig.numberOfTimelineBlock) then
-        --     print(
-        --         "-- blockIndex " .. blockIndex .. "-- minValue " .. minValue .. "-- maxValue " .. maxValue
-        --     )
-        --     print("-- lower " .. block.lowerBound .. "-- upper " .. block.upperBound)
-        -- end
+        period.hasEvents = HasEvents(period)
 
-        block.hasEvents = HasEvents(block)
-
-        insert(timelineBlocks, block)
+        table.insert(timelineBlocks, period)
     end
 
     local displayableTimeFrames = {}
@@ -173,16 +157,14 @@ function HasEvents(block)
 
     local upperDateIndex = GetDateCurrentStepIndex(upperBound)
     local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
-
     local eventDates = GetCurrentStepEventDates()
-    --local currentstep = Chronicles.UI.Timeline.CurrentStepValue
 
     local gap = math.abs(upperDateIndex - lowerDateIndex)
 
     if (gap > 1) then
         for i = lowerDateIndex, upperDateIndex, 1 do
             local eventsDate = eventDates[i]
-            if (eventsDate ~= nil and eventsDate) then
+            if (eventsDate ~= nil and #eventsDate > 0) then
                 return true
             end
         end
@@ -190,10 +172,10 @@ function HasEvents(block)
         local lowerEventsDate = eventDates[lowerDateIndex]
         local upperEventsDate = eventDates[upperDateIndex]
 
-        if (lowerEventsDate ~= nil and lowerEventsDate) then
+        if (lowerEventsDate ~= nil and #lowerEventsDate > 0) then
             return true
         end
-        if (upperEventsDate ~= nil and upperEventsDate) then
+        if (upperEventsDate ~= nil and #upperEventsDate > 0) then
             return true
         end
     end
@@ -201,7 +183,7 @@ function HasEvents(block)
 end
 
 function GetDateCurrentStepIndex(date)
-    local dateProfile = Chronicles.DB:ComputeDateProfile(date)
+    local dateProfile = Chronicles.DB:ComputeEventDateProfile(date)
     if (Timeline.CurrentStepValue == 1000) then
         return dateProfile.mod1000
     elseif (Timeline.CurrentStepValue == 500) then
@@ -220,7 +202,7 @@ function GetDateCurrentStepIndex(date)
 end
 
 function GetCurrentStepEventDates()
-    local eventDates = Chronicles.DB.EventsDates
+    local eventDates = Chronicles.DB.PeriodsFillingBySteps
     if (Timeline.CurrentStepValue == 1000) then
         return eventDates.mod1000
     elseif (Timeline.CurrentStepValue == 500) then

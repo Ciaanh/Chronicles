@@ -117,8 +117,16 @@ function TimelinePeriodMixin:OnLoad()
     EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
 end
 
-function TimelinePeriodMixin:OnDisplayTimelinePeriod(data)
-    self.data = data
+function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
+    self.data = eventData
+
+    print(tostring(eventData.hasEvents))
+
+    if eventData.hasEvents then
+        measureFrame:Show()
+    else
+        measureFrame:Hide()
+    end
     -- print("OnDisplayTimelinePeriod")
     -- EventRegistry:TriggerEvent(
     --     private.constants.events.TimelinePeriodSelected,

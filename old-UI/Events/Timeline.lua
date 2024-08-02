@@ -7,7 +7,7 @@ Chronicles.UI.Timeline = {}
 
 Chronicles.UI.Timeline.MaxStepIndex = 7
 
-Chronicles.UI.Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 1}
+Chronicles.UI.Timeline.StepValues = { 1000, 500, 250, 100, 50, 10, 1 }
 Chronicles.UI.Timeline.CurrentStepValue = nil
 Chronicles.UI.Timeline.CurrentPage = nil
 Chronicles.UI.Timeline.SelectedYear = nil
@@ -24,7 +24,7 @@ function Chronicles.UI.Timeline:Init()
             bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
             tile = true,
             tileSize = 16,
-            insets = {left = 6, right = 6, top = 0, bottom = 17}
+            insets = { left = 6, right = 6, top = 0, bottom = 17 }
         }
     )
 
@@ -186,13 +186,8 @@ end
 function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
-
-    -- print("-- minYear " .. minYear)
-    -- print("-- maxYear " .. maxYear)
-
     local timelineConfig = Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 
-    local insert = table.insert
     local timelineBlocks = {}
 
     -- print("-- numberOfTimelineBlock " .. timelineConfig.numberOfTimelineBlock)
@@ -256,7 +251,7 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
 
         block.hasEvents = Chronicles.UI.Timeline:HasEvents(block)
 
-        insert(timelineBlocks, block)
+        table.insert(timelineBlocks, block)
     end
 
     local displayableTimeFrames = {}
@@ -345,7 +340,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
     if (gap > 1) then
         for i = lowerDateIndex, upperDateIndex, 1 do
             local eventsDate = eventDates[i]
-            if (eventsDate ~= nil and eventsDate) then
+            if (eventsDate ~= nil and #eventsDate > 0) then
                 return true
             end
         end
@@ -364,7 +359,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
         --     )
         -- end
 
-        if (lowerEventsDate ~= nil and lowerEventsDate) then
+        if (lowerEventsDate ~= nil and #lowerEventsDate > 0) then
             -- if (block.lowerBound == 0) then
             --     print(
             --         "-- lowerDateIndex " .. lowerDateIndex .. " " .. tostring(eventDates[lowerDateIndex])
@@ -372,7 +367,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
             -- end
             return true
         end
-        if (upperEventsDate ~= nil and upperEventsDate) then
+        if (upperEventsDate ~= nil and #upperEventsDate > 0) then
             -- if (block.lowerBound == 0) then
             --     print(
             --         "-- upperDateIndex " .. upperDateIndex .. " " .. tostring(eventDates[upperDateIndex])
@@ -385,7 +380,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
 end
 
 function Chronicles.UI.Timeline:GetDateCurrentStepIndex(date)
-    local dateProfile = Chronicles.DB:ComputeDateProfile(date)
+    local dateProfile = Chronicles.DB:ComputeEventDateProfile(date)
     if (Chronicles.UI.Timeline.CurrentStepValue == 1000) then
         return dateProfile.mod1000
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 500) then
@@ -404,7 +399,7 @@ function Chronicles.UI.Timeline:GetDateCurrentStepIndex(date)
 end
 
 function Chronicles.UI.Timeline:GetCurrentStepEventDates()
-    local eventDates = Chronicles.DB.EventsDates
+    local eventDates = Chronicles.DB.PeriodsFillingBySteps
     if (Chronicles.UI.Timeline.CurrentStepValue == 1000) then
         return eventDates.mod1000
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 500) then
