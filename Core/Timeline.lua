@@ -96,7 +96,7 @@ function private.Core.Timeline.ComputeTimelinePeriods()
         local nbEvents = CountEvents(period)
         period.hasEvents = nbEvents > 0
         period.nbEvents = nbEvents
-plop
+bug for mythos
         -- if period.hasEvents then
         --     print("-- blockIndex " .. tostring(i))
         -- end

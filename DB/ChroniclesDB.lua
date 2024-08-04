@@ -56,7 +56,7 @@ function Chronicles.DB:GetPeriodsFillingBySteps()
         mod1 = {}
     }
 
-    print("-- periods " .. tostring(#periods.mod1000))
+    -- print("-- periods " .. tostring(#periods.mod1000))
 
     for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
         if Chronicles.DB:GetGroupStatus(groupName) then
@@ -70,14 +70,14 @@ function Chronicles.DB:GetPeriodsFillingBySteps()
         end
     end
 
-    print("-- periods 2 " .. tostring(#periods.mod1000))
+    -- print("-- periods 2 " .. tostring(#periods.mod1000))
     return periods
 end
 
 function Chronicles.DB:SetPeriodsForEvent(periods, date, eventId)
     local profile = Chronicles.DB:ComputeEventDateProfile(date)
 
-    print("-- date " .. tostring(date))
+    -- print("-- date " .. tostring(date))
 
     periods.mod1000[profile.mod1000] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1000[profile.mod1000], eventId)
     periods.mod500[profile.mod500] = Chronicles.DB:DefinePeriodsForEvent(periods.mod500[profile.mod500], eventId)
@@ -94,7 +94,9 @@ function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
     if period ~= nil then
         local items = Set(period)
         if items[eventId] ~= nil then
-            -- print("-- found event ")
+            print("-- found event do nothing")
+        else
+            print("-- event not found insert")
             table.insert(period, eventId)
         end
 
@@ -103,6 +105,7 @@ function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
         local data = {}
         table.insert(data, eventId)
         
+        print("-- create new data")
         return data
     end
     
