@@ -11,7 +11,7 @@ local Chronicles = private.Chronicles
 -----------------------------------------------------------------------------------------
 local Timeline = {}
 Timeline.MaxStepIndex = 7
-Timeline.StepValues = { 1000, 500, 250, 100, 50, 10, 1 }
+Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 1}
 Timeline.CurrentStepValue = nil
 Timeline.CurrentPage = nil
 Timeline.SelectedYear = nil
@@ -36,6 +36,10 @@ function private.Core.Timeline.ComputeTimelinePeriods()
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
     local timelineConfig = GetTimelineConfig(minYear, maxYear, stepValue)
+
+    -- for k, v in pairs(timelineConfig) do
+    --     print("-- " .. k .. " " .. tostring(v))
+    -- end
 
     local timelineBlocks = {}
 
@@ -89,7 +93,14 @@ function private.Core.Timeline.ComputeTimelinePeriods()
             end
         end
 
-        period.hasEvents = HasEvents(period)
+        local nbEvents = CountEvents(period)
+        period.hasEvents = nbEvents > 0
+        period.nbEvents = nbEvents
+plop
+        -- if period.hasEvents then
+        --     print("-- blockIndex " .. tostring(i))
+        -- end
+        -- print("-- blockIndex " .. tostring(period))
 
         table.insert(timelineBlocks, period)
     end
@@ -110,7 +121,8 @@ function private.Core.Timeline.ComputeTimelinePeriods()
                         lowerBound = value.lowerBound,
                         upperBound = value.upperBound,
                         text = value.text,
-                        hasEvents = value.hasEvents
+                        hasEvents = value.hasEvents,
+                        nbEvents = value.nbEvents
                     }
                 )
             end
@@ -125,7 +137,8 @@ function private.Core.Timeline.ComputeTimelinePeriods()
                     lowerBound = value.lowerBound,
                     upperBound = value.upperBound,
                     text = value.text,
-                    hasEvents = value.hasEvents
+                    hasEvents = value.hasEvents,
+                    nbEvents = value.nbEvents
                 }
             )
         end
@@ -151,35 +164,58 @@ function private.Core.Timeline.ComputeTimelinePeriods()
     return displayableTimeFrames
 end
 
-function HasEvents(block)
+function CountEvents(block)
     local upperBound = block.upperBound
     local lowerBound = block.lowerBound
 
+    -- print(tostring(upperBound) .. " " .. tostring(lowerBound))
+
     local upperDateIndex = GetDateCurrentStepIndex(upperBound)
     local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
-    local eventDates = GetCurrentStepEventDates()
+
+    -- print(tostring(upperDateIndex) .. " " .. tostring(lowerDateIndex))
+
+    local periodsFilling = GetCurrentStepPeriodsFilling()
+
+    -- print(tostring(#periodsFilling))
 
     local gap = math.abs(upperDateIndex - lowerDateIndex)
 
     if (gap > 1) then
+        local eventCount = 0
         for i = lowerDateIndex, upperDateIndex, 1 do
-            local eventsDate = eventDates[i]
-            if (eventsDate ~= nil and #eventsDate > 0) then
-                return true
+            local periodEvents = periodsFilling[i]
+            -- print("-- filling " .. tostring(i) .. " " .. tostring(period))
+
+            if (periodEvents ~= nil) then
+                eventCount = eventCount + #periodEvents
             end
         end
     else
-        local lowerEventsDate = eventDates[lowerDateIndex]
-        local upperEventsDate = eventDates[upperDateIndex]
+        if upperDateIndex ~= lowerDateIndex then
+            local lowerPeriodEvents = periodsFilling[lowerDateIndex]
+            local upperPeriodEvents = periodsFilling[upperDateIndex]
 
-        if (lowerEventsDate ~= nil and #lowerEventsDate > 0) then
-            return true
-        end
-        if (upperEventsDate ~= nil and #upperEventsDate > 0) then
-            return true
+            -- print("-- HasEvents " .. tostring(#lowerPeriodEvents) .. " " .. tostring(#upperPeriodEvents))
+            if (lowerPeriodEvents ~= nil and upperPeriodEvents ~= nil) then
+                return #lowerPeriodEvents + #upperPeriodEvents
+            elseif lowerPeriodEvents == nil then
+                return #upperPeriodEvents
+            elseif upperPeriodEvents == nil then
+                return #lowerPeriodEvents
+            end
+
+            if (upperPeriodEvents ~= nil and #upperPeriodEvents > 0) then
+                return period
+            end
+        else
+            local periodEvents = periodsFilling[lowerDateIndex]
+            if (periodEvents ~= nil) then
+                return #periodEvents
+            end
         end
     end
-    return false
+    return 0
 end
 
 function GetDateCurrentStepIndex(date)
@@ -201,7 +237,7 @@ function GetDateCurrentStepIndex(date)
     end
 end
 
-function GetCurrentStepEventDates()
+function GetCurrentStepPeriodsFilling()
     local eventDates = Chronicles.DB.PeriodsFillingBySteps
     if (Timeline.CurrentStepValue == 1000) then
         return eventDates.mod1000
@@ -292,7 +328,7 @@ end
 -- index should go from 1 to GetNumberOfTimelineBlock
 function private.Core.Timeline.DefineDisplayedTimelinePage(debounceIndex)
     local pageIndex = Timeline.CurrentPage
-    local pageSize = Chronicles.constants.config.timeline.pageSize
+    local pageSize = private.constants.config.timeline.pageSize
 
     if (debounceIndex ~= nil) then
         if (debounceIndex ~= pageIndex) then
@@ -365,7 +401,7 @@ end
 function private.Core.Timeline.DisplayTimelineWindow()
     -- print("DisplayTimelineWindow")
     local pageIndex = Timeline.CurrentPage
-    local pageSize = Chronicles.constants.config.timeline.pageSize
+    local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
     local maxPageValue = math.ceil(numberOfCells / pageSize)
 
@@ -403,6 +439,10 @@ function private.Core.Timeline.DisplayTimelineWindow()
 
         local labelData = Timeline.Periods[firstIndex + labelIndex - 1]
         local eventName = private.constants.events.DisplayTimelineLabel .. tostring(labelIndex)
+
+        -- if labelData == nil then
+        --     print("data nil " .. tostring(#Timeline.Periods))
+        -- end
 
         if labelIndex == pageSize + 1 then
             labelData = Timeline.Periods[firstIndex + labelIndex - 2]

@@ -56,23 +56,28 @@ function Chronicles.DB:GetPeriodsFillingBySteps()
         mod1 = {}
     }
 
+    print("-- periods " .. tostring(#periods.mod1000))
+
     for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
         if Chronicles.DB:GetGroupStatus(groupName) then
             for _, event in pairs(eventsGroup.data) do
                 if (event ~= nil) then
                     for date = event.yearStart, event.yearEnd, 1 do
-                        Chronicles.DB:SetPeriodsForEvent(periods, date, event.id)
+                        periods = Chronicles.DB:SetPeriodsForEvent(periods, date, event.id)
                     end
                 end
             end
         end
     end
 
+    print("-- periods 2 " .. tostring(#periods.mod1000))
     return periods
 end
 
 function Chronicles.DB:SetPeriodsForEvent(periods, date, eventId)
     local profile = Chronicles.DB:ComputeEventDateProfile(date)
+
+    print("-- date " .. tostring(date))
 
     periods.mod1000[profile.mod1000] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1000[profile.mod1000], eventId)
     periods.mod500[profile.mod500] = Chronicles.DB:DefinePeriodsForEvent(periods.mod500[profile.mod500], eventId)
@@ -81,18 +86,26 @@ function Chronicles.DB:SetPeriodsForEvent(periods, date, eventId)
     periods.mod50[profile.mod50] = Chronicles.DB:DefinePeriodsForEvent(periods.mod50[profile.mod50], eventId)
     periods.mod10[profile.mod10] = Chronicles.DB:DefinePeriodsForEvent(periods.mod10[profile.mod10], eventId)
     periods.mod1[profile.mod1] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1[profile.mod1], eventId)
+
+    return periods
 end
 
 function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
     if period ~= nil then
         local items = Set(period)
         if items[eventId] ~= nil then
+            -- print("-- found event ")
             table.insert(period, eventId)
         end
+
+        return period
     else
         local data = {}
         table.insert(data, eventId)
+        
+        return data
     end
+    
 end
 
 function Chronicles.DB:ComputeEventDateProfile(date)
@@ -235,11 +248,11 @@ function Chronicles.DB:CleanEventObject(event, groupName)
         local start = event.yearStart
         local finish = event.yearEnd
 
-        -- if (start < Chronicles.constants.config.historyStartYear) then
-        --     start = Chronicles.constants.config.historyStartYear - 1
+        -- if (start < private.constants.config.historyStartYear) then
+        --     start = private.constants.config.historyStartYear - 1
         -- end
-        -- if (finish < Chronicles.constants.config.historyEndYear) then
-        --     finish = Chronicles.constants.config.historyEndYear - 1
+        -- if (finish < private.constants.config.historyEndYear) then
+        --     finish = private.constants.config.historyEndYear - 1
         -- end
 
         local formatedEvent = {
@@ -258,9 +271,9 @@ function Chronicles.DB:CleanEventObject(event, groupName)
         }
         if (event.order == nil) then
             formatedEvent.order = 0
-            -- print("-- event " .. tostring(event.id) .. " --")
-            -- print("order: " .. tostring(event.order))
-            -- print("label: " .. tostring(event.label))
+        -- print("-- event " .. tostring(event.id) .. " --")
+        -- print("order: " .. tostring(event.order))
+        -- print("label: " .. tostring(event.label))
         end
 
         return formatedEvent
@@ -726,11 +739,11 @@ end
 
 function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     -- compare date with current year
-    local birth = Chronicles.constants.config.currentYear - age
+    local birth = private.constants.config.currentYear - age
     local event = {
         id = 0,
         label = "Birth of " .. name,
-        description = { "Birth of " .. name .. " \n\nImported from " .. addon },
+        description = {"Birth of " .. name .. " \n\nImported from " .. addon},
         yearStart = birth,
         yearEnd = birth,
         eventType = 5,

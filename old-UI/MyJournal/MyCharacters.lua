@@ -163,7 +163,7 @@ end
 
 function Chronicles.UI.MyCharacters:DisplayCharacterList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.myJournal.characterListPageSize
+        local pageSize = private.constants.config.myJournal.characterListPageSize
         local characterList = Chronicles.DB:GetMyJournalCharacters()
 
         local numberOfCharacters = tablelength(characterList)
@@ -317,7 +317,7 @@ function Chronicles.UI.MyCharacters:SetMyCharacterDetails(character)
         MyCharactersDetails.searchBox:SetText("")
 
         UIDropDownMenu_SetSelectedID(MyCharactersDetailsTimelineDropDown, character.timeline)
-        UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, Chronicles.constants.timelines[character.timeline])
+        UIDropDownMenu_SetText(MyCharactersDetailsTimelineDropDown, private.constants.timelines[character.timeline])
 
         Chronicles.UI.MyCharacters.SelectedCharacterFactions = copyTable(character.factions)
         Chronicles.UI.MyCharacters:ChangeFactionsPage(1)
@@ -346,14 +346,14 @@ end
 ------------------------------------------------------------------------------------------
 
 function Init_MyCharacters_Timeline_Dropdown()
-    for key, value in ipairs(Chronicles.constants.timelines) do
+    for key, value in ipairs(private.constants.timelines) do
         local info = UIDropDownMenu_CreateInfo()
 
         info.text = value
         info.value = key
 
         info.arg1 = MyCharactersDetailsTimelineDropDown
-        info.arg2 = Chronicles.constants.timelines
+        info.arg2 = private.constants.timelines
         info.func = Set_DropdownValue
 
         info.notCheckable = true
@@ -445,7 +445,7 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then
-            local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
+            local pageSize = private.constants.config.myJournal.characterFactionsPageSize
 
             -- print("-- numberOfFactions " .. numberOfFactions)
 

@@ -47,7 +47,7 @@ function Chronicles.UI.Timeline:DisplayTimeline(debounceIndex)
 
     local stepValue = Chronicles.UI.Timeline.CurrentStepValue
     local pageIndex = Chronicles.UI.Timeline.CurrentPage
-    local pageSize = Chronicles.constants.config.timeline.pageSize
+    local pageSize = private.constants.config.timeline.pageSize
 
     if (debounceIndex ~= nil) then
         if (debounceIndex ~= pageIndex) then
@@ -128,13 +128,13 @@ function Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
     }
 
     -- Define the boundaries of the timeline
-    if (minYear < Chronicles.constants.config.historyStartYear) then -- there is event before the history start year
-        timelineConfig.minYear = Chronicles.constants.config.historyStartYear
+    if (minYear < private.constants.config.historyStartYear) then -- there is event before the history start year
+        timelineConfig.minYear = private.constants.config.historyStartYear
         timelineConfig.pastEvents = true
     end
 
-    if (maxYear > Chronicles.constants.config.currentYear) then -- there is event after the current year
-        timelineConfig.maxYear = Chronicles.constants.config.currentYear
+    if (maxYear > private.constants.config.currentYear) then -- there is event after the current year
+        timelineConfig.maxYear = private.constants.config.currentYear
         timelineConfig.futurEvents = true
     end
 
@@ -153,7 +153,7 @@ function Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 
         timelineConfig.after = math.ceil((afterLength) / stepValue)
 
-        if (maxYear == Chronicles.constants.config.currentYear and stepValue < Chronicles.constants.config.currentYear) then
+        if (maxYear == private.constants.config.currentYear and stepValue < private.constants.config.currentYear) then
             timelineConfig.after = timelineConfig.after + 1
         end
     end
@@ -224,21 +224,21 @@ function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
             hasEvents = nil
         }
 
-        if (maxValue > Chronicles.constants.config.currentYear) then
-            if (minValue > Chronicles.constants.config.currentYear) then
-                block.lowerBound = Chronicles.constants.config.currentYear + 1
+        if (maxValue > private.constants.config.currentYear) then
+            if (minValue > private.constants.config.currentYear) then
+                block.lowerBound = private.constants.config.currentYear + 1
                 block.upperBound = 999999
                 block.text = Locale["Futur"]
             else
-                block.upperBound = Chronicles.constants.config.currentYear
+                block.upperBound = private.constants.config.currentYear
             end
-        elseif (maxValue < Chronicles.constants.config.historyStartYear) then
-            if (minValue < Chronicles.constants.config.historyStartYear) then
+        elseif (maxValue < private.constants.config.historyStartYear) then
+            if (minValue < private.constants.config.historyStartYear) then
                 block.lowerBound = -999999
-                block.upperBound = Chronicles.constants.config.historyStartYear - 1
+                block.upperBound = private.constants.config.historyStartYear - 1
                 block.text = Locale["Mythos"]
             else
-                block.upperBound = Chronicles.constants.config.historyStartYear
+                block.upperBound = private.constants.config.historyStartYear
             end
         end
 
@@ -423,7 +423,7 @@ function Chronicles.UI.Timeline:GetIndex(year)
 
     if (selectedYear == nil) then
         local page = Chronicles.UI.Timeline.CurrentPage
-        local pageSize = Chronicles.constants.config.timeline.pageSize
+        local pageSize = private.constants.config.timeline.pageSize
         -- local numberOfCells = Chronicles.UI.Timeline:GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
         local numberOfCells = #Chronicles.UI.Timeline.Periods
 
@@ -464,7 +464,7 @@ function Chronicles.UI.Timeline:GetIndex(year)
     local minYear = Chronicles.DB:MinEventYear()
     local length = math.abs(minYear - selectedYear)
     local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)
-    local result = yearIndex - (yearIndex % Chronicles.constants.config.timeline.pageSize)
+    local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
 
     -- print("-- GetIndex " .. length .. " " .. yearIndex .. " " .. result)
 

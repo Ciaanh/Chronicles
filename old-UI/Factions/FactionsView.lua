@@ -100,7 +100,7 @@ end
 
 function Chronicles.UI.FactionsView:DisplayFactionList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.myJournal.factionListPageSize
+        local pageSize = private.constants.config.myJournal.factionListPageSize
         local factionList = Chronicles.DB:SearchFactions()
 
         local numberOfFactions = tablelength(factionList)
@@ -254,5 +254,5 @@ function Chronicles.UI.FactionsView:SetFactionDetails(faction)
     FactionTimelineLabel:Show()
     FactionTitle:SetText(faction.name)
     FactionDescriptionHTML:SetText(cleanHTML(faction.description))
-    FactionTimeline:SetText(Chronicles.constants.timelines[faction.timeline])
+    FactionTimeline:SetText(private.constants.timelines[faction.timeline])
 end

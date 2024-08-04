@@ -60,7 +60,7 @@ end
 
 function DisplayLibrariesFilter(page)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.librariesFilter.pageSize
+        local pageSize = private.constants.config.librariesFilter.pageSize
 
         if (Chronicles.UI.OptionsView.LibrariesData ~= nil) then
             local eventGroups = Chronicles.UI.OptionsView.LibrariesData

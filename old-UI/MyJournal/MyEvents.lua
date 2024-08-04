@@ -205,7 +205,7 @@ end
 
 function Chronicles.UI.MyEvents:DisplayEventList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.myJournal.eventListPageSize
+        local pageSize = private.constants.config.myJournal.eventListPageSize
         local eventList = Chronicles.UI.MyEvents:FilterEvents(Chronicles.DB:GetMyJournalEvents())
 
         local numberOfEvents = tablelength(eventList)
@@ -396,10 +396,10 @@ function Chronicles.UI.MyEvents:SetMyEventDetails(event)
     MyEventsDetailsYearEnd:SetNumber(event.yearEnd)
 
     UIDropDownMenu_SetSelectedID(MyEventsDetailsTypeDropDown, event.eventType)
-    UIDropDownMenu_SetText(MyEventsDetailsTypeDropDown, Chronicles.constants.eventType[event.eventType])
+    UIDropDownMenu_SetText(MyEventsDetailsTypeDropDown, private.constants.eventType[event.eventType])
 
     UIDropDownMenu_SetSelectedID(MyEventsDetailsTimelineDropDown, event.timeline)
-    UIDropDownMenu_SetText(MyEventsDetailsTimelineDropDown, Chronicles.constants.timelines[event.timeline])
+    UIDropDownMenu_SetText(MyEventsDetailsTimelineDropDown, private.constants.timelines[event.timeline])
 
     Chronicles.UI.MyEvents.SelectedEvent_Factions = copyTable(event.factions)
     Chronicles.UI.MyEvents:ChangeFactionsPage(1)
@@ -501,16 +501,16 @@ end
 ------------------------------------------------------------------------------------------
 
 function Init_EventType_Dropdown()
-    -- print("-- Init_EventType_Dropdown " .. tostring(Chronicles.constants.eventType))
+    -- print("-- Init_EventType_Dropdown " .. tostring(private.constants.eventType))
 
-    for key, value in ipairs(Chronicles.constants.eventType) do
+    for key, value in ipairs(private.constants.eventType) do
         local info = UIDropDownMenu_CreateInfo()
 
         info.text = value
         info.value = key
 
         info.arg1 = MyEventsDetailsTypeDropDown
-        info.arg2 = Chronicles.constants.eventType
+        info.arg2 = private.constants.eventType
         info.func = Set_DropdownValue
 
         info.notCheckable = true
@@ -524,14 +524,14 @@ function Init_EventType_Dropdown()
 end
 
 function Init_Timeline_Dropdown()
-    for key, value in ipairs(Chronicles.constants.timelines) do
+    for key, value in ipairs(private.constants.timelines) do
         local info = UIDropDownMenu_CreateInfo()
 
         info.text = value
         info.value = key
 
         info.arg1 = MyEventsDetailsTimelineDropDown
-        info.arg2 = Chronicles.constants.timelines
+        info.arg2 = private.constants.timelines
         info.func = Set_DropdownValue
 
         info.notCheckable = true
@@ -743,7 +743,7 @@ function Chronicles.UI.MyEvents:ChangeFactionsPage(page)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then
-            local pageSize = Chronicles.constants.config.myJournal.eventFactionsPageSize
+            local pageSize = private.constants.config.myJournal.eventFactionsPageSize
 
             Chronicles.UI.MyEvents:HideAllFactions()
 
@@ -1224,7 +1224,7 @@ function Chronicles.UI.MyEvents:ChangeCharactersPage(page)
         local numberOfCharacters = tablelength(charactersList)
 
         if (page ~= nil and numberOfCharacters > 0) then
-            local pageSize = Chronicles.constants.config.myJournal.eventCharactersPageSize
+            local pageSize = private.constants.config.myJournal.eventCharactersPageSize
 
             Chronicles.UI.MyEvents:HideAllCharacters()
 

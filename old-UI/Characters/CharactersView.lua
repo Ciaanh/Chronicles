@@ -108,7 +108,7 @@ end
 
 function Chronicles.UI.CharactersView:DisplayCharacterList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.myJournal.characterListPageSize
+        local pageSize = private.constants.config.myJournal.characterListPageSize
         local characterList = Chronicles.DB:SearchCharacters()
 
         local numberOfCharacters = tablelength(characterList)
@@ -269,7 +269,7 @@ function Chronicles.UI.CharactersView:SetCharacterDetails(character)
     CharacterTimelineLabel:Show()
     CharacterTitle:SetText(character.name)
     CharacterBiographyHTML:SetText(cleanHTML(character.biography))
-    CharacterTimeline:SetText(Chronicles.constants.timelines[character.timeline])
+    CharacterTimeline:SetText(private.constants.timelines[character.timeline])
 
     -- print("-- SetCharacterDetails " .. tablelength(character.factions))
 
@@ -318,7 +318,7 @@ function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then
-            local pageSize = Chronicles.constants.config.myJournal.characterFactionsPageSize
+            local pageSize = private.constants.config.myJournal.characterFactionsPageSize
 
             -- print("-- numberOfFactions " .. numberOfFactions)
 

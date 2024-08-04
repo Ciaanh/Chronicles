@@ -77,6 +77,8 @@ constants.events = {
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 
+	TimelineStepChanged="Timeline.STEP_CHANGED",
+
 	EventDetailPageEventSelected = "EVENT_SELECTED",
 
 	DisplayTimelineLabel = "DisplayTimelineLabel",

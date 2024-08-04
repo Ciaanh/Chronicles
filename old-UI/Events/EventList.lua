@@ -49,7 +49,7 @@ end
 
 function Chronicles.UI.EventList:DisplayEventList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.eventList.pageSize
+        local pageSize = private.constants.config.eventList.pageSize
 
         if (Chronicles.UI.EventList.Data ~= nil and Chronicles.UI.EventList.Data.events ~= nil) then
             local eventList = Chronicles.UI.EventList:FilterEvents(Chronicles.UI.EventList.Data.events)

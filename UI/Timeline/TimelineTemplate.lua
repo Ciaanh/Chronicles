@@ -20,8 +20,11 @@ function TimelineMixin:OnLoad()
 
     EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
 
-    EventRegistry:RegisterCallback(private.constants.events.TimelinePreviousButtonVisible, self
-        .OnTimelinePreviousVisible, self)
+    EventRegistry:RegisterCallback(
+        private.constants.events.TimelinePreviousButtonVisible,
+        self.OnTimelinePreviousVisible,
+        self
+    )
     EventRegistry:RegisterCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
     EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
 end
@@ -123,9 +126,10 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
     print(tostring(eventData.hasEvents))
 
     if eventData.hasEvents then
-        measureFrame:Show()
+        self.Text:SetText(eventData.nbEvents)
+        self:Show()
     else
-        measureFrame:Hide()
+        self:Hide()
     end
     -- print("OnDisplayTimelinePeriod")
     -- EventRegistry:TriggerEvent(

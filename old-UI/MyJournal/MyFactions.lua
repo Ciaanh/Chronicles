@@ -145,7 +145,7 @@ end
 
 function Chronicles.UI.MyFactions:DisplayFactionList(page, force)
     if (page ~= nil) then
-        local pageSize = Chronicles.constants.config.myJournal.factionListPageSize
+        local pageSize = private.constants.config.myJournal.factionListPageSize
         local factionList = Chronicles.DB:GetMyJournalFactions()
 
         local numberOfFactions = tablelength(factionList)
@@ -290,7 +290,7 @@ function Chronicles.UI.MyFactions:SetMyFactionDetails(faction)
     MyFactionsDetailsDescription:SetText(faction.description)
 
     UIDropDownMenu_SetSelectedID(MyFactionsDetailsTimelineDropDown, faction.timeline)
-    UIDropDownMenu_SetText(MyFactionsDetailsTimelineDropDown, Chronicles.constants.timelines[faction.timeline])
+    UIDropDownMenu_SetText(MyFactionsDetailsTimelineDropDown, private.constants.timelines[faction.timeline])
 end
 
 function MyFactionsDetailsSave_Click()
@@ -311,14 +311,14 @@ end
 ------------------------------------------------------------------------------------------
 
 function Init_MyFactions_Timeline_Dropdown()
-    for key, value in ipairs(Chronicles.constants.timelines) do
+    for key, value in ipairs(private.constants.timelines) do
         local info = UIDropDownMenu_CreateInfo()
 
         info.text = value
         info.value = key
 
         info.arg1 = MyFactionsDetailsTimelineDropDown
-        info.arg2 = Chronicles.constants.timelines
+        info.arg2 = private.constants.timelines
         info.func = Set_DropdownValue
 
         info.notCheckable = true
