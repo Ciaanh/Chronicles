@@ -7,32 +7,22 @@ local Chronicles = private.Chronicles
 
 EventListItemMixin = {}
 function EventListItemMixin:Init(eventData)
-	print("EventListItemMixin:Init")
-
 	self.Text:SetText(eventData.text)
 	self.Event = eventData.event
 end
 
 function EventListItemMixin:OnClick()
-	print("EventListItemMixin:OnClick " .. tostring(self.Event.Id))
 	EventRegistry:TriggerEvent(private.constants.events.EventDetailPageEventSelected, self.Event)
 end
 
 EventListTitleMixin = {}
 function EventListTitleMixin:Init(eventData)
-	if eventData.text ~= nil then
-		self.Text:SetText(eventData.text)
-	end
+	self.Text:SetText(eventData.text)
 end
 
 -----------------------------------------------------------------------------------------
 -- Event List ---------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
--- local Templates = {
--- 	["TITLE"] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
--- 	["ITEM"] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init}
--- }
 
 EventListMixin = {}
 function EventListMixin:OnLoad()

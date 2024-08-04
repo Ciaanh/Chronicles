@@ -20,7 +20,6 @@ end
 MainFrameUIMixin = {}
 
 function MainFrameUIMixin:OnLoad()
-	
 end
 
 function MainFrameUIMixin:OnShow()
@@ -44,7 +43,7 @@ TabUIMixin = {}
 
 TabUIMixin.FrameTabs = {
 	EventDetails = 1,
-	Options = 2,
+	Options = 2
 	-- Third = 3
 }
 
@@ -56,7 +55,7 @@ function TabUIMixin:OnLoad()
 
 	self.frameTabsToTabID = {
 		[TabUIMixin.FrameTabs.EventDetails] = self.EventDetailsTabID,
-		[TabUIMixin.FrameTabs.Options] = self.OptionsTabID,
+		[TabUIMixin.FrameTabs.Options] = self.OptionsTabID
 	}
 end
 
@@ -105,5 +104,4 @@ end
 
 function TabUIMixin:IsTabAvailable(tabID)
 	return true
-	
 end
