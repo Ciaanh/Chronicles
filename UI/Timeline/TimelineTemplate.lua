@@ -6,35 +6,87 @@ local Chronicles = private.Chronicles
 -----------------------------------------------------------------------------------------
 TimelineMixin = {}
 
+-- arrow CovenantSanctum-Renown-Arrow-Depressed
+-- CovenantSanctum-Renown-DoubleArrow
+-- cyphersetupgrade-arrow-full
+-- helptip-arrow
+-- wowlabs-spectatecycling-arrowleft
+
+-- ui color ideas UI-Tuskarr-Highlight-Middle
+
 function TimelineMixin:OnLoad()
+    self.Previous:SetScript("OnClick", self.TimelinePrevious)
+    self.Next:SetScript("OnClick", self.TimelineNext)
+
     EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
 
-    -- EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnTimelineLoad, self)
-    -- EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnTimelineNext, self)
-    -- EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnTimelinePrevious, self)
-    -- EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnTimelineChangeStep, self)
+    EventRegistry:RegisterCallback(private.constants.events.TimelinePreviousButtonVisible, self
+        .OnTimelinePreviousVisible, self)
+    EventRegistry:RegisterCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
+    EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
     -- load data
     private.Core.Timeline.ComputeTimelinePeriods()
 
-    local timelineData = private.Core.Timeline.ComputeDisplayedTimeline()
+    local timelineData = private.Core.Timeline.DefineDisplayedTimelinePage()
     -- for k, v in pairs(timelineData) do
     --     print(k)
     --     print(v)
     -- end
-    private.Core.Timeline.ComputeTimelineWindow()
+
+    private.Core.Timeline.DisplayTimelineWindow()
+
+    -- scrollFrame:SetScript("OnMouseWheel", onMouseWheel)
 end
 
-function TimelineMixin:OnTimelineNext(eventData)
+function TimelineMixin:TimelinePrevious()
+    -- print("TimelineMixin:TimelinePrevious")
+    private.Core.Timeline:ChangePage(-1)
 end
 
-function TimelineMixin:OnTimelinePrevious(eventData)
+function TimelineMixin:OnTimelinePreviousVisible(isVisible)
+    -- print("TimelineMixin:OnTimelinePreviousVisible " .. tostring(isVisible))
+    if isVisible then
+        -- print("Previous Enabled")
+        self.Previous:Enable()
+    else
+        -- print("Previous Disabled")
+        self.Previous:Disable()
+    end
 end
 
-function TimelineMixin:OnTimelineChangeStep(eventData)
+function TimelineMixin:TimelineNext()
+    -- print("TimelineMixin:TimelineNext")
+    private.Core.Timeline:ChangePage(1)
 end
+
+function TimelineMixin:OnTimelineNextVisible(isVisible)
+    -- print("TimelineMixin:OnTimelineNextVisible " .. tostring(isVisible))
+    if isVisible then
+        -- print("Next Enabled")
+        self.Next:Enable()
+    else
+        -- print("Next Disabled")
+        self.Next:Disable()
+    end
+end
+
+function TimelineMixin:OnMouseWheel(value)
+    if (value > 0) then
+        private.Core.Timeline:ChangePage(-1)
+    else
+        private.Core.Timeline:ChangePage(1)
+    end
+end
+
+function TimelineMixin:OnTimelineStepChanged(eventData)
+end
+
+-- function TimelineMixin:OnClick()
+--     print("TimelineMixin:OnClick")
+-- end
 
 -----------------------------------------------------------------------------------------
 -- TimelineLabel ------------------------------------------------------------------------
@@ -49,7 +101,7 @@ function TimelineLabelMixin:OnLoad()
 end
 
 function TimelineLabelMixin:OnDisplayTimelineLabel(data)
-    print("Set label text " .. data)
+    -- print("Set label text " .. data)
     self.Text:SetText(data)
 end
 
@@ -65,8 +117,16 @@ function TimelinePeriodMixin:OnLoad()
     EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
 end
 
-function TimelinePeriodMixin:OnDisplayTimelinePeriod(data)
-    self.data = data
+function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
+    self.data = eventData
+
+    print(tostring(eventData.hasEvents))
+
+    if eventData.hasEvents then
+        measureFrame:Show()
+    else
+        measureFrame:Hide()
+    end
     -- print("OnDisplayTimelinePeriod")
     -- EventRegistry:TriggerEvent(
     --     private.constants.events.TimelinePeriodSelected,

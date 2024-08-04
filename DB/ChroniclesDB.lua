@@ -23,8 +23,9 @@ function Chronicles.DB:Init()
         Chronicles.Custom.DB:Init()
     end
 
-    Chronicles.DB.EventsDates = Chronicles.DB:GetEventsDates()
+    Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
 end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -44,8 +45,8 @@ function Chronicles.DB:AddRPEvent(event)
 end
 
 -- function to retrieve the list of dates for all eventsGroup
-function Chronicles.DB:GetEventsDates()
-    local dates = {
+function Chronicles.DB:GetPeriodsFillingBySteps()
+    local periods = {
         mod1000 = {},
         mod500 = {},
         mod250 = {},
@@ -56,46 +57,52 @@ function Chronicles.DB:GetEventsDates()
     }
 
     for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-        local isActive = Chronicles.DB.GetGroupStatus(self, groupName)
-        local computeDateProfile = Chronicles.DB.ComputeDateProfile
-
-        if (isActive) then
+        if Chronicles.DB:GetGroupStatus(groupName) then
             for _, event in pairs(eventsGroup.data) do
                 if (event ~= nil) then
-                    for i = event.yearStart, event.yearEnd, 1 do
-                        local dateProfile = computeDateProfile(self, i)
-
-                        dates.mod1000[dateProfile.mod1000] = true
-                        dates.mod500[dateProfile.mod500] = true
-                        dates.mod250[dateProfile.mod250] = true
-                        dates.mod100[dateProfile.mod100] = true
-                        dates.mod50[dateProfile.mod50] = true
-                        dates.mod10[dateProfile.mod10] = true
-                        dates.mod1[dateProfile.mod1] = true
+                    for date = event.yearStart, event.yearEnd, 1 do
+                        Chronicles.DB:SetPeriodsForEvent(periods, date, event.id)
                     end
                 end
             end
         end
     end
 
-    return dates
+    return periods
 end
 
-function Chronicles.DB:ComputeDateProfile(date)
-    local mod1000 = math.floor(date / 1000)
-    local mod500 = math.floor(date / 500)
-    local mod250 = math.floor(date / 250)
-    local mod100 = math.floor(date / 100)
-    local mod50 = math.floor(date / 50)
-    local mod10 = math.floor(date / 10)
+function Chronicles.DB:SetPeriodsForEvent(periods, date, eventId)
+    local profile = Chronicles.DB:ComputeEventDateProfile(date)
 
+    periods.mod1000[profile.mod1000] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1000[profile.mod1000], eventId)
+    periods.mod500[profile.mod500] = Chronicles.DB:DefinePeriodsForEvent(periods.mod500[profile.mod500], eventId)
+    periods.mod250[profile.mod250] = Chronicles.DB:DefinePeriodsForEvent(periods.mod250[profile.mod250], eventId)
+    periods.mod100[profile.mod100] = Chronicles.DB:DefinePeriodsForEvent(periods.mod100[profile.mod100], eventId)
+    periods.mod50[profile.mod50] = Chronicles.DB:DefinePeriodsForEvent(periods.mod50[profile.mod50], eventId)
+    periods.mod10[profile.mod10] = Chronicles.DB:DefinePeriodsForEvent(periods.mod10[profile.mod10], eventId)
+    periods.mod1[profile.mod1] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1[profile.mod1], eventId)
+end
+
+function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
+    if period ~= nil then
+        local items = Set(period)
+        if items[eventId] ~= nil then
+            table.insert(period, eventId)
+        end
+    else
+        local data = {}
+        table.insert(data, eventId)
+    end
+end
+
+function Chronicles.DB:ComputeEventDateProfile(date)
     return {
-        mod1000 = mod1000,
-        mod500 = mod500,
-        mod250 = mod250,
-        mod100 = mod100,
-        mod50 = mod50,
-        mod10 = mod10,
+        mod1000 = math.floor(date / 1000),
+        mod500 = math.floor(date / 500),
+        mod250 = math.floor(date / 250),
+        mod100 = math.floor(date / 100),
+        mod50 = math.floor(date / 50),
+        mod10 = math.floor(date / 10),
         mod1 = date
     }
 end
@@ -171,7 +178,6 @@ end
 
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local foundEvents = {}
-    local insert = table.insert
     local searchEventsInDB = Chronicles.DB.SearchEventsInDB
     local cleanEventObject = Chronicles.DB.CleanEventObject
 
@@ -181,7 +187,7 @@ function Chronicles.DB:SearchEvents(yearStart, yearEnd)
             local pluginEvents = searchEventsInDB(self, yearStart, yearEnd, eventsGroup.data)
 
             for eventIndex, event in pairs(pluginEvents) do
-                insert(foundEvents, cleanEventObject(self, event, groupName))
+                table.insert(foundEvents, cleanEventObject(self, event, groupName))
             end
         end
     end
@@ -191,7 +197,6 @@ end
 
 function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
     local foundEvents = {}
-    local insert = table.insert
     local getEventTypeStatus = Chronicles.DB.GetEventTypeStatus
     local isInRange = Chronicles.DB.IsInRange
 
@@ -199,7 +204,7 @@ function Chronicles.DB:SearchEventsInDB(yearStart, yearEnd, db)
         local isEventTypeActive = getEventTypeStatus(self, event.eventType)
 
         if isEventTypeActive and isInRange(self, db[eventIndex], yearStart, yearEnd) then
-            insert(foundEvents, db[eventIndex])
+            table.insert(foundEvents, db[eventIndex])
         end
     end
     return foundEvents
@@ -253,9 +258,9 @@ function Chronicles.DB:CleanEventObject(event, groupName)
         }
         if (event.order == nil) then
             formatedEvent.order = 0
-        -- print("-- event " .. tostring(event.id) .. " --")
-        -- print("order: " .. tostring(event.order))
-        -- print("label: " .. tostring(event.label))
+            -- print("-- event " .. tostring(event.id) .. " --")
+            -- print("order: " .. tostring(event.order))
+            -- print("label: " .. tostring(event.label))
         end
 
         return formatedEvent
@@ -267,7 +272,6 @@ end
 function Chronicles.DB:SearchFactions(name)
     local foundFactions = {}
     local lower = string.lower
-    local insert = table.insert
     local getGroupStatus = Chronicles.DB.GetGroupStatus
     local cleanFactionObject = Chronicles.DB.CleanFactionObject
 
@@ -277,10 +281,10 @@ function Chronicles.DB:SearchFactions(name)
             for factionIndex, faction in pairs(factionsGroup.data) do
                 if (name ~= nil and strlen(name) >= MIN_CHARACTER_SEARCH) then
                     if (lower(faction.name):find(lower(name)) ~= nil) then
-                        insert(foundFactions, cleanFactionObject(self, faction, groupName))
+                        table.insert(foundFactions, cleanFactionObject(self, faction, groupName))
                     end
                 else
-                    insert(foundFactions, cleanFactionObject(self, faction, groupName))
+                    table.insert(foundFactions, cleanFactionObject(self, faction, groupName))
                 end
             end
         end
@@ -290,7 +294,6 @@ end
 
 function Chronicles.DB:FindFactions(ids)
     local foundFactions = {}
-    local insert = table.insert
     local getGroupStatus = Chronicles.DB.GetGroupStatus
     local cleanFactionObject = Chronicles.DB.CleanFactionObject
 
@@ -302,7 +305,7 @@ function Chronicles.DB:FindFactions(ids)
                 for factionIndex, faction in pairs(factionsGroup.data) do
                     for index, id in ipairs(factionIds) do
                         if (faction.id == id) then
-                            insert(foundFactions, cleanFactionObject(self, faction, group))
+                            table.insert(foundFactions, cleanFactionObject(self, faction, group))
                         end
                     end
                 end
@@ -510,7 +513,7 @@ end
 function Chronicles.DB:SetGroupStatus(groupName, status)
     if Chronicles.DB.Events[groupName] ~= nil then
         Chronicles.storage.global.EventDBStatuses[groupName] = status
-        Chronicles.DB.EventsDates = Chronicles.DB:GetEventsDates()
+        Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
     end
 
     if Chronicles.DB.Factions[groupName] ~= nil then
@@ -532,7 +535,7 @@ function Chronicles.DB:GetGroupStatus(groupName)
         if (isActive == nil) then
             isActive = true
             Chronicles.storage.global.EventDBStatuses[groupName] = isActive
-            Chronicles.DB.EventsDates = Chronicles.DB:GetEventsDates()
+            Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
         isEventActive = isActive
     end
@@ -568,7 +571,7 @@ function Chronicles.DB:GetGroupStatus(groupName)
     if (isFactionActive) then
         if Chronicles.DB.Events[groupName] ~= nil then
             Chronicles.storage.global.EventDBStatuses[groupName] = true
-            Chronicles.DB.EventsDates = Chronicles.DB:GetEventsDates()
+            Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
         if Chronicles.DB.Characters[groupName] ~= nil then
             Chronicles.storage.global.CharacterDBStatuses[groupName] = true
@@ -579,7 +582,7 @@ function Chronicles.DB:GetGroupStatus(groupName)
     if (isCharacterActive) then
         if Chronicles.DB.Events[groupName] ~= nil then
             Chronicles.storage.global.EventDBStatuses[groupName] = true
-            Chronicles.DB.EventsDates = Chronicles.DB:GetEventsDates()
+            Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
         if Chronicles.DB.Factions[groupName] ~= nil then
             Chronicles.storage.global.FactionDBStatuses[groupName] = true
@@ -604,6 +607,7 @@ function Chronicles.DB:GetEventTypeStatus(eventType)
     end
     return isActive
 end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -726,7 +730,7 @@ function Chronicles.DB.RP:RegisterBirth(age, name, addon)
     local event = {
         id = 0,
         label = "Birth of " .. name,
-        description = {"Birth of " .. name .. " \n\nImported from " .. addon},
+        description = { "Birth of " .. name .. " \n\nImported from " .. addon },
         yearStart = birth,
         yearEnd = birth,
         eventType = 5,
@@ -783,5 +787,6 @@ function Chronicles.DB.RP:TRP_GetAge()
         return characteristics.AG
     end
 end
+
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

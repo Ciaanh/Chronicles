@@ -2,6 +2,12 @@ function Trim(s)
 	return s:match("^%s*(.-)%s*$")
 end
 
+function Set(list)
+	local set = {}
+	for _, l in ipairs(list) do set[l] = true end
+	return set
+end
+
 -- Create a hidden frame for measuring text width
 local measureFrame = CreateFrame("Frame", nil, UIParent)
 measureFrame:Hide()
@@ -13,7 +19,7 @@ function SplitTextToFitWidth(textToSplit, width)
 	local text = textToSplit:gsub("\n", " \n ")
 	text = text:gsub("  ", " ")
 
-	local words = {strsplit(" ", text)}
+	local words = { strsplit(" ", text) }
 	local lines = {}
 	local line = "<tab>"
 

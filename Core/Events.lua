@@ -26,7 +26,7 @@ local function CreateChapter(title, pages)
 	local chapter = {elements = {}}
 
 	if (title ~= nil) then
-		print(title)
+		-- print(title)
 		chapter.header = {
 			templateKey = "HEADER",
 			text = title

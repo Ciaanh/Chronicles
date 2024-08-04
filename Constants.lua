@@ -72,11 +72,15 @@ constants.configurationName = {
 
 constants.events = {
 	TimelineInit = "TIMELINE_INIT",
-	EventDetailPageEventSelected = "EVENT_SELECTED",
 	TimelinePeriodSelected = "TIMELINE_PERIOD_SELECTED",
+	
+	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
+	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 
-	DisplayTimelineLabel="DisplayTimelineLabel",
-	DisplayTimelinePeriod="DisplayTimelinePeriod",
+	EventDetailPageEventSelected = "EVENT_SELECTED",
+
+	DisplayTimelineLabel = "DisplayTimelineLabel",
+	DisplayTimelinePeriod = "DisplayTimelinePeriod",
 
 	TabUITabSet = "TabUI.TabSet",
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
