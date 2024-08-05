@@ -94,9 +94,9 @@ function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
     if period ~= nil then
         local items = Set(period)
         if items[eventId] ~= nil then
-            print("-- found event do nothing")
+            --print("-- found event do nothing")
         else
-            print("-- event not found insert")
+            --print("-- event not found insert")
             table.insert(period, eventId)
         end
 
@@ -105,7 +105,7 @@ function Chronicles.DB:DefinePeriodsForEvent(period, eventId)
         local data = {}
         table.insert(data, eventId)
         
-        print("-- create new data")
+        --print("-- create new data")
         return data
     end
     

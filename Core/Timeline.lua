@@ -96,7 +96,7 @@ function private.Core.Timeline.ComputeTimelinePeriods()
         local nbEvents = CountEvents(period)
         period.hasEvents = nbEvents > 0
         period.nbEvents = nbEvents
-bug for mythos
+
         -- if period.hasEvents then
         --     print("-- blockIndex " .. tostring(i))
         -- end
@@ -168,53 +168,28 @@ function CountEvents(block)
     local upperBound = block.upperBound
     local lowerBound = block.lowerBound
 
-    -- print(tostring(upperBound) .. " " .. tostring(lowerBound))
-
     local upperDateIndex = GetDateCurrentStepIndex(upperBound)
     local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
 
-    -- print(tostring(upperDateIndex) .. " " .. tostring(lowerDateIndex))
-
     local periodsFilling = GetCurrentStepPeriodsFilling()
 
-    -- print(tostring(#periodsFilling))
-
-    local gap = math.abs(upperDateIndex - lowerDateIndex)
-
-    if (gap > 1) then
+    if (lowerDateIndex < upperDateIndex) then
         local eventCount = 0
         for i = lowerDateIndex, upperDateIndex, 1 do
             local periodEvents = periodsFilling[i]
-            -- print("-- filling " .. tostring(i) .. " " .. tostring(period))
 
             if (periodEvents ~= nil) then
                 eventCount = eventCount + #periodEvents
             end
         end
-    else
-        if upperDateIndex ~= lowerDateIndex then
-            local lowerPeriodEvents = periodsFilling[lowerDateIndex]
-            local upperPeriodEvents = periodsFilling[upperDateIndex]
-
-            -- print("-- HasEvents " .. tostring(#lowerPeriodEvents) .. " " .. tostring(#upperPeriodEvents))
-            if (lowerPeriodEvents ~= nil and upperPeriodEvents ~= nil) then
-                return #lowerPeriodEvents + #upperPeriodEvents
-            elseif lowerPeriodEvents == nil then
-                return #upperPeriodEvents
-            elseif upperPeriodEvents == nil then
-                return #lowerPeriodEvents
-            end
-
-            if (upperPeriodEvents ~= nil and #upperPeriodEvents > 0) then
-                return period
-            end
-        else
-            local periodEvents = periodsFilling[lowerDateIndex]
-            if (periodEvents ~= nil) then
-                return #periodEvents
-            end
+        return eventCount
+    elseif lowerDateIndex == upperDateIndex then
+        local periodEvents = periodsFilling[lowerDateIndex]
+        if (periodEvents ~= nil) then
+            return #periodEvents
         end
     end
+
     return 0
 end
 

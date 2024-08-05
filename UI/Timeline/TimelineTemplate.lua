@@ -123,7 +123,7 @@ end
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
     self.data = eventData
 
-    print(tostring(eventData.hasEvents))
+    -- print(tostring(eventData.hasEvents))
 
     if eventData.hasEvents then
         self.Text:SetText(eventData.nbEvents)
