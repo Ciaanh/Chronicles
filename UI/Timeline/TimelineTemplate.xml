@@ -12,8 +12,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true"
-                    justifyH="CENTER">
+                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT" />
@@ -36,8 +35,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
-                    justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT" />
@@ -60,6 +58,13 @@
             <KeyValue key="layoutType" value="TooltipAzeriteLayout" type="string" />
         </KeyValues>
 
+        <!-- <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="255.0" g="0.0" b="0.0" />
+                </Texture>
+            </Layer>
+        </Layers> -->
         <!-- 
 TooltipAzeriteLayout 
 TooltipDefaultDarkLayout
@@ -67,6 +72,92 @@ TooltipGluesLayout
 -->
 
         <Frames>
+
+            <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate" Text="-">
+                <KeyValues>
+                    <KeyValue key="direction" value="-1" type="number"/>
+                </KeyValues>
+                <Size x="20" y="20" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="20" y="-5" />
+                </Anchors>
+            </Button>
+
+            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate" Text="+">
+                <KeyValues>
+                    <KeyValue key="direction" value="1" type="number"/>
+                </KeyValues>
+                <Size x="20" y="20" />
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomOut" x="5" y="0" />
+                </Anchors>
+            </Button>
+
+
+
+            <Button parentKey="Previous">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="LEFT" x="10" y="10" />
+                </Anchors>
+                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </NormalTexture>
+                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </PushedTexture>
+                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </DisabledTexture>
+                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </HighlightTexture>
+            </Button>
+
+            <Button parentKey="Next">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="RIGHT" x="-10" y="10" />
+                </Anchors>
+                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </NormalTexture>
+                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </PushedTexture>
+                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </DisabledTexture>
+                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </HighlightTexture>
+                <Scripts>
+                    <OnLoad >
+                        self:GetNormalTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetHighlightTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetPushedTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetDisabledTexture():SetTexCoord(1, 0, 0, 1)
+                    </OnLoad >
+                </Scripts>
+            </Button>
+
+
             <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="7" y="-6" />
@@ -75,56 +166,6 @@ TooltipGluesLayout
             </Frame>
 
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate" />
-
-            <Button parentKey="Previous">
-                <Size x="50" y="50" />
-                <Anchors>
-                    <Anchor point="RIGHT" relativePoint="LEFT" />
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="255.0" g="0.0" b="0.0" />
-                        </Texture>
-                    </Layer>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
-                            justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" />
-                                <Anchor point="BOTTOMRIGHT" />
-                            </Anchors>
-                            <!-- <Color color="SPELLBOOK_FONT_COLOR" />-->
-                            <!-- SystemFont_Med3 ChroniclesFont -->
-                        </FontString>
-                    </Layer>
-                </Layers>
-            </Button>
-            <Button parentKey="Next">
-                <Size x="50" y="50" />
-                <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" />
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="255.0" g="0.0" b="0.0" />
-                        </Texture>
-                    </Layer>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true"
-                            justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" />
-                                <Anchor point="BOTTOMRIGHT" />
-                            </Anchors>
-                            <!-- <Color color="SPELLBOOK_FONT_COLOR" />-->
-                            <!-- SystemFont_Med3 ChroniclesFont -->
-                        </FontString>
-                    </Layer>
-                </Layers>
-            </Button>
-
 
             <Frame name="Label1" inherits="TimelineLabelTemplate">
                 <Anchors>

@@ -9,7 +9,7 @@ local Chronicles = private.Chronicles
 -----------------------------------------------------------------------------------------
 -- Timeline -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-local Timeline = {}
+local Timeline = private.Core.Timeline
 Timeline.MaxStepIndex = 7
 Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 1}
 Timeline.CurrentStepValue = nil
@@ -452,19 +452,23 @@ function private.Core.Timeline.DisplayTimelineWindow()
     end
 end
 
--- function ChangeCurrentStepValue(stepValue)
--- 	if (stepValue == nil) then
--- 		stepValue = Chronicles.UI.Timeline.StepValues[1]
--- 	end
 
--- 	local stepText = Locale["currentstep"] .. stepValue .. Locale["years"]
--- 	if (stepValue == 1) then
--- 		stepText = Locale["currentstep"] .. stepValue .. Locale["year"]
--- 	end
+function private.Core.Timeline.GetStepValueIndex(stepValue)
+    local index = {}
+    for k, v in pairs(Timeline.StepValues) do
+        index[v] = k
+    end
+    return index[stepValue]
+end
 
--- 	TimelineStep:SetText(stepText)
+function private.Core.Timeline.ChangeCurrentStepValue(stepValue)
+	if (stepValue == nil) then
+		stepValue = Timeline.StepValues[1]
+	end
 
--- 	Chronicles.UI.Timeline.CurrentStepValue = stepValue
+	Timeline.CurrentStepValue = stepValue
 
--- 	Chronicles.UI.Timeline.Periods = Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
--- end
+	private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.DefineDisplayedTimelinePage()
+    private.Core.Timeline.DisplayTimelineWindow()
+end

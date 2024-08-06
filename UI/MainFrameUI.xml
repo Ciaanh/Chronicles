@@ -86,9 +86,17 @@
 
 
     <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
+    <KeyValues>
+            <KeyValue key="layoutType" value="DragonflightMissionFrame" type="string"/>
+        </KeyValues>
+
+
+        <Size x="1500" y="950"/>
         <Anchors>
-            <Anchor point="TOPLEFT"/>
-            <Anchor point="BOTTOMRIGHT"/>
+            <!-- <Anchor point="TOPLEFT"/>
+            <Anchor point="BOTTOMRIGHT"/> -->
+
+            <Anchor point="CENTER" />
         </Anchors>
         <Layers>
             <Layer level="BACKGROUND" textureSubLevel="0">
@@ -100,13 +108,15 @@
         <Frames>
             <Button name="CloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
-                    <Anchor point="CENTER" x="600" y="450"/>
+                    <Anchor point="CENTER" relativePoint="TOPRIGHT"/>
                 </Anchors>
             </Button>
 
+            <!-- <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/> -->
+
             <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="CENTER" y="450"/>
+                    <Anchor point="TOP" relativePoint="CENTER" x="125" y="425"/>
                 </Anchors>
             </Frame>
 
