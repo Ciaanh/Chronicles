@@ -55,25 +55,30 @@
         </KeyValues>
 
         <!-- 
-TooltipAzeriteLayout 
-TooltipDefaultDarkLayout
-TooltipGluesLayout
+            TooltipAzeriteLayout 
+            TooltipDefaultDarkLayout
+            TooltipGluesLayout
 
-TooltipCorruptedLayout
-TooltipMawLayout
-DarkmoonBasicSmallContainerLayout
-TooltipMixedLayout
+            TooltipCorruptedLayout
+            TooltipMawLayout
+            DarkmoonBasicSmallContainerLayout
+            TooltipMixedLayout
 
-Runeforge
-AdventuresMissionComplete
-CharacterCreateDropdown
-WoodenNeutralFrameTemplate
-GenericMetal
-DragonflightMissionFrame
-CovenantMissionFrame
-BFAMissionAlliance
-BFAMissionHorde
--->
+            Runeforge
+            AdventuresMissionComplete
+            CharacterCreateDropdown
+            WoodenNeutralFrameTemplate
+            GenericMetal
+            DragonflightMissionFrame
+            CovenantMissionFrame
+            BFAMissionAlliance
+            BFAMissionHorde
+        -->
+
+        <!-- 
+            Texture idea for flags  
+            delves-scenario-affix-ring
+        -->
 
         <Frames>
             <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">

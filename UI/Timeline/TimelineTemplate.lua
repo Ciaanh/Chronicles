@@ -15,8 +15,8 @@ TimelineMixin = {}
 -- ui color ideas UI-Tuskarr-Highlight-Middle
 
 function TimelineMixin:OnLoad()
-    self.ZoomOut:SetScript("OnClick", self.OnZoomed)
-    self.ZoomIn:SetScript("OnClick", self.OnZoomed)
+    self.ZoomOut:SetScript("OnClick", self.OnZooming)
+    self.ZoomIn:SetScript("OnClick", self.OnZooming)
 
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
@@ -34,15 +34,15 @@ end
 
 function TimelineMixin:OnTimelineInit(eventData)
     -- load data
-    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline:ComputeTimelinePeriods()
 
-    local timelineData = private.Core.Timeline.DefineDisplayedTimelinePage()
+    --local timelineData = private.Core.Timeline:DefineDisplayedTimelinePage()
     -- for k, v in pairs(timelineData) do
     --     print(k)
     --     print(v)
     -- end
 
-    private.Core.Timeline.DisplayTimelineWindow()
+    private.Core.Timeline:DisplayTimelineWindow()
 
     -- scrollFrame:SetScript("OnMouseWheel", onMouseWheel)
 end
@@ -90,48 +90,8 @@ end
 function TimelineMixin:OnTimelineStepChanged(eventData)
 end
 
-function TimelineMixin:OnZoomed()
-    local CurrentStepValueValue = private.Core.Timeline.CurrentStepValue
-    local curentStepIndex = private.Core.Timeline.GetStepValueIndex(CurrentStepValueValue)
-
-handle selected year
-
-    if self.direction == 1 then
-        print(tostring(curentStepIndex) .. " " .. tostring(private.Core.Timeline.MaxStepIndex))
-        if (curentStepIndex == private.Core.Timeline.MaxStepIndex) then
-            return
-        end
-
-        print("zoom in")
-        private.Core.Timeline.ChangeCurrentStepValue(private.Core.Timeline.StepValues[curentStepIndex + 1])
-    else
-        if (curentStepIndex == 1) then
-            return
-        end
-
-        print("zoom out")
-        private.Core.Timeline.ChangeCurrentStepValue(private.Core.Timeline.StepValues[curentStepIndex - 1])
-    end
-
-    -- local stepText = Locale["currentstep"] .. stepValue .. Locale["years"]
-    -- if (stepValue == 1) then
-    -- 	stepText = Locale["currentstep"] .. stepValue .. Locale["year"]
-    -- end
-
-    -- TimelineStep:SetText(stepText)
-
-    -- local CurrentStepValueValue = Chronicles.UI.Timeline.CurrentStepValue
-    -- local curentStepIndex = Chronicles.UI.Timeline:GetStepValueIndex(CurrentStepValueValue)
-
-    -- if (curentStepIndex == Chronicles.UI.Timeline.MaxStepIndex) then
-    --     return
-    -- end
-    -- Chronicles.UI.Timeline:ChangeCurrentStepValue(Chronicles.UI.Timeline.StepValues[curentStepIndex + 1])
-
-    -- Chronicles.UI.Timeline.CurrentPage = Chronicles.UI.Timeline:GetIndex(Chronicles.UI.Timeline.SelectedYear)
-
-    -- -- print("-- Timeline_ZoomIn " .. GetTime())
-    -- Chronicles.UI.Timeline:DisplayTimeline()
+function TimelineMixin:OnZooming()
+    private.Core.Timeline:ChangeCurrentStepValue(self.direction)
 end
 -----------------------------------------------------------------------------------------
 -- TimelineLabel ------------------------------------------------------------------------

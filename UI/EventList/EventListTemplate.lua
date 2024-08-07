@@ -41,7 +41,7 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 	local data = {}
 
 	local eventList = Chronicles.DB:SearchEvents(period.lower, period.upper)
-	private.Core.Timeline.SetYear(math.floor((period.lower + period.upper) / 2))
+	private.Core.Timeline:SetYear(math.floor((period.lower + period.upper) / 2))
 
 	local content = {
 		header = {
