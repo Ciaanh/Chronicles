@@ -26,7 +26,7 @@
     </Frame>
 
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
-        <Size x="50" y="30"/>
+        <Size y="80"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
@@ -49,10 +49,18 @@
     </Button>
 
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
-        <Size x="200" y="600"/>
-        <KeyValues>
+        <!-- <Size x="200" y="600"/>-->
+        <!-- <KeyValues>
             <KeyValue key="layoutType" value="TooltipAzeriteLayout" type="string"/>
-        </KeyValues>
+        </KeyValues>  -->
+
+        <!-- <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="1000">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="125.0" b="125.0"/>
+                </Texture>
+            </Layer>
+        </Layers> -->
 
         <!-- 
             TooltipAzeriteLayout 
@@ -81,33 +89,34 @@
         -->
 
         <Frames>
-            <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
+            <!-- <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="7" y="-6"/>
                     <Anchor point="BOTTOMRIGHT" x="-7" y="6"/>
                 </Anchors>
-            </Frame>
+            </Frame> -->
 
-            <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+            <!-- <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/> -->
 
             <Frame parentKey="PagedEventList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
                 <KeyValues>
-                    <KeyValue key="viewsPerPage" value="1" type="number"/>
+                    <KeyValue key="viewsPerPage" value="2" type="number"/>
                     <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
                     <KeyValue key="xPadding" value="10" type="number"/>
                     <KeyValue key="columnsPerRow" value="1" type="number"/>
                     <KeyValue key="autoExpandElements" value="true" type="boolean"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="5" y="-5"/>
-                    <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
 
                     <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
                         <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
+                            <!-- <Anchor point="RIGHT" relativePoint="LEFT" x="-10"/> -->
+                            <Anchor point="TOPLEFT" x="0" y="-40" />
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="160" y="40" />
                         </Anchors>
                         <!-- <Layers>
                             <Layer level="BACKGROUND" textureSubLevel="1000">
@@ -118,6 +127,22 @@
                         </Layers> -->
                     </Frame>
 
+                    <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Anchors>
+                            <!-- <Anchor point="LEFT" relativePoint="RIGHT" x="10"/> -->
+                            <Anchor point="TOPRIGHT" x="0" y="-40" />
+                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-160" y="40" />
+                        </Anchors>
+                        <!-- <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="1000">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="0.0" g="0.0" b="255.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers> -->
+                    </Frame>
+
+                    <!-- //TODO implement a new paging control for the event list -->
                     <Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
                         <Anchors>
                             <Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>

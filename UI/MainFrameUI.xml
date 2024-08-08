@@ -36,7 +36,7 @@
                     </Layer>
                 </Layers> -->
                 <Frames>
-                    <Frame name="EventBook" parentKey="Book" inherits="EventDetailPageTemplate">
+                    <Frame parentKey="Book" inherits="EventDetailPageTemplate">
                         <Anchors>
                             <Anchor point="TOP" />
                         </Anchors>
@@ -50,7 +50,8 @@
 
                     <Frame parentKey="EventList" inherits="EventListTemplate">
                         <Anchors>
-                            <Anchor point="BOTTOMRIGHT" relativeTo="EventBook" relativePoint="BOTTOMLEFT" x="-50" />
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-150"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="150"/>
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -86,29 +87,21 @@
 
 
     <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
-    <KeyValues>
-            <KeyValue key="layoutType" value="DragonflightMissionFrame" type="string"/>
-        </KeyValues>
-
-
-        <Size x="1500" y="950"/>
+        <Size x="1200" y="850"/>
         <Anchors>
-            <!-- <Anchor point="TOPLEFT"/>
-            <Anchor point="BOTTOMRIGHT"/> -->
-
             <Anchor point="CENTER" />
         </Anchors>
-        <Layers>
+        <!-- <Layers>
             <Layer level="BACKGROUND" textureSubLevel="0">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.6">
                     <Color r="0.0" g="0.0" b="0.0"/>
                 </Texture>
             </Layer>
-        </Layers>
+        </Layers> -->
         <Frames>
             <Button name="CloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
-                    <Anchor point="CENTER" relativePoint="TOPRIGHT"/>
+                    <Anchor point="CENTER" x="600" y="425"/>
                 </Anchors>
             </Button>
 
@@ -116,7 +109,7 @@
 
             <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
                 <Anchors>
-                    <Anchor point="TOP" relativePoint="CENTER" x="125" y="425"/>
+                    <Anchor point="TOP" relativePoint="CENTER" x="0" y="425"/>
                 </Anchors>
             </Frame>
 

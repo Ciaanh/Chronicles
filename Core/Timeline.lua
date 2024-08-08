@@ -421,6 +421,7 @@ function private.Core.Timeline:DisplayTimelineWindow()
 end
 
 function private.Core.Timeline:ChangeCurrentStepValue(direction)
+    -- //TODO investigate performance issue with step 1 and 10
     local currentStepValue = Timeline.CurrentStepValue
     local curentStepIndex = GetStepValueIndex(currentStepValue)
     local nextStepValue = Timeline.StepValues[1]
