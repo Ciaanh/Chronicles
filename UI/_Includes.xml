@@ -3,7 +3,9 @@
 ..\FrameXML\UI.xsd">
 
 	<Include file="Fonts.xml" />
-	
+
+	<Include file="EventList\PagingControls\EventListPagingControls.xml" />
+
 	<Include file="EventList\EventListTemplate.xml" />
 
 	<Include file="EventDetails\BookPageTemplates.xml" />

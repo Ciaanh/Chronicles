@@ -143,11 +143,12 @@
                     </Frame>
 
                     <!-- //TODO implement a new paging control for the event list -->
-                    <Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
                         <Anchors>
                             <Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
                         </Anchors>
                         <KeyValues>
+                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
                             <KeyValue key="fontName" value="SystemFont_Med3" type="string" />
                             <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
                             <KeyValue key="spacing" value="8" type="number"/>
