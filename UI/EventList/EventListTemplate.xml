@@ -27,12 +27,20 @@
 
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
         <Size y="80"/>
+        <NormalTexture file="Interface\AddOns\Chronicles\Art\bookmark">
+            <!-- <Size>
+                        <AbsDimension x="128" y="64"/>
+                    </Size> -->
+            <Anchors>
+                <Anchor point="TOPLEFT" x="0" y="0"/>
+                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+            </Anchors>
+            <!-- <TexCoords left="0.5" right="1.0" top="0" bottom="0.15625"/> -->
+        </NormalTexture>
         <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="255.0" g="0.0" b="0.0"/>
-                </Texture>
-            </Layer>
+            <!-- <Layer level="BACKGROUND">
+
+            </Layer> -->
             <Layer level="ARTWORK">
                 <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
@@ -113,6 +121,9 @@
                 <Frames>
 
                     <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <KeyValues>
+                            <KeyValue key="side" value="left" type="string"/>
+                        </KeyValues>
                         <Anchors>
                             <!-- <Anchor point="RIGHT" relativePoint="LEFT" x="-10"/> -->
                             <Anchor point="TOPLEFT" x="0" y="-40" />
@@ -128,6 +139,9 @@
                     </Frame>
 
                     <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <KeyValues>
+                            <KeyValue key="side" value="right" type="string"/>
+                        </KeyValues>
                         <Anchors>
                             <!-- <Anchor point="LEFT" relativePoint="RIGHT" x="10"/> -->
                             <Anchor point="TOPRIGHT" x="0" y="-40" />

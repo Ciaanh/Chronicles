@@ -9,6 +9,19 @@ EventListItemMixin = {}
 function EventListItemMixin:Init(eventData)
 	self.Text:SetText(eventData.text)
 	self.Event = eventData.event
+
+	local normalTexture = self:GetNormalTexture()
+	if self:GetParent().side == "right" then
+		normalTexture:SetTexCoord(1, 0, 0, 1)
+
+		normalTexture:ClearAllPoints()
+		normalTexture:SetPoint("TOPLEFT", 0, 0)
+		normalTexture:SetPoint("BOTTOMRIGHT", 50, 0)
+	else
+		normalTexture:ClearAllPoints()
+		normalTexture:SetPoint("TOPLEFT", -50, 0)
+		normalTexture:SetPoint("BOTTOMRIGHT", 0, 0)
+	end
 end
 
 function EventListItemMixin:OnClick()
