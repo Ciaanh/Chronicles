@@ -11,15 +11,21 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString name="Title" parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="CENTER"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
-                <FontString name="Dates" parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
+                <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="400" y="10"/>
                     <Anchors>
-                        <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Title" x="0" y="-20"/>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Title" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Separator" x="0" y="-20"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
@@ -32,7 +38,7 @@
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
-        <Layers>
+        <!-- <Layers>
             <Layer level="ARTWORK">
                 <Texture parentKey="Border" atlas="spellbook-divider" useAtlasSize="false">
                     <Size y="10"/>
@@ -42,7 +48,7 @@
                     </Anchors>
                 </Texture>
             </Layer>
-        </Layers>
+        </Layers> -->
     </Frame>
 
     <Frame name="AuthorTemplate" mixin="AuthorMixin" virtual="true">

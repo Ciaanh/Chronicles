@@ -1,4 +1,5 @@
 local FOLDER_NAME, private = ...
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Events = {}
 
@@ -75,23 +76,18 @@ function private.Core.Events.TransformEventToBook(event)
 			elements = {}
 		}
 
+		local author = ""
 		if (event.author ~= nil) then
-			table.insert(
-				title.elements,
-				{
-					templateKey = "AUTHOR",
-					text = event.author
-				}
-			)
-		else
-			table.insert(
-				title.elements,
-				{
-					templateKey = "EMPTY",
-					text = ""
-				}
-			)
+			author = Locale["Author"] .. event.author
 		end
+
+		table.insert(
+			title.elements,
+			{
+				templateKey = "AUTHOR",
+				text = author
+			}
+		)
 		table.insert(data, title)
 
 		-- local descriptionLength = #event.description

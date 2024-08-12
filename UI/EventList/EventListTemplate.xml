@@ -26,26 +26,32 @@
     </Frame>
 
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
-        <Size y="80"/>
-        <NormalTexture file="Interface\AddOns\Chronicles\Art\bookmark">
-            <!-- <Size>
-                        <AbsDimension x="128" y="64"/>
-                    </Size> -->
-            <Anchors>
-                <Anchor point="TOPLEFT" x="0" y="0"/>
-                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-            </Anchors>
-            <!-- <TexCoords left="0.5" right="1.0" top="0" bottom="0.15625"/> -->
-        </NormalTexture>
+        <Size y="110"/>
+        <KeyValues>
+            <KeyValue key="textureHeight" value="80" type="number"/>
+        </KeyValues>
         <Layers>
-            <!-- <Layer level="BACKGROUND">
+            <Layer level="BACKGROUND">
 
-            </Layer> -->
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Anchors>
+                        <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-15"/>
+                        <Anchor point="BOTTOMRIGHT" y="15"/>
+                    </Anchors>
+                </Texture>
+
+            </Layer>
             <Layer level="ARTWORK">
                 <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="TOPLEFT" />
-                        <Anchor point="BOTTOMRIGHT"/>
+                        <Anchor point="TOPLEFT" x="5" y="-15" />
+                        <Anchor point="BOTTOMRIGHT" x="-5" y="15" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -57,55 +63,7 @@
     </Button>
 
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
-        <!-- <Size x="200" y="600"/>-->
-        <!-- <KeyValues>
-            <KeyValue key="layoutType" value="TooltipAzeriteLayout" type="string"/>
-        </KeyValues>  -->
-
-        <!-- <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="1000">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="125.0" b="125.0"/>
-                </Texture>
-            </Layer>
-        </Layers> -->
-
-        <!-- 
-            TooltipAzeriteLayout 
-            TooltipDefaultDarkLayout
-            TooltipGluesLayout
-
-            TooltipCorruptedLayout
-            TooltipMawLayout
-            DarkmoonBasicSmallContainerLayout
-            TooltipMixedLayout
-
-            Runeforge
-            AdventuresMissionComplete
-            CharacterCreateDropdown
-            WoodenNeutralFrameTemplate
-            GenericMetal
-            DragonflightMissionFrame
-            CovenantMissionFrame
-            BFAMissionAlliance
-            BFAMissionHorde
-        -->
-
-        <!-- 
-            Texture idea for flags  
-            delves-scenario-affix-ring
-        -->
-
         <Frames>
-            <!-- <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
-                <Anchors>
-                    <Anchor point="TOPLEFT" x="7" y="-6"/>
-                    <Anchor point="BOTTOMRIGHT" x="-7" y="6"/>
-                </Anchors>
-            </Frame> -->
-
-            <!-- <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/> -->
-
             <Frame parentKey="PagedEventList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
                 <KeyValues>
                     <KeyValue key="viewsPerPage" value="2" type="number"/>
@@ -125,7 +83,6 @@
                             <KeyValue key="side" value="left" type="string"/>
                         </KeyValues>
                         <Anchors>
-                            <!-- <Anchor point="RIGHT" relativePoint="LEFT" x="-10"/> -->
                             <Anchor point="TOPLEFT" x="0" y="-40" />
                             <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="160" y="40" />
                         </Anchors>
@@ -172,13 +129,6 @@
                     </Frame>
                 </Frames>
             </Frame>
-
-
-
-
-
-
-
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>

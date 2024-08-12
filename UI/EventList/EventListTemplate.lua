@@ -10,17 +10,30 @@ function EventListItemMixin:Init(eventData)
 	self.Text:SetText(eventData.text)
 	self.Event = eventData.event
 
-	local normalTexture = self:GetNormalTexture()
-	if self:GetParent().side == "right" then
-		normalTexture:SetTexCoord(1, 0, 0, 1)
+	local contentTexture = self.Content
+	local sideTexture = self.Side
 
-		normalTexture:ClearAllPoints()
-		normalTexture:SetPoint("TOPLEFT", 0, 0)
-		normalTexture:SetPoint("BOTTOMRIGHT", 50, 0)
+	if self:GetParent().side == "right" then
+		-- print("right " .. eventData.text)
+
+		-- self.Text:SetJustifyH("LEFT")
+
+		contentTexture:SetTexCoord(1, 0, 0, 1)
+		sideTexture:SetTexCoord(1, 0, 0, 1)
+
+		--actionButton:GetWidth(), actionButton:GetHeight()
+		sideTexture:ClearAllPoints()
+		sideTexture:SetPoint("LEFT", self, "RIGHT", 0, 0)
+		sideTexture:SetSize(50, self.textureHeight)
 	else
-		normalTexture:ClearAllPoints()
-		normalTexture:SetPoint("TOPLEFT", -50, 0)
-		normalTexture:SetPoint("BOTTOMRIGHT", 0, 0)
+		-- self.Text:SetJustifyH("RIGHT")
+
+		contentTexture:SetTexCoord(0, 1, 0, 1)
+		sideTexture:SetTexCoord(0, 1, 0, 1)
+
+		sideTexture:ClearAllPoints()
+		sideTexture:SetPoint("RIGHT", self, "LEFT", 0, 0)
+		sideTexture:SetSize(50, self.textureHeight)
 	end
 end
 

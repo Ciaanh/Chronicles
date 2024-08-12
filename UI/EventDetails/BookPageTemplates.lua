@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 BookTitleMixin = {}
 function BookTitleMixin:Init(elementData)
@@ -34,7 +33,7 @@ end
 AuthorMixin = {}
 function AuthorMixin:Init(elementData)
     if elementData.text then
-        self.Text:SetText(Locale["Author"] .. elementData.text)
+        self.Text:SetText(elementData.text)
     end
 end
 
