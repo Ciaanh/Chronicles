@@ -4,16 +4,7 @@ local Chronicles = private.Chronicles
 EventDetailPageMixin = {}
 
 function EventDetailPageMixin:OnLoad()
-	self.PagedEventDetails:SetElementTemplateData(
-		{
-			["TITLE"] = {template = "BookTitleTemplate", initFunc = BookTitleMixin.Init},
-			["EMPTY"] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
-			["AUTHOR"] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
-			["HEADER"] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
-			["TEXTCONTENT"] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
-			["HTMLCONTENT"] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
-		}
-	)
+	self.PagedEventDetails:SetElementTemplateData(private.constants.templates)
 
 	EventRegistry:RegisterCallback(private.constants.events.EventDetailPageEventSelected, self.OnEventSelected, self)
 
@@ -41,4 +32,3 @@ function EventDetailPageMixin:OnEventSelected(data)
 	local retainScrollPosition = false
 	self.PagedEventDetails:SetDataProvider(dataProvider, retainScrollPosition)
 end
-

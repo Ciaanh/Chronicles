@@ -3,16 +3,19 @@
 ..\FrameXML\UI.xsd">
 
 	<Include file="Fonts.xml" />
+	
+	<Include file="Templates\BookPages.xml" />
+	<Include file="Events\Timeline\TimelineTemplate.xml" />
+	<Include file="Events\List\EventListTemplate.xml" />
+	<Include file="Events\List\EventListPagingControls.xml" />
+	<Include file="Events\Details\EventBookPageTemplates.xml" />
+	<Include file="Characters\Details\CharacterBookPageTemplates.xml" />
 
-	<Include file="EventList\PagingControls\EventListPagingControls.xml" />
-
-	<Include file="EventList\EventListTemplate.xml" />
-
-	<Include file="EventDetails\BookPageTemplates.xml" />
-	<Include file="EventDetails\EventDetailPageTemplate.xml" />
-
-	<Include file="Timeline\TimelineTemplate.xml" />
-
+	
+		
+	<Include file="Events\Details\EventDetailPageTemplate.xml" />
+	<Include file="Characters\Details\CharacterDetailPageTemplate.xml" />
+<Include file="Templates\Templates.lua" />
 	<Include file="MainFrameUI.xml" />
 
 </Ui>

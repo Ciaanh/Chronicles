@@ -28,13 +28,6 @@
                     <Anchor point="TOPLEFT" />
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
-                <!-- <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="0">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="0.0" g="0.0" b="255.0"/>
-                        </Texture>
-                    </Layer>
-                </Layers> -->
                 <Frames>
                     <Frame parentKey="Book" inherits="EventDetailPageTemplate">
                         <Anchors>

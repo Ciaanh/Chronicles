@@ -54,12 +54,7 @@ EventListMixin = {}
 function EventListMixin:OnLoad()
 	EventRegistry:RegisterCallback(private.constants.events.TimelinePeriodSelected, self.OnTimelinePeriodSelected, self)
 
-	self.PagedEventList:SetElementTemplateData(
-		{
-			["PERIOD_TITLE"] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
-			["EVENT"] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init}
-		}
-	)
+	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
@@ -72,7 +67,7 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 	-- //TODO find other place for the dates of the period
 	local content = {
 		-- header = {
-		-- 	templateKey = "PERIOD_TITLE",
+		-- 	templateKey = private.constants.templateKeys.PERIOD_TITLE,
 		-- 	text = tostring(period.lower) .. " " .. tostring(period.upper)
 		-- },
 		elements = {}
@@ -83,7 +78,7 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 	for key, event in pairs(filteredEvents) do
 		-- print(event.label)
 		local eventSummary = {
-			templateKey = "EVENT",
+			templateKey = private.constants.templateKeys.EVENT_DESCRIPTION,
 			text = event.label,
 			event = event
 		}

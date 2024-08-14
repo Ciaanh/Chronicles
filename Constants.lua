@@ -73,18 +73,25 @@ constants.configurationName = {
 constants.events = {
 	TimelineInit = "TIMELINE_INIT",
 	TimelinePeriodSelected = "TIMELINE_PERIOD_SELECTED",
-	
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
-
-	TimelineStepChanged="Timeline.STEP_CHANGED",
-
+	TimelineStepChanged = "Timeline.STEP_CHANGED",
 	EventDetailPageEventSelected = "EVENT_SELECTED",
-
 	DisplayTimelineLabel = "DisplayTimelineLabel",
 	DisplayTimelinePeriod = "DisplayTimelinePeriod",
-
 	TabUITabSet = "TabUI.TabSet",
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
 	MainFrameUICloseFrame = "MainFrameUI.CloseFrame"
+}
+
+constants.templateKeys = {
+	EVENTLIST_TITLE = "EVENTLIST_TITLE",
+	EVENT_DESCRIPTION = "EVENT_DESCRIPTION",
+	EVENT_TITLE = "EVENT_TITLE",
+	CHARACTER_TITLE = "CHARACTER_TITLE",
+	EMPTY = "EMPTY",
+	AUTHOR = "AUTHOR",
+	HEADER = "HEADER",
+	TEXT_CONTENT = "TEXT_CONTENT",
+	HTML_CONTENT = "HTML_CONTENT"
 }
