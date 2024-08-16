@@ -15,8 +15,6 @@
 
     <Include file="Core\_Includes.xml"/>
 
-
-    <Include file="DB\ChroniclesDB.xml"/>
     <Include file="Custom\DB\ChroniclesDB.xml"/>
 
     <Include file="UI\_Includes.xml"/>

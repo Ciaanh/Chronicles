@@ -6,7 +6,7 @@ CharacterDetailPageMixin = {}
 function CharacterDetailPageMixin:OnLoad()
 	self.PagedCharacterDetails:SetElementTemplateData(private.constants.templates)
 
-	CharacterRegistry:RegisterCallback(private.constants.Characters.CharacterDetailPageCharacterSelected, self.OnCharacterSelected, self)
+	EventRegistry:RegisterCallback(private.constants.events.CharacterSelected, self.OnCharacterSelected, self)
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

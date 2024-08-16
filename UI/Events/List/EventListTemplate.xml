@@ -113,7 +113,7 @@
                         </Layers> -->
                     </Frame>
 
-                    <!-- //TODO implement a new paging control for the event list -->
+                    <!-- TODO implement a new paging control for the event list -->
                     <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
                         <Anchors>
                             <Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>

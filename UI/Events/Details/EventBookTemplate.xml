@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
-	<Script file="CharacterDetailPageTemplate.lua"/>
+	<Script file="EventBookTemplate.lua"/>
 
-	<Frame name="CharacterDetailPageTemplate" mixin="CharacterDetailPageMixin" virtual="true">
+	<Frame name="EventBookTemplate" mixin="EventBookMixin" virtual="true">
 		<Size x="1200" y="650"/>
 		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="1">
@@ -40,7 +40,7 @@
 			</Layer> -->
 		</Layers>
 		<Frames>
-			<Frame parentKey="PagedCharacterDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+			<Frame parentKey="PagedEventDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
 				<KeyValues>
 					<KeyValue key="viewsPerPage" value="2" type="number"/>
 					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>

@@ -209,7 +209,7 @@ function Chronicles.UI.EventList:SetTextToFrame(event, frame)
             "OnMouseDown",
             function()
                 Chronicles.UI.EventDescription:DrawEventDescription(frame.event)
-                EventRegistry:TriggerEvent(private.constants.events.EventDetailPageEventSelected, event)
+                EventRegistry:TriggerEvent(private.constants.events.EventSelected, event)
             end
         )
         frame:Show()

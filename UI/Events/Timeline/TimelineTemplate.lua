@@ -1,5 +1,5 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -----------------------------------------------------------------------------------------
 -- Timeline -----------------------------------------------------------------------------
@@ -33,18 +33,8 @@ function TimelineMixin:OnLoad()
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
-    -- load data
     private.Core.Timeline:ComputeTimelinePeriods()
-
-    --local timelineData = private.Core.Timeline:DefineDisplayedTimelinePage()
-    -- for k, v in pairs(timelineData) do
-    --     print(k)
-    --     print(v)
-    -- end
-
     private.Core.Timeline:DisplayTimelineWindow()
-
-    -- scrollFrame:SetScript("OnMouseWheel", onMouseWheel)
 end
 
 function TimelineMixin:TimelinePrevious()
@@ -91,6 +81,7 @@ function TimelineMixin:OnTimelineStepChanged(eventData)
 end
 
 function TimelineMixin:OnZooming()
+    -- print("OnZooming: " .. GetTime())
     private.Core.Timeline:ChangeCurrentStepValue(self.direction)
 end
 -----------------------------------------------------------------------------------------
@@ -152,4 +143,24 @@ function TimelinePeriodMixin:OnClick()
             upper = self.data.upperBound
         }
     )
+
+    Timeline.Period:Show()
+
+    if self.data.lowerBound == private.constants.config.mythos then
+        Timeline.Period.Text:SetText(Locale["Mythos"])
+        return
+    end
+
+    if self.data.upperBound == private.constants.config.futur then
+        Timeline.Period.Text:SetText(Locale["Futur"])
+        return
+    end
+
+    local left = tostring(self.data.lowerBound)
+    local right = tostring(self.data.upperBound)
+    if self.data.lowerBound == self.data.upperBound then
+        Timeline.Period.Text:SetText(left)
+    else
+        Timeline.Period.Text:SetText(left .. " / " .. right)
+    end
 end

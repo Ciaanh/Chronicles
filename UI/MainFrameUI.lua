@@ -42,7 +42,9 @@ end
 TabUIMixin = {}
 
 TabUIMixin.FrameTabs = {
-	EventDetails = 1,
+	Events = 1,
+	Characters = 2,
+	Factions = 3,
 	Options = 2
 	-- Third = 3
 }
@@ -50,25 +52,29 @@ TabUIMixin.FrameTabs = {
 function TabUIMixin:OnLoad()
 	TabSystemOwnerMixin.OnLoad(self)
 	self:SetTabSystem(self.TabSystem)
-	self.EventDetailsTabID = self:AddNamedTab("Events Details", self.EventDetails)
+
+	self.EventsTabID = self:AddNamedTab("Events", self.Events)
+	self.CharactersTabID = self:AddNamedTab("Characters", self.Characters)
+	self.FactionsTabID = self:AddNamedTab("Factions", self.Factions)
+
 	self.OptionsTabID = self:AddNamedTab("Options", self.Options)
 
 	self.frameTabsToTabID = {
-		[TabUIMixin.FrameTabs.EventDetails] = self.EventDetailsTabID,
+		[TabUIMixin.FrameTabs.Events] = self.EventsTabID,
 		[TabUIMixin.FrameTabs.Options] = self.OptionsTabID
 	}
 end
 
 function TabUIMixin:UpdateTabs()
-	local isEventDetailsTabAvailable = self:IsTabAvailable(self.EventDetailsTabID)
+	local isEventsTabAvailable = self:IsTabAvailable(self.EventsTabID)
 	local isOptionsTabAvailable = self:IsTabAvailable(self.OptionsTabID)
 
-	self.TabSystem:SetTabShown(self.EventDetailsTabID, isEventDetailsTabAvailable)
+	self.TabSystem:SetTabShown(self.EventsTabID, isEventsTabAvailable)
 	self.TabSystem:SetTabShown(self.OptionsTabID, isOptionsTabAvailable)
 
 	local currentTab = self:GetTab()
 	if not currentTab or not self:IsTabAvailable(currentTab) then
-		self:SetTab(self.EventDetailsTabID)
+		self:SetTab(self.EventsTabID)
 	end
 end
 

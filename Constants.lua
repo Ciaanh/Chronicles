@@ -44,6 +44,8 @@ constants.timelines = {
 constants.config = {
 	currentYear = 42,
 	historyStartYear = -150000,
+	mythos = -999999,
+	futur = 999999,
 	timeline = {
 		pageSize = 8
 	},
@@ -63,7 +65,9 @@ constants.config = {
 		characterFactionsPageSize = 8,
 		eventFactionsPageSize = 8,
 		eventCharactersPageSize = 8
-	}
+	},
+	-- stepValues = {1000, 500, 250, 100, 50, 10, 1}
+	stepValues = {1000, 500, 100, 10}
 }
 
 constants.configurationName = {
@@ -76,10 +80,16 @@ constants.events = {
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 	TimelineStepChanged = "Timeline.STEP_CHANGED",
-	EventDetailPageEventSelected = "EVENT_SELECTED",
+
+	EventSelected = "EVENT_SELECTED",
+	CharacterSelected = "CHARACTER_SELECTED",
+	FactionSelected = "FACTION_SELECTED",
+	
 	DisplayTimelineLabel = "DisplayTimelineLabel",
 	DisplayTimelinePeriod = "DisplayTimelinePeriod",
+	
 	TabUITabSet = "TabUI.TabSet",
+	
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
 	MainFrameUICloseFrame = "MainFrameUI.CloseFrame"
 }

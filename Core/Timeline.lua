@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Timeline = {}
@@ -10,8 +9,7 @@ local Chronicles = private.Chronicles
 -- Timeline -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 local Timeline = {}
-Timeline.MaxStepIndex = 7
-Timeline.StepValues = {1000, 500, 250, 100, 50, 10, 1}
+Timeline.MaxStepIndex = #private.constants.config.stepValues
 Timeline.CurrentStepValue = nil
 Timeline.CurrentPage = nil
 Timeline.SelectedYear = nil
@@ -118,13 +116,28 @@ local function GetTimelineConfig(minYear, maxYear, stepValue)
     end
 
     if (timelineConfig.maxYear > 0) then
+        -- print(tostring(timelineConfig.maxYear))
         local afterLength = math.abs(timelineConfig.maxYear)
 
-        timelineConfig.after = math.ceil((afterLength) / stepValue)
+        -- print(tostring(afterLength / stepValue))
 
-        if (maxYear == private.constants.config.currentYear and stepValue < private.constants.config.currentYear) then
-            timelineConfig.after = timelineConfig.after + 1
-        end
+        local ceil = math.ceil(afterLength / stepValue)
+        -- local floor = math.floor(afterLength / stepValue)
+
+        -- print("-- ceil "..tostring(ceil))
+        -- print("-- floor "..tostring(floor))
+
+        timelineConfig.after = ceil
+
+    -- print("-- maxYear "..tostring(maxYear))
+    -- print("-- currentYear "..tostring(private.constants.config.currentYear))
+    -- print("-- stepValue "..tostring(stepValue))
+
+    -- if (maxYear == private.constants.config.currentYear and stepValue < private.constants.config.currentYear) then
+    --     print("-- timelineConfig.after + 1 ")
+
+    --     timelineConfig.after = timelineConfig.after + 1
+    -- end
     end
 
     -- Define the total number of timeline blocks
@@ -154,7 +167,7 @@ end
 
 local function GetStepValueIndex(stepValue)
     local index = {}
-    for k, v in pairs(Timeline.StepValues) do
+    for k, v in pairs(private.constants.config.stepValues) do
         index[v] = k
     end
     return index[stepValue]
@@ -226,7 +239,7 @@ end
 function private.Core.Timeline:ComputeTimelinePeriods()
     local stepValue = Timeline.CurrentStepValue
     if (stepValue == nil) then
-        Timeline.CurrentStepValue = Timeline.StepValues[1]
+        Timeline.CurrentStepValue = private.constants.config.stepValues[1]
         stepValue = Timeline.CurrentStepValue
     end
 
@@ -275,14 +288,14 @@ function private.Core.Timeline:ComputeTimelinePeriods()
         if (maxValue > private.constants.config.currentYear) then
             if (minValue > private.constants.config.currentYear) then
                 period.lowerBound = private.constants.config.currentYear + 1
-                period.upperBound = 999999
+                period.upperBound = private.constants.config.futur
                 period.text = Locale["Futur"]
             else
                 period.upperBound = private.constants.config.currentYear
             end
         elseif (maxValue < private.constants.config.historyStartYear) then
             if (minValue < private.constants.config.historyStartYear) then
-                period.lowerBound = -999999
+                period.lowerBound = private.constants.config.mythos
                 period.upperBound = private.constants.config.historyStartYear - 1
                 period.text = Locale["Mythos"]
             else
@@ -421,35 +434,38 @@ function private.Core.Timeline:DisplayTimelineWindow()
 end
 
 function private.Core.Timeline:ChangeCurrentStepValue(direction)
-    -- //TODO investigate performance issue with step 1 and 10
+    -- print("ChangeCurrentStepValue: " .. GetTime())
+    -- TODO investigate performance issue with step 1 and 10
     local currentStepValue = Timeline.CurrentStepValue
     local curentStepIndex = GetStepValueIndex(currentStepValue)
-    local nextStepValue = Timeline.StepValues[1]
+    local nextStepValue = private.constants.config.stepValues[1]
 
     -- handle selected year
 
     if direction == 1 then
-        print(tostring(curentStepIndex) .. " " .. tostring(Timeline.MaxStepIndex))
+        -- print(tostring(curentStepIndex) .. " " .. tostring(Timeline.MaxStepIndex))
         if (curentStepIndex == Timeline.MaxStepIndex) then
             return
         end
 
-        print("zoom in")
-        nextStepValue = Timeline.StepValues[curentStepIndex + 1]
+        -- print("zoom in")
+        nextStepValue = private.constants.config.stepValues[curentStepIndex + 1]
     else
         if (curentStepIndex == 1) then
             return
         end
 
-        print("zoom out")
-        nextStepValue = Timeline.StepValues[curentStepIndex - 1]
+        -- print("zoom out")
+        nextStepValue = private.constants.config.stepValues[curentStepIndex - 1]
     end
 
     Timeline.CurrentStepValue = nextStepValue
 
+    -- print("1 - Milliseconds: " .. GetTime())
     private.Core.Timeline:ComputeTimelinePeriods()
-    --private.Core.Timeline:DefineDisplayedTimelinePage()
-
+    -- print("2 - Milliseconds: " .. GetTime())
     Timeline.CurrentPage = GetYearPageIndex(Timeline.SelectedYear)
+    -- print("3 - Milliseconds: " .. GetTime())
     private.Core.Timeline:DisplayTimelineWindow()
+    -- print("4 - Milliseconds: " .. GetTime())
 end

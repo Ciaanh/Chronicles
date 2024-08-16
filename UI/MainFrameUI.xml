@@ -23,19 +23,39 @@
                 </Anchors>
             </Frame>
 
-            <Frame parentKey="EventDetails" frameLevel="100" hidden="true">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <Frame parentKey="Events" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="Book" inherits="EventDetailPageTemplate">
+                    <Frame parentKey="Book" inherits="EventBookTemplate">
                         <Anchors>
                             <Anchor point="TOP" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="Timeline" inherits="TimelineTemplate">
+                    <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
                         <Anchors>
                             <Anchor point="BOTTOM" />
                         </Anchors>
@@ -49,6 +69,105 @@
                     </Frame>
                 </Frames>
             </Frame>
+
+
+
+
+
+
+
+
+
+
+            <Frame parentKey="Characters" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="Book" inherits="CharacterBookTemplate">
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
+                    <!-- <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-150"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="150"/>
+                        </Anchors>
+                    </Frame> -->
+                </Frames>
+            </Frame>
+
+
+
+
+
+
+
+
+
+            <Frame parentKey="Factions" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="Book" inherits="FactionBookTemplate">
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
+                    <!-- <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-150"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="150"/>
+                        </Anchors>
+                    </Frame> -->
+                </Frames>
+            </Frame>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             <Frame parentKey="Options" frameLevel="100" hidden="true">
                 <KeyValues>
