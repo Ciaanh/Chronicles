@@ -30,6 +30,10 @@ function Chronicles.UI:Init()
     Chronicles.UI.OptionsView:Init()
     Chronicles.UI.MyJournalView:Init()
 
+    MainFrame:RegisterForDrag("LeftButton")
+    MainFrame:SetScript("OnDragStart", function() frame:StartMoving() end)
+    MainFrame:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
+
     EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
 end
 

@@ -105,3 +105,41 @@ constants.templateKeys = {
 	TEXT_CONTENT = "TEXT_CONTENT",
 	HTML_CONTENT = "HTML_CONTENT"
 }
+
+
+
+
+constants.colors = {
+	white	= "|cFFFFFFFF",
+	red = "|cFFFF0000",
+	darkred = "|cFFF00000",
+	green = "|cFF00FF00",
+	orange = "|cFFFF7F00",
+	yellow = "|cFFFFFF00",
+	gold = "|cFFFFD700",
+	teal = "|cFF00FF9A",
+	cyan = "|cFF1CFAFE",
+	lightBlue = "|cFFB0B0FF",
+	battleNetBlue = "|cff82c5ff",
+	grey = "|cFF909090",
+	
+	-- classes
+	classMage = "|cFF69CCF0",
+	classHunter = "|cFFABD473",
+	
+	-- recipes
+	recipeGrey = "|cFF808080",
+	recipeGreen = "|cFF40C040",
+	recipeOrange = "|cFFFF8040",
+	
+	-- rarity : http://wow.gamepedia.com/Quality
+	common = "|cFFFFFFFF",
+	uncommon = "|cFF1EFF00",
+	rare = "|cFF0070DD",
+	epic = "|cFFA335EE",
+	legendary = "|cFFFF8000",
+	heirloom = "|cFFE6CC80",
+
+	Alliance = "|cFF2459FF",
+	Horde = "|cFFFF0000"
+}

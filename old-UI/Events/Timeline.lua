@@ -393,8 +393,8 @@ function Chronicles.UI.Timeline:GetDateCurrentStepIndex(date)
         return dateProfile.mod50
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 10) then
         return dateProfile.mod10
-    elseif (Chronicles.UI.Timeline.CurrentStepValue == 1) then
-        return dateProfile.mod1
+    -- elseif (Chronicles.UI.Timeline.CurrentStepValue == 1) then
+    --     return dateProfile.mod1
     end
 end
 
@@ -412,8 +412,8 @@ function Chronicles.UI.Timeline:GetCurrentStepEventDates()
         return eventDates.mod50
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 10) then
         return eventDates.mod10
-    elseif (Chronicles.UI.Timeline.CurrentStepValue == 1) then
-        return eventDates.mod1
+    -- elseif (Chronicles.UI.Timeline.CurrentStepValue == 1) then
+    --     return eventDates.mod1
     end
 end
 

@@ -53,7 +53,7 @@ function Chronicles.DB:GetPeriodsFillingBySteps()
         mod100 = {},
         mod50 = {},
         mod10 = {},
-        mod1 = {}
+        --mod1 = {}
     }
 
     -- print("-- periods " .. tostring(#periods.mod1000))
@@ -85,7 +85,7 @@ function Chronicles.DB:SetPeriodsForEvent(periods, date, eventId)
     periods.mod100[profile.mod100] = Chronicles.DB:DefinePeriodsForEvent(periods.mod100[profile.mod100], eventId)
     periods.mod50[profile.mod50] = Chronicles.DB:DefinePeriodsForEvent(periods.mod50[profile.mod50], eventId)
     periods.mod10[profile.mod10] = Chronicles.DB:DefinePeriodsForEvent(periods.mod10[profile.mod10], eventId)
-    periods.mod1[profile.mod1] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1[profile.mod1], eventId)
+    --periods.mod1[profile.mod1] = Chronicles.DB:DefinePeriodsForEvent(periods.mod1[profile.mod1], eventId)
 
     return periods
 end
@@ -119,7 +119,7 @@ function Chronicles.DB:ComputeEventDateProfile(date)
         mod100 = math.floor(date / 100),
         mod50 = math.floor(date / 50),
         mod10 = math.floor(date / 10),
-        mod1 = date
+        --mod1 = date
     }
 end
 

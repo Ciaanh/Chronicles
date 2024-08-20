@@ -15,6 +15,7 @@
 	<Include file="Events\Details\EventBookTemplate.xml" />
 	<Include file="Characters\Details\CharacterBookTemplate.xml" />
 	<Include file="Factions\Details\FactionBookTemplate.xml" />
+	<Include file="Settings\Settings.xml" />
 
 	<Include file="Templates\Templates.lua" />
 

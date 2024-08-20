@@ -45,7 +45,7 @@ TabUIMixin.FrameTabs = {
 	Events = 1,
 	Characters = 2,
 	Factions = 3,
-	Options = 2
+	Settings = 2
 	-- Third = 3
 }
 
@@ -57,20 +57,20 @@ function TabUIMixin:OnLoad()
 	self.CharactersTabID = self:AddNamedTab("Characters", self.Characters)
 	self.FactionsTabID = self:AddNamedTab("Factions", self.Factions)
 
-	self.OptionsTabID = self:AddNamedTab("Options", self.Options)
+	self.SettingsTabID = self:AddNamedTab("Settings", self.Settings)
 
 	self.frameTabsToTabID = {
 		[TabUIMixin.FrameTabs.Events] = self.EventsTabID,
-		[TabUIMixin.FrameTabs.Options] = self.OptionsTabID
+		[TabUIMixin.FrameTabs.Settings] = self.SettingsTabID
 	}
 end
 
 function TabUIMixin:UpdateTabs()
 	local isEventsTabAvailable = self:IsTabAvailable(self.EventsTabID)
-	local isOptionsTabAvailable = self:IsTabAvailable(self.OptionsTabID)
+	local isSettingsTabAvailable = self:IsTabAvailable(self.SettingsTabID)
 
 	self.TabSystem:SetTabShown(self.EventsTabID, isEventsTabAvailable)
-	self.TabSystem:SetTabShown(self.OptionsTabID, isOptionsTabAvailable)
+	self.TabSystem:SetTabShown(self.SettingsTabID, isSettingsTabAvailable)
 
 	local currentTab = self:GetTab()
 	if not currentTab or not self:IsTabAvailable(currentTab) then

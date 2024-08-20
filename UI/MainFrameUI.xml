@@ -155,39 +155,23 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <Frame parentKey="Options" frameLevel="100" hidden="true">
-                <KeyValues>
-                    <KeyValue key="layoutType" value="BFAMissionAlliance" type="string"/>
-                </KeyValues>
-                <Size x="1200" y="650"/>
+            <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
                 <Anchors>
                     <Anchor point="TOP"/>
                 </Anchors>
-                <!-- <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="0">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="0.0" g="0.0" b="255.0"/>
-                        </Texture>
-                    </Layer>
-                </Layers> -->
-                <Frames>
-                    <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
-                </Frames>
             </Frame>
+
+
+
+
+
+
+
+
+
+
+
+
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>

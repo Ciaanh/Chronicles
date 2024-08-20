@@ -8,5 +8,5 @@
     <Script file="Events.lua"/>
     <Script file="Timeline.lua"/>
     <Script file="Factions.lua"/>
-    <Script file="Options.lua"/>
+    <Script file="Settings.lua"/>
 </Ui>

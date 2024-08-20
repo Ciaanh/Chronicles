@@ -29,8 +29,8 @@ local function GetDateCurrentStepIndex(date)
         return dateProfile.mod50
     elseif (Timeline.CurrentStepValue == 10) then
         return dateProfile.mod10
-    elseif (Timeline.CurrentStepValue == 1) then
-        return dateProfile.mod1
+    -- elseif (Timeline.CurrentStepValue == 1) then
+    --     return dateProfile.mod1
     end
 end
 
@@ -48,8 +48,8 @@ local function GetCurrentStepPeriodsFilling()
         return eventDates.mod50
     elseif (Timeline.CurrentStepValue == 10) then
         return eventDates.mod10
-    elseif (Timeline.CurrentStepValue == 1) then
-        return eventDates.mod1
+    -- elseif (Timeline.CurrentStepValue == 1) then
+    --     return eventDates.mod1
     end
 end
 
