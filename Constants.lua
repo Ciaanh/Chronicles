@@ -91,7 +91,9 @@ constants.events = {
 	TabUITabSet = "TabUI.TabSet",
 	
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
-	MainFrameUICloseFrame = "MainFrameUI.CloseFrame"
+	MainFrameUICloseFrame = "MainFrameUI.CloseFrame",
+
+	-- SettingsSelectCategory = "Settings.SELECT_CATEGORY"
 }
 
 constants.templateKeys = {

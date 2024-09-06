@@ -3,142 +3,6 @@
     xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="Settings.lua"></Script>
 
-    <Slider name="Custom_UIPanelScrollBarTemplate" virtual="true">
-        <Size x="16" y="0" />
-        <Frames>
-            <Button parentKey="ScrollUpButton" inherits="UIPanelScrollUpButtonTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOM" relativePoint="TOP"/>
-                </Anchors>
-                <Scripts>
-                    <OnClick>
-						local parent = self:GetParent()
-						local scrollStep = parent.scrollStep or (parent:GetHeight() / 2)
-						parent:SetValue(parent:GetValue() - scrollStep)
-						PlaySound(1115)
-                    </OnClick>
-                </Scripts>
-            </Button>
-            <Button parentKey="ScrollDownButton" inherits="UIPanelScrollDownButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM"/>
-                </Anchors>
-                <Scripts>
-                    <OnClick>
-						local parent = self:GetParent()
-						local scrollStep = parent.scrollStep or (parent:GetHeight() / 2)
-						parent:SetValue(parent:GetValue() + scrollStep)
-						PlaySound(1115)
-                    </OnClick>
-                </Scripts>
-            </Button>
-        </Frames>
-        <Scripts>
-            <OnValueChanged>
-				self:GetParent():SetVerticalScroll(value)
-            </OnValueChanged>
-        </Scripts>
-        <ThumbTexture parentKey="ThumbTexture" inherits="UIPanelScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob">
-            <Size x="18" y="24"/>
-            <TexCoords left="0.20" right="0.80" top="0.125" bottom="0.875"/>
-        </ThumbTexture>
-    </Slider>
-
-    <ScrollFrame name="Custom_UIPanelScrollFrameTemplate" virtual="true" mixin="Custom_UIPanelScrollFrameMixin">
-        <Frames>
-            <Slider parentKey="ScrollBar" inherits="Custom_UIPanelScrollBarTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-18" />
-                    <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="17" />
-                </Anchors>
-            </Slider>
-        </Frames>
-        <ScrollChild>
-            <Frame parentKey="ScrollChildFrame">
-                <Size x="300" y="334" />
-            </Frame>
-        </ScrollChild>
-        <KeyValues>
-            <KeyValue key="rowPrefix" value="Entry" />
-        </KeyValues>
-        <Scripts>
-            <!-- <OnLoad>
-				LibStub("LibMVC-1.0"):BindViewToController(self, "AddonFactory.UIPanelScrollFrame")
-            </OnLoad> -->
-            <OnLoad method="OnLoad"/>
-            <OnScrollRangeChanged method="OnScrollRangeChanged" />
-            <!-- <OnScrollRangeChanged>
-				self:OnScrollRangeChanged(xrange, yrange)
-            </OnScrollRangeChanged> -->
-            <!--  The code to disable the ScrollDownButton is pretty hacked, but it works -->
-            <OnVerticalScroll>
-				-- this code is actually not executed since it's always overriden in derived frames
-				local scrollBar = self.ScrollBar
-				scrollBar:SetValue(offset)
-				
-				local _, maximum = scrollBar:GetMinMaxValues()
-				
-				if offset == 0 then
-					scrollBar.ScrollUpButton:Disable()
-				else
-					scrollBar.ScrollUpButton:Enable()
-				end
-				
-				if ((scrollBar:GetValue() - maximum) == 0) then
-					scrollBar.ScrollDownButton:Disable()
-				else
-					scrollBar.ScrollDownButton:Enable()
-				end
-            </OnVerticalScroll>
-            <OnMouseWheel method="OnMouseWheel" />
-            <!-- <OnMouseWheel>
-				self:OnMouseWheel(delta)
-            </OnMouseWheel> -->
-            <OnScrollRangeChanged function=""/>
-        </Scripts>
-    </ScrollFrame>
-
-    <ScrollFrame name="MenuScrollFrameTemplate" inherits="Custom_UIPanelScrollFrameTemplate" virtual="true">
-        <Size x="188" y="438" />
-        <Anchors>
-            <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="188" y="0" />
-        </Anchors>
-        <Layers>
-            <Layer level="BORDER">
-                <Texture parentKey="scrollBorderTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
-                    <Size x="28" y="48"/>
-                    <Anchors>
-                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="0" y="2"/>
-                    </Anchors>
-                    <TexCoords left="0" right="0.484375" top="0" bottom="0.2"/>
-                </Texture>
-                <Texture parentKey="scrollBorderBottom" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
-                    <Size x="28" y="67"/>
-                    <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-                    </Anchors>
-                    <TexCoords left="0.515625" right="1.0" top="0.1440625" bottom="0.4140625"/>
-                </Texture>
-                <Texture parentKey="scrollBorderMiddle" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.scrollBorderTop" relativePoint="BOTTOMLEFT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.scrollBorderBottom" relativePoint="TOPRIGHT"/>
-                    </Anchors>
-                    <TexCoords left="0" right="0.484375" top="0.1640625" bottom="1"/>
-                </Texture>
-            </Layer>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="scrollFrameScrollBarBackground">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.scrollBorderTop" relativePoint="TOPLEFT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.scrollBorderBottom" relativePoint="BOTTOMRIGHT"/>
-                    </Anchors>
-                    <Color r="0" g="0" b="0"/>
-                </Texture>
-            </Layer>
-        </Layers>
-    </ScrollFrame>
-
     <Button name="CategoryButtonTemplate" parentArray="Buttons" inherits="TruncatedTooltipScriptTemplate" virtual="true" mixin="CategoryButtonMixin">
         <Size x="152" y="21"/>
         <Layers>
@@ -157,28 +21,27 @@
             </Layer>
             <Layer level="BORDER">
                 <Texture parentKey="HighlightTexture" atlas="auctionhouse-nav-button-highlight" hidden="true">
+                    <Size x="152" y="21"/>
                     <Anchors>
-                        <Anchor point="CENTER"/>
+                        <Anchor point="CENTER" />
                     </Anchors>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="SelectedTexture" atlas="auctionhouse-nav-button-select" alphaMode="ADD" hidden="true">
+                    <Size x="152" y="21"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.NormalTexture" relativePoint="TOPLEFT"/>
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.NormalTexture" relativePoint="BOTTOMRIGHT"/>
+                        <Anchor point="CENTER" />
                     </Anchors>
                 </Texture>
             </Layer>
         </Layers>
-        <Scripts>
-            <OnClick method="Button_OnClick" />
-        </Scripts>
+
         <ButtonText parentKey="Text" justifyH="LEFT">
             <Size x="0" y="8"/>
             <Anchors>
-                <Anchor point="LEFT" x="4" y="0"/>
-                <Anchor point="RIGHT" x="-4" y="0"/>
+                <Anchor point="TOPLEFT" x="4" y="0"/>
+                <Anchor point="BOTTOMRIGHT" x="-4" y="0"/>
             </Anchors>
             <Shadow>
                 <Offset>
@@ -189,46 +52,12 @@
         </ButtonText>
         <NormalFont style="GameFontNormalSmall"/>
         <HighlightFont style="GameFontHighlightSmall"/>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnClick method="Button_OnClick" />
+        </Scripts>
     </Button>
 
-    <Frame name="CategoriesListTemplate" virtual="true" mixin="CategoriesListMixin">
-        <Size x="188" y="438"/>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="Background" atlas="auctionhouse-background-categories">
-                    <Size x="182" y="432"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="3" y="-3"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers>
-        <Frames>
-            <ScrollFrame parentKey="ScrollFrame" inherits="MenuScrollFrameTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" x="17" y="-4"/>
-                    <Anchor point="BOTTOMRIGHT" x="-29" y="2"/>
-                </Anchors>
-                <Scripts>
-                    <OnVerticalScroll>
-						local parent = self:GetParent()
-						self:OnVerticalScroll(offset, 20, function() parent:UpdateCategories() end)
-                    </OnVerticalScroll>
-                </Scripts>
-                <KeyValues>
-                    <KeyValue key="numRows" value="20" type="number" />
-                    <KeyValue key="rowHeight" value="20" type="number" />
-                    <KeyValue key="rowTemplate" value="CategoryButtonTemplate" />
-                    <KeyValue key="xOffset" value="6" type="number" />
-                    <KeyValue key="yOffset" value="-6" type="number" />
-                    <KeyValue key="scrollBarHideable" value="false" type="boolean"/>
-                </KeyValues>
-            </ScrollFrame>
-        </Frames>
-        <Scripts>
-            <OnLoad method="OnLoad"/>
-        </Scripts>
-    </Frame>
 
 
 
@@ -265,10 +94,22 @@
         <Frames>
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
 
-            <Frame parentKey="CategoriesList" inherits="CategoriesListTemplate">
+            <Frame parentKey="CategoriesList">
                 <Anchors>
                     <Anchor point="TOPLEFT" x="20" y="-68"/>
                 </Anchors>
+
+                <Size x="188" y="438"/>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" atlas="auctionhouse-background-categories">
+                            <Size x="182" y="432"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="3" y="-3"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                </Layers>
             </Frame>
 
             <Frame parentKey="Background" useParentLevel="true">
