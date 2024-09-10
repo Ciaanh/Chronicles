@@ -86,27 +86,27 @@ function TabUIMixin:SetTab(tabID)
 	return true -- Don't show the tab as selected yet.
 end
 
-function TabUIMixin:IsFrameTabActive(frameTab)
-	local tabID = self.frameTabsToTabID[frameTab]
-	if not tabID then
-		return false
-	end
-	return self:GetTab() == tabID
-end
+-- function TabUIMixin:IsFrameTabActive(frameTab)
+-- 	local tabID = self.frameTabsToTabID[frameTab]
+-- 	if not tabID then
+-- 		return false
+-- 	end
+-- 	return self:GetTab() == tabID
+-- end
 
-function TabUIMixin:TrySetTab(frameTab)
-	local tabID = self.frameTabsToTabID[frameTab]
-	if not tabID then
-		return false
-	end
+-- function TabUIMixin:TrySetTab(frameTab)
+-- 	local tabID = self.frameTabsToTabID[frameTab]
+-- 	if not tabID then
+-- 		return false
+-- 	end
 
-	local isTabAvailable = self:IsTabAvailable(tabID)
-	if isTabAvailable then
-		self:SetTab(tabID)
-	end
+-- 	local isTabAvailable = self:IsTabAvailable(tabID)
+-- 	if isTabAvailable then
+-- 		self:SetTab(tabID)
+-- 	end
 
-	return isTabAvailable
-end
+-- 	return isTabAvailable
+-- end
 
 function TabUIMixin:IsTabAvailable(tabID)
 	return true

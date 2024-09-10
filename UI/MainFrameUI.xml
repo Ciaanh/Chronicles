@@ -24,25 +24,6 @@
             </Frame>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             <Frame parentKey="Events" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
@@ -69,14 +50,6 @@
                     </Frame>
                 </Frames>
             </Frame>
-
-
-
-
-
-
-
-
 
 
             <Frame parentKey="Characters" frameLevel="100" hidden="true">
@@ -107,13 +80,6 @@
             </Frame>
 
 
-
-
-
-
-
-
-
             <Frame parentKey="Factions" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
@@ -142,34 +108,11 @@
             </Frame>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
             <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
                 <Anchors>
                     <Anchor point="TOP"/>
                 </Anchors>
             </Frame>
-
-
-
-
-
-
-
-
-
-
 
 
         </Frames>

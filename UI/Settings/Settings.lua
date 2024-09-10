@@ -14,28 +14,38 @@ function SettingsMixin:OnLoad()
             subMenu = {
                 {
                     text = "Event types",
-                    callback = self.EventTypes_Tab
+                    isTab = true,
+                    TabName = "EventTypes",
+                    TabFrame = self.Events
                 },
                 {
                     text = "Libraries",
-                    callback = self.Libraries_Tab
+                    isTab = true,
+                    TabName = "Libraries",
+                    TabFrame = self.Libraries
                 }
             }
         },
         {
             text = "My Journal",
-            callback = self.MyJournal_Tab
+            isTab = true,
+            TabName = "MyJournal",
+            TabFrame = self.MyJournal
         },
         {
             text = "Test 1",
             subMenu = {
                 {
                     text = "Test 2",
-                    callback = self.EventTypes_Tab
+                    isTab = true,
+                    TabName = "Test2",
+                    TabFrame = self.Test2
                 },
                 {
                     text = "Test 3",
-                    callback = self.Libraries_Tab
+                    isTab = true,
+                    TabName = "Test3",
+                    TabFrame = self.Test3
                 }
             }
         }
@@ -47,12 +57,50 @@ function SettingsMixin:OnLoad()
     for index, category in ipairs(self.categories) do
         self:AddCategory(index, category)
     end
+
+    self.TabUI.FrameTabs = {}
+    for _, category in ipairs(self.categories) do
+        if category.isTab then
+            self.TabUI.FrameTabs[category.TabName] = category.TabFrame
+        end
+    end
+
+    EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
+
+    self:UpdateTabs()
+end
+
+function SettingsMixin:GetTab()
+    local currentTab = self.TabUI.currentTab
+    return currentTab
+end
+
+function SettingsMixin:UpdateTabs()
+    local currentTab = self:GetTab()
+    if not currentTab then
+        for key, tab in pairs(self.TabUI.FrameTabs) do
+            self:SetTab(tab.TabName)
+            break
+        end
+    end
+end
+
+function SettingsMixin:SetTab(tabName)
+    for key, tab in pairs(self.TabUI.FrameTabs) do
+        if tabName == key then
+            tab:Show()
+            self.TabUI.currentTab = key
+        else
+            tab:Hide()
+        end
+    end
 end
 
 function SettingsMixin:GetVisibleCategories(categories)
     local visibleCategories = {}
 
     for index, category in ipairs(categories) do
+        category.index = index
         category.level = 1
         table.insert(visibleCategories, category)
 
@@ -90,17 +138,17 @@ function SettingsMixin:OnUnselectAll()
     print("SettingsMixin:UnselectAll")
 end
 
-function SettingsMixin:EventTypes_Tab()
-    print("SettingsMixin:EventTypes_Tab")
-end
+-- function SettingsMixin:EventTypes_Tab()
+--     print("SettingsMixin:EventTypes_Tab")
+-- end
 
-function SettingsMixin:Libraries_Tab()
-    print("SettingsMixin:Libraries_Tab")
-end
+-- function SettingsMixin:Libraries_Tab()
+--     print("SettingsMixin:Libraries_Tab")
+-- end
 
-function SettingsMixin:MyJournal_Tab()
-    print("SettingsMixin:MyJournal_Tab")
-end
+-- function SettingsMixin:MyJournal_Tab()
+--     print("SettingsMixin:MyJournal_Tab")
+-- end
 
 CategoryButtonMixin = {}
 function CategoryButtonMixin:OnLoad()
@@ -160,9 +208,12 @@ function CategoryButtonMixin:Button_OnClick(button)
         menuButton.SelectedTexture:SetShown(false)
     end
 
-    if data.callback then
-        print("Should call calback " .. tostring(self.CategoryId))
-        data.callback(data, self)
+    if data.isTab then
+        print("Should call set tab " .. tostring(self.CategoryId))
+
+        EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
+        
+        -- self:SetTab(data.TabName)
         self.SelectedTexture:SetShown(true)
     end
 end

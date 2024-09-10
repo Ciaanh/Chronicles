@@ -112,7 +112,8 @@
                 </Layers>
             </Frame>
 
-            <Frame parentKey="Background" useParentLevel="true">
+
+            <Frame parentKey="TabUI">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="4" y="0"/>
                     <Anchor point="RIGHT" x="-30" y="0"/>
@@ -123,7 +124,120 @@
                         <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="true" />
                     </Layer>
                 </Layers>
+                <!-- <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="0">
+                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                            <Color r="255.0" g="0.0" b="0.0"/>
+                        </Texture>
+                    </Layer>
+                </Layers> -->
+                <Frames>
+
+                    <Frame parentKey="EventTypes" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="0.0" g="0.0" b="255.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+
+                        </Frames>
+                    </Frame>
+
+                    <Frame parentKey="Libraries" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="0.0" g="255.0" b="0.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+
+                        </Frames>
+                    </Frame>
+
+                    <Frame parentKey="MyJournal" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="255.0" g="0.0" b="0.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+
+                        </Frames>
+                    </Frame>
+
+                    <Frame parentKey="Test2" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="125.0" g="0.0" b="125.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+
+                        </Frames>
+                    </Frame>
+
+                    <Frame parentKey="Test3" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="BOTTOMRIGHT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                                    <Color r="125.0" g="125.0" b="0.0"/>
+                                </Texture>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+
+                        </Frames>
+                    </Frame>
+
+                </Frames>
+                <!-- <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts> -->
             </Frame>
+
+
+            <!-- <Frame parentKey="Background" useParentLevel="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="4" y="0"/>
+                    <Anchor point="RIGHT" x="-30" y="0"/>
+                    <Anchor point="BOTTOM" x="0" y="28"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND" textureSubLevel="-5">
+                        <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="true" />
+                    </Layer>
+                </Layers>
+
+            </Frame> -->
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>
