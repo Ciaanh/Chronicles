@@ -144,9 +144,94 @@
                                     <Color r="0.0" g="0.0" b="255.0"/>
                                 </Texture>
                             </Layer>
+                            <Layer level="OVERLAY">
+                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT" text="Event Types">
+                                    <Size y="20"/>
+                                    <Anchors>
+                                        <Anchor point="TOP" x="0" y="0"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
                         </Layers>
                         <Frames>
-
+                            <!-- <CheckButton name="EventTypeBlockEra" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" y="-30" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[1]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(1,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="EventTypeBlockWar" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockEra"/>
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[2]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(2,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="EventTypeBlockBattle" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockWar" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[3]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(3,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="EventTypeBlockDeath" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBattle" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[4]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(4,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="EventTypeBlockBirth" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockDeath" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[5]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(5,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton>
+                            <CheckButton name="EventTypeBlockOther" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBirth" />
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad>
+                                self.Text:SetText(get_locale(get_constants().eventType[6]));
+                                    </OnLoad>
+                                    <OnClick>
+                                change_EventType(6,self:GetChecked())
+                                    </OnClick>
+                                </Scripts>
+                            </CheckButton> -->
                         </Frames>
                     </Frame>
 
@@ -161,9 +246,51 @@
                                     <Color r="0.0" g="255.0" b="0.0"/>
                                 </Texture>
                             </Layer>
+                            <Layer level="OVERLAY">
+                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
+                                    <Size y="20"/>
+                                    <Anchors>
+                                        <Anchor point="TOP" y="-10"/>
+                                    </Anchors>
+                                </FontString>
+                            </Layer>
                         </Layers>
                         <Frames>
-
+                            <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock2" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock3" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock4" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock5" />
+                                </Anchors>
+                            </CheckButton>
+                            <CheckButton name="LibrariesFilterBlock7" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
+                                </Anchors>
+                            </CheckButton>
                         </Frames>
                     </Frame>
 
@@ -178,43 +305,24 @@
                                     <Color r="255.0" g="0.0" b="0.0"/>
                                 </Texture>
                             </Layer>
-                        </Layers>
-                        <Frames>
-
-                        </Frames>
-                    </Frame>
-
-                    <Frame parentKey="Test2" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="0">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="125.0" g="0.0" b="125.0"/>
-                                </Texture>
+                            <Layer level="OVERLAY">
+                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
+                                    <Size y="20"/>
+                                    <Anchors>
+                                        <Anchor point="TOP" y="-10"/>
+                                    </Anchors>
+                                </FontString>
                             </Layer>
                         </Layers>
                         <Frames>
-
-                        </Frames>
-                    </Frame>
-
-                    <Frame parentKey="Test3" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="0">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="125.0" g="125.0" b="0.0"/>
-                                </Texture>
-                            </Layer>
-                        </Layers>
-                        <Frames>
-
+                            <CheckButton name="MyJournalCheckBox" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="10" y="-25"/>
+                                </Anchors>
+                                <!-- <Scripts>
+                                    <OnClick function="MyJournalCheckBox_OnClick" />
+                                </Scripts> -->
+                            </CheckButton>
                         </Frames>
                     </Frame>
 
@@ -224,20 +332,6 @@
                 </Scripts> -->
             </Frame>
 
-
-            <!-- <Frame parentKey="Background" useParentLevel="true">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="4" y="0"/>
-                    <Anchor point="RIGHT" x="-30" y="0"/>
-                    <Anchor point="BOTTOM" x="0" y="28"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="-5">
-                        <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="true" />
-                    </Layer>
-                </Layers>
-
-            </Frame> -->
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>

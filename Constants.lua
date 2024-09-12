@@ -93,7 +93,8 @@ constants.events = {
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
 	MainFrameUICloseFrame = "MainFrameUI.CloseFrame",
 
-	SettingsTabSelected = "Settings.TAB_SELECTED"
+	SettingsTabSelected = "Settings.TAB_SELECTED",
+	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED"
 }
 
 constants.templateKeys = {

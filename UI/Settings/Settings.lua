@@ -1,5 +1,6 @@
 local FOLDER_NAME, private = ...
---local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
+local Chronicles = private.Chronicles
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- Event types
 -- Libraries
@@ -14,40 +15,23 @@ function SettingsMixin:OnLoad()
             subMenu = {
                 {
                     text = "Event types",
-                    isTab = true,
                     TabName = "EventTypes",
-                    TabFrame = self.Events
+                    TabFrame = self.TabUI.EventTypes,
+                    Load = self.LoadEventTypes
                 },
                 {
                     text = "Libraries",
-                    isTab = true,
                     TabName = "Libraries",
-                    TabFrame = self.Libraries
+                    TabFrame = self.TabUI.Libraries,
+                    Load = self.LoadLibraries
                 }
             }
         },
         {
             text = "My Journal",
-            isTab = true,
             TabName = "MyJournal",
-            TabFrame = self.MyJournal
-        },
-        {
-            text = "Test 1",
-            subMenu = {
-                {
-                    text = "Test 2",
-                    isTab = true,
-                    TabName = "Test2",
-                    TabFrame = self.Test2
-                },
-                {
-                    text = "Test 3",
-                    isTab = true,
-                    TabName = "Test3",
-                    TabFrame = self.Test3
-                }
-            }
+            TabFrame = self.TabUI.MyJournal,
+            Load = self.LoadMyJournal
         }
     }
 
@@ -58,41 +42,44 @@ function SettingsMixin:OnLoad()
         self:AddCategory(index, category)
     end
 
-    self.TabUI.FrameTabs = {}
+    self.TabUI.Tabs = {}
+
     for _, category in ipairs(self.categories) do
-        if category.isTab then
-            self.TabUI.FrameTabs[category.TabName] = category.TabFrame
+        if (category.TabName ~= nil and category.TabFrame ~= nil) then
+            local tabKey = category.TabName
+            local element = category.TabFrame
+
+            local currentTab = self.TabUI.currentTab
+            if not currentTab then
+                self.TabUI.currentTab = tabKey
+            end
+
+            self.TabUI.Tabs[tabKey] = element
         end
     end
 
     EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
+    EventRegistry:RegisterCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
 
     self:UpdateTabs()
 end
 
-function SettingsMixin:GetTab()
-    local currentTab = self.TabUI.currentTab
-    return currentTab
-end
-
 function SettingsMixin:UpdateTabs()
-    local currentTab = self:GetTab()
+    local currentTab = self.TabUI.currentTab
     if not currentTab then
-        for key, tab in pairs(self.TabUI.FrameTabs) do
-            self:SetTab(tab.TabName)
+        for key, tab in pairs(self.TabUI.Tabs) do
+            self:SetTab(key)
             break
         end
     end
 end
 
 function SettingsMixin:SetTab(tabName)
-    for key, tab in pairs(self.TabUI.FrameTabs) do
-        if tabName == key then
-            tab:Show()
-            self.TabUI.currentTab = key
-        else
-            tab:Hide()
-        end
+    print("SettingsMixin:SetTab " .. tabName)
+
+    self.TabUI.currentTab = tabKey
+    for key, tabbedElement in pairs(self.TabUI.Tabs) do
+        tabbedElement:SetShown(key == tabName)
     end
 end
 
@@ -130,25 +117,62 @@ function SettingsMixin:AddCategory(index, category)
     end
 
     button:SetData(category, index)
-    --button:SetID(index)
     self.Buttons[self.prefix .. index] = button
+
+    if (category.Load and category.TabFrame) then
+        category.Load(self, category.TabFrame)
+    end
 end
 
-function SettingsMixin:OnUnselectAll()
-    print("SettingsMixin:UnselectAll")
+function SettingsMixin:Change_EventType(eventType, checked)
+    Chronicles.DB:SetEventTypeStatus(eventType, checked)
+    --Chronicles.UI:Refresh()
+
+    print("SettingsMixin:Change_EventType")
 end
 
--- function SettingsMixin:EventTypes_Tab()
---     print("SettingsMixin:EventTypes_Tab")
+-- function SettingsMixin:Get_EventType_Checked(eventType)
+--     return Chronicles.DB:GetEventTypeStatus(eventType)
 -- end
 
--- function SettingsMixin:Libraries_Tab()
---     print("SettingsMixin:Libraries_Tab")
--- end
+function SettingsMixin:LoadEventTypes(frame)
+    local previousCheckbox = nil
+    for index, value in ipairs(get_constants().eventType) do
+        local text = get_locale(value)
 
--- function SettingsMixin:MyJournal_Tab()
---     print("SettingsMixin:MyJournal_Tab")
--- end
+        local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+        newCheckbox.Text:SetText(text)
+        newCheckbox.eventId = index
+
+        newCheckbox:SetChecked(Chronicles.DB:GetEventTypeStatus(index))
+        newCheckbox:SetScript(
+            "OnClick",
+            function(self)
+                local data = {
+                    eventId = self.eventId,
+                    isActive = self:GetChecked()
+                }
+                EventRegistry:TriggerEvent(private.constants.events.SettingsEventTypeChecked, data)
+            end
+        )
+
+        if (previousCheckbox) then
+            newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
+        else
+            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+        end
+        newCheckbox:Show()
+        previousCheckbox = newCheckbox
+    end
+end
+
+function SettingsMixin:LoadLibraries(frame)
+    print("SettingsMixin:LoadLibraries")
+end
+
+function SettingsMixin:LoadMyJournal(frame)
+    print("SettingsMixin:LoadMyJournal")
+end
 
 CategoryButtonMixin = {}
 function CategoryButtonMixin:OnLoad()
@@ -193,14 +217,14 @@ function CategoryButtonMixin:SetData(category, categoryId)
 end
 
 function CategoryButtonMixin:Button_OnClick(button)
-    print("CategoryButtonMixin:Button_OnClick " .. tostring(self.CategoryId))
+    --print("CategoryButtonMixin:Button_OnClick " .. tostring(self.CategoryId))
 
     local data = self.data
-    for k, v in pairs(data) do
-        print(k .. " - " .. tostring(v))
-    end
+    -- for k, v in pairs(data) do
+    --     print(k .. " - " .. tostring(v))
+    -- end
     if button ~= "LeftButton" or not data or data.subMenu then
-        print("returned " .. tostring(self.CategoryId))
+        --print("returned " .. tostring(self.CategoryId))
         return
     end
 
@@ -208,11 +232,11 @@ function CategoryButtonMixin:Button_OnClick(button)
         menuButton.SelectedTexture:SetShown(false)
     end
 
-    if data.isTab then
-        print("Should call set tab " .. tostring(self.CategoryId))
+    if data.TabName and data.TabFrame then
+        --print("Should call set tab " .. tostring(self.CategoryId))
 
         EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
-        
+
         -- self:SetTab(data.TabName)
         self.SelectedTexture:SetShown(true)
     end

@@ -1,5 +1,21 @@
 local FOLDER_NAME, private = ...
 private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
+local defaults = {
+    global = {
+        options = {
+            minimap = {hide = false},
+            myjournal = true
+        },
+        EventTypesStatuses = {},
+        EventDBStatuses = {},
+        FactionDBStatuses = {},
+        CharacterDBStatuses = {},
+        MyJournalEventDB = {},
+        MyJournalFactionDB = {},
+        MyJournalCharacterDB = {}
+    }
+}
+private.Chronicles.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
@@ -14,23 +30,6 @@ Chronicles.description = Locale["Description"]
 private.constants = private.constants
 
 function Chronicles:OnInitialize()
-    local defaults = {
-        global = {
-            options = {
-                minimap = {hide = false},
-                myjournal = true
-            },
-            EventTypesStatuses = {},
-            EventDBStatuses = {},
-            FactionDBStatuses = {},
-            CharacterDBStatuses = {},
-            MyJournalEventDB = {},
-            MyJournalFactionDB = {},
-            MyJournalCharacterDB = {}
-        }
-    }
-    self.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
-
     self.mapIcon =
         LibStub("LibDataBroker-1.1"):NewDataObject(
         FOLDER_NAME,
