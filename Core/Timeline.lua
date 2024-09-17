@@ -116,28 +116,10 @@ local function GetTimelineConfig(minYear, maxYear, stepValue)
     end
 
     if (timelineConfig.maxYear > 0) then
-        -- print(tostring(timelineConfig.maxYear))
         local afterLength = math.abs(timelineConfig.maxYear)
-
-        -- print(tostring(afterLength / stepValue))
-
         local ceil = math.ceil(afterLength / stepValue)
-        -- local floor = math.floor(afterLength / stepValue)
-
-        -- print("-- ceil "..tostring(ceil))
-        -- print("-- floor "..tostring(floor))
 
         timelineConfig.after = ceil
-
-    -- print("-- maxYear "..tostring(maxYear))
-    -- print("-- currentYear "..tostring(private.constants.config.currentYear))
-    -- print("-- stepValue "..tostring(stepValue))
-
-    -- if (maxYear == private.constants.config.currentYear and stepValue < private.constants.config.currentYear) then
-    --     print("-- timelineConfig.after + 1 ")
-
-    --     timelineConfig.after = timelineConfig.after + 1
-    -- end
     end
 
     -- Define the total number of timeline blocks
@@ -174,16 +156,12 @@ local function GetStepValueIndex(stepValue)
 end
 
 local function GetYearPageIndex(year)
-    -- print("-- GetIndex " .. GetTime())
     local selectedYear = year
 
     if (selectedYear == nil) then
         local page = Timeline.CurrentPage
         local pageSize = private.constants.config.timeline.pageSize
-        -- local numberOfCells = Chronicles.UI.Timeline:GetNumberOfTimelineBlock(Chronicles.UI.Timeline.CurrentStepValue)
         local numberOfCells = #Timeline.Periods
-
-        -- print("-- GetIndex " .. numberOfCells)
 
         if (page == nil) then
             page = 1
@@ -199,10 +177,6 @@ local function GetYearPageIndex(year)
             firstIndex = numberOfCells - (pageSize)
             lastIndex = numberOfCells - 1
         end
-
-        -- print("-- firstIndex " .. firstIndex)
-        -- print("-- lastIndex " .. lastIndex)
-        -- print("-- Size " .. #Chronicles.UI.Timeline.Periods)
 
         local firstIndexBounds = Timeline.Periods[firstIndex]
         local lastIndexBounds = Timeline.Periods[lastIndex]
@@ -221,8 +195,6 @@ local function GetYearPageIndex(year)
     local length = math.abs(minYear - selectedYear)
     local yearIndex = math.floor(length / Timeline.CurrentStepValue)
     local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
-
-    -- print("-- GetIndex " .. length .. " " .. yearIndex .. " " .. result)
 
     return result
 end
@@ -246,11 +218,6 @@ function private.Core.Timeline:ComputeTimelinePeriods()
     local minYear = Chronicles.DB:MinEventYear()
     local maxYear = Chronicles.DB:MaxEventYear()
     local timelineConfig = GetTimelineConfig(minYear, maxYear, stepValue)
-
-    -- for k, v in pairs(timelineConfig) do
-    --     print("-- " .. k .. " " .. tostring(v))
-    -- end
-
     local timelineBlocks = {}
 
     for blockIndex = 1, timelineConfig.numberOfTimelineBlock do
@@ -307,21 +274,12 @@ function private.Core.Timeline:ComputeTimelinePeriods()
         period.hasEvents = nbEvents > 0
         period.nbEvents = nbEvents
 
-        -- if period.hasEvents then
-        --     print("-- blockIndex " .. tostring(i))
-        -- end
-        -- print("-- blockIndex " .. tostring(period))
-
         table.insert(timelineBlocks, period)
     end
 
     local displayableTimeFrames = {}
     for j, value in ipairs(timelineBlocks) do
         local nextValue = timelineBlocks[j + 1]
-
-        -- if (value.lowerBound == 40) then
-        --     print("-- value.lowerBound " .. value.lowerBound)
-        -- end
 
         if (nextValue ~= nil) then
             if (value.hasEvents == true or (value.hasEvents == false and nextValue.hasEvents == true)) then
@@ -354,22 +312,7 @@ function private.Core.Timeline:ComputeTimelinePeriods()
         end
     end
 
-    -- for i, v in ipairs(displayableTimeFrames) do
-    --     print(
-    --         "-- block " ..
-    --             i .. --" " .. #displayableTimeFrames ..
-    --                 " " .. tostring(v) .. " " .. tostring(v.lowerBound) .. " " .. tostring(v.upperBound)
-    --     )
-    -- end
-
-    -- print(#displayableTimeFrames)
-
     Timeline.Periods = displayableTimeFrames
-
-    -- for index, value in ipairs(displayableTimeFrames) do
-    --     print(index)
-    --     print(value)
-    -- end
 
     return displayableTimeFrames
 end
@@ -378,6 +321,7 @@ function private.Core.Timeline:DisplayTimelineWindow()
     local pageIndex = Timeline.CurrentPage
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
+
     local maxPageValue = math.ceil(numberOfCells / pageSize)
     if (pageIndex == nil) then
         pageIndex = maxPageValue
@@ -412,29 +356,31 @@ function private.Core.Timeline:DisplayTimelineWindow()
     for labelIndex = 1, pageSize + 1, 1 do
         local labelData = Timeline.Periods[firstIndex + labelIndex - 1]
         local eventName = private.constants.events.DisplayTimelineLabel .. tostring(labelIndex)
-
-        if labelIndex == pageSize + 1 then
-            labelData = Timeline.Periods[firstIndex + labelIndex - 2]
-            EventRegistry:TriggerEvent(eventName, tostring(labelData.upperBound))
-        else
-            if (labelData.text ~= nil) then
-                EventRegistry:TriggerEvent(eventName, labelData.text)
+        if (labelData ~= nil) then
+            if labelIndex == pageSize + 1 then
+                labelData = Timeline.Periods[firstIndex + labelIndex - 2]
+                EventRegistry:TriggerEvent(eventName, tostring(labelData.upperBound))
             else
-                EventRegistry:TriggerEvent(eventName, tostring(labelData.lowerBound))
+                if (labelData.text ~= nil) then
+                    EventRegistry:TriggerEvent(eventName, labelData.text)
+                else
+                    EventRegistry:TriggerEvent(eventName, tostring(labelData.lowerBound))
+                end
             end
+        else
+            EventRegistry:TriggerEvent(eventName, nil)
         end
     end
 
     for periodIndex = 1, pageSize, 1 do
+        local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(periodIndex)
         local periodData = Timeline.Periods[firstIndex + periodIndex - 1]
 
-        local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(periodIndex)
         EventRegistry:TriggerEvent(eventName, periodData)
     end
 end
 
 function private.Core.Timeline:ChangeCurrentStepValue(direction)
-    -- print("ChangeCurrentStepValue: " .. GetTime())
     -- TODO investigate performance issue with step 1 and 10
     local currentStepValue = Timeline.CurrentStepValue
     local curentStepIndex = GetStepValueIndex(currentStepValue)
@@ -443,29 +389,22 @@ function private.Core.Timeline:ChangeCurrentStepValue(direction)
     -- handle selected year
 
     if direction == 1 then
-        -- print(tostring(curentStepIndex) .. " " .. tostring(Timeline.MaxStepIndex))
         if (curentStepIndex == Timeline.MaxStepIndex) then
             return
         end
 
-        -- print("zoom in")
         nextStepValue = private.constants.config.stepValues[curentStepIndex + 1]
     else
         if (curentStepIndex == 1) then
             return
         end
 
-        -- print("zoom out")
         nextStepValue = private.constants.config.stepValues[curentStepIndex - 1]
     end
 
     Timeline.CurrentStepValue = nextStepValue
 
-    -- print("1 - Milliseconds: " .. GetTime())
     private.Core.Timeline:ComputeTimelinePeriods()
-    -- print("2 - Milliseconds: " .. GetTime())
     Timeline.CurrentPage = GetYearPageIndex(Timeline.SelectedYear)
-    -- print("3 - Milliseconds: " .. GetTime())
     private.Core.Timeline:DisplayTimelineWindow()
-    -- print("4 - Milliseconds: " .. GetTime())
 end

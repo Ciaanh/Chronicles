@@ -54,7 +54,7 @@ function SettingsMixin:OnLoad()
                 self.TabUI.currentTab = tabKey
             end
 
-            self.TabUI.Tabs[tabKey] = element
+            self.TabUI.Tabs[tabKey] = category
         end
     end
 
@@ -67,7 +67,7 @@ end
 function SettingsMixin:UpdateTabs()
     local currentTab = self.TabUI.currentTab
     if not currentTab then
-        for key, tab in pairs(self.TabUI.Tabs) do
+        for key, _ in pairs(self.TabUI.Tabs) do
             self:SetTab(key)
             break
         end
@@ -75,11 +75,14 @@ function SettingsMixin:UpdateTabs()
 end
 
 function SettingsMixin:SetTab(tabName)
-    print("SettingsMixin:SetTab " .. tabName)
-
     self.TabUI.currentTab = tabKey
-    for key, tabbedElement in pairs(self.TabUI.Tabs) do
-        tabbedElement:SetShown(key == tabName)
+    for key, tab in pairs(self.TabUI.Tabs) do
+        if (tab.Load and tab.TabFrame and not tab.IsLoaded) then
+            tab.Load(self, tab.TabFrame)
+            tab.IsLoaded = true
+        end
+
+        tab.TabFrame:SetShown(key == tabName)
     end
 end
 
@@ -118,41 +121,44 @@ function SettingsMixin:AddCategory(index, category)
 
     button:SetData(category, index)
     self.Buttons[self.prefix .. index] = button
-
-    if (category.Load and category.TabFrame) then
-        category.Load(self, category.TabFrame)
-    end
 end
 
-function SettingsMixin:Change_EventType(eventType, checked)
-    Chronicles.DB:SetEventTypeStatus(eventType, checked)
-    --Chronicles.UI:Refresh()
+function SettingsMixin:Change_EventType(eventTypeId, checked)
+    Chronicles.DB:SetEventTypeStatus(eventTypeId, checked)
+    Chronicles.DB:RefreshPeriods()
 
-    print("SettingsMixin:Change_EventType")
+    private.Core.Timeline:ComputeTimelinePeriods()
+    private.Core.Timeline:DisplayTimelineWindow()
+
+    -- TODO clean select period and event
+
+    -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
+
+    EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
 end
-
--- function SettingsMixin:Get_EventType_Checked(eventType)
---     return Chronicles.DB:GetEventTypeStatus(eventType)
--- end
 
 function SettingsMixin:LoadEventTypes(frame)
     local previousCheckbox = nil
-    for index, value in ipairs(get_constants().eventType) do
-        local text = get_locale(value)
+    for eventTypeId, eventTypeName in ipairs(get_constants().eventType) do
+        local text = get_locale(eventTypeName)
 
         local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
         newCheckbox.Text:SetText(text)
-        newCheckbox.eventId = index
-
-        newCheckbox:SetChecked(Chronicles.DB:GetEventTypeStatus(index))
+        newCheckbox.eventTypeId = eventTypeId
+        newCheckbox.eventTypeName = eventTypeName
+        newCheckbox:SetChecked(Chronicles.DB:GetEventTypeStatus(eventTypeId))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
                 local data = {
-                    eventId = self.eventId,
+                    eventTypeId = self.eventTypeId,
                     isActive = self:GetChecked()
                 }
-                EventRegistry:TriggerEvent(private.constants.events.SettingsEventTypeChecked, data)
+                EventRegistry:TriggerEvent(
+                    private.constants.events.SettingsEventTypeChecked,
+                    data.eventTypeId,
+                    data.isActive
+                )
             end
         )
 
@@ -217,14 +223,9 @@ function CategoryButtonMixin:SetData(category, categoryId)
 end
 
 function CategoryButtonMixin:Button_OnClick(button)
-    --print("CategoryButtonMixin:Button_OnClick " .. tostring(self.CategoryId))
-
     local data = self.data
-    -- for k, v in pairs(data) do
-    --     print(k .. " - " .. tostring(v))
-    -- end
+
     if button ~= "LeftButton" or not data or data.subMenu then
-        --print("returned " .. tostring(self.CategoryId))
         return
     end
 
@@ -233,11 +234,8 @@ function CategoryButtonMixin:Button_OnClick(button)
     end
 
     if data.TabName and data.TabFrame then
-        --print("Should call set tab " .. tostring(self.CategoryId))
-
         EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
 
-        -- self:SetTab(data.TabName)
         self.SelectedTexture:SetShown(true)
     end
 end

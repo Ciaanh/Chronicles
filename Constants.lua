@@ -76,6 +76,7 @@ constants.configurationName = {
 
 constants.events = {
 	TimelineInit = "TIMELINE_INIT",
+	TimelineClean = "Timeline.CLEAN",
 	TimelinePeriodSelected = "TIMELINE_PERIOD_SELECTED",
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",

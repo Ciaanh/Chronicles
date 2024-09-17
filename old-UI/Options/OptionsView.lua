@@ -31,16 +31,16 @@ function Chronicles.UI.OptionsView:Init()
     )
 
     MyJournalCheckBox.Text:SetText(Locale["My journal"])
-    MyJournalCheckBox:SetChecked(Chronicles.storage.global.options.myjournal)
+    MyJournalCheckBox:SetChecked(Chronicles.db.global.options.myjournal)
 end
 
 ------------------------------------------------------------------------------------------
 -- My Journal ----------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function MyJournalCheckBox_OnClick()
-    Chronicles.storage.global.options.myjournal = not Chronicles.storage.global.options.myjournal
+    Chronicles.db.global.options.myjournal = not Chronicles.db.global.options.myjournal
 
-    if (Chronicles.storage.global.options.myjournal) then
+    if (Chronicles.db.global.options.myjournal) then
         MyJournalViewShow:Show()
         Chronicles.DB:SetGroupStatus("myjournal", true)
     else

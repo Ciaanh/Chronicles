@@ -14,20 +14,13 @@ function EventListItemMixin:Init(eventData)
 	local sideTexture = self.Side
 
 	if self:GetParent().side == "right" then
-		-- print("right " .. eventData.text)
-
-		-- self.Text:SetJustifyH("LEFT")
-
 		contentTexture:SetTexCoord(1, 0, 0, 1)
 		sideTexture:SetTexCoord(1, 0, 0, 1)
 
-		--actionButton:GetWidth(), actionButton:GetHeight()
 		sideTexture:ClearAllPoints()
 		sideTexture:SetPoint("LEFT", self, "RIGHT", 0, 0)
 		sideTexture:SetSize(50, self.textureHeight)
 	else
-		-- self.Text:SetJustifyH("RIGHT")
-
 		contentTexture:SetTexCoord(0, 1, 0, 1)
 		sideTexture:SetTexCoord(0, 1, 0, 1)
 
@@ -53,12 +46,20 @@ end
 EventListMixin = {}
 function EventListMixin:OnLoad()
 	EventRegistry:RegisterCallback(private.constants.events.TimelinePeriodSelected, self.OnTimelinePeriodSelected, self)
+	EventRegistry:RegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
 
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 
+function EventListMixin:OnTimelineClean()
+	local data = {}
+	local dataProvider = CreateDataProvider(data)
+	local retainScrollPosition = false
+	
+	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
+end
+
 function EventListMixin:OnTimelinePeriodSelected(period)
-	-- print("EventListMixin:OnTimelinePeriodSelected " .. tostring(period.lower) .. " " .. tostring(period.upper))
 	local data = {}
 
 	local eventList = Chronicles.DB:SearchEvents(period.lower, period.upper)
@@ -74,15 +75,12 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 	}
 
 	local filteredEvents = private.Core.Events.FilterEvents(eventList)
-	-- print(tostring(#filteredEvents))
 	for key, event in pairs(filteredEvents) do
-		-- print(event.label)
 		local eventSummary = {
 			templateKey = private.constants.templateKeys.EVENT_DESCRIPTION,
 			text = event.label,
 			event = event
 		}
-		-- print(eventSummary.templateKey .. " " .. eventSummary.text)
 
 		table.insert(content.elements, eventSummary)
 	end

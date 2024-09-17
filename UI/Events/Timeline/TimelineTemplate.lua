@@ -38,33 +38,25 @@ function TimelineMixin:OnTimelineInit(eventData)
 end
 
 function TimelineMixin:TimelinePrevious()
-    -- print("TimelineMixin:TimelinePrevious")
     private.Core.Timeline:ChangePage(-1)
 end
 
 function TimelineMixin:OnTimelinePreviousVisible(isVisible)
-    -- print("TimelineMixin:OnTimelinePreviousVisible " .. tostring(isVisible))
     if isVisible then
-        -- print("Previous Enabled")
         self.Previous:Enable()
     else
-        -- print("Previous Disabled")
         self.Previous:Disable()
     end
 end
 
 function TimelineMixin:TimelineNext()
-    -- print("TimelineMixin:TimelineNext")
     private.Core.Timeline:ChangePage(1)
 end
 
 function TimelineMixin:OnTimelineNextVisible(isVisible)
-    -- print("TimelineMixin:OnTimelineNextVisible " .. tostring(isVisible))
     if isVisible then
-        -- print("Next Enabled")
         self.Next:Enable()
     else
-        -- print("Next Disabled")
         self.Next:Disable()
     end
 end
@@ -81,7 +73,6 @@ function TimelineMixin:OnTimelineStepChanged(eventData)
 end
 
 function TimelineMixin:OnZooming()
-    -- print("OnZooming: " .. GetTime())
     private.Core.Timeline:ChangeCurrentStepValue(self.direction)
 end
 -----------------------------------------------------------------------------------------
@@ -89,16 +80,17 @@ end
 -----------------------------------------------------------------------------------------
 TimelineLabelMixin = {}
 function TimelineLabelMixin:OnLoad()
-    -- print(self.index)
-
     local eventName = private.constants.events.DisplayTimelineLabel .. tostring(self.index)
-    -- print("Register " .. eventName)
     EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelineLabel, self)
 end
 
 function TimelineLabelMixin:OnDisplayTimelineLabel(data)
-    -- print("Set label text " .. data)
-    self.Text:SetText(data)
+    if (data ~= nil) then
+        self:Show()
+        self.Text:SetText(data)
+    else
+        self:Hide()
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -106,25 +98,21 @@ end
 -----------------------------------------------------------------------------------------
 TimelinePeriodMixin = {}
 function TimelinePeriodMixin:OnLoad()
-    -- print(self.index)
-
     local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(self.index)
-    -- print("Register " .. eventName)
     EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
 end
 
-function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
-    self.data = eventData
+function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
+    self.data = periodData
 
-    -- print(tostring(eventData.hasEvents))
-
-    if eventData.hasEvents then
-        self.Text:SetText(eventData.nbEvents)
+    if (periodData ~= nil and periodData.hasEvents) then
+        self.Text:SetText(periodData.nbEvents)
         self:Show()
     else
+        self.Text:SetText("")
         self:Hide()
     end
-    -- print("OnDisplayTimelinePeriod")
+
     -- EventRegistry:TriggerEvent(
     --     private.constants.events.TimelinePeriodSelected,
     --     {
@@ -135,7 +123,6 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(eventData)
 end
 
 function TimelinePeriodMixin:OnClick()
-    -- print("OnDisplayTimelinePeriod")
     EventRegistry:TriggerEvent(
         private.constants.events.TimelinePeriodSelected,
         {

@@ -27,7 +27,6 @@ local function CreateChapter(title, pages)
 	local chapter = {elements = {}}
 
 	if (title ~= nil) then
-		-- print(title)
 		chapter.header = {
 			templateKey = private.constants.templateKeys.HEADER,
 			text = title
@@ -35,7 +34,6 @@ local function CreateChapter(title, pages)
 	end
 
 	for key, text in pairs(pages) do
-		--print(text)
 		if (containsHTML(text)) then
 			table.insert(
 				chapter.elements,

@@ -17,7 +17,7 @@ function Chronicles.UI:Init()
         }
     )
 
-    if (Chronicles.storage.global.options.myjournal) then
+    if (Chronicles.db.global.options.myjournal) then
         MyJournalViewShow:Show()
     else
         MyJournalViewShow:Hide()

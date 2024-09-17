@@ -15,7 +15,7 @@ local defaults = {
         MyJournalCharacterDB = {}
     }
 }
-private.Chronicles.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
@@ -30,6 +30,8 @@ Chronicles.description = Locale["Description"]
 private.constants = private.constants
 
 function Chronicles:OnInitialize()
+    private.Chronicles.db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+
     self.mapIcon =
         LibStub("LibDataBroker-1.1"):NewDataObject(
         FOLDER_NAME,
@@ -55,7 +57,7 @@ function Chronicles:OnInitialize()
             end
         }
     )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.storage.global.options.minimap)
+    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
 
     self:RegisterChatCommand(
         "chronicles",
