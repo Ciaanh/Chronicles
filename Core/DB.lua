@@ -59,8 +59,8 @@ function Chronicles.DB:GetPeriodsFillingBySteps()
         --mod1 = {}
     }
 
-    for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-        if Chronicles.DB:GetGroupStatus(groupName) then
+    for libraryName, eventsGroup in pairs(Chronicles.DB.Events) do
+        if Chronicles.DB:GetLibraryStatus(libraryName) then
             for _, event in pairs(eventsGroup.data) do
                 if (event ~= nil) then
                     local isActive = Chronicles.DB:GetEventTypeStatus(event.eventType)
@@ -126,11 +126,11 @@ end
 
 function Chronicles.DB:HasEvents(yearStart, yearEnd)
     if (yearStart <= yearEnd) then
-        local getGroupStatus = Chronicles.DB.GetGroupStatus
+        local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
         local hasEventsInDB = Chronicles.DB.HasEventsInDB
 
-        for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-            local isActive = getGroupStatus(self, groupName)
+        for libraryName, eventsGroup in pairs(Chronicles.DB.Events) do
+            local isActive = GetLibraryStatus(self, libraryName)
             if (isActive and hasEventsInDB(self, yearStart, yearEnd, eventsGroup.data)) then
                 return true
             end
@@ -154,11 +154,11 @@ end
 
 function Chronicles.DB:MinEventYear()
     local MinEventYear = 0
-    local getGroupStatus = Chronicles.DB.GetGroupStatus
+    local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
     local getEventTypeStatus = Chronicles.DB.GetEventTypeStatus
 
-    for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-        local isActive = getGroupStatus(self, groupName)
+    for libraryName, eventsGroup in pairs(Chronicles.DB.Events) do
+        local isActive = GetLibraryStatus(self, libraryName)
         if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = getEventTypeStatus(self, event.eventType)
@@ -174,11 +174,11 @@ end
 
 function Chronicles.DB:MaxEventYear()
     local MaxEventYear = 0
-    local getGroupStatus = Chronicles.DB.GetGroupStatus
+    local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
     local getEventTypeStatus = Chronicles.DB.GetEventTypeStatus
 
-    for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-        local isActive = getGroupStatus(self, groupName)
+    for libraryName, eventsGroup in pairs(Chronicles.DB.Events) do
+        local isActive = GetLibraryStatus(self, libraryName)
         if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = getEventTypeStatus(self, event.eventType)
@@ -197,19 +197,19 @@ end
 function Chronicles.DB:SearchEvents(yearStart, yearEnd)
     local foundEvents = {}
     local searchEventsInDB = Chronicles.DB.SearchEventsInDB
-    local getGroupStatus = Chronicles.DB.GetGroupStatus
+    local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
     local cleanEventObject = Chronicles.DB.CleanEventObject
 
     if (yearStart <= yearEnd) then
         -- filter groupname ?
-        for groupName, eventsGroup in pairs(Chronicles.DB.Events) do
-            -- local isActive = getGroupStatus(self, groupName)
+        for libraryName, eventsGroup in pairs(Chronicles.DB.Events) do
+            -- local isActive = GetLibraryStatus(self, libraryName)
 
             -- if (isActive) then
                 local pluginEvents = searchEventsInDB(self, yearStart, yearEnd, eventsGroup.data)
 
                 for eventIndex, event in pairs(pluginEvents) do
-                    table.insert(foundEvents, cleanEventObject(self, event, groupName))
+                    table.insert(foundEvents, cleanEventObject(self, event, libraryName))
                 end
             --end
         end
@@ -250,7 +250,7 @@ function Chronicles.DB:IsInRange(event, yearStart, yearEnd)
     return false
 end
 
-function Chronicles.DB:CleanEventObject(event, groupName)
+function Chronicles.DB:CleanEventObject(event, libraryName)
     if event then
         local description = event.description or UNKNOWN
 
@@ -267,7 +267,7 @@ function Chronicles.DB:CleanEventObject(event, groupName)
             eventType = event.eventType,
             factions = event.factions,
             characters = event.characters,
-            source = groupName,
+            source = libraryName,
             order = event.order,
             author = event.author
         }
@@ -284,19 +284,19 @@ end
 function Chronicles.DB:SearchFactions(name)
     local foundFactions = {}
     local lower = string.lower
-    local getGroupStatus = Chronicles.DB.GetGroupStatus
+    local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
     local cleanFactionObject = Chronicles.DB.CleanFactionObject
 
-    for groupName, factionsGroup in pairs(Chronicles.DB.Factions) do
-        local factionGroupStatus = getGroupStatus(self, groupName)
+    for libraryName, factionsGroup in pairs(Chronicles.DB.Factions) do
+        local factionGroupStatus = GetLibraryStatus(self, libraryName)
         if (factionGroupStatus) then
             for factionIndex, faction in pairs(factionsGroup.data) do
                 if (name ~= nil and strlen(name) >= MIN_CHARACTER_SEARCH) then
                     if (lower(faction.name):find(lower(name)) ~= nil) then
-                        table.insert(foundFactions, cleanFactionObject(self, faction, groupName))
+                        table.insert(foundFactions, cleanFactionObject(self, faction, libraryName))
                     end
                 else
-                    table.insert(foundFactions, cleanFactionObject(self, faction, groupName))
+                    table.insert(foundFactions, cleanFactionObject(self, faction, libraryName))
                 end
             end
         end
@@ -306,11 +306,11 @@ end
 
 function Chronicles.DB:FindFactions(ids)
     local foundFactions = {}
-    local getGroupStatus = Chronicles.DB.GetGroupStatus
+    local GetLibraryStatus = Chronicles.DB.GetLibraryStatus
     local cleanFactionObject = Chronicles.DB.CleanFactionObject
 
     for group, factionIds in pairs(ids) do
-        local factionGroupStatus = getGroupStatus(self, group)
+        local factionGroupStatus = GetLibraryStatus(self, group)
         if (factionGroupStatus) then
             local factionsGroup = Chronicles.DB.Factions[group]
             if (factionsGroup ~= nil and factionsGroup.data ~= nil and tablelength(factionsGroup.data) > 0) then
@@ -327,14 +327,14 @@ function Chronicles.DB:FindFactions(ids)
     return foundFactions
 end
 
-function Chronicles.DB:CleanFactionObject(faction, groupName)
+function Chronicles.DB:CleanFactionObject(faction, libraryName)
     if faction ~= nil then
         return {
             id = faction.id,
             name = faction.name,
             description = faction.description,
             timeline = faction.timeline,
-            source = groupName
+            source = libraryName
         }
     end
     return nil
@@ -345,16 +345,16 @@ end
 function Chronicles.DB:SearchCharacters(name)
     local foundCharacters = {}
 
-    for groupName, charactersGroup in pairs(self.Characters) do
-        local characterGroupStatus = Chronicles.DB:GetGroupStatus(groupName)
+    for libraryName, charactersGroup in pairs(self.Characters) do
+        local characterGroupStatus = Chronicles.DB:GetLibraryStatus(libraryName)
         if (characterGroupStatus) then
             for characterIndex, character in pairs(charactersGroup.data) do
                 if (name ~= nil and strlen(name) >= MIN_CHARACTER_SEARCH) then
                     if (string.lower(character.name):find(string.lower(name)) ~= nil) then
-                        table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, groupName))
+                        table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, libraryName))
                     end
                 else
-                    table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, groupName))
+                    table.insert(foundCharacters, Chronicles.DB:CleanCharacterObject(character, libraryName))
                 end
             end
         end
@@ -366,7 +366,7 @@ function Chronicles.DB:FindCharacters(ids)
     local foundCharacters = {}
 
     for group, characterIds in pairs(ids) do
-        local characterGroupStatus = Chronicles.DB:GetGroupStatus(group)
+        local characterGroupStatus = Chronicles.DB:GetLibraryStatus(group)
         if (characterGroupStatus) then
             local charactersGroup = Chronicles.DB.Characters[group]
             if (charactersGroup ~= nil and charactersGroup.data ~= nil and tablelength(charactersGroup.data) > 0) then
@@ -383,7 +383,7 @@ function Chronicles.DB:FindCharacters(ids)
     return foundCharacters
 end
 
-function Chronicles.DB:CleanCharacterObject(character, groupName)
+function Chronicles.DB:CleanCharacterObject(character, libraryName)
     if character ~= nil then
         return {
             id = character.id,
@@ -391,7 +391,7 @@ function Chronicles.DB:CleanCharacterObject(character, groupName)
             biography = character.biography,
             timeline = character.timeline,
             factions = character.factions,
-            source = groupName
+            source = libraryName
         }
     end
     return nil
@@ -403,53 +403,53 @@ end
 -----------------------------------------------------------------------------------------
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.DB:RegisterEventDB(groupName, db)
-    if Chronicles.DB.Events[groupName] ~= nil then
-        error(groupName .. " is already registered by another plugin in Events.")
+function Chronicles.DB:RegisterEventDB(libraryName, db)
+    if Chronicles.DB.Events[libraryName] ~= nil then
+        error(libraryName .. " is already registered by another plugin in Events.")
     else
-        local isActive = Chronicles.db.global.EventDBStatuses[groupName]
+        local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.EventDBStatuses[groupName] = isActive
+            Chronicles.db.global.EventDBStatuses[libraryName] = isActive
         end
 
-        Chronicles.DB.Events[groupName] = {
+        Chronicles.DB.Events[libraryName] = {
             data = db,
-            name = groupName
+            name = libraryName
         }
     end
 end
 
-function Chronicles.DB:RegisterCharacterDB(groupName, db)
-    if Chronicles.DB.Characters[groupName] ~= nil then
-        error(groupName .. " is already registered by another plugin in Characters.")
+function Chronicles.DB:RegisterCharacterDB(libraryName, db)
+    if Chronicles.DB.Characters[libraryName] ~= nil then
+        error(libraryName .. " is already registered by another plugin in Characters.")
     else
-        local isActive = Chronicles.db.global.CharacterDBStatuses[groupName]
+        local isActive = Chronicles.db.global.CharacterDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.CharacterDBStatuses[groupName] = isActive
+            Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
         end
 
-        Chronicles.DB.Characters[groupName] = {
+        Chronicles.DB.Characters[libraryName] = {
             data = db,
-            name = groupName
+            name = libraryName
         }
     end
 end
 
-function Chronicles.DB:RegisterFactionDB(groupName, db)
-    if Chronicles.DB.Factions[groupName] ~= nil then
-        error(groupName .. " is already registered by another plugin in Factions.")
+function Chronicles.DB:RegisterFactionDB(libraryName, db)
+    if Chronicles.DB.Factions[libraryName] ~= nil then
+        error(libraryName .. " is already registered by another plugin in Factions.")
     else
-        local isActive = Chronicles.db.global.FactionDBStatuses[groupName]
+        local isActive = Chronicles.db.global.FactionDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.FactionDBStatuses[groupName] = isActive
+            Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
         end
 
-        Chronicles.DB.Factions[groupName] = {
+        Chronicles.DB.Factions[libraryName] = {
             data = db,
-            name = groupName
+            name = libraryName
         }
     end
 end
@@ -463,49 +463,49 @@ function exist_in_table(value, lookUpTable)
     return false
 end
 
-function Chronicles.DB:GetGroupNames()
+function Chronicles.DB:GetLibrariesNames()
     local dataGroups = {}
 
-    for eventGroupName, group in pairs(Chronicles.DB.Events) do
-        if (eventGroupName ~= "myjournal") then
+    for eventLibraryName, group in pairs(Chronicles.DB.Events) do
+        if (eventLibraryName ~= "myjournal") then
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.EventDBStatuses[eventGroupName]
+                isActive = Chronicles.db.global.EventDBStatuses[eventLibraryName]
             }
 
-            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetLibraryStatus(groupProjection.name, groupProjection.isActive)
 
-            if not exist_in_table(eventGroupName, dataGroups) then
+            if not exist_in_table(eventLibraryName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end
     end
 
-    for factionGroupName, group in pairs(Chronicles.DB.Factions) do
-        if (factionGroupName ~= "myjournal") then
+    for factionLibraryName, group in pairs(Chronicles.DB.Factions) do
+        if (factionLibraryName ~= "myjournal") then
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.FactionDBStatuses[factionGroupName]
+                isActive = Chronicles.db.global.FactionDBStatuses[factionLibraryName]
             }
 
-            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetLibraryStatus(groupProjection.name, groupProjection.isActive)
 
-            if not exist_in_table(factionGroupName, dataGroups) then
+            if not exist_in_table(factionLibraryName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end
     end
 
-    for characterGroupName, group in pairs(Chronicles.DB.Characters) do
-        if (characterGroupName ~= "myjournal") then
+    for characterLibraryName, group in pairs(Chronicles.DB.Characters) do
+        if (characterLibraryName ~= "myjournal") then
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.CharacterDBStatuses[characterGroupName]
+                isActive = Chronicles.db.global.CharacterDBStatuses[characterLibraryName]
             }
 
-            Chronicles.DB:SetGroupStatus(groupProjection.name, groupProjection.isActive)
+            Chronicles.DB:SetLibraryStatus(groupProjection.name, groupProjection.isActive)
 
-            if not exist_in_table(characterGroupName, dataGroups) then
+            if not exist_in_table(characterLibraryName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end
@@ -514,82 +514,82 @@ function Chronicles.DB:GetGroupNames()
     return dataGroups
 end
 
-function Chronicles.DB:SetGroupStatus(groupName, status)
-    if Chronicles.DB.Events[groupName] ~= nil then
-        Chronicles.db.global.EventDBStatuses[groupName] = status
+function Chronicles.DB:SetLibraryStatus(libraryName, status)
+    if Chronicles.DB.Events[libraryName] ~= nil then
+        Chronicles.db.global.EventDBStatuses[libraryName] = status
         Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
     end
 
-    if Chronicles.DB.Factions[groupName] ~= nil then
-        Chronicles.db.global.FactionDBStatuses[groupName] = status
+    if Chronicles.DB.Factions[libraryName] ~= nil then
+        Chronicles.db.global.FactionDBStatuses[libraryName] = status
     end
 
-    if Chronicles.DB.Characters[groupName] ~= nil then
-        Chronicles.db.global.CharacterDBStatuses[groupName] = status
+    if Chronicles.DB.Characters[libraryName] ~= nil then
+        Chronicles.db.global.CharacterDBStatuses[libraryName] = status
     end
 end
 
-function Chronicles.DB:GetGroupStatus(groupName)
+function Chronicles.DB:GetLibraryStatus(libraryName)
     local isEventActive = nil
     local isFactionActive = nil
     local isCharacterActive = nil
 
-    if Chronicles.DB.Events[groupName] ~= nil then
-        local isActive = Chronicles.db.global.EventDBStatuses[groupName]
+    if Chronicles.DB.Events[libraryName] ~= nil then
+        local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.EventDBStatuses[groupName] = isActive
+            Chronicles.db.global.EventDBStatuses[libraryName] = isActive
             Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
         isEventActive = isActive
     end
 
-    if Chronicles.DB.Factions[groupName] ~= nil then
-        local isActive = Chronicles.db.global.FactionDBStatuses[groupName]
+    if Chronicles.DB.Factions[libraryName] ~= nil then
+        local isActive = Chronicles.db.global.FactionDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.FactionDBStatuses[groupName] = isActive
+            Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
         end
         isFactionActive = isActive
     end
 
-    if Chronicles.DB.Characters[groupName] ~= nil then
-        local isActive = Chronicles.db.global.CharacterDBStatuses[groupName]
+    if Chronicles.DB.Characters[libraryName] ~= nil then
+        local isActive = Chronicles.db.global.CharacterDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.CharacterDBStatuses[groupName] = isActive
+            Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
         end
         isCharacterActive = isActive
     end
     --------------------------------------------------
     if (isEventActive) then
-        if Chronicles.DB.Factions[groupName] ~= nil then
-            Chronicles.db.global.FactionDBStatuses[groupName] = true
+        if Chronicles.DB.Factions[libraryName] ~= nil then
+            Chronicles.db.global.FactionDBStatuses[libraryName] = true
         end
-        if Chronicles.DB.Characters[groupName] ~= nil then
-            Chronicles.db.global.CharacterDBStatuses[groupName] = true
+        if Chronicles.DB.Characters[libraryName] ~= nil then
+            Chronicles.db.global.CharacterDBStatuses[libraryName] = true
         end
         return true
     end
 
     if (isFactionActive) then
-        if Chronicles.DB.Events[groupName] ~= nil then
-            Chronicles.db.global.EventDBStatuses[groupName] = true
+        if Chronicles.DB.Events[libraryName] ~= nil then
+            Chronicles.db.global.EventDBStatuses[libraryName] = true
             Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
-        if Chronicles.DB.Characters[groupName] ~= nil then
-            Chronicles.db.global.CharacterDBStatuses[groupName] = true
+        if Chronicles.DB.Characters[libraryName] ~= nil then
+            Chronicles.db.global.CharacterDBStatuses[libraryName] = true
         end
         return true
     end
 
     if (isCharacterActive) then
-        if Chronicles.DB.Events[groupName] ~= nil then
-            Chronicles.db.global.EventDBStatuses[groupName] = true
+        if Chronicles.DB.Events[libraryName] ~= nil then
+            Chronicles.db.global.EventDBStatuses[libraryName] = true
             Chronicles.DB.PeriodsFillingBySteps = Chronicles.DB:GetPeriodsFillingBySteps()
         end
-        if Chronicles.DB.Factions[groupName] ~= nil then
-            Chronicles.db.global.FactionDBStatuses[groupName] = true
+        if Chronicles.DB.Factions[libraryName] ~= nil then
+            Chronicles.db.global.FactionDBStatuses[libraryName] = true
         end
         return true
     end

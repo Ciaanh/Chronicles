@@ -153,86 +153,6 @@
                                 </FontString>
                             </Layer>
                         </Layers>
-                        <Frames>
-                            <!-- <CheckButton name="EventTypeBlockEra" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" y="-30" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[1]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(1,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton>
-                            <CheckButton name="EventTypeBlockWar" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockEra"/>
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[2]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(2,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton>
-                            <CheckButton name="EventTypeBlockBattle" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockWar" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[3]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(3,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton>
-                            <CheckButton name="EventTypeBlockDeath" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBattle" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[4]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(4,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton>
-                            <CheckButton name="EventTypeBlockBirth" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockDeath" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[5]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(5,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton>
-                            <CheckButton name="EventTypeBlockOther" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="EventTypeBlockBirth" />
-                                </Anchors>
-                                <Scripts>
-                                    <OnLoad>
-                                self.Text:SetText(get_locale(get_constants().eventType[6]));
-                                    </OnLoad>
-                                    <OnClick>
-                                change_EventType(6,self:GetChecked())
-                                    </OnClick>
-                                </Scripts>
-                            </CheckButton> -->
-                        </Frames>
                     </Frame>
 
                     <Frame parentKey="Libraries" frameLevel="100" hidden="true">
@@ -256,7 +176,7 @@
                             </Layer>
                         </Layers>
                         <Frames>
-                            <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <!-- <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" />
                                 </Anchors>
@@ -290,7 +210,7 @@
                                 <Anchors>
                                     <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
                                 </Anchors>
-                            </CheckButton>
+                            </CheckButton> -->
                         </Frames>
                     </Frame>
 

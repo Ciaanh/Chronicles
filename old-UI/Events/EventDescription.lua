@@ -10,7 +10,7 @@ Chronicles.UI.EventDescription.CurrentEvent = nil
 Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = {}
 
 function Chronicles.UI.EventDescription:Refresh()
-    --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetGroupStatus(self.CurrentEvent.source)) then
+    --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetLibraryStatus(self.CurrentEvent.source)) then
     self.CurrentEvent = nil
     self.CurrentPage = nil
     self.CurrentFactionsCharactersResults = {}

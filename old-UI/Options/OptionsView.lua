@@ -42,10 +42,10 @@ function MyJournalCheckBox_OnClick()
 
     if (Chronicles.db.global.options.myjournal) then
         MyJournalViewShow:Show()
-        Chronicles.DB:SetGroupStatus("myjournal", true)
+        Chronicles.DB:SetLibraryStatus("myjournal", true)
     else
         MyJournalViewShow:Hide()
-        Chronicles.DB:SetGroupStatus("myjournal", false)
+        Chronicles.DB:SetLibraryStatus("myjournal", false)
     end
 
     Chronicles.UI:Refresh()
@@ -190,7 +190,7 @@ function Chronicles.UI.OptionsView:WipeAllLibrariesContent()
 end
 
 function Chronicles.UI.OptionsView:SetLibrariesFilterData()
-    local groupList = Chronicles.DB:GetGroupNames()
+    local groupList = Chronicles.DB:GetLibrariesNames()
 
     if (groupList == nil) then
         self:HideAllLibrariesContent()
@@ -225,7 +225,7 @@ function Chronicles.UI.OptionsView:SetTextToFrame(group, checkBox)
             function(selfCheckBox)
                 group.isActive = not group.isActive
 
-                Chronicles.DB:SetGroupStatus(group.name, group.isActive)
+                Chronicles.DB:SetLibraryStatus(group.name, group.isActive)
                 Chronicles.UI:Refresh()
             end
         )

@@ -174,6 +174,39 @@ end
 
 function SettingsMixin:LoadLibraries(frame)
     print("SettingsMixin:LoadLibraries")
+
+    local libraries = Chronicles.DB:GetLibrariesNames()
+    for _, libraryName in ipairs(get_constants().eventType) do
+        local text = get_locale(libraryName)
+
+        local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+        newCheckbox.Text:SetText(text)
+        newCheckbox.libraryName = libraryName
+
+        newCheckbox:SetChecked(Chronicles.DB:GetLibraryStatus(libraryName))
+        newCheckbox:SetScript(
+            "OnClick",
+            function(self)
+                local data = {
+                    libraryName = self.libraryName,
+                    isActive = self:GetChecked()
+                }
+                EventRegistry:TriggerEvent(
+                    private.constants.events.SettingsLibraryChecked,
+                    data.libraryName,
+                    data.isActive
+                )
+            end
+        )
+
+        if (previousCheckbox) then
+            newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
+        else
+            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+        end
+        newCheckbox:Show()
+        previousCheckbox = newCheckbox
+    end
 end
 
 function SettingsMixin:LoadMyJournal(frame)
