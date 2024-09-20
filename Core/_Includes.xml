@@ -2,7 +2,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-    <Script file="DB.lua"/>
+    <Script file="Data.lua"/>
 
     <Script file="Characters.lua"/>
     <Script file="Events.lua"/>

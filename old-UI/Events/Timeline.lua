@@ -184,8 +184,8 @@ function Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 end
 
 function Chronicles.UI.Timeline:ComputeTimelinePeriods(stepValue)
-    local minYear = Chronicles.DB:MinEventYear()
-    local maxYear = Chronicles.DB:MaxEventYear()
+    local minYear = Chronicles.Data:MinEventYear()
+    local maxYear = Chronicles.Data:MaxEventYear()
     local timelineConfig = Chronicles.UI.Timeline:GetTimelineConfig(minYear, maxYear, stepValue)
 
     local timelineBlocks = {}
@@ -380,7 +380,7 @@ function Chronicles.UI.Timeline:HasEvents(block)
 end
 
 function Chronicles.UI.Timeline:GetDateCurrentStepIndex(date)
-    local dateProfile = Chronicles.DB:ComputeEventDateProfile(date)
+    local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
     if (Chronicles.UI.Timeline.CurrentStepValue == 1000) then
         return dateProfile.mod1000
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 500) then
@@ -399,7 +399,7 @@ function Chronicles.UI.Timeline:GetDateCurrentStepIndex(date)
 end
 
 function Chronicles.UI.Timeline:GetCurrentStepEventDates()
-    local eventDates = Chronicles.DB.PeriodsFillingBySteps
+    local eventDates = Chronicles.Data.PeriodsFillingBySteps
     if (Chronicles.UI.Timeline.CurrentStepValue == 1000) then
         return eventDates.mod1000
     elseif (Chronicles.UI.Timeline.CurrentStepValue == 500) then
@@ -461,7 +461,7 @@ function Chronicles.UI.Timeline:GetIndex(year)
         end
     end
 
-    local minYear = Chronicles.DB:MinEventYear()
+    local minYear = Chronicles.Data:MinEventYear()
     local length = math.abs(minYear - selectedYear)
     local yearIndex = math.floor(length / Chronicles.UI.Timeline.CurrentStepValue)
     local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
@@ -573,7 +573,7 @@ function Chronicles.UI.Timeline:SetDateToBlock(index, frameEvent, frameNoEvent)
         frameEvent:SetScript(
             "OnMouseDown",
             function()
-                local eventList = Chronicles.DB:SearchEvents(frameEvent.lowerBound, frameEvent.upperBound)
+                local eventList = Chronicles.Data:SearchEvents(frameEvent.lowerBound, frameEvent.upperBound)
                 Chronicles.UI.Timeline.SelectedYear = math.floor((frameEvent.lowerBound + frameEvent.upperBound) / 2)
                 Chronicles.UI.EventList:SetEventListData(frameEvent.lowerBound, frameEvent.upperBound, eventList)
             end

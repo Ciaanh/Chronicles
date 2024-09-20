@@ -109,7 +109,7 @@ end
 function Chronicles.UI.CharactersView:DisplayCharacterList(page, force)
     if (page ~= nil) then
         local pageSize = private.constants.config.myJournal.characterListPageSize
-        local characterList = Chronicles.DB:SearchCharacters()
+        local characterList = Chronicles.Data:SearchCharacters()
 
         local numberOfCharacters = tablelength(characterList)
 
@@ -314,7 +314,7 @@ function Chronicles.UI.CharactersView:ChangeFactionsPage(page)
         (Chronicles.UI.CharactersView.SelectedCharacterFactions ~= nil and
             tablelength(Chronicles.UI.CharactersView.SelectedCharacterFactions) > 0)
      then
-        local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.CharactersView.SelectedCharacterFactions)
+        local factionsList = Chronicles.Data:FindFactions(Chronicles.UI.CharactersView.SelectedCharacterFactions)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then

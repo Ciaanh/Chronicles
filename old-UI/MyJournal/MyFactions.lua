@@ -146,7 +146,7 @@ end
 function Chronicles.UI.MyFactions:DisplayFactionList(page, force)
     if (page ~= nil) then
         local pageSize = private.constants.config.myJournal.factionListPageSize
-        local factionList = Chronicles.DB:GetMyJournalFactions()
+        local factionList = Chronicles.Data:GetMyJournalFactions()
 
         local numberOfFactions = tablelength(factionList)
 
@@ -254,13 +254,13 @@ function MyFactionsListAddFaction_OnClick()
         description = "",
         timeline = 1
     }
-    Chronicles.DB:SetMyJournalFactions(faction)
+    Chronicles.Data:SetMyJournalFactions(faction)
     Chronicles.UI.MyFactions:DisplayFactionList(Chronicles.UI.MyFactions.CurrentPage, true)
     Chronicles.UI:Refresh()
 end
 
 function MyFactionsDetailsRemoveFaction_OnClick()
-    Chronicles.DB:RemoveMyJournalFaction(Chronicles.UI.MyFactions.SelectedFaction.id)
+    Chronicles.Data:RemoveMyJournalFaction(Chronicles.UI.MyFactions.SelectedFaction.id)
     Chronicles.UI.MyFactions:HideFields()
     Chronicles.UI.MyFactions.SelectedFaction = {}
     Chronicles.UI.MyFactions:DisplayFactionList(Chronicles.UI.MyFactions.CurrentPage, true)
@@ -301,7 +301,7 @@ function MyFactionsDetailsSave_Click()
         timeline = MyFactionsDetailsTimelineDropDown.selectedID
     }
 
-    Chronicles.DB:SetMyJournalFactions(faction)
+    Chronicles.Data:SetMyJournalFactions(faction)
     Chronicles.UI.MyFactions:DisplayFactionList(Chronicles.UI.MyFactions.CurrentPage, true)
     Chronicles.UI:Refresh()
 end

@@ -120,8 +120,8 @@ function private.Core.Events.FilterEvents(events)
 	for eventIndex in pairs(events) do
 		local event = events[eventIndex]
 
-		local eventGroupStatus = private.Chronicles.DB:GetLibraryStatus(event.source)
-		local eventTypeStatus = private.Chronicles.DB:GetEventTypeStatus(event.eventType)
+		local eventGroupStatus = private.Chronicles.Data:GetLibraryStatus(event.source)
+		local eventTypeStatus = private.Chronicles.Data:GetEventTypeStatus(event.eventType)
 
 		if eventGroupStatus and eventTypeStatus then
 			table.insert(foundEvents, event)

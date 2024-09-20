@@ -16,7 +16,7 @@ Timeline.SelectedYear = nil
 Timeline.Periods = {}
 
 local function GetDateCurrentStepIndex(date)
-    local dateProfile = Chronicles.DB:ComputeEventDateProfile(date)
+    local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
     if (Timeline.CurrentStepValue == 1000) then
         return dateProfile.mod1000
     elseif (Timeline.CurrentStepValue == 500) then
@@ -35,7 +35,7 @@ local function GetDateCurrentStepIndex(date)
 end
 
 local function GetCurrentStepPeriodsFilling()
-    local eventDates = Chronicles.DB.PeriodsFillingBySteps
+    local eventDates = Chronicles.Data.PeriodsFillingBySteps
     if (Timeline.CurrentStepValue == 1000) then
         return eventDates.mod1000
     elseif (Timeline.CurrentStepValue == 500) then
@@ -191,7 +191,7 @@ local function GetYearPageIndex(year)
         end
     end
 
-    local minYear = Chronicles.DB:MinEventYear()
+    local minYear = Chronicles.Data:MinEventYear()
     local length = math.abs(minYear - selectedYear)
     local yearIndex = math.floor(length / Timeline.CurrentStepValue)
     local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
@@ -215,8 +215,8 @@ function private.Core.Timeline:ComputeTimelinePeriods()
         stepValue = Timeline.CurrentStepValue
     end
 
-    local minYear = Chronicles.DB:MinEventYear()
-    local maxYear = Chronicles.DB:MaxEventYear()
+    local minYear = Chronicles.Data:MinEventYear()
+    local maxYear = Chronicles.Data:MaxEventYear()
     local timelineConfig = GetTimelineConfig(minYear, maxYear, stepValue)
     local timelineBlocks = {}
 

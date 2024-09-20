@@ -124,8 +124,8 @@ function SettingsMixin:AddCategory(index, category)
 end
 
 function SettingsMixin:Change_EventType(eventTypeId, checked)
-    Chronicles.DB:SetEventTypeStatus(eventTypeId, checked)
-    Chronicles.DB:RefreshPeriods()
+    Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
+    Chronicles.Data:RefreshPeriods()
 
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
@@ -146,7 +146,7 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox.Text:SetText(text)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
-        newCheckbox:SetChecked(Chronicles.DB:GetEventTypeStatus(eventTypeId))
+        newCheckbox:SetChecked(Chronicles.Data:GetEventTypeStatus(eventTypeId))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
@@ -175,7 +175,7 @@ end
 function SettingsMixin:LoadLibraries(frame)
     print("SettingsMixin:LoadLibraries")
 
-    local libraries = Chronicles.DB:GetLibrariesNames()
+    local libraries = Chronicles.Data:GetLibrariesNames()
     for _, libraryName in ipairs(get_constants().eventType) do
         local text = get_locale(libraryName)
 
@@ -183,7 +183,7 @@ function SettingsMixin:LoadLibraries(frame)
         newCheckbox.Text:SetText(text)
         newCheckbox.libraryName = libraryName
 
-        newCheckbox:SetChecked(Chronicles.DB:GetLibraryStatus(libraryName))
+        newCheckbox:SetChecked(Chronicles.Data:GetLibraryStatus(libraryName))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
@@ -211,6 +211,29 @@ end
 
 function SettingsMixin:LoadMyJournal(frame)
     print("SettingsMixin:LoadMyJournal")
+
+    frame.IsActive:SetChecked(Chronicles.db.global.options.myjournal)
+end
+
+function SettingsMixin:MyJournalIsActive_OnClick(chkBox)
+    print("SettingsMixin:MyJournalIsActive_OnClick")
+
+    Chronicles.db.global.options.myjournal = chkBox:GetChecked()
+    Chronicles.Data:SetLibraryStatus(private.constants.configurationName.myjournal, Chronicles.db.global.options.myjournal)
+    
+    -- EventRegistry:TriggerEvent(
+    --                 private.constants.events.SettingsLibraryChecked,
+    --                 data.libraryName,
+    --                 data.isActive
+    --             )
+
+    if (Chronicles.db.global.options.myjournal) then
+        MyJournalViewShow:Show()
+    else
+        MyJournalViewShow:Hide()
+    end
+
+    Chronicles.UI:Refresh()
 end
 
 CategoryButtonMixin = {}
@@ -273,87 +296,87 @@ function CategoryButtonMixin:Button_OnClick(button)
     end
 end
 
-function CategoryButtonMixin:SetCategory(text)
-    self:SetText(text)
-    self.Text:SetPoint("LEFT", self, "LEFT", 8, 0)
-    self.Lines:Hide()
-    self:SetNormalFontObject(GameFontNormalSmall)
+-- function CategoryButtonMixin:SetCategory(text)
+--     self:SetText(text)
+--     self.Text:SetPoint("LEFT", self, "LEFT", 8, 0)
+--     self.Lines:Hide()
+--     self:SetNormalFontObject(GameFontNormalSmall)
 
-    local texture = self.NormalTexture
-    texture:SetAtlas("auctionhouse-nav-button", false)
-    texture:SetSize(156, 32)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPLEFT", -2, 0)
-    texture:SetAlpha(1.0)
+--     local texture = self.NormalTexture
+--     texture:SetAtlas("auctionhouse-nav-button", false)
+--     texture:SetSize(156, 32)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPLEFT", -2, 0)
+--     texture:SetAlpha(1.0)
 
-    texture = self.SelectedTexture
-    texture:SetAtlas("auctionhouse-nav-button-select", false)
-    texture:SetSize(152, 21)
-    texture:ClearAllPoints()
-    texture:SetPoint("CENTER")
+--     texture = self.SelectedTexture
+--     texture:SetAtlas("auctionhouse-nav-button-select", false)
+--     texture:SetSize(152, 21)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("CENTER")
 
-    texture = self.HighlightTexture
-    texture:SetAtlas("auctionhouse-nav-button-highlight", false)
-    texture:SetSize(152, 21)
-    texture:ClearAllPoints()
-    texture:SetPoint("CENTER")
-    texture:SetBlendMode("BLEND")
+--     texture = self.HighlightTexture
+--     texture:SetAtlas("auctionhouse-nav-button-highlight", false)
+--     texture:SetSize(152, 21)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("CENTER")
+--     texture:SetBlendMode("BLEND")
 
-    self:Show()
-end
+--     self:Show()
+-- end
 
-function CategoryButtonMixin:SetSubCategory(text)
-    self:SetText(text)
-    self.Text:SetPoint("LEFT", self, "LEFT", 18, 0)
-    self.Lines:Hide()
-    self:SetNormalFontObject(GameFontHighlightSmall)
+-- function CategoryButtonMixin:SetSubCategory(text)
+--     self:SetText(text)
+--     self.Text:SetPoint("LEFT", self, "LEFT", 18, 0)
+--     self.Lines:Hide()
+--     self:SetNormalFontObject(GameFontHighlightSmall)
 
-    local texture = self.NormalTexture
-    texture:SetAtlas("auctionhouse-nav-button-secondary", false)
-    texture:SetSize(153, 32)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPLEFT", 1, 0)
-    texture:SetAlpha(1.0)
+--     local texture = self.NormalTexture
+--     texture:SetAtlas("auctionhouse-nav-button-secondary", false)
+--     texture:SetSize(153, 32)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPLEFT", 1, 0)
+--     texture:SetAlpha(1.0)
 
-    texture = self.SelectedTexture
-    texture:SetAtlas("auctionhouse-nav-button-secondary-select", false)
-    texture:SetSize(142, 21)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPLEFT", 10, 0)
+--     texture = self.SelectedTexture
+--     texture:SetAtlas("auctionhouse-nav-button-secondary-select", false)
+--     texture:SetSize(142, 21)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPLEFT", 10, 0)
 
-    texture = self.HighlightTexture
-    texture:SetAtlas("auctionhouse-nav-button-secondary-highlight", false)
-    texture:SetSize(142, 21)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPLEFT", 10, 0)
-    texture:SetBlendMode("BLEND")
+--     texture = self.HighlightTexture
+--     texture:SetAtlas("auctionhouse-nav-button-secondary-highlight", false)
+--     texture:SetSize(142, 21)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPLEFT", 10, 0)
+--     texture:SetBlendMode("BLEND")
 
-    self:Show()
-end
+--     self:Show()
+-- end
 
-function CategoryButtonMixin:SetSubSubCategory(text)
-    self:SetText(text)
-    self.Text:SetPoint("LEFT", self, "LEFT", 26, 0)
-    self.Lines:Show()
-    self:SetNormalFontObject(GameFontHighlightSmall)
+-- function CategoryButtonMixin:SetSubSubCategory(text)
+--     self:SetText(text)
+--     self.Text:SetPoint("LEFT", self, "LEFT", 26, 0)
+--     self.Lines:Show()
+--     self:SetNormalFontObject(GameFontHighlightSmall)
 
-    local texture = self.NormalTexture
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPLEFT", 10, 0)
-    texture:SetAlpha(0.0)
+--     local texture = self.NormalTexture
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPLEFT", 10, 0)
+--     texture:SetAlpha(0.0)
 
-    texture = self.SelectedTexture
-    texture:SetAtlas("auctionhouse-ui-row-select", false)
-    texture:SetSize(136, 18)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPRIGHT", 0, -2)
+--     texture = self.SelectedTexture
+--     texture:SetAtlas("auctionhouse-ui-row-select", false)
+--     texture:SetSize(136, 18)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPRIGHT", 0, -2)
 
-    texture = self.HighlightTexture
-    texture:SetAtlas("auctionhouse-ui-row-highlight", false)
-    texture:SetSize(136, 18)
-    texture:ClearAllPoints()
-    texture:SetPoint("TOPRIGHT", 0, -2)
-    texture:SetBlendMode("ADD")
+--     texture = self.HighlightTexture
+--     texture:SetAtlas("auctionhouse-ui-row-highlight", false)
+--     texture:SetSize(136, 18)
+--     texture:ClearAllPoints()
+--     texture:SetPoint("TOPRIGHT", 0, -2)
+--     texture:SetBlendMode("ADD")
 
-    self:Show()
-end
+--     self:Show()
+-- end

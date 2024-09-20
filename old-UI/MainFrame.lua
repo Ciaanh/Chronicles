@@ -47,7 +47,7 @@ function Chronicles.UI:Refresh()
 end
 
 function Chronicles.UI:DisplayWindow()
-    Chronicles.DB:LoadRolePlayProfile()
+    Chronicles.Data:LoadRolePlayProfile()
     MainFrame:Show()
 end
 

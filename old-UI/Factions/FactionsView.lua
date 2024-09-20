@@ -101,7 +101,7 @@ end
 function Chronicles.UI.FactionsView:DisplayFactionList(page, force)
     if (page ~= nil) then
         local pageSize = private.constants.config.myJournal.factionListPageSize
-        local factionList = Chronicles.DB:SearchFactions()
+        local factionList = Chronicles.Data:SearchFactions()
 
         local numberOfFactions = tablelength(factionList)
 

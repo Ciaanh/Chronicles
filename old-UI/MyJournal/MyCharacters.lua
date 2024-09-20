@@ -164,7 +164,7 @@ end
 function Chronicles.UI.MyCharacters:DisplayCharacterList(page, force)
     if (page ~= nil) then
         local pageSize = private.constants.config.myJournal.characterListPageSize
-        local characterList = Chronicles.DB:GetMyJournalCharacters()
+        local characterList = Chronicles.Data:GetMyJournalCharacters()
 
         local numberOfCharacters = tablelength(characterList)
 
@@ -279,13 +279,13 @@ function MyCharactersListAddCharacter_OnClick()
         -- timeline=[integer],    		-- id of the timeline
         -- factions=table[integer], 	-- concerned factions
     }
-    Chronicles.DB:SetMyJournalCharacters(character)
+    Chronicles.Data:SetMyJournalCharacters(character)
     Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage, true)
     Chronicles.UI.CharactersView:Refresh()
 end
 
 function MyCharactersDetailsRemoveCharacter_OnClick()
-    Chronicles.DB:RemoveMyJournalCharacter(Chronicles.UI.MyCharacters.SelectedCharacterId)
+    Chronicles.Data:RemoveMyJournalCharacter(Chronicles.UI.MyCharacters.SelectedCharacterId)
     Chronicles.UI.MyCharacters:HideFields()
     Chronicles.UI.MyCharacters.SelectedCharacterId = nil
     Chronicles.UI.MyCharacters.SelectedCharacterFactions = nil
@@ -336,7 +336,7 @@ function MyCharactersDetailsSave_Click()
         factions = copyTable(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
     }
 
-    Chronicles.DB:SetMyJournalCharacters(character)
+    Chronicles.Data:SetMyJournalCharacters(character)
     Chronicles.UI.MyCharacters:DisplayCharacterList(Chronicles.UI.MyCharacters.CurrentPage, true)
     Chronicles.UI.CharactersView:Refresh()
 end
@@ -441,7 +441,7 @@ function Chronicles.UI.MyCharacters:ChangeFactionsPage(page)
         --     "-- ChangeFactionsPage " .. tablelength(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
         -- )
 
-        local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
+        local factionsList = Chronicles.Data:FindFactions(Chronicles.UI.MyCharacters.SelectedCharacterFactions)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then
@@ -762,7 +762,7 @@ end
 
 function MyCharacterFactions_ShowSearchPreviewResults()
     local searchtext = MyCharactersDetails.searchBox:GetText()
-    local searchResults = Chronicles.DB:SearchFactions(searchtext)
+    local searchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(searchResults)
 
@@ -823,7 +823,7 @@ function MyCharacterFactions_SelectSearchItem(factionID)
     -- print("-- MyCharacterFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
 
     local results =
-        Chronicles.DB:FindFactions(
+        Chronicles.Data:FindFactions(
         {
             [factionID.group] = {factionID.id}
         }
@@ -898,7 +898,7 @@ function MyCharacterFactions_ShowFullSearch()
     MyCharacterFactions_UpdateFullSearchResults()
 
     local searchtext = MyCharactersDetails.searchBox:GetText()
-    local searchResults = Chronicles.DB:SearchFactions(searchtext)
+    local searchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(searchResults)
     if (numResults == 0) then
@@ -913,7 +913,7 @@ end
 
 function MyCharacterFactions_UpdateFullSearchResults()
     local searchtext = MyCharactersDetails.searchBox:GetText()
-    local searchResults = Chronicles.DB:SearchFactions(searchtext)
+    local searchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(searchResults)
 

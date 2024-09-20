@@ -10,7 +10,7 @@ Chronicles.UI.EventDescription.CurrentEvent = nil
 Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = {}
 
 function Chronicles.UI.EventDescription:Refresh()
-    --if (self.CurrentEvent ~= nil and not Chronicles.DB:GetLibraryStatus(self.CurrentEvent.source)) then
+    --if (self.CurrentEvent ~= nil and not Chronicles.Data:GetLibraryStatus(self.CurrentEvent.source)) then
     self.CurrentEvent = nil
     self.CurrentPage = nil
     self.CurrentFactionsCharactersResults = {}
@@ -54,11 +54,11 @@ function Chronicles.UI.EventDescription:DrawEventDescription(event)
     self:SetDescriptionPager(1, tablelength(event.description))
     -- print("-- Display description " .. event.description[1])
 
-    if (event.factions ~= nil and tablelength(Chronicles.DB:FindFactions(event.factions)) > 0) then
+    if (event.factions ~= nil and tablelength(Chronicles.Data:FindFactions(event.factions)) > 0) then
         EventDescription.FactionsButton:Show()
     end
 
-    if (event.characters ~= nil and tablelength(Chronicles.DB:FindCharacters(event.characters)) > 0) then
+    if (event.characters ~= nil and tablelength(Chronicles.Data:FindCharacters(event.characters)) > 0) then
         EventDescription.CharactersButton:Show()
     end
 end
@@ -136,7 +136,7 @@ function EventFactionsButton_OnClick(self)
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
 
     if (currentEvent ~= nil and currentEvent.factions and tablelength(currentEvent.factions) > 0) then
-        local factionsList = Chronicles.DB:FindFactions(currentEvent.factions)
+        local factionsList = Chronicles.Data:FindFactions(currentEvent.factions)
 
         Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = MapFactionsToItems(factionsList)
 
@@ -174,12 +174,12 @@ end
 
 function EventCharactersButton_OnClick(self)
     -- print("-- EventCharactersButton_OnClick ")
-    -- local charactersList = Chronicles.DB:FindCharacters(event.characters)
+    -- local charactersList = Chronicles.Data:FindCharacters(event.characters)
 
     local currentEvent = Chronicles.UI.EventDescription.CurrentEvent
 
     if (currentEvent ~= nil and currentEvent.characters and tablelength(currentEvent.characters) > 0) then
-        local charactersList = Chronicles.DB:FindCharacters(currentEvent.characters)
+        local charactersList = Chronicles.Data:FindCharacters(currentEvent.characters)
 
         Chronicles.UI.EventDescription.CurrentFactionsCharactersResults = MapCharactersToItems(charactersList)
 

@@ -20,7 +20,7 @@ Chronicles.Custom.Modules = {
 	warwithin = "warwithin"
 }
 function Chronicles.Custom.DB:Init()
-	Chronicles.DB:RegisterEventDB(Chronicles.Custom.Modules.expansions, ExpansionsEventsDB)
-	Chronicles.DB:RegisterEventDB(Chronicles.Custom.Modules.origins, OriginsEventsDB)
-	Chronicles.DB:RegisterEventDB(Chronicles.Custom.Modules.warwithin, WarwithinEventsDB)   
+	Chronicles.Data:RegisterEventDB(Chronicles.Custom.Modules.expansions, ExpansionsEventsDB)
+	Chronicles.Data:RegisterEventDB(Chronicles.Custom.Modules.origins, OriginsEventsDB)
+	Chronicles.Data:RegisterEventDB(Chronicles.Custom.Modules.warwithin, WarwithinEventsDB)   
 end

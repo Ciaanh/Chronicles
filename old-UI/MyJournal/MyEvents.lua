@@ -206,7 +206,7 @@ end
 function Chronicles.UI.MyEvents:DisplayEventList(page, force)
     if (page ~= nil) then
         local pageSize = private.constants.config.myJournal.eventListPageSize
-        local eventList = Chronicles.UI.MyEvents:FilterEvents(Chronicles.DB:GetMyJournalEvents())
+        local eventList = Chronicles.UI.MyEvents:FilterEvents(Chronicles.Data:GetMyJournalEvents())
 
         local numberOfEvents = tablelength(eventList)
 
@@ -318,13 +318,13 @@ function MyEventsListAddEvent_OnClick()
         eventType = 1,
         timeline = 1
     }
-    Chronicles.DB:SetMyJournalEvents(event)
+    Chronicles.Data:SetMyJournalEvents(event)
     Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage, true)
     Chronicles.UI:Refresh()
 end
 
 function MyEventsDetailsRemoveEvent_OnClick()
-    Chronicles.DB:RemoveMyJournalEvent(Chronicles.UI.MyEvents.SelectedEvent.id)
+    Chronicles.Data:RemoveMyJournalEvent(Chronicles.UI.MyEvents.SelectedEvent.id)
     Chronicles.UI.MyEvents:HideFields()
     Chronicles.UI.MyEvents.SelectedEvent = {}
     Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage, true)
@@ -491,7 +491,7 @@ function MyEventsDetailsSave_Click()
         order = 0
     }
 
-    Chronicles.DB:SetMyJournalEvents(event)
+    Chronicles.Data:SetMyJournalEvents(event)
     Chronicles.UI.MyEvents:DisplayEventList(Chronicles.UI.MyEvents.CurrentPage, true)
     Chronicles.UI:Refresh()
 end
@@ -739,7 +739,7 @@ function Chronicles.UI.MyEvents:ChangeFactionsPage(page)
         (Chronicles.UI.MyEvents.SelectedEvent ~= nil and Chronicles.UI.MyEvents.SelectedEvent_Factions ~= nil and
             tablelength(Chronicles.UI.MyEvents.SelectedEvent_Factions) > 0)
      then
-        local factionsList = Chronicles.DB:FindFactions(Chronicles.UI.MyEvents.SelectedEvent_Factions)
+        local factionsList = Chronicles.Data:FindFactions(Chronicles.UI.MyEvents.SelectedEvent_Factions)
         local numberOfFactions = tablelength(factionsList)
 
         if (page ~= nil and numberOfFactions > 0) then
@@ -990,7 +990,7 @@ function MyEventsFactions_ShowSearchPreviewResults()
     -- print("-- MyEventsFactions_ShowSearchPreviewResults ")
 
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
-    local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
+    local factionSearchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(factionSearchResults)
 
@@ -1054,7 +1054,7 @@ function MyEventsFactions_SelectSearchItem(factionID)
     -- print("-- MyEventsFactions_SelectSearchItem " .. factionID.id .. " " .. factionID.group)
 
     local results =
-        Chronicles.DB:FindFactions(
+        Chronicles.Data:FindFactions(
         {
             [factionID.group] = {factionID.id}
         }
@@ -1126,7 +1126,7 @@ function MyEventsFactions_ShowFullSearch()
     MyEventsFactions_UpdateFullSearchResults()
 
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
-    local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
+    local factionSearchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(factionSearchResults)
     if (numResults == 0) then
@@ -1142,7 +1142,7 @@ end
 
 function MyEventsFactions_UpdateFullSearchResults()
     local searchtext = MyEvents.Details.FactionsCharacters.factionSearchBox:GetText()
-    local factionSearchResults = Chronicles.DB:SearchFactions(searchtext)
+    local factionSearchResults = Chronicles.Data:SearchFactions(searchtext)
 
     local numResults = tablelength(factionSearchResults)
 
@@ -1220,7 +1220,7 @@ function Chronicles.UI.MyEvents:ChangeCharactersPage(page)
         (Chronicles.UI.MyEvents.SelectedEvent ~= nil and Chronicles.UI.MyEvents.SelectedEvent_Characters ~= nil and
             tablelength(Chronicles.UI.MyEvents.SelectedEvent_Characters) > 0)
      then
-        local charactersList = Chronicles.DB:FindCharacters(Chronicles.UI.MyEvents.SelectedEvent_Characters)
+        local charactersList = Chronicles.Data:FindCharacters(Chronicles.UI.MyEvents.SelectedEvent_Characters)
         local numberOfCharacters = tablelength(charactersList)
 
         if (page ~= nil and numberOfCharacters > 0) then
@@ -1495,7 +1495,7 @@ function MyEventsCharacters_ShowSearchPreviewResults()
     -- print("-- MyEventsCharacters_ShowSearchPreviewResults ")
 
     local searchtext = MyEvents.Details.FactionsCharacters.characterSearchBox:GetText()
-    local characterSearchResults = Chronicles.DB:SearchCharacters(searchtext)
+    local characterSearchResults = Chronicles.Data:SearchCharacters(searchtext)
 
     local numResults = tablelength(characterSearchResults)
 
@@ -1559,7 +1559,7 @@ function MyEventsCharacters_SelectSearchItem(characterID)
     -- print("-- MyEventsCharacters_SelectSearchItem " .. characterID.id .. " " .. characterID.group)
 
     local results =
-        Chronicles.DB:FindCharacters(
+        Chronicles.Data:FindCharacters(
         {
             [characterID.group] = {characterID.id}
         }
@@ -1631,7 +1631,7 @@ function MyEventsCharacters_ShowFullSearch()
     MyEventsCharacters_UpdateFullSearchResults()
 
     local searchtext = MyEvents.Details.FactionsCharacters.characterSearchBox:GetText()
-    local characterSearchResults = Chronicles.DB:SearchCharacters(searchtext)
+    local characterSearchResults = Chronicles.Data:SearchCharacters(searchtext)
 
     local numResults = tablelength(characterSearchResults)
     if (numResults == 0) then
@@ -1647,7 +1647,7 @@ end
 
 function MyEventsCharacters_UpdateFullSearchResults()
     local searchtext = MyEvents.Details.FactionsCharacters.characterSearchBox:GetText()
-    local characterSearchResults = Chronicles.DB:SearchCharacters(searchtext)
+    local characterSearchResults = Chronicles.Data:SearchCharacters(searchtext)
 
     local numResults = tablelength(characterSearchResults)
 

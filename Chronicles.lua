@@ -74,12 +74,12 @@ function Chronicles:OnInitialize()
     )
 
     Chronicles.UI.EventFilter:Init()
-    Chronicles.DB:Init()
+    Chronicles.Data:Init()
     Chronicles.UI:Init()
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.DB:RegisterEventDB(pluginName, db)
+    Chronicles.Data:RegisterEventDB(pluginName, db)
     Chronicles.UI:Init()
 end
 

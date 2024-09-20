@@ -235,13 +235,13 @@
                             </Layer>
                         </Layers>
                         <Frames>
-                            <CheckButton name="MyJournalCheckBox" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <CheckButton parentKey="IsActive" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="10" y="-25"/>
                                 </Anchors>
-                                <!-- <Scripts>
-                                    <OnClick function="MyJournalCheckBox_OnClick" />
-                                </Scripts> -->
+                                <Scripts>
+                                    <OnClick function="MyJournalIsActive_OnClick" />
+                                </Scripts>
                             </CheckButton>
                         </Frames>
                     </Frame>

@@ -17,10 +17,10 @@ end
 -- Event type Filter ---------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 function change_EventType(eventType, checked)
-    Chronicles.DB:SetEventTypeStatus(eventType, checked)
+    Chronicles.Data:SetEventTypeStatus(eventType, checked)
     Chronicles.UI:Refresh()
 end
 
 function get_EventType_Checked(eventType)
-    return Chronicles.DB:GetEventTypeStatus(eventType)
+    return Chronicles.Data:GetEventTypeStatus(eventType)
 end

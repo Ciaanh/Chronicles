@@ -62,7 +62,7 @@ end
 function EventListMixin:OnTimelinePeriodSelected(period)
 	local data = {}
 
-	local eventList = Chronicles.DB:SearchEvents(period.lower, period.upper)
+	local eventList = Chronicles.Data:SearchEvents(period.lower, period.upper)
 	private.Core.Timeline:SetYear(math.floor((period.lower + period.upper) / 2))
 
 	-- TODO find other place for the dates of the period
