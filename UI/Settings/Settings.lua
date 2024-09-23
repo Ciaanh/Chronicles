@@ -176,7 +176,7 @@ function SettingsMixin:LoadLibraries(frame)
     print("SettingsMixin:LoadLibraries")
 
     local libraries = Chronicles.Data:GetLibrariesNames()
-    for _, libraryName in ipairs(get_constants().eventType) do
+    for _, libraryName in ipairs(libraries) do
         local text = get_locale(libraryName)
 
         local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")

@@ -239,9 +239,9 @@
                                 <Anchors>
                                     <Anchor point="TOPLEFT" x="10" y="-25"/>
                                 </Anchors>
-                                <Scripts>
+                                <!-- <Scripts>
                                     <OnClick function="MyJournalIsActive_OnClick" />
-                                </Scripts>
+                                </Scripts> -->
                             </CheckButton>
                         </Frames>
                     </Frame>
