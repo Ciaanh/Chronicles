@@ -113,13 +113,13 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
         self:Hide()
     end
 
-    if periodData.nbEvents < 10 then
+    -- if periodData.nbEvents < 10 then
 
-    elseif periodData.nbEvents< 25 then
+    -- elseif periodData.nbEvents< 25 then
     
-    elseif periodData.nbEvents>= 25 then
+    -- elseif periodData.nbEvents>= 25 then
 
-    end
+    -- end
     
     -- EventRegistry:TriggerEvent(
     --     private.constants.events.TimelinePeriodSelected,

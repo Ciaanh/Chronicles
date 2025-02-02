@@ -60,6 +60,7 @@ function SettingsMixin:OnLoad()
 
     EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
     EventRegistry:RegisterCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
+    EventRegistry:RegisterCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
 
     self:UpdateTabs()
 end
@@ -137,6 +138,20 @@ function SettingsMixin:Change_EventType(eventTypeId, checked)
     EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
 end
 
+function SettingsMixin:Change_Library(libraryId, checked)
+    Chronicles.Data:SetLibraryStatus(libraryId, checked)
+    Chronicles.Data:RefreshPeriods()
+
+    private.Core.Timeline:ComputeTimelinePeriods()
+    private.Core.Timeline:DisplayTimelineWindow()
+
+    -- TODO clean select period and event
+
+    -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
+
+    EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+end
+
 function SettingsMixin:LoadEventTypes(frame)
     local previousCheckbox = nil
     for eventTypeId, eventTypeName in ipairs(get_constants().eventType) do
@@ -176,8 +191,9 @@ function SettingsMixin:LoadLibraries(frame)
     print("SettingsMixin:LoadLibraries")
 
     local libraries = Chronicles.Data:GetLibrariesNames()
-    for _, libraryName in ipairs(libraries) do
-        local text = get_locale(libraryName)
+    for _, library in ipairs(libraries) do
+        local libraryName = library.name
+        local text = get_locale(libraryName) or ""
 
         local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
         newCheckbox.Text:SetText(text)
@@ -219,8 +235,11 @@ function SettingsMixin:MyJournalIsActive_OnClick(chkBox)
     print("SettingsMixin:MyJournalIsActive_OnClick")
 
     Chronicles.db.global.options.myjournal = chkBox:GetChecked()
-    Chronicles.Data:SetLibraryStatus(private.constants.configurationName.myjournal, Chronicles.db.global.options.myjournal)
-    
+    Chronicles.Data:SetLibraryStatus(
+        private.constants.configurationName.myjournal,
+        Chronicles.db.global.options.myjournal
+    )
+
     -- EventRegistry:TriggerEvent(
     --                 private.constants.events.SettingsLibraryChecked,
     --                 data.libraryName,
