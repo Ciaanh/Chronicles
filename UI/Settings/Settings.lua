@@ -145,10 +145,6 @@ function SettingsMixin:Change_Library(libraryId, checked)
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    -- TODO clean select period and event
-
-    -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
-
     EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
 end
 
@@ -180,7 +176,7 @@ function SettingsMixin:LoadEventTypes(frame)
         if (previousCheckbox) then
             newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+            newCheckbox:SetPoint("TOP", frame, "TOPLEFT", 50, -50)
         end
         newCheckbox:Show()
         previousCheckbox = newCheckbox
@@ -188,7 +184,7 @@ function SettingsMixin:LoadEventTypes(frame)
 end
 
 function SettingsMixin:LoadLibraries(frame)
-    print("SettingsMixin:LoadLibraries")
+    local previousCheckbox = nil
 
     local libraries = Chronicles.Data:GetLibrariesNames()
     for _, library in ipairs(libraries) do
@@ -218,7 +214,7 @@ function SettingsMixin:LoadLibraries(frame)
         if (previousCheckbox) then
             newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+            newCheckbox:SetPoint("TOP", frame, "TOP", 50, -50)
         end
         newCheckbox:Show()
         previousCheckbox = newCheckbox

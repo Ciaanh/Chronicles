@@ -139,11 +139,11 @@
                             <Anchor point="BOTTOMRIGHT" />
                         </Anchors>
                         <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="0">
+                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
                                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
                                     <Color r="0.0" g="0.0" b="255.0"/>
                                 </Texture>
-                            </Layer>
+                            </Layer> -->
                             <Layer level="OVERLAY">
                                 <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT" text="Event Types">
                                     <Size y="20"/>
@@ -161,11 +161,11 @@
                             <Anchor point="BOTTOMRIGHT" />
                         </Anchors>
                         <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="0">
+                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
                                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
                                     <Color r="0.0" g="255.0" b="0.0"/>
                                 </Texture>
-                            </Layer>
+                            </Layer> -->
                             <Layer level="OVERLAY">
                                 <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
                                     <Size y="20"/>
@@ -220,13 +220,13 @@
                             <Anchor point="BOTTOMRIGHT" />
                         </Anchors>
                         <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="0">
+                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
                                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
                                     <Color r="255.0" g="0.0" b="0.0"/>
                                 </Texture>
-                            </Layer>
+                            </Layer> -->
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
+                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT" Text="My Journal">
                                     <Size y="20"/>
                                     <Anchors>
                                         <Anchor point="TOP" y="-10"/>
