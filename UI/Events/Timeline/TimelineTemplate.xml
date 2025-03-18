@@ -7,8 +7,11 @@
         <Size x="130" y="25" />
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r=".0" g="255.0" b="0.0" />
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\timeline\label" alpha="0.5">
+                    <Size x="130" y="25"/>
+                    <Anchors>
+                        <Anchor point="TOP"  x="0" y="0"/>
+                    </Anchors>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">

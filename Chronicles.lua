@@ -67,7 +67,7 @@ function Chronicles:OnInitialize()
     )
 
     self:RegisterChatCommand(
-        "ct",
+        "oldui",
         function()
             self.UI.DisplayWindow()
         end

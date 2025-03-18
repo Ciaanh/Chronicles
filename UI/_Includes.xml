@@ -9,7 +9,10 @@
 	<Include file="Events\List\EventListTemplate.xml" />
 	<Include file="Events\List\EventListPagingControls.xml" />
 	<Include file="Events\Details\EventBookContentTemplates.xml" />
+
 	<Include file="Characters\Details\CharacterBookContentTemplates.xml" />
+	<Include file="Characters\List\CharacterListTemplate.xml" />
+
 	<Include file="Factions\Details\FactionBookContentTemplates.xml" />
 
 	<Include file="Events\Details\EventBookTemplate.xml" />

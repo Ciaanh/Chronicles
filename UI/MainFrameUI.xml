@@ -64,13 +64,13 @@
                         </Anchors>
                     </Frame>
 
-                    <!-- <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                    <Frame parentKey="CharacterList" inherits="CharacterListTemplate">
                         <Anchors>
                             <Anchor point="BOTTOM" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                    <!--<Frame parentKey="EventList" inherits="EventListTemplate">
                         <Anchors>
                             <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-150"/>
                             <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="150"/>
