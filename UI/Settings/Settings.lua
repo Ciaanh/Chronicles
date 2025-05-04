@@ -145,10 +145,6 @@ function SettingsMixin:Change_Library(libraryId, checked)
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    -- TODO clean select period and event
-
-    -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
-
     EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
 end
 
