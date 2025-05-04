@@ -176,7 +176,7 @@ function SettingsMixin:LoadEventTypes(frame)
         if (previousCheckbox) then
             newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+            newCheckbox:SetPoint("TOP", frame, "TOPLEFT", 50, -50)
         end
         newCheckbox:Show()
         previousCheckbox = newCheckbox
@@ -184,7 +184,7 @@ function SettingsMixin:LoadEventTypes(frame)
 end
 
 function SettingsMixin:LoadLibraries(frame)
-    print("SettingsMixin:LoadLibraries")
+    local previousCheckbox = nil
 
     local libraries = Chronicles.Data:GetLibrariesNames()
     for _, library in ipairs(libraries) do
@@ -214,7 +214,7 @@ function SettingsMixin:LoadLibraries(frame)
         if (previousCheckbox) then
             newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOP", 0, -1)
+            newCheckbox:SetPoint("TOP", frame, "TOP", 50, -50)
         end
         newCheckbox:Show()
         previousCheckbox = newCheckbox

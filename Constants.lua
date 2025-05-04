@@ -75,19 +75,19 @@ constants.configurationName = {
 }
 
 constants.events = {
-	TimelineInit = "TIMELINE_INIT",
+	TimelineInit = "Timeline.INIT",
 	TimelineClean = "Timeline.CLEAN",
-	TimelinePeriodSelected = "TIMELINE_PERIOD_SELECTED",
+	TimelinePeriodSelected = "Timeline.PERIOD_SELECTED",
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 	TimelineStepChanged = "Timeline.STEP_CHANGED",
 
-	EventSelected = "EVENT_SELECTED",
-	CharacterSelected = "CHARACTER_SELECTED",
-	FactionSelected = "FACTION_SELECTED",
+	EventSelected = "Event.SELECTED",
+	CharacterSelected = "Character.SELECTED",
+	FactionSelected = "Faction.SELECTED",
 	
-	DisplayTimelineLabel = "DisplayTimelineLabel",
-	DisplayTimelinePeriod = "DisplayTimelinePeriod",
+	DisplayTimelineLabel = "Timeline.DisplayLabel",
+	DisplayTimelinePeriod = "Timeline.DisplayPeriod",
 	
 	TabUITabSet = "TabUI.TabSet",
 	

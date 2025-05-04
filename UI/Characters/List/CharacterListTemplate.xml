@@ -1,0 +1,98 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <Script file="CharacterListTemplate.lua" />
+
+
+    <Frame name="CharacterListTemplate" mixin="CharacterListMixin" virtual="true">
+        <Size x="1200" y="125" />
+        <KeyValues>
+            <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
+        </KeyValues>
+
+        <!-- 
+TooltipAzeriteLayout 
+TooltipDefaultDarkLayout
+TooltipGluesLayout
+-->
+
+        <Frames>
+            <Button parentKey="Previous">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="LEFT" x="10" y="10" />
+                </Anchors>
+                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </NormalTexture>
+                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </PushedTexture>
+                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </DisabledTexture>
+                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </HighlightTexture>
+            </Button>
+
+            <Button parentKey="Next">
+                <Size x="50" y="50" />
+                <Anchors>
+                    <Anchor point="RIGHT" x="-10" y="10" />
+                </Anchors>
+                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </NormalTexture>
+                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </PushedTexture>
+                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </DisabledTexture>
+                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
+                    <Anchors>
+                        <Anchor point="CENTER" y="1"/>
+                    </Anchors>
+                </HighlightTexture>
+                <Scripts>
+                    <OnLoad >
+                        self:GetNormalTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetHighlightTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetPushedTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetDisabledTexture():SetTexCoord(1, 0, 0, 1)
+                    </OnLoad >
+                </Scripts>
+            </Button>
+
+            <Frame parentKey="Bg" inherits="FlatPanelBackgroundTemplate" frameLevel="0">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="7" y="-6" />
+                    <Anchor point="BOTTOMRIGHT" x="-7" y="6" />
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate" />
+
+            <!-- Content -->
+
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <!-- <OnMouseWheel method="OnMouseWheel" /> -->
+        </Scripts>
+    </Frame>
+</Ui>

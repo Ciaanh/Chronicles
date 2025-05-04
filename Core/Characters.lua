@@ -3,6 +3,8 @@ local FOLDER_NAME, private = ...
 private.Core.Characters = {}
 
 
+-- Interface\\AddOns\\Chronicles\\Images\\Example-image
+
 --[[
 
 id = ${character._id},
@@ -15,7 +17,7 @@ factions = {${character.factions.map((fac) => fac._id).join(", ")}}
 
 
 --  Character
---  id = [integer]					-- Id of the event
+--  id = [integer]					-- Id of the character
 -- 	name = [string]				    --
 -- 	description = { [string] }		-- descriptions
 -- 	chapters = { [chapter] }		--
@@ -27,6 +29,14 @@ factions = {${character.factions.map((fac) => fac._id).join(", ")}}
 -- 	characters = { [character] }	--
 -- 	factions = { [faction] }		--
 --  author = [string]				-- Author of the event
+
+-- name: string;
+-- labelId: number;
+-- biographyId: number;
+-- timeline: number;
+-- factionIds: number[];
+-- collectionId: number;
+
 
 --  Chapter
 --  header = [integer]				-- Title of the chapter
