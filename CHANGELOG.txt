@@ -1,10 +1,66 @@
-v2.0
-- redesign UI using The War Within assets
+# Chronicles Addon Changelog
 
-v1.3
+## v2.0.0 (May 23, 2025)
+- Add detailed README with project documentation
+- Refactor book display system
+- Add container for character list
+- Add image for timeline label
+- Handle timeline period background image by event count
+- Improve timeline navigation with variable zoom levels (1000, 500, 250, 100, 50, 10 years)
+- Fix issues with event type filtering
+- Improve settings panel and menu structure
+- Add bookmarks for events
+- Implement pagination for event lists
+- Update UI to use The War Within assets
+- Switch to new UI system as default
+- Update database structure (renamed Chronicles.DB to Chronicles.Data)
+- Update for WoW 11.0.2
+
+## v1.3.0 (November 2022)
 - Populate basic data for the period before the Dark Portal
-- Fix bugs and performance issue for timeline with 10 or 1 year time period
-- Update for 10.0.2
+- Fix bugs and performance issues for timeline with 10 or 1 year time period
+- Add event ordering system
+- Fix timeline display for 1 year step
+- Improve step text display
+- Clean code structure for new data
+- Fix character list in event display
+- Fix constant definitions
+- Update for WoW 10.0.2 (Dragonflight)
 
-v1.2
--  Fix issues for Dragonflight 10.0 release.
+## v1.2.0 (October 2022)
+- Fix TRP age conversion handling
+- Remove YAML dependencies
+- Add packaging improvements
+- Fix custom data editor background
+- Update for WoW 10.0 release (Dragonflight)
+
+## v1.1.0 (April 2021)
+- Add Mythos system
+- Add character management for events
+- Fix faction display for events
+- Add faction searchbox functionality
+- Fix add button positioning
+- Fix timeline label limits
+- Add Mythos/Future sections
+- Add date information in tooltips
+- Update faction and character association system
+- Improve faction display formatting
+- Update for WoW 9.0.5 (Shadowlands)
+
+## v1.0.0 (November 2020)
+- Initial release with basic timeline functionality
+- Event filtering system
+- Custom journal implementation
+- Timeline navigation with multiple zoom levels
+- Event type filtering
+- Integration with roleplay addons (TRP3, MyRolePlay)
+- Event list with pagination
+- Basic character and faction database
+- Update for WoW 9.0 (Shadowlands)
+
+## Early Development
+- Implemented timeline design and functionality
+- Added event description paging
+- Created event list with scrolling
+- Integrated UI elements and styling
+- Added license information
