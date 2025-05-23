@@ -252,8 +252,6 @@ end
 
 function Chronicles.Data:CleanEventObject(event, libraryName)
     if event then
-        local description = event.description or UNKNOWN
-
         local start = event.yearStart
         local finish = event.yearEnd
 
@@ -262,14 +260,14 @@ function Chronicles.Data:CleanEventObject(event, libraryName)
             label = event.label,
             yearStart = start,
             yearEnd = finish,
-            description = description,
-            chapters = event.chapters,
+            chapters = event.chapters or {},
             eventType = event.eventType,
-            factions = event.factions,
-            characters = event.characters,
+            factions = event.factions or {},
+            characters = event.characters or {},
             source = libraryName,
             order = event.order,
-            author = event.author
+            author = event.author,
+            timeline = event.timeline
         }
         if (event.order == nil) then
             formatedEvent.order = 0
@@ -329,10 +327,22 @@ end
 
 function Chronicles.Data:CleanFactionObject(faction, libraryName)
     if faction ~= nil then
+        local desc = faction.description
+        if type(desc) == "string" then
+            -- Convert string description to chapter structure if needed
+            faction.chapters = faction.chapters or {
+                {
+                    header = faction.name,
+                    pages = {desc}
+                }
+            }
+        end
+        
         return {
             id = faction.id,
             name = faction.name,
             description = faction.description,
+            chapters = faction.chapters,
             timeline = faction.timeline,
             source = libraryName
         }
@@ -385,10 +395,22 @@ end
 
 function Chronicles.Data:CleanCharacterObject(character, libraryName)
     if character ~= nil then
+        local bio = character.biography
+        if type(bio) == "string" then
+            -- Convert string biography to chapter structure if needed
+            character.chapters = character.chapters or {
+                {
+                    header = character.name,
+                    pages = {bio}
+                }
+            }
+        end
+        
         return {
             id = character.id,
             name = character.name,
             biography = character.biography,
+            chapters = character.chapters,
             timeline = character.timeline,
             factions = character.factions,
             source = libraryName

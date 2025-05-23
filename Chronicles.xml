@@ -18,5 +18,4 @@
     <Include file="Custom\DB\ChroniclesDB.xml"/>
 
     <Include file="UI\_Includes.xml"/>
-    <Include file="old-UI\_Includes.xml"/>
 </Ui>

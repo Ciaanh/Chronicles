@@ -40,12 +40,6 @@ function Chronicles:OnInitialize()
             text = Locale["Chronicles"],
             icon = "Interface\\ICONS\\Inv_scroll_04",
             OnClick = function(self, button, down)
-                -- if (MainFrame:IsVisible()) then
-                --     Chronicles.UI:HideWindow()
-                -- else
-                --     Chronicles.UI:DisplayWindow()
-                -- end
-
                 Chronicles.NewUi:DisplayWindow()
             end,
             OnTooltipShow = function(tt)
@@ -66,21 +60,13 @@ function Chronicles:OnInitialize()
         end
     )
 
-    self:RegisterChatCommand(
-        "oldui",
-        function()
-            self.UI.DisplayWindow()
-        end
-    )
-
-    Chronicles.UI.EventFilter:Init()
     Chronicles.Data:Init()
-    Chronicles.UI:Init()
+    EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
     Chronicles.Data:RegisterEventDB(pluginName, db)
-    Chronicles.UI:Init()
+    EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
 end
 
 function get_constants()
