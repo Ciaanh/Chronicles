@@ -57,17 +57,17 @@ function Chronicles.Data:GetPeriodsFillingBySteps()
         mod50 = {},
         mod10 = {}
         --mod1 = {}
-    }
-
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
+    }    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
         if Chronicles.Data:GetLibraryStatus(libraryName) then
-            for _, event in pairs(eventsGroup.data) do
-                if (event ~= nil) then
-                    local isActive = Chronicles.Data:GetEventTypeStatus(event.eventType)
+            if eventsGroup and eventsGroup.data then
+                for _, event in pairs(eventsGroup.data) do
+                    if (event ~= nil) then
+                        local isActive = Chronicles.Data:GetEventTypeStatus(event.eventType)
 
-                    if (isActive) then
-                        for date = event.yearStart, event.yearEnd, 1 do
-                            periods = Chronicles.Data:SetPeriodsForEvent(periods, date, event.id)
+                        if (isActive) then
+                            for date = event.yearStart, event.yearEnd, 1 do
+                                periods = Chronicles.Data:SetPeriodsForEvent(periods, date, event.id)
+                            end
                         end
                     end
                 end
@@ -429,6 +429,11 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
     if Chronicles.Data.Events[libraryName] ~= nil then
         error(libraryName .. " is already registered by another plugin in Events.")
     else
+        -- Log warning if db is nil
+        if db == nil then
+            print("|cFFFF0000Chronicles Warning:|r Library '" .. libraryName .. "' is trying to register a nil events database.")
+        end
+        
         local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
@@ -436,7 +441,7 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
         end
 
         Chronicles.Data.Events[libraryName] = {
-            data = db,
+            data = db or {}, -- Ensure data is never nil
             name = libraryName
         }
     end
