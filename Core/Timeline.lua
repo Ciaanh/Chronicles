@@ -17,6 +17,7 @@ Timeline.Periods = {}
 
 local function GetDateCurrentStepIndex(date)
     local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
+
     if (Timeline.CurrentStepValue == 1000) then
         return dateProfile.mod1000
     elseif (Timeline.CurrentStepValue == 500) then
@@ -29,8 +30,11 @@ local function GetDateCurrentStepIndex(date)
         return dateProfile.mod50
     elseif (Timeline.CurrentStepValue == 10) then
         return dateProfile.mod10
-    -- elseif (Timeline.CurrentStepValue == 1) then
-    --     return dateProfile.mod1
+    elseif (Timeline.CurrentStepValue == 1) then
+        --     return dateProfile.mod1
+    else
+        -- Return nil for unsupported step values
+        return nil
     end
 end
 
@@ -48,38 +52,82 @@ local function GetCurrentStepPeriodsFilling()
         return eventDates.mod50
     elseif (Timeline.CurrentStepValue == 10) then
         return eventDates.mod10
-    -- elseif (Timeline.CurrentStepValue == 1) then
-    --     return eventDates.mod1
+    elseif (Timeline.CurrentStepValue == 1) then
+        --     return eventDates.mod1
+    else
+        -- Return nil for unsupported step values
+        return nil
     end
 end
 
 local function CountEvents(block)
-    local upperBound = block.upperBound
-    local lowerBound = block.lowerBound
+    local eventCount = 0
 
-    local upperDateIndex = GetDateCurrentStepIndex(upperBound)
-    local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
+    local originalLowerBound = block.lowerBound
+    local originalUpperBound = block.upperBound
 
-    local periodsFilling = GetCurrentStepPeriodsFilling()
+    -- Handle special periods differently
+    local isMytosPeriod = (originalLowerBound == private.constants.config.mythos)
+    local isFuturePeriod = (originalUpperBound == private.constants.config.futur)    if isMytosPeriod then
+        -- For mythos period: manually search for events before historyStartYear
+        -- since the date index system might not properly handle extreme negative values
+        local mythosYearEnd = private.constants.config.historyStartYear - 1
+        local foundEvents = Chronicles.Data:SearchEvents(private.constants.config.mythos, mythosYearEnd)
 
-    if (lowerDateIndex < upperDateIndex) then
-        local eventCount = 0
-        for i = lowerDateIndex, upperDateIndex, 1 do
-            local periodEvents = periodsFilling[i]
+        if foundEvents ~= nil then
+            eventCount = #foundEvents
+        end    elseif isFuturePeriod then
+        -- For future period: manually search for events beyond currentYear
+        -- since the date index system doesn't cover future dates
+        local futureYearStart = private.constants.config.currentYear + 1
+        local foundEvents = Chronicles.Data:SearchEvents(futureYearStart, private.constants.config.futur)
 
-            if (periodEvents ~= nil) then
-                eventCount = eventCount + #periodEvents
+        if foundEvents ~= nil then
+            eventCount = #foundEvents
+        end
+    else
+        -- Regular period processing - use original logic with bounds clamping for index calculation
+        local lowerBound = originalLowerBound
+        local upperBound = originalUpperBound
+
+        -- Clamp bounds to valid date range for date index calculation only
+        if (lowerBound < private.constants.config.historyStartYear) then
+            lowerBound = private.constants.config.historyStartYear
+        end
+
+        if (upperBound > private.constants.config.currentYear) then
+            upperBound = private.constants.config.currentYear
+        end
+
+        local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
+        local upperDateIndex = GetDateCurrentStepIndex(upperBound)
+
+        if upperDateIndex == nil or lowerDateIndex == nil then
+            return eventCount
+        end
+
+        local periodsFilling = GetCurrentStepPeriodsFilling()
+        if periodsFilling == nil then
+            return eventCount
+        end
+
+        if (lowerDateIndex < upperDateIndex) then
+            for i = lowerDateIndex, upperDateIndex - 1, 1 do
+                local periodEvents = periodsFilling[i]
+
+                if (periodEvents ~= nil) then
+                    local periodsCount = #periodEvents
+                    eventCount = eventCount + periodsCount
+                end
             end
-        end
-        return eventCount
-    elseif lowerDateIndex == upperDateIndex then
-        local periodEvents = periodsFilling[lowerDateIndex]
-        if (periodEvents ~= nil) then
-            return #periodEvents
-        end
+        elseif lowerDateIndex == upperDateIndex then
+            local periodEvents = periodsFilling[lowerDateIndex]
+            if (periodEvents ~= nil) then
+                eventCount = #periodEvents
+            end        end
     end
 
-    return 0
+    return eventCount
 end
 
 local function GetTimelineConfig(minYear, maxYear, stepValue)
