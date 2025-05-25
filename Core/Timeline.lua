@@ -18,45 +18,58 @@ Timeline.Periods = {}
 local function GetDateCurrentStepIndex(date)
     local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
 
+    -- Safety check: if dateProfile is nil, return default value
+    if dateProfile == nil then
+        return 0
+    end
+
     if (Timeline.CurrentStepValue == 1000) then
-        return dateProfile.mod1000
+        return dateProfile.mod1000 or 0
     elseif (Timeline.CurrentStepValue == 500) then
-        return dateProfile.mod500
+        return dateProfile.mod500 or 0
     elseif (Timeline.CurrentStepValue == 250) then
-        return dateProfile.mod250
+        return dateProfile.mod250 or 0
     elseif (Timeline.CurrentStepValue == 100) then
-        return dateProfile.mod100
+        return dateProfile.mod100 or 0
     elseif (Timeline.CurrentStepValue == 50) then
-        return dateProfile.mod50
+        return dateProfile.mod50 or 0
     elseif (Timeline.CurrentStepValue == 10) then
-        return dateProfile.mod10
+        return dateProfile.mod10 or 0
     elseif (Timeline.CurrentStepValue == 1) then
         --     return dateProfile.mod1
+        return 0 -- Return default value for step 1 (not implemented)
     else
-        -- Return nil for unsupported step values
-        return nil
+        -- Return default value for unsupported step values
+        return 0
     end
 end
 
 local function GetCurrentStepPeriodsFilling()
     local eventDates = Chronicles.Data.PeriodsFillingBySteps
+
+    -- Safety check: if eventDates is nil, return empty table
+    if eventDates == nil then
+        return {}
+    end
+
     if (Timeline.CurrentStepValue == 1000) then
-        return eventDates.mod1000
+        return eventDates.mod1000 or {}
     elseif (Timeline.CurrentStepValue == 500) then
-        return eventDates.mod500
+        return eventDates.mod500 or {}
     elseif (Timeline.CurrentStepValue == 250) then
-        return eventDates.mod250
+        return eventDates.mod250 or {}
     elseif (Timeline.CurrentStepValue == 100) then
-        return eventDates.mod100
+        return eventDates.mod100 or {}
     elseif (Timeline.CurrentStepValue == 50) then
-        return eventDates.mod50
+        return eventDates.mod50 or {}
     elseif (Timeline.CurrentStepValue == 10) then
-        return eventDates.mod10
+        return eventDates.mod10 or {}
     elseif (Timeline.CurrentStepValue == 1) then
         --     return eventDates.mod1
+        return {} -- Return empty table for step 1 (not implemented)
     else
-        -- Return nil for unsupported step values
-        return nil
+        -- Return empty table for unsupported step values to prevent errors
+        return {}
     end
 end
 
@@ -68,7 +81,8 @@ local function CountEvents(block)
 
     -- Handle special periods differently
     local isMytosPeriod = (originalLowerBound == private.constants.config.mythos)
-    local isFuturePeriod = (originalUpperBound == private.constants.config.futur)    if isMytosPeriod then
+    local isFuturePeriod = (originalUpperBound == private.constants.config.futur)
+    if isMytosPeriod then
         -- For mythos period: manually search for events before historyStartYear
         -- since the date index system might not properly handle extreme negative values
         local mythosYearEnd = private.constants.config.historyStartYear - 1
@@ -76,7 +90,8 @@ local function CountEvents(block)
 
         if foundEvents ~= nil then
             eventCount = #foundEvents
-        end    elseif isFuturePeriod then
+        end
+    elseif isFuturePeriod then
         -- For future period: manually search for events beyond currentYear
         -- since the date index system doesn't cover future dates
         local futureYearStart = private.constants.config.currentYear + 1
@@ -124,7 +139,8 @@ local function CountEvents(block)
             local periodEvents = periodsFilling[lowerDateIndex]
             if (periodEvents ~= nil) then
                 eventCount = #periodEvents
-            end        end
+            end
+        end
     end
 
     return eventCount
@@ -380,23 +396,57 @@ function private.Core.Timeline:DisplayTimelineWindow()
     end
 
     local firstIndex = 1 + ((pageIndex - 1) * pageSize)
-
     if (firstIndex <= 1) then
         firstIndex = 1
         pageIndex = 1
 
-        EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, false)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelinePreviousButtonVisible,
+                {visible = false},
+                "Timeline:DisplayTimelineWindow"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, false)
+        end
     else
-        EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, true)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelinePreviousButtonVisible,
+                {visible = true},
+                "Timeline:DisplayTimelineWindow"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, true)
+        end
     end
-
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
         firstIndex = numberOfCells - 7
         pageIndex = maxPageValue
 
-        EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, false)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelineNextButtonVisible,
+                {visible = false},
+                "Timeline:DisplayTimelineWindow"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, false)
+        end
     else
-        EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, true)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelineNextButtonVisible,
+                {visible = true},
+                "Timeline:DisplayTimelineWindow"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, true)
+        end
     end
 
     Timeline.CurrentPage = pageIndex
@@ -407,24 +457,60 @@ function private.Core.Timeline:DisplayTimelineWindow()
         if (labelData ~= nil) then
             if labelIndex == pageSize + 1 then
                 labelData = Timeline.Periods[firstIndex + labelIndex - 2]
-                EventRegistry:TriggerEvent(eventName, tostring(labelData.upperBound))
+                -- Use EventManager for safe event triggering
+                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                    private.Core.EventManager.safeTrigger(
+                        eventName,
+                        tostring(labelData.upperBound),
+                        "Timeline:DisplayTimelineWindow"
+                    )
+                else
+                    EventRegistry:TriggerEvent(eventName, tostring(labelData.upperBound))
+                end
             else
                 if (labelData.text ~= nil) then
-                    EventRegistry:TriggerEvent(eventName, labelData.text)
+                    -- Use EventManager for safe event triggering
+                    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                        private.Core.EventManager.safeTrigger(
+                            eventName,
+                            labelData.text,
+                            "Timeline:DisplayTimelineWindow"
+                        )
+                    else
+                        EventRegistry:TriggerEvent(eventName, labelData.text)
+                    end
                 else
-                    EventRegistry:TriggerEvent(eventName, tostring(labelData.lowerBound))
+                    -- Use EventManager for safe event triggering
+                    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                        private.Core.EventManager.safeTrigger(
+                            eventName,
+                            tostring(labelData.lowerBound),
+                            "Timeline:DisplayTimelineWindow"
+                        )
+                    else
+                        EventRegistry:TriggerEvent(eventName, tostring(labelData.lowerBound))
+                    end
                 end
             end
         else
-            EventRegistry:TriggerEvent(eventName, nil)
+            -- Use EventManager for safe event triggering - send empty string instead of nil
+            if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                private.Core.EventManager.safeTrigger(eventName, "", "Timeline:DisplayTimelineWindow")
+            else
+                EventRegistry:TriggerEvent(eventName, "")
+            end
         end
     end
-
     for periodIndex = 1, pageSize, 1 do
         local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(periodIndex)
         local periodData = Timeline.Periods[firstIndex + periodIndex - 1]
 
-        EventRegistry:TriggerEvent(eventName, periodData)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(eventName, periodData, "Timeline:DisplayTimelineWindow")
+        else
+            EventRegistry:TriggerEvent(eventName, periodData)
+        end
     end
 end
 

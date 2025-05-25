@@ -31,7 +31,12 @@ function EventListItemMixin:Init(eventData)
 end
 
 function EventListItemMixin:OnClick()
-	EventRegistry:TriggerEvent(private.constants.events.EventSelected, self.Event)
+	-- Use safe event triggering
+	if private.Core.EventManager then
+		private.Core.EventManager.safeTrigger(private.constants.events.EventSelected, self.Event, "EventListItem:OnClick")
+	else
+		EventRegistry:TriggerEvent(private.constants.events.EventSelected, self.Event)
+	end
 end
 
 EventListTitleMixin = {}
@@ -45,8 +50,19 @@ end
 
 EventListMixin = {}
 function EventListMixin:OnLoad()
-	EventRegistry:RegisterCallback(private.constants.events.TimelinePeriodSelected, self.OnTimelinePeriodSelected, self)
-	EventRegistry:RegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	-- Use safe event registration
+	if private.Core.EventManager then
+		private.Core.EventManager.safeRegisterCallback(
+			private.constants.events.TimelinePeriodSelected,
+			self.OnTimelinePeriodSelected,
+			self
+		)
+		private.Core.EventManager.safeRegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	else
+		-- Fallback to direct EventRegistry
+		EventRegistry:RegisterCallback(private.constants.events.TimelinePeriodSelected, self.OnTimelinePeriodSelected, self)
+		EventRegistry:RegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	end
 
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
@@ -55,7 +71,7 @@ function EventListMixin:OnTimelineClean()
 	local data = {}
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
-	
+
 	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
 end
 

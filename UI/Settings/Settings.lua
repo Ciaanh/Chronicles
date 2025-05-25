@@ -56,11 +56,25 @@ function SettingsMixin:OnLoad()
 
             self.TabUI.Tabs[tabKey] = category
         end
+    end -- Use EventManager for safe event registration with error handling
+    if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
+        private.Core.EventManager.safeRegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
+        private.Core.EventManager.safeRegisterCallback(
+            private.constants.events.SettingsEventTypeChecked,
+            self.Change_EventType,
+            self
+        )
+        private.Core.EventManager.safeRegisterCallback(
+            private.constants.events.SettingsLibraryChecked,
+            self.Change_Library,
+            self
+        )
+    else
+        -- Fallback to direct EventRegistry
+        EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
+        EventRegistry:RegisterCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
+        EventRegistry:RegisterCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
     end
-
-    EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
-    EventRegistry:RegisterCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
-    EventRegistry:RegisterCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
 
     self:UpdateTabs()
 end
@@ -127,7 +141,6 @@ end
 function SettingsMixin:Change_EventType(eventTypeId, checked)
     Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
     Chronicles.Data:RefreshPeriods()
-
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
@@ -135,7 +148,26 @@ function SettingsMixin:Change_EventType(eventTypeId, checked)
 
     -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
 
-    EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+    -- Use safe event triggering
+    if private.Core.EventManager then
+        private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_EventType")
+        private.Core.EventManager.safeTrigger(
+            private.constants.events.SettingsEventTypeChecked,
+            {eventType = eventTypeId, checked = checked},
+            "Settings:Change_EventType"
+        )
+    else
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelineClean,
+                nil,
+                "Settings:Change_EventType"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+        end
+    end
 end
 
 function SettingsMixin:Change_Library(libraryId, checked)
@@ -145,13 +177,31 @@ function SettingsMixin:Change_Library(libraryId, checked)
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+    -- Use safe event triggering
+    if private.Core.EventManager then
+        private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_Library")
+        private.Core.EventManager.safeTrigger(
+            private.constants.events.SettingsLibraryChecked,
+            {library = libraryId, checked = checked},
+            "Settings:Change_Library"
+        )
+    else
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.TimelineClean,
+                nil,
+                "Settings:Change_Library"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+        end
+    end
 end
 
-function SettingsMixin:LoadEventTypes(frame)
-    local previousCheckbox = nil
-    for eventTypeId, eventTypeName in ipairs(get_constants().eventType) do
-        local text = get_locale(eventTypeName)
+function SettingsMixin:LoadEventTypes(frame)    local previousCheckbox = nil
+    for eventTypeId, eventTypeName in ipairs(private.constants.eventType) do
+        local text = Locale[eventTypeName]
 
         local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
         newCheckbox.Text:SetText(text)
@@ -165,11 +215,20 @@ function SettingsMixin:LoadEventTypes(frame)
                     eventTypeId = self.eventTypeId,
                     isActive = self:GetChecked()
                 }
-                EventRegistry:TriggerEvent(
-                    private.constants.events.SettingsEventTypeChecked,
-                    data.eventTypeId,
-                    data.isActive
-                )
+                -- Use EventManager for safe event triggering
+                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                    private.Core.EventManager.safeTrigger(
+                        private.constants.events.SettingsEventTypeChecked,
+                        {eventType = data.eventTypeId, checked = data.isActive},
+                        "Settings:EventTypeCheckbox"
+                    )
+                else
+                    EventRegistry:TriggerEvent(
+                        private.constants.events.SettingsEventTypeChecked,
+                        data.eventTypeId,
+                        data.isActive
+                    )
+                end
             end
         )
 
@@ -184,12 +243,10 @@ function SettingsMixin:LoadEventTypes(frame)
 end
 
 function SettingsMixin:LoadLibraries(frame)
-    local previousCheckbox = nil
-
-    local libraries = Chronicles.Data:GetLibrariesNames()
+    local previousCheckbox = nil    local libraries = Chronicles.Data:GetLibrariesNames()
     for _, library in ipairs(libraries) do
         local libraryName = library.name
-        local text = get_locale(libraryName) or ""
+        local text = Locale[libraryName] or ""
 
         local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
         newCheckbox.Text:SetText(text)
@@ -203,11 +260,20 @@ function SettingsMixin:LoadLibraries(frame)
                     libraryName = self.libraryName,
                     isActive = self:GetChecked()
                 }
-                EventRegistry:TriggerEvent(
-                    private.constants.events.SettingsLibraryChecked,
-                    data.libraryName,
-                    data.isActive
-                )
+                -- Use EventManager for safe event triggering
+                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+                    private.Core.EventManager.safeTrigger(
+                        private.constants.events.SettingsLibraryChecked,
+                        {library = data.libraryName, checked = data.isActive},
+                        "Settings:LibraryCheckbox"
+                    )
+                else
+                    EventRegistry:TriggerEvent(
+                        private.constants.events.SettingsLibraryChecked,
+                        data.libraryName,
+                        data.isActive
+                    )
+                end
             end
         )
 
@@ -303,9 +369,17 @@ function CategoryButtonMixin:Button_OnClick(button)
     for _, menuButton in pairs(self:GetParent().Buttons) do
         menuButton.SelectedTexture:SetShown(false)
     end
-
     if data.TabName and data.TabFrame then
-        EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
+        -- Use EventManager for safe event triggering
+        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+            private.Core.EventManager.safeTrigger(
+                private.constants.events.SettingsTabSelected,
+                {tabName = data.TabName},
+                "Settings:CategoryButton"
+            )
+        else
+            EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
+        end
 
         self.SelectedTexture:SetShown(true)
     end

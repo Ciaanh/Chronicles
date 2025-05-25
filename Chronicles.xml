@@ -6,11 +6,8 @@
 
     <Include file="Locales\Locales.xml"/>
     <Include file="Custom\Locales\Locales.xml"/>
-
     <Script file="Constants.lua"/>
-
     <Script file="Functions.lua"/>
-
     <Script file="Chronicles.lua"/>
 
     <Include file="Core\_Includes.xml"/>

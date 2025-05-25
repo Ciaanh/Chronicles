@@ -81,22 +81,49 @@ constants.events = {
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 	TimelineStepChanged = "Timeline.STEP_CHANGED",
-
 	EventSelected = "Event.SELECTED",
 	CharacterSelected = "Character.SELECTED",
 	FactionSelected = "Faction.SELECTED",
-	
 	DisplayTimelineLabel = "Timeline.DisplayLabel",
 	DisplayTimelinePeriod = "Timeline.DisplayPeriod",
-	
 	TabUITabSet = "TabUI.TabSet",
-	
 	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
 	MainFrameUICloseFrame = "MainFrameUI.CloseFrame",
-
 	SettingsTabSelected = "Settings.TAB_SELECTED",
 	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
-	SettingsLibraryChecked = "Settings.LIBRARY_CHECKED"
+	SettingsLibraryChecked = "Settings.LIBRARY_CHECKED",
+	-- New event management events
+	EventManagerError = "EventManager.ERROR",
+	EventValidationFailed = "EventManager.VALIDATION_FAILED",
+	EventBatchExecuted = "EventManager.BATCH_EXECUTED"
+}
+
+-- Event system configuration
+constants.eventSystem = {
+	debugMode = false,
+	enableValidation = true,
+	enableErrorLogging = true,
+	maxEventHistory = 100,
+	batchTimeout = 100, -- milliseconds
+	enableAsyncEvents = false
+}
+
+-- Event priority levels for batching and processing
+constants.eventPriority = {
+	CRITICAL = 1, -- UI state changes, errors
+	HIGH = 2, -- User interactions, selections
+	NORMAL = 3, -- Data updates, refreshes
+	LOW = 4 -- Background tasks, logging
+}
+
+-- Event categories for organization and filtering
+constants.eventCategories = {
+	UI = "UI",
+	DATA = "DATA",
+	USER_INTERACTION = "USER_INTERACTION",
+	SYSTEM = "SYSTEM",
+	PLUGIN = "PLUGIN",
+	ERROR = "ERROR"
 }
 
 constants.templateKeys = {
@@ -111,11 +138,8 @@ constants.templateKeys = {
 	HTML_CONTENT = "HTML_CONTENT"
 }
 
-
-
-
 constants.colors = {
-	white	= "|cFFFFFFFF",
+	white = "|cFFFFFFFF",
 	red = "|cFFFF0000",
 	darkred = "|cFFF00000",
 	green = "|cFF00FF00",
@@ -127,16 +151,13 @@ constants.colors = {
 	lightBlue = "|cFFB0B0FF",
 	battleNetBlue = "|cff82c5ff",
 	grey = "|cFF909090",
-	
 	-- classes
 	classMage = "|cFF69CCF0",
 	classHunter = "|cFFABD473",
-	
 	-- recipes
 	recipeGrey = "|cFF808080",
 	recipeGreen = "|cFF40C040",
 	recipeOrange = "|cFFFF8040",
-	
 	-- rarity : http://wow.gamepedia.com/Quality
 	common = "|cFFFFFFFF",
 	uncommon = "|cFF1EFF00",
@@ -144,7 +165,6 @@ constants.colors = {
 	epic = "|cFFA335EE",
 	legendary = "|cFFFF8000",
 	heirloom = "|cFFE6CC80",
-
 	Alliance = "|cFF2459FF",
 	Horde = "|cFFFF0000"
 }

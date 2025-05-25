@@ -5,8 +5,12 @@ FactionDetailPageMixin = {}
 
 function FactionDetailPageMixin:OnLoad()
 	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)
-
-	EventRegistry:RegisterCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
+	-- Use safe event registration with fallback
+	if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
+		private.Core.EventManager.safeRegisterCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
+	else
+		EventRegistry:RegisterCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
+	end
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
@@ -32,4 +36,3 @@ function FactionDetailPageMixin:OnFactionSelected(data)
 	local retainScrollPosition = false
 	self.PagedFactionDetails:SetDataProvider(dataProvider, retainScrollPosition)
 end
-

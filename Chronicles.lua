@@ -16,7 +16,6 @@ local defaults = {
     }
 }
 
-
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
 
@@ -39,7 +38,7 @@ function Chronicles:OnInitialize()
             type = "launcher",
             text = Locale["Chronicles"],
             icon = "Interface\\ICONS\\Inv_scroll_04",
-            OnClick = function(self, button, down)
+            OnClick = function(self, button)
                 Chronicles.NewUi:DisplayWindow()
             end,
             OnTooltipShow = function(tt)
@@ -52,7 +51,6 @@ function Chronicles:OnInitialize()
         }
     )
     Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
-
     self:RegisterChatCommand(
         "chronicles",
         function()
@@ -61,20 +59,36 @@ function Chronicles:OnInitialize()
     )
 
     Chronicles.Data:Init()
-    EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
+
+    -- Initialize event system
+    if private.Core.EventManager then
+        -- Enable debug mode if configured
+        if private.constants.eventSystem.debugMode then
+            private.Core.EventManager.Debugger:enable()
+        end
+    end
+
+    -- Initialize state manager
+    if private.Core.StateManager then
+        private.Core.StateManager.init()
+    end
+
+    -- Use safe event triggering
+    if private.Core.EventManager then
+        private.Core.EventManager.safeTrigger(private.constants.events.TimelineInit, nil, "Chronicles:OnInitialize")
+    else
+        EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
+    end
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
     Chronicles.Data:RegisterEventDB(pluginName, db)
-    EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
-end
 
-function get_constants()
-    return private.constants
-end
-
-function get_locale(value)
-    return Locale[value]
+    -- Use safe event triggering
+    if private.Core.EventManager then
+        private.Core.EventManager.safeTrigger(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
+    else
+        EventRegistry:TriggerEvent(private.constants.events.TimelineInit)    end
 end
 
 -----------------------------------------------------------------------------------------

@@ -17,19 +17,41 @@ TimelineMixin = {}
 function TimelineMixin:OnLoad()
     self.ZoomOut:SetScript("OnClick", self.OnZooming)
     self.ZoomIn:SetScript("OnClick", self.OnZooming)
-
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
 
-    EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
-
-    EventRegistry:RegisterCallback(
-        private.constants.events.TimelinePreviousButtonVisible,
-        self.OnTimelinePreviousVisible,
-        self
-    )
-    EventRegistry:RegisterCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
-    EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
+    -- Use safe event registration
+    if private.Core.EventManager then
+        private.Core.EventManager.safeRegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
+        private.Core.EventManager.safeRegisterCallback(
+            private.constants.events.TimelinePreviousButtonVisible,
+            self.OnTimelinePreviousVisible,
+            self
+        )
+        private.Core.EventManager.safeRegisterCallback(
+            private.constants.events.TimelineNextButtonVisible,
+            self.OnTimelineNextVisible,
+            self
+        )
+        private.Core.EventManager.safeRegisterCallback(
+            private.constants.events.TimelineStepChanged,
+            self.OnTimelineStepChanged,
+            self
+        )
+    else
+        EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
+        EventRegistry:RegisterCallback(
+            private.constants.events.TimelinePreviousButtonVisible,
+            self.OnTimelinePreviousVisible,
+            self
+        )
+        EventRegistry:RegisterCallback(
+            private.constants.events.TimelineNextButtonVisible,
+            self.OnTimelineNextVisible,
+            self
+        )
+        EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
+    end
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
@@ -81,13 +103,18 @@ end
 TimelineLabelMixin = {}
 function TimelineLabelMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelineLabel .. tostring(self.index)
-    EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelineLabel, self)
+    -- Use safe event registration
+    if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
+        private.Core.EventManager.safeRegisterCallback(eventName, self.OnDisplayTimelineLabel, self)
+    else
+        EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelineLabel, self)
+    end
 end
 
 function TimelineLabelMixin:OnDisplayTimelineLabel(data)
-    if (data ~= nil) then
+    if (data ~= nil and data ~= "") then
         self:Show()
-        self.Text:SetText(data)
+        self.Text:SetText(tostring(data))
     else
         self:Hide()
     end
@@ -99,7 +126,12 @@ end
 TimelinePeriodMixin = {}
 function TimelinePeriodMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(self.index)
-    EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
+    -- Use safe event registration
+    if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
+        private.Core.EventManager.safeRegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
+    else
+        EventRegistry:RegisterCallback(eventName, self.OnDisplayTimelinePeriod, self)
+    end
 end
 
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
@@ -131,13 +163,21 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
 end
 
 function TimelinePeriodMixin:OnClick()
-    EventRegistry:TriggerEvent(
-        private.constants.events.TimelinePeriodSelected,
-        {
-            lower = self.data.lowerBound,
-            upper = self.data.upperBound
-        }
-    )
+    local periodData = {
+        lower = self.data.lowerBound,
+        upper = self.data.upperBound
+    }
+
+    -- Use safe event triggering
+    if private.Core.EventManager then
+        private.Core.EventManager.safeTrigger(
+            private.constants.events.TimelinePeriodSelected,
+            periodData,
+            "TimelinePeriod:OnClick"
+        )
+    else
+        EventRegistry:TriggerEvent(private.constants.events.TimelinePeriodSelected, periodData)
+    end
 
     Timeline.Period:Show()
 
