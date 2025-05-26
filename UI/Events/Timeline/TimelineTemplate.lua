@@ -139,27 +139,17 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
 
     if (periodData ~= nil and periodData.hasEvents) then
         self.Text:SetText(periodData.nbEvents)
-        self:Show()
+        if periodData.nbEvents < 10 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events")
+        elseif periodData.nbEvents < 25 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events")
+        elseif periodData.nbEvents >= 25 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events")
+        end
     else
         self.Text:SetText("")
-        self:Hide()
+        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
     end
-
-    if periodData.nbEvents < 10 then
-        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events")
-    elseif periodData.nbEvents < 25 then
-        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events")
-    elseif periodData.nbEvents >= 25 then
-        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events")
-    end
-
-    -- EventRegistry:TriggerEvent(
-    --     private.constants.events.TimelinePeriodSelected,
-    --     {
-    --         lower = data.lowerBound,
-    --         upper = data.upperBound
-    --     }
-    -- )
 end
 
 function TimelinePeriodMixin:OnClick()
