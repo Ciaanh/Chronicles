@@ -272,7 +272,7 @@ function private.Core.Timeline:SetYear(year)
     Timeline.SelectedYear = year
 end
 
-function private.Core.Timeline:ComputeTimelinePeriods()
+function private.Core.Timeline:Label()
     local stepValue = Timeline.CurrentStepValue
     if (stepValue == nil) then
         Timeline.CurrentStepValue = private.constants.config.stepValues[1]
