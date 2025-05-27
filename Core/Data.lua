@@ -36,9 +36,6 @@ end
 -- Events Tools -------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-function Chronicles.Data:AvailableDbId(db)
-end
-
 function Chronicles.Data:AddRPEvent(event)
     -- check max index and set it to event
     if (event.id == nil) then
@@ -57,7 +54,8 @@ function Chronicles.Data:GetPeriodsFillingBySteps()
         mod50 = {},
         mod10 = {}
         --mod1 = {}
-    }    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
+    }
+    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
         if Chronicles.Data:GetLibraryStatus(libraryName) then
             if eventsGroup and eventsGroup.data then
                 for _, event in pairs(eventsGroup.data) do
@@ -206,11 +204,11 @@ function Chronicles.Data:SearchEvents(yearStart, yearEnd)
             -- local isActive = GetLibraryStatus(self, libraryName)
 
             -- if (isActive) then
-                local pluginEvents = searchEventsInDB(self, yearStart, yearEnd, eventsGroup.data)
+            local pluginEvents = searchEventsInDB(self, yearStart, yearEnd, eventsGroup.data)
 
-                for eventIndex, event in pairs(pluginEvents) do
-                    table.insert(foundEvents, cleanEventObject(self, event, libraryName))
-                end
+            for eventIndex, event in pairs(pluginEvents) do
+                table.insert(foundEvents, cleanEventObject(self, event, libraryName))
+            end
             --end
         end
     end
@@ -330,14 +328,16 @@ function Chronicles.Data:CleanFactionObject(faction, libraryName)
         local desc = faction.description
         if type(desc) == "string" then
             -- Convert string description to chapter structure if needed
-            faction.chapters = faction.chapters or {
+            faction.chapters =
+                faction.chapters or
                 {
-                    header = faction.name,
-                    pages = {desc}
+                    {
+                        header = faction.name,
+                        pages = {desc}
+                    }
                 }
-            }
         end
-        
+
         return {
             id = faction.id,
             name = faction.name,
@@ -398,14 +398,16 @@ function Chronicles.Data:CleanCharacterObject(character, libraryName)
         local bio = character.biography
         if type(bio) == "string" then
             -- Convert string biography to chapter structure if needed
-            character.chapters = character.chapters or {
+            character.chapters =
+                character.chapters or
                 {
-                    header = character.name,
-                    pages = {bio}
+                    {
+                        header = character.name,
+                        pages = {bio}
+                    }
                 }
-            }
         end
-        
+
         return {
             id = character.id,
             name = character.name,
@@ -431,9 +433,12 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
     else
         -- Log warning if db is nil
         if db == nil then
-            print("|cFFFF0000Chronicles Warning:|r Library '" .. libraryName .. "' is trying to register a nil events database.")
+            print(
+                "|cFFFF0000Chronicles Warning:|r Library '" ..
+                    libraryName .. "' is trying to register a nil events database."
+            )
         end
-        
+
         local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
