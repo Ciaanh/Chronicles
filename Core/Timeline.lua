@@ -272,7 +272,7 @@ function private.Core.Timeline:SetYear(year)
     Timeline.SelectedYear = year
 end
 
-function private.Core.Timeline:Label()
+function private.Core.Timeline:ComputeTimelinePeriods()
     local stepValue = Timeline.CurrentStepValue
     if (stepValue == nil) then
         Timeline.CurrentStepValue = private.constants.config.stepValues[1]
@@ -300,7 +300,7 @@ function private.Core.Timeline:Label()
             if (timelineConfig.pastEvents == true and blockIndex == 1) then
                 minValue = timelineConfig.minYear - 2
                 maxValue = timelineConfig.minYear - 1
-            elseif (timelineConfig.futurEvents == true and blockIndex == numberOfCells) then
+            elseif (timelineConfig.futurEvents == true and blockIndex == timelineConfig.numberOfTimelineBlock) then
                 minValue = timelineConfig.maxYear + 1
                 maxValue = timelineConfig.maxYear + 2
             else
@@ -377,16 +377,26 @@ function private.Core.Timeline:Label()
     end
 
     Timeline.Periods = displayableTimeFrames
-
     return displayableTimeFrames
 end
 
-function private.Core.Timeline:DisplayTimelineWindow()
+-- Helper function to safely trigger events
+local function SafeTriggerEvent(eventName, eventData, source)
+    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+        private.Core.EventManager.safeTrigger(eventName, eventData, source)
+    else
+        EventRegistry:TriggerEvent(eventName, eventData)
+    end
+end
+
+-- Calculate pagination parameters for the timeline window
+local function CalculateTimelinePagination()
     local pageIndex = Timeline.CurrentPage
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
-
     local maxPageValue = math.ceil(numberOfCells / pageSize)
+
+    -- Validate and normalize page index
     if (pageIndex == nil) then
         pageIndex = maxPageValue
     elseif (pageIndex < 1) then
@@ -396,122 +406,127 @@ function private.Core.Timeline:DisplayTimelineWindow()
     end
 
     local firstIndex = 1 + ((pageIndex - 1) * pageSize)
+
+    -- Adjust for boundary conditions
     if (firstIndex <= 1) then
         firstIndex = 1
         pageIndex = 1
-
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelinePreviousButtonVisible,
-                {visible = false},
-                "Timeline:DisplayTimelineWindow"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, false)
-        end
-    else
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelinePreviousButtonVisible,
-                {visible = true},
-                "Timeline:DisplayTimelineWindow"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelinePreviousButtonVisible, true)
-        end
     end
+
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
         firstIndex = numberOfCells - 7
         pageIndex = maxPageValue
-
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelineNextButtonVisible,
-                {visible = false},
-                "Timeline:DisplayTimelineWindow"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, false)
-        end
-    else
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelineNextButtonVisible,
-                {visible = true},
-                "Timeline:DisplayTimelineWindow"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelineNextButtonVisible, true)
-        end
     end
 
-    Timeline.CurrentPage = pageIndex
+    return {
+        pageIndex = pageIndex,
+        firstIndex = firstIndex,
+        pageSize = pageSize,
+        numberOfCells = numberOfCells,
+        maxPageValue = maxPageValue
+    }
+end
+
+-- Update navigation button visibility based on pagination state
+local function UpdateNavigationButtons(paginationData)
+    local showPrevious = paginationData.firstIndex > 1
+    local showNext = (paginationData.firstIndex + paginationData.pageSize - 1) < paginationData.numberOfCells
+
+    SafeTriggerEvent(
+        private.constants.events.TimelinePreviousButtonVisible,
+        showPrevious and {visible = true} or {visible = false},
+        "Timeline:UpdateNavigationButtons"
+    )
+
+    SafeTriggerEvent(
+        private.constants.events.TimelineNextButtonVisible,
+        showNext and {visible = true} or {visible = false},
+        "Timeline:UpdateNavigationButtons"
+    )
+end
+
+-- Helper function to generate label text based on period data and position
+local function GenerateLabelText(labelData, isLastLabel, firstIndex, labelIndex)
+    if not labelData then
+        return ""
+    end
+
+    -- For the last label (boundary label), always show upper bound
+    if isLastLabel then
+        return tostring(labelData.upperBound)
+    end
+
+    -- For regular labels, determine text based on period type
+    if labelData.upperBound == private.constants.config.futur then
+        -- Future period: get previous period's upper bound
+        local prevPeriodIndex = firstIndex + labelIndex - 2
+        local prevPeriodData = Timeline.Periods[prevPeriodIndex]
+        return prevPeriodData and tostring(prevPeriodData.upperBound) or ""
+    elseif labelData.lowerBound == private.constants.config.mythos then
+        -- Mythos period: use localized text
+        return Locale["Mythos"]
+    else
+        -- Standard period: use lower bound
+        return tostring(labelData.lowerBound)
+    end
+end
+
+-- Distribute timeline label data via events
+local function DistributeTimelineLabels(paginationData)
+    local firstIndex = paginationData.firstIndex
+    local pageSize = paginationData.pageSize
+    local eventNamePrefix = private.constants.events.DisplayTimelineLabel
 
     for labelIndex = 1, pageSize + 1, 1 do
-        local labelData = Timeline.Periods[firstIndex + labelIndex - 1]
-        local eventName = private.constants.events.DisplayTimelineLabel .. tostring(labelIndex)
-        if (labelData ~= nil) then
-            if labelIndex == pageSize + 1 then
-                labelData = Timeline.Periods[firstIndex + labelIndex - 2]
-                -- Use EventManager for safe event triggering
-                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                    private.Core.EventManager.safeTrigger(
-                        eventName,
-                        tostring(labelData.upperBound),
-                        "Timeline:DisplayTimelineWindow"
-                    )
-                else
-                    EventRegistry:TriggerEvent(eventName, tostring(labelData.upperBound))
-                end
-            else
-                if (labelData.text ~= nil) then
-                    -- Use EventManager for safe event triggering
-                    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                        private.Core.EventManager.safeTrigger(
-                            eventName,
-                            labelData.text,
-                            "Timeline:DisplayTimelineWindow"
-                        )
-                    else
-                        EventRegistry:TriggerEvent(eventName, labelData.text)
-                    end
-                else
-                    -- Use EventManager for safe event triggering
-                    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                        private.Core.EventManager.safeTrigger(
-                            eventName,
-                            tostring(labelData.lowerBound),
-                            "Timeline:DisplayTimelineWindow"
-                        )
-                    else
-                        EventRegistry:TriggerEvent(eventName, tostring(labelData.lowerBound))
-                    end
-                end
-            end
-        else
-            -- Use EventManager for safe event triggering - send empty string instead of nil
-            if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                private.Core.EventManager.safeTrigger(eventName, "", "Timeline:DisplayTimelineWindow")
-            else
-                EventRegistry:TriggerEvent(eventName, "")
+        local periodIndex = firstIndex + labelIndex - 1
+        local labelData = Timeline.Periods[periodIndex]
+        local eventName = eventNamePrefix .. tostring(labelIndex)
+        local isLastLabel = (labelIndex == pageSize + 1)
+        
+        local labelText = ""
+        
+        if labelData then
+            labelText = GenerateLabelText(labelData, isLastLabel, firstIndex, labelIndex)
+        elseif isLastLabel then
+            -- Special case: no data for last label, check if previous period is future
+            local prevPeriodIndex = firstIndex + labelIndex - 2
+            local prevPeriodData = Timeline.Periods[prevPeriodIndex]
+            if prevPeriodData and prevPeriodData.upperBound == private.constants.config.futur then
+                labelText = Locale["Futur"]
             end
         end
+
+        SafeTriggerEvent(eventName, labelText, "Timeline:DistributeTimelineLabels")
     end
+end
+
+-- Distribute timeline period data via events
+local function DistributeTimelinePeriods(paginationData)
+    local firstIndex = paginationData.firstIndex
+    local pageSize = paginationData.pageSize
+
     for periodIndex = 1, pageSize, 1 do
         local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(periodIndex)
         local periodData = Timeline.Periods[firstIndex + periodIndex - 1]
 
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(eventName, periodData, "Timeline:DisplayTimelineWindow")
-        else
-            EventRegistry:TriggerEvent(eventName, periodData)
-        end
+        SafeTriggerEvent(eventName, periodData, "Timeline:DistributeTimelinePeriods")
     end
+end
+
+-- Main function to display the timeline window - now orchestrates the separated responsibilities
+function private.Core.Timeline:DisplayTimelineWindow()
+    -- Calculate pagination parameters
+    local paginationData = CalculateTimelinePagination()
+
+    -- Update the current page state
+    Timeline.CurrentPage = paginationData.pageIndex
+
+    -- Update UI state
+    UpdateNavigationButtons(paginationData)
+
+    -- Distribute data to UI components
+    DistributeTimelineLabels(paginationData)
+    DistributeTimelinePeriods(paginationData)
 end
 
 function private.Core.Timeline:ChangeCurrentStepValue(direction)

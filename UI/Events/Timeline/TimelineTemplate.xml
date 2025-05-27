@@ -10,7 +10,7 @@
                 <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\timeline\label">
                     <Size x="130" y="25"/>
                     <Anchors>
-                        <Anchor point="TOP"  x="0" y="0"/>
+                        <Anchor point="TOP" x="0" y="0"/>
                     </Anchors>
                 </Texture>
             </Layer>
@@ -59,7 +59,7 @@
 
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Size x="1200" y="125" />
-        
+
 
         <Frames>
 
@@ -148,14 +148,22 @@
             </Button>
 
 
-       
+
             <Frame parentKey="Period" hidden="true">
                 <Size x="233" y="70"/>
                 <Anchors>
                     <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-10"/>
                 </Anchors>
                 <Layers>
-                    
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="background" atlas="GarrMission_RewardsBanner-Desaturate">
+                            <Anchors>
+                                <Anchor point="TOPLEFT"/>
+                                <Anchor point="BOTTOMRIGHT"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+
                     <Layer level="ARTWORK">
                         <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
                             <Anchors>
