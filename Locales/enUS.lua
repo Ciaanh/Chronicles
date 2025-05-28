@@ -56,4 +56,12 @@ if L then
     L["shadowlands"] = "Shadowlands"
 
     L["Author"] = "by "
+
+    L["event"] = "Event"
+    L["era"] = "Era"
+    L["war"] = "War"
+    L["battle"] = "Battle"
+    L["death"] = "Death"
+    L["birth"] = "Birth"
+    L["other"] = "Other"
 end
