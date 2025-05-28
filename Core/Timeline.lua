@@ -382,11 +382,7 @@ end
 
 -- Helper function to safely trigger events
 local function SafeTriggerEvent(eventName, eventData, source)
-    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-        private.Core.EventManager.safeTrigger(eventName, eventData, source)
-    else
-        EventRegistry:TriggerEvent(eventName, eventData)
-    end
+    private.Core.triggerEvent(eventName, eventData, source)
 end
 
 -- Calculate pagination parameters for the timeline window

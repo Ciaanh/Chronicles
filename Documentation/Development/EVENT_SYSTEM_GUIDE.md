@@ -8,8 +8,9 @@ The Chronicles addon now features an enhanced event system with validation, erro
 
 ### 1. EventManager (`Core/EventManager.lua`)
 
--   **Safe Event Triggering**: `private.Core.EventManager.safeTrigger(eventName, data, context)`
--   **Safe Event Registration**: `private.Core.EventManager.safeRegisterCallback(eventName, callback, owner)`
+-   **Safe Event Triggering**: `private.Core.triggerEvent(eventName, data, context)`
+-   **Safe Event Registration**: `private.Core.registerCallback(eventName, callback, owner)`
+-   **Legacy Direct Access**: `private.Core.EventManager.safeTrigger(eventName, data, context)` and `private.Core.EventManager.safeRegisterCallback(eventName, callback, owner)`
 -   **Event Validation**: Automatic schema validation for known events
 -   **Error Handling**: Safe event execution with error boundaries
 -   **Event Debugging**: Event history tracking and console commands
@@ -58,8 +59,15 @@ The Chronicles addon now features an enhanced event system with validation, erro
 -- Old way (direct EventRegistry)
 EventRegistry:TriggerEvent(private.constants.events.EventSelected, eventData)
 
--- New way (with error handling and validation)
+-- Previous way (with error handling and validation)
 private.Core.EventManager.safeTrigger(
+    private.constants.events.EventSelected,
+    {eventId = 123, eventName = "Battle of Stormwind"},
+    "EventList:OnClick"
+)
+
+-- Recommended way (with utility function)
+private.Core.triggerEvent(
     private.constants.events.EventSelected,
     {eventId = 123, eventName = "Battle of Stormwind"},
     "EventList:OnClick"
@@ -72,8 +80,11 @@ private.Core.EventManager.safeTrigger(
 -- Old way
 EventRegistry:RegisterCallback(eventName, self.OnEvent, self)
 
--- New way (with error handling)
+-- Previous way (with error handling)
 private.Core.EventManager.safeRegisterCallback(eventName, self.OnEvent, self)
+
+-- Recommended way (with utility function)
+private.Core.registerCallback(eventName, self.OnEvent, self)
 ```
 
 ### State Management
@@ -103,7 +114,7 @@ private.Core.EventManager.registerPluginEvent("MyPlugin.CustomEvent", {
 })
 
 -- Trigger custom events
-private.Core.EventManager.safeTrigger(
+private.Core.triggerEvent(
     "MyPlugin.CustomEvent",
     {eventId = 1, customData = "test"},
     "MyPlugin:SomeFunction"

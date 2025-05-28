@@ -6,11 +6,7 @@ FactionDetailPageMixin = {}
 function FactionDetailPageMixin:OnLoad()
 	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)
 	-- Use safe event registration with fallback
-	if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
-		private.Core.EventManager.safeRegisterCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
-	else
-		EventRegistry:RegisterCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
-	end
+	private.Core.registerCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

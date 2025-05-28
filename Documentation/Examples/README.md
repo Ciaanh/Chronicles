@@ -70,7 +70,9 @@ The example demonstrates integration with these Chronicles systems:
 
 ### Core Event Manager
 
--   `private.Core.EventManager.safeRegisterCallback()` - Safe event listening
+-   `private.Core.registerCallback()` - Recommended way for event listening
+-   `private.Core.triggerEvent()` - Recommended way for triggering events
+-   `private.Core.EventManager.safeRegisterCallback()` - Legacy event listening
 -   `private.Core.EventManager.PluginEvents` - Custom plugin event system
 -   Event validation and error reporting
 

@@ -53,12 +53,8 @@ end
 -----------------------------------------------------------------------------------------
 
 function ExamplePlugin:SetupEventListeners()
-    if not private.Core.EventManager then
-        return
-    end
-
     -- Listen to Chronicles core events
-    private.Core.EventManager.safeRegisterCallback(
+    private.Core.registerCallback(
         private.constants.events.EventSelected,
         function(eventData)
             ExamplePlugin:OnEventSelected(eventData)
@@ -66,7 +62,7 @@ function ExamplePlugin:SetupEventListeners()
         "ExamplePlugin"
     )
 
-    private.Core.EventManager.safeRegisterCallback(
+    private.Core.registerCallback(
         private.constants.events.TimelinePeriodSelected,
         function(periodData)
             ExamplePlugin:OnPeriodSelected(periodData)

@@ -4,6 +4,29 @@ local Chronicles = private.Chronicles
 private.Core.EventManager = {}
 
 -----------------------------------------------------------------------------------------
+-- Global Utility Functions ------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+
+-- Helper function to safely trigger events with fallback to EventRegistry
+function private.Core.triggerEvent(eventName, eventData, source)
+    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
+        return private.Core.EventManager.safeTrigger(eventName, eventData, source)
+    else
+        EventRegistry:TriggerEvent(eventName, eventData)
+        return true
+    end
+end
+
+-- Helper function to safely register callbacks with fallback to EventRegistry
+function private.Core.registerCallback(eventName, callback, owner)
+    if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
+        private.Core.EventManager.safeRegisterCallback(eventName, callback, owner)
+    else
+        EventRegistry:RegisterCallback(eventName, callback, owner)
+    end
+end
+
+-----------------------------------------------------------------------------------------
 -- Event Validation & Schema -----------------------------------------------------------
 -----------------------------------------------------------------------------------------
 

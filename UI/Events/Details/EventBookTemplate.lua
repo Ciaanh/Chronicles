@@ -7,13 +7,8 @@ function EventBookMixin:OnLoad()
 	self.PagedEventDetails:SetElementTemplateData(private.constants.templates)
 
 	-- Use safe event registration
-	if private.Core.EventManager then
-		private.Core.EventManager.safeRegisterCallback(private.constants.events.EventSelected, self.OnEventSelected, self)
-		private.Core.EventManager.safeRegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	else
-		EventRegistry:RegisterCallback(private.constants.events.EventSelected, self.OnEventSelected, self)
-		EventRegistry:RegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	end
+	private.Core.registerCallback(private.constants.events.EventSelected, self.OnEventSelected, self)
+	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

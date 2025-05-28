@@ -25,22 +25,14 @@ end
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs()
 	-- Use safe event triggering with fallback
-	if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-		private.Core.EventManager.safeTrigger(private.constants.events.MainFrameUIOpenFrame, nil, "MainFrameUI:OnShow")
-	else
-		EventRegistry:TriggerEvent(private.constants.events.MainFrameUIOpenFrame)
-	end
+	private.Core.triggerEvent(private.constants.events.MainFrameUIOpenFrame, nil, "MainFrameUI:OnShow")
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
 
 function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW)
 	-- Use safe event triggering with fallback
-	if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-		private.Core.EventManager.safeTrigger(private.constants.events.MainFrameUICloseFrame, nil, "MainFrameUI:OnHide")
-	else
-		EventRegistry:TriggerEvent(private.constants.events.MainFrameUICloseFrame)
-	end
+	private.Core.triggerEvent(private.constants.events.MainFrameUICloseFrame, nil, "MainFrameUI:OnHide")
 end
 
 -----------------------------------------------------------------------------------------
@@ -89,16 +81,12 @@ end
 function TabUIMixin:SetTab(tabID)
 	TabSystemOwnerMixin.SetTab(self, tabID)
 	-- Use safe event triggering with fallback
-	if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-		private.Core.EventManager.safeTrigger(
-			private.constants.events.TabUITabSet,
-			{frame = self, tabID = tabID},
-			"MainFrameUI:SetTab"
-		)
-	else
-		EventRegistry:TriggerEvent(private.constants.events.TabUITabSet, self, tabID)
-	end
-
+	private.Core.triggerEvent(
+		private.constants.events.TabUITabSet,
+		{frame = self, tabID = tabID},
+		"MainFrameUI:SetTab"
+	)
+	
 	return true -- Don't show the tab as selected yet.
 end
 

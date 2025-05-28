@@ -58,37 +58,24 @@ function Chronicles:OnInitialize()
         end
     )
 
-    Chronicles.Data:Init()
-
+    Chronicles.Data:Init()    
+    
     -- Initialize event system
-    if private.Core.EventManager then
-        -- Enable debug mode if configured
-        if private.constants.eventSystem.debugMode then
-            private.Core.EventManager.Debugger:enable()
-        end
+    -- Enable debug mode if configured
+    if private.Core.EventManager and private.constants.eventSystem.debugMode then
+        private.Core.EventManager.Debugger:enable()
     end
 
     -- Initialize state manager
     if private.Core.StateManager then
         private.Core.StateManager.init()
-    end
-
-    -- Use safe event triggering
-    if private.Core.EventManager then
-        private.Core.EventManager.safeTrigger(private.constants.events.TimelineInit, nil, "Chronicles:OnInitialize")
-    else
-        EventRegistry:TriggerEvent(private.constants.events.TimelineInit)
-    end
+    end    -- Use safe event triggering
+    private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:OnInitialize")
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.Data:RegisterEventDB(pluginName, db)
-
-    -- Use safe event triggering
-    if private.Core.EventManager then
-        private.Core.EventManager.safeTrigger(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
-    else
-        EventRegistry:TriggerEvent(private.constants.events.TimelineInit)    end
+    Chronicles.Data:RegisterEventDB(pluginName, db)    -- Use safe event triggering
+    private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
 end
 
 -----------------------------------------------------------------------------------------

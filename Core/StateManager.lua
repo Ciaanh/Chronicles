@@ -195,83 +195,63 @@ end
 -----------------------------------------------------------------------------------------
 
 local function setupEventListeners()
-    if not private.Core.EventManager then
-        return
-    end
-
     -- Event selection
-    private.Core.EventManager.safeRegisterCallback(
+    private.Core.registerCallback(
         private.constants.events.EventSelected,
         function(eventData)
             private.Core.StateManager.setState("ui.selectedEvent", eventData, "Event selected")
         end,
         "StateManager"
-    )
-
-    -- Character selection
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Character selection
+    private.Core.registerCallback(
         private.constants.events.CharacterSelected,
         function(characterData)
             private.Core.StateManager.setState("ui.selectedCharacter", characterData, "Character selected")
         end,
         "StateManager"
-    )
-
-    -- Faction selection
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Faction selection
+    private.Core.registerCallback(
         private.constants.events.FactionSelected,
         function(factionData)
             private.Core.StateManager.setState("ui.selectedFaction", factionData, "Faction selected")
         end,
         "StateManager"
-    )
-
-    -- Timeline period selection
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Timeline period selection
+    private.Core.registerCallback(
         private.constants.events.TimelinePeriodSelected,
         function(periodData)
             private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
         end,
         "StateManager"
-    )
-
-    -- Timeline step changes
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Timeline step changes
+    private.Core.registerCallback(
         private.constants.events.TimelineStepChanged,
         function(stepData)
             private.Core.StateManager.setState("timeline.currentStep", stepData, "Timeline step changed")
         end,
         "StateManager"
-    )
-
-    -- Main frame state
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Main frame state
+    private.Core.registerCallback(
         private.constants.events.MainFrameUIOpenFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
         end,
         "StateManager"
-    )
-
-    private.Core.EventManager.safeRegisterCallback(
+    )    private.Core.registerCallback(
         private.constants.events.MainFrameUICloseFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
         end,
         "StateManager"
-    )
-
-    -- Settings changes
-    private.Core.EventManager.safeRegisterCallback(
+    )    -- Settings changes
+    private.Core.registerCallback(
         private.constants.events.SettingsEventTypeChecked,
         function(data)
             local path = "settings.eventTypes." .. tostring(data.eventType)
             private.Core.StateManager.setState(path, data.checked, "Event type setting changed")
         end,
         "StateManager"
-    )
-
-    private.Core.EventManager.safeRegisterCallback(
+    )    private.Core.registerCallback(
         private.constants.events.SettingsLibraryChecked,
         function(data)
             local path = "settings.libraries." .. tostring(data.library)

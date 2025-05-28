@@ -58,27 +58,10 @@ function SettingsMixin:OnLoad()
 
             self.TabUI.Tabs[tabKey] = category
         end
-    end
-
-    -- Use EventManager for safe event registration with error handling
-    if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
-        private.Core.EventManager.safeRegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
-        private.Core.EventManager.safeRegisterCallback(
-            private.constants.events.SettingsEventTypeChecked,
-            self.Change_EventType,
-            self
-        )
-        private.Core.EventManager.safeRegisterCallback(
-            private.constants.events.SettingsLibraryChecked,
-            self.Change_Library,
-            self
-        )
-    else
-        -- Fallback to direct EventRegistry
-        EventRegistry:RegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
-        EventRegistry:RegisterCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
-        EventRegistry:RegisterCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
-    end
+    end -- Use EventManager for safe event registration with error handling
+    private.Core.registerCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
+    private.Core.registerCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
+    private.Core.registerCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
 
     self:UpdateTabs()
     if self.TabUI.currentTab then
@@ -199,44 +182,32 @@ end
 function SettingsMixin:Change_EventType(eventTypeId, checked)
     Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
     Chronicles.Data:RefreshPeriods()
-
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
     -- TODO clean select period and event
     -- Use safe event triggering (without self-triggering to prevent recursion)
-    if private.Core.EventManager then
-        private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_EventType")
-        private.Core.EventManager.safeTrigger(
-            private.constants.events.SettingsEventTypeChecked,
-            {eventType = eventTypeId, checked = checked},
-            "Settings:Change_EventType"
-        )
-    else
-        EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
-        EventRegistry:TriggerEvent(private.constants.events.SettingsEventTypeChecked, eventTypeId, checked)
-    end
+    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:Change_EventType")
+    local eventData = {
+        eventType = eventTypeId,
+        checked = checked
+    }
+    private.Core.triggerEvent(private.constants.events.SettingsEventTypeChecked, eventData, "Settings:Change_EventType")
 end
 
 function SettingsMixin:Change_Library(libraryId, checked)
     Chronicles.Data:SetLibraryStatus(libraryId, checked)
     Chronicles.Data:RefreshPeriods()
-
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
     -- Use safe event triggering
-    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-        private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_Library")
-        private.Core.EventManager.safeTrigger(
-            private.constants.events.SettingsLibraryChecked,
-            {library = libraryId, checked = checked},
-            "Settings:Change_Library"
-        )
-    else
-        EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
-        EventRegistry:TriggerEvent(private.constants.events.SettingsLibraryChecked, libraryId, checked)
-    end
+    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:Change_Library")
+    local eventData = {
+        library = libraryId,
+        checked = checked
+    }
+    private.Core.triggerEvent(private.constants.events.SettingsLibraryChecked, eventData, "Settings:Change_Library")
 end
 
 function SettingsMixin:LoadSettingsHome(frame)
@@ -308,24 +279,15 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox:SetScript(
             "OnClick",
             function(self)
-                local data = {
+                local eventData = {
                     eventTypeId = self.eventTypeId,
                     isActive = self:GetChecked()
                 }
-                -- Use EventManager for safe event triggering
-                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                    private.Core.EventManager.safeTrigger(
-                        private.constants.events.SettingsEventTypeChecked,
-                        {eventType = data.eventTypeId, checked = data.isActive},
-                        "Settings:EventTypeCheckbox"
-                    )
-                else
-                    EventRegistry:TriggerEvent(
-                        private.constants.events.SettingsEventTypeChecked,
-                        data.eventTypeId,
-                        data.isActive
-                    )
-                end
+                private.Core.triggerEvent(
+                    private.constants.events.SettingsEventTypeChecked,
+                    eventData,
+                    "Settings:EventTypeCheckbox"
+                )
             end
         )
 
@@ -404,24 +366,16 @@ function SettingsMixin:LoadLibraries(frame)
         newCheckbox:SetScript(
             "OnClick",
             function(self)
-                local data = {
+                local eventData = {
                     libraryName = self.libraryName,
                     isActive = self:GetChecked()
                 }
-                -- Use EventManager for safe event triggering
-                if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-                    private.Core.EventManager.safeTrigger(
-                        private.constants.events.SettingsLibraryChecked,
-                        {library = data.libraryName, checked = data.isActive},
-                        "Settings:LibraryCheckbox"
-                    )
-                else
-                    EventRegistry:TriggerEvent(
-                        private.constants.events.SettingsLibraryChecked,
-                        data.libraryName,
-                        data.isActive
-                    )
-                end
+
+                private.Core.triggerEvent(
+                    private.constants.events.SettingsLibraryChecked,
+                    eventData,
+                    "Settings:LibraryCheckbox"
+                )
             end
         )
 
@@ -512,6 +466,7 @@ function SettingsMixin:UpdateScrollIndicators(scrollFrame)
 end
 
 CategoryButtonMixin = {}
+
 function CategoryButtonMixin:OnLoad()
     -- Initialize the button with default properties
     self.isSelected = false
@@ -599,9 +554,9 @@ function CategoryButtonMixin:SetData(category, index)
     self.eventTypeId = category.eventTypeId
 end
 
-function CategoryButtonMixin:GetData()
-    return self.category, self.index
-end
+-- function CategoryButtonMixin:GetData()
+--     return self.category, self.index
+-- end
 
 function CategoryButtonMixin:SetSelected(selected)
     self.isSelected = selected

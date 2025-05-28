@@ -6,17 +6,16 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 -----------------------------------------------------------------------------------------
 CharacterListMixin = {}
 
-function CharacterListMixin:OnLoad()
-    -- self.Previous:SetScript("OnClick", self.TimelinePrevious)
+function CharacterListMixin:OnLoad()    -- self.Previous:SetScript("OnClick", self.TimelinePrevious)
     -- self.Next:SetScript("OnClick", self.TimelineNext)
 
-    -- EventRegistry:RegisterCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
+    -- private.Core.registerCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
 
-    -- EventRegistry:RegisterCallback(
+    -- private.Core.registerCallback(
     --     private.constants.events.TimelinePreviousButtonVisible,
     --     self.OnTimelinePreviousVisible,
     --     self
     -- )
-    -- EventRegistry:RegisterCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
-    -- EventRegistry:RegisterCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
+    -- private.Core.registerCallback(private.constants.events.TimelineNextButtonVisible, self.OnTimelineNextVisible, self)
+    -- private.Core.registerCallback(private.constants.events.TimelineStepChanged, self.OnTimelineStepChanged, self)
 end

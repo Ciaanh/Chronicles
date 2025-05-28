@@ -32,11 +32,7 @@ end
 
 function EventListItemMixin:OnClick()
 	-- Use safe event triggering
-	if private.Core.EventManager then
-		private.Core.EventManager.safeTrigger(private.constants.events.EventSelected, self.Event, "EventListItem:OnClick")
-	else
-		EventRegistry:TriggerEvent(private.constants.events.EventSelected, self.Event)
-	end
+	private.Core.triggerEvent(private.constants.events.EventSelected, self.Event, "EventListItem:OnClick")
 end
 
 EventListTitleMixin = {}
@@ -51,18 +47,12 @@ end
 EventListMixin = {}
 function EventListMixin:OnLoad()
 	-- Use safe event registration
-	if private.Core.EventManager then
-		private.Core.EventManager.safeRegisterCallback(
-			private.constants.events.TimelinePeriodSelected,
-			self.OnTimelinePeriodSelected,
-			self
-		)
-		private.Core.EventManager.safeRegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	else
-		-- Fallback to direct EventRegistry
-		EventRegistry:RegisterCallback(private.constants.events.TimelinePeriodSelected, self.OnTimelinePeriodSelected, self)
-		EventRegistry:RegisterCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	end
+	private.Core.registerCallback(
+		private.constants.events.TimelinePeriodSelected,
+		self.OnTimelinePeriodSelected,
+		self
+	)
+	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
 
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
