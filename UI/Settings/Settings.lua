@@ -58,10 +58,15 @@ function SettingsMixin:OnLoad()
 
             self.TabUI.Tabs[tabKey] = category
         end
-    end -- Use EventManager for safe event registration with error handling
-    private.Core.registerCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
-    private.Core.registerCallback(private.constants.events.SettingsEventTypeChecked, self.Change_EventType, self)
-    private.Core.registerCallback(private.constants.events.SettingsLibraryChecked, self.Change_Library, self)
+    end
+
+    private.Core.registerCallback(private.constants.events.SettingsTabSelected, self.OnSettingsTabSelected, self)
+    private.Core.registerCallback(
+        private.constants.events.SettingsEventTypeChecked,
+        self.OnSettingsEventTypeChecked,
+        self
+    )
+    private.Core.registerCallback(private.constants.events.SettingsLibraryChecked, self.OnSettingsLibraryChecked, self)
 
     self:UpdateTabs()
     if self.TabUI.currentTab then
@@ -80,7 +85,7 @@ function SettingsMixin:UpdateTabs()
     local currentTab = self.TabUI.currentTab
     if not currentTab then
         for key, _ in pairs(self.TabUI.Tabs) do
-            self:SetTab(key)
+            self:OnSettingsTabSelected(key)
             break
         end
     end
@@ -102,11 +107,13 @@ function SettingsMixin:UpdateCategoryButtonSelection()
     end
 end
 
-function SettingsMixin:SetTab(tabNameOrData)
+function SettingsMixin:OnSettingsTabSelected(tabNameOrData)
     -- Handle both string and table format for backward compatibility
     local tabName = tabNameOrData
     if type(tabNameOrData) == "table" and tabNameOrData.tabName then
         tabName = tabNameOrData.tabName
+    else
+        print("SettingsMixin:OnSettingsTabSelected - Invalid tabNameOrData format")
     end
 
     self.TabUI.currentTab = tabName
@@ -166,48 +173,37 @@ function SettingsMixin:AddCategory(index, category)
     local initialYoffset = -50
     local xOffset = 8
 
-    local button = CreateFrame("Button", nil, self.CategoriesList, "CategoryButtonTemplate")
+    local categoryButton = CreateFrame("Button", nil, self.CategoriesList, "CategoryButtonTemplate")
 
     if index == 1 then
-        button:SetPoint("TOPLEFT", initialXoffset, initialYoffset)
+        categoryButton:SetPoint("TOPLEFT", initialXoffset, initialYoffset)
     else
-        button:SetPoint("TOP", self.Buttons[self.prefix .. (index - 1)], "BOTTOM", 0, -3)
-        button:SetPoint("LEFT", initialXoffset + xOffset * category.level, 0)
+        categoryButton:SetPoint("TOP", self.Buttons[self.prefix .. (index - 1)], "BOTTOM", 0, -3)
+        categoryButton:SetPoint("LEFT", initialXoffset + xOffset * category.level, 0)
     end
 
-    button:SetData(category, index)
-    self.Buttons[self.prefix .. index] = button
+    categoryButton:SetData(category, index)
+    self.Buttons[self.prefix .. index] = categoryButton
 end
 
-function SettingsMixin:Change_EventType(eventTypeId, checked)
+function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
     Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
     Chronicles.Data:RefreshPeriods()
+
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    -- TODO clean select period and event
-    -- Use safe event triggering (without self-triggering to prevent recursion)
-    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:Change_EventType")
-    local eventData = {
-        eventType = eventTypeId,
-        checked = checked
-    }
-    private.Core.triggerEvent(private.constants.events.SettingsEventTypeChecked, eventData, "Settings:Change_EventType")
+    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:OnSettingsEventTypeChecked")
 end
 
-function SettingsMixin:Change_Library(libraryId, checked)
+function SettingsMixin:OnSettingsLibraryChecked(libraryId, checked)
     Chronicles.Data:SetLibraryStatus(libraryId, checked)
     Chronicles.Data:RefreshPeriods()
+
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    -- Use safe event triggering
-    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:Change_Library")
-    local eventData = {
-        library = libraryId,
-        checked = checked
-    }
-    private.Core.triggerEvent(private.constants.events.SettingsLibraryChecked, eventData, "Settings:Change_Library")
+    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:OnSettingsLibraryChecked")
 end
 
 function SettingsMixin:LoadSettingsHome(frame)
@@ -257,7 +253,6 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
-        newCheckbox.Text:SetTextColor(0.9, 0.9, 0.9)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
         newCheckbox:SetChecked(Chronicles.Data:GetEventTypeStatus(eventTypeId))
@@ -360,6 +355,7 @@ function SettingsMixin:LoadLibraries(frame)
         local newCheckbox = CreateFrame("CheckButton", nil, checkboxContainer, "ChroniclesSettingsCheckboxTemplate")
         newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
+        newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.libraryName = libraryName
 
         newCheckbox:SetChecked(Chronicles.Data:GetLibraryStatus(libraryName))
@@ -515,8 +511,8 @@ function CategoryButtonMixin:OnClick()
     -- Handle tab selection if this category has a TabName
     if self.category and self.category.TabName then
         local settingsFrame = self:GetParent():GetParent() -- Get the main settings frame
-        if settingsFrame and settingsFrame.SetTab then
-            settingsFrame:SetTab(self.category.TabName)
+        if settingsFrame and settingsFrame.OnSettingsTabSelected then
+            settingsFrame:OnSettingsTabSelected(self.category.TabName)
 
             -- Update visual selection state for all category buttons
             self:UpdateCategorySelection()
