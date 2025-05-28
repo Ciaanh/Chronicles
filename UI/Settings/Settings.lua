@@ -81,6 +81,16 @@ function SettingsMixin:OnLoad()
     end
 
     self:UpdateTabs()
+    if self.TabUI.currentTab then
+        local currentTab = self.TabUI.Tabs[self.TabUI.currentTab]
+        if currentTab and currentTab.Load and currentTab.TabFrame then
+            currentTab.Load(self, currentTab.TabFrame)
+            currentTab.IsLoaded = true
+
+            currentTab.TabFrame:Show()
+            self:UpdateCategoryButtonSelection()
+        end
+    end
 end
 
 function SettingsMixin:UpdateTabs()
@@ -93,15 +103,59 @@ function SettingsMixin:UpdateTabs()
     end
 end
 
-function SettingsMixin:SetTab(tabName)
+function SettingsMixin:UpdateCategoryButtonSelection()
+    local currentTab = self.TabUI.currentTab
+    if not currentTab then
+        return
+    end
+
+    -- Find and select the appropriate category button
+    for _, button in pairs(self.Buttons) do
+        if button.category and button.category.TabName == currentTab then
+            button:SetSelected(true)
+        else
+            button:SetSelected(false)
+        end
+    end
+end
+
+function SettingsMixin:SetTab(tabNameOrData)
+    -- Handle both string and table format for backward compatibility
+    local tabName = tabNameOrData
+    if type(tabNameOrData) == "table" and tabNameOrData.tabName then
+        tabName = tabNameOrData.tabName
+    end
+
     self.TabUI.currentTab = tabName
     for key, tab in pairs(self.TabUI.Tabs) do
-        if (tab.Load and tab.TabFrame and not tab.IsLoaded) then
-            tab.Load(self, tab.TabFrame)
-            tab.IsLoaded = true
-        end
+        if (tab.Load and tab.TabFrame) then
+            if tab.Load and not tab.IsLoaded then
+                local success, errorMsg =
+                    pcall(
+                    function()
+                        tab.Load(self, tab.TabFrame)
+                    end
+                )
 
-        tab.TabFrame:SetShown(key == tabName)
+                if success then
+                    tab.IsLoaded = true
+                end
+            end
+            local isSelected = (key == tabName)
+            tab.TabFrame:SetShown(isSelected)
+
+            -- If we're showing this tab, make sure it's fully initialized
+            if isSelected and tab.TabFrame.ScrollFrame and tab.TabFrame.ScrollFrame.Content then
+                local scrollFrame = tab.TabFrame.ScrollFrame
+                local content = scrollFrame.Content
+                -- Ensure content is sized properly
+                if content.checkboxes and #content.checkboxes > 0 then
+                    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+                    content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+                    self:UpdateScrollIndicators(scrollFrame)
+                end
+            end
+        end
     end
 end
 
@@ -125,16 +179,16 @@ function SettingsMixin:GetVisibleCategories(categories)
 end
 
 function SettingsMixin:AddCategory(index, category)
-    local initialXoffset = 8
-    local initialYoffset = -10
-    local xOffset = 6
+    local initialXoffset = 12
+    local initialYoffset = -50
+    local xOffset = 8
 
     local button = CreateFrame("Button", nil, self.CategoriesList, "CategoryButtonTemplate")
 
     if index == 1 then
         button:SetPoint("TOPLEFT", initialXoffset, initialYoffset)
     else
-        button:SetPoint("TOP", self.Buttons[self.prefix .. (index - 1)], "BOTTOM", 0, -2)
+        button:SetPoint("TOP", self.Buttons[self.prefix .. (index - 1)], "BOTTOM", 0, -3)
         button:SetPoint("LEFT", initialXoffset + xOffset * category.level, 0)
     end
 
@@ -194,15 +248,63 @@ function SettingsMixin:LoadSettingsHome(frame)
 end
 
 function SettingsMixin:LoadEventTypes(frame)
+    local scrollFrame = frame.ScrollFrame
+    if not scrollFrame then
+        return
+    end
+
+    local content = scrollFrame.Content
+    if not content then
+        return
+    end
+
+    -- Initialize checkboxes array if it doesn't exist
+    content.checkboxes = content.checkboxes or {}
+
     local previousCheckbox = nil
+    local yOffset = -15
+
+    -- Clear any existing content
+    for i = #content.checkboxes, 1, -1 do
+        if content.checkboxes[i] then
+            content.checkboxes[i]:Hide()
+            content.checkboxes[i]:SetParent(nil)
+        end
+    end
+    content.checkboxes = {}
+    -- Make sure eventType is available
+    if not private.constants or not private.constants.eventType then
+        return
+    end
     for eventTypeId, eventTypeName in ipairs(private.constants.eventType) do
         local text = Locale[eventTypeName]
 
-        local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+        local checkboxContainer = CreateFrame("Frame", nil, content)
+        checkboxContainer:SetSize(400, 28)
+
+        local newCheckbox = CreateFrame("CheckButton", nil, checkboxContainer, "ChroniclesSettingsCheckboxTemplate")
+        newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
+        newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
+        newCheckbox.Text:SetTextColor(0.9, 0.9, 0.9)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
         newCheckbox:SetChecked(Chronicles.Data:GetEventTypeStatus(eventTypeId))
+
+        -- Add hover effect to container
+        checkboxContainer:SetScript(
+            "OnEnter",
+            function(self)
+                newCheckbox:LockHighlight()
+            end
+        )
+        checkboxContainer:SetScript(
+            "OnLeave",
+            function(self)
+                newCheckbox:UnlockHighlight()
+            end
+        )
+
         newCheckbox:SetScript(
             "OnClick",
             function(self)
@@ -227,25 +329,74 @@ function SettingsMixin:LoadEventTypes(frame)
             end
         )
 
-        if (previousCheckbox) then
-            newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
+        if previousCheckbox then
+            checkboxContainer:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -5)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOPLEFT", 50, -50)
+            checkboxContainer:SetPoint("TOPLEFT", content, "TOPLEFT", 0, yOffset)
         end
-        newCheckbox:Show()
-        previousCheckbox = newCheckbox
+        checkboxContainer:Show()
+        table.insert(content.checkboxes, checkboxContainer)
+        previousCheckbox = checkboxContainer
     end
+    -- Update content size for scrolling
+    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+    content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+
+    -- Update scroll indicators
+    self:UpdateScrollIndicators(scrollFrame)
+
+    -- Make sure ScrollFrame is working properly
+    if scrollFrame.ScrollBar then
+        scrollFrame.ScrollBar:SetMinMaxValues(0, math.max(scrollFrame:GetVerticalScrollRange(), 1))
+        scrollFrame.ScrollBar:SetValue(0) -- Reset to top position
+        -- Show scrollbar if needed
+        if scrollFrame.scrollBarHideIfUnscrollable then
+            scrollFrame.ScrollBar:SetShown(scrollFrame:GetVerticalScrollRange() > 0)
+        else
+            scrollFrame.ScrollBar:Show()
+        end
+    end
+
+    -- Force show the content
+    content:Show()
+    scrollFrame:Show()
 end
 
 function SettingsMixin:LoadLibraries(frame)
+    local scrollFrame = frame.ScrollFrame
+    if not scrollFrame then
+        return
+    end
+
+    local content = scrollFrame.Content
+    if not content then
+        return
+    end
+
+    -- Initialize checkboxes array if it doesn't exist
+    content.checkboxes = content.checkboxes or {}
+
     local previousCheckbox = nil
+    local yOffset = -15
+
+    -- Clear any existing content
+    for i = #content.checkboxes, 1, -1 do
+        if content.checkboxes[i] then
+            content.checkboxes[i]:Hide()
+            content.checkboxes[i]:SetParent(nil)
+        end
+    end
+    content.checkboxes = {}
 
     local libraries = Chronicles.Data:GetLibrariesNames()
     for _, library in ipairs(libraries) do
         local libraryName = library.name
-        local text = Locale[libraryName] or ""
+        local text = Locale[libraryName] or libraryName
+        local checkboxContainer = CreateFrame("Frame", nil, content)
+        checkboxContainer:SetSize(400, 28)
 
-        local newCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+        local newCheckbox = CreateFrame("CheckButton", nil, checkboxContainer, "ChroniclesSettingsCheckboxTemplate")
+        newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
         newCheckbox.libraryName = libraryName
 
@@ -274,102 +425,200 @@ function SettingsMixin:LoadLibraries(frame)
             end
         )
 
-        if (previousCheckbox) then
-            newCheckbox:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -1)
+        if previousCheckbox then
+            checkboxContainer:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -5)
         else
-            newCheckbox:SetPoint("TOP", frame, "TOP", 50, -50)
+            checkboxContainer:SetPoint("TOPLEFT", content, "TOPLEFT", 0, yOffset)
         end
-        newCheckbox:Show()
-        previousCheckbox = newCheckbox
+        checkboxContainer:Show()
+        table.insert(content.checkboxes, checkboxContainer)
+        previousCheckbox = checkboxContainer
     end
+
+    -- Update content size for scrolling
+    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+    content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+
+    -- Update scroll indicators
+    self:UpdateScrollIndicators(scrollFrame)
 end
 
 function SettingsMixin:LoadMyJournal(frame)
-    frame.IsActive:SetChecked(Chronicles.db.global.options.myjournal)
-end
-
-function SettingsMixin:MyJournalIsActive_OnClick(chkBox)
-    Chronicles.db.global.options.myjournal = chkBox:GetChecked()
-    Chronicles.Data:SetLibraryStatus(
-        private.constants.configurationName.myjournal,
-        Chronicles.db.global.options.myjournal
-    )
-
-    if (Chronicles.db.global.options.myjournal) then
-        MyJournalViewShow:Show()
-    else
-        MyJournalViewShow:Hide()
+    local isActive = frame.SettingsContainer.IsActive
+    -- Check if the setting exists in the database
+    if not private.Chronicles.db or not private.Chronicles.db.global or not private.Chronicles.db.global.options then
+        private.Chronicles.db = private.Chronicles.db or {}
+        private.Chronicles.db.global = private.Chronicles.db.global or {}
+        private.Chronicles.db.global.options = private.Chronicles.db.global.options or {}
+        private.Chronicles.db.global.options.myjournal = false
     end
 
-    Chronicles.UI:Refresh()
-end
+    isActive:SetChecked(private.Chronicles.db.global.options.myjournal)
 
-CategoryButtonMixin = {}
+    -- Apply enhanced styling to the checkbox
+    isActive.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
+    isActive.Text:SetTextColor(0.9, 0.9, 0.9)
 
-function CategoryButtonMixin:OnLoad()
-    self:SetPushedTextOffset(0, 0)
-
-    self:SetScript(
-        "OnEnter",
+    isActive:SetScript(
+        "OnClick",
         function(self)
-            TruncatedTooltipScript_OnEnter(self)
-            self.HighlightTexture:Show()
-        end
-    )
+            local isChecked = self:GetChecked()
 
-    self:SetScript(
-        "OnLeave",
-        function(self)
-            TruncatedTooltipScript_OnLeave(self)
-            self.HighlightTexture:Hide()
-        end
-    )
+            if not private.Chronicles.db or not private.Chronicles.db.global or not private.Chronicles.db.global.options then
+                private.Chronicles.db = private.Chronicles.db or {}
+                private.Chronicles.db.global = private.Chronicles.db.global or {}
+                private.Chronicles.db.global.options = private.Chronicles.db.global.options or {}
+            end
+            private.Chronicles.db.global.options.myjournal = isChecked
+            Chronicles.Data:SetLibraryStatus(private.constants.configurationName.myjournal, isChecked)
 
-    self:SetScript(
-        "OnMouseDown",
-        function(self)
-            self.Text:AdjustPointsOffset(1, -1)
-        end
-    )
+            -- Update UI
+            if MyJournalViewShow then
+                if (isChecked) then
+                    MyJournalViewShow:Show()
+                else
+                    MyJournalViewShow:Hide()
+                end
+            end
 
-    self:SetScript(
-        "OnMouseUp",
-        function(self)
-            self.Text:AdjustPointsOffset(-1, 1)
+            -- Refresh UI if method exists
+            if Chronicles.UI and Chronicles.UI.Refresh then
+                Chronicles.UI:Refresh()
+            end
         end
     )
 end
 
-function CategoryButtonMixin:SetData(category, categoryId)
-    self.data = category
-    self.CategoryId = categoryId
-
-    self.Text:SetText(category.text)
-end
-
-function CategoryButtonMixin:Button_OnClick(button)
-    local data = self.data
-
-    if button ~= "LeftButton" or not data or data.subMenu then
+function SettingsMixin:UpdateScrollIndicators(scrollFrame)
+    if not scrollFrame or not scrollFrame.ScrollBar then
         return
     end
 
-    for _, menuButton in pairs(self:GetParent().Buttons) do
-        menuButton.SelectedTexture:SetShown(false)
+    local scrollBar = scrollFrame.ScrollBar
+    local content = scrollFrame.Content
+
+    if content and scrollFrame then
+        local contentHeight = content:GetHeight() or 0
+        local frameHeight = scrollFrame:GetHeight() or 0
+
+        -- Show/hide scroll bar based on content overflow
+        if contentHeight > frameHeight then
+            scrollBar:Show()
+            scrollBar:SetAlpha(0.8)
+        else
+            scrollBar:Hide()
+        end
+    end
+end
+
+CategoryButtonMixin = {}
+function CategoryButtonMixin:OnLoad()
+    -- Initialize the button with default properties
+    self.isSelected = false
+
+    -- Set up default text properties if text exists
+    if self.Text then
+        self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white text
     end
 
-    if data.TabName and data.TabFrame then
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.SettingsTabSelected,
-                {tabName = data.TabName},
-                "Settings:CategoryButton"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.SettingsTabSelected, data.TabName)
-        end
+    -- Initialize selection state textures
+    if self.SelectedTexture then
+        self.SelectedTexture:Hide()
+    end
+    if self.HighlightTexture then
+        self.HighlightTexture:Hide()
+    end
+end
 
-        self.SelectedTexture:SetShown(true)
+function CategoryButtonMixin:OnEnter()
+    if self.HighlightTexture then
+        self.HighlightTexture:Show()
+    end
+
+    -- Enhanced text coloring on hover
+    if self.Text then
+        self.Text:SetTextColor(1.0, 1.0, 0.8) -- Slight golden tint
+    end
+end
+
+function CategoryButtonMixin:OnLeave()
+    if self.HighlightTexture then
+        self.HighlightTexture:Hide()
+    end
+
+    -- Reset text color based on selection state
+    if self.Text then
+        if self.isSelected then
+            self.Text:SetTextColor(1.0, 0.82, 0.0) -- Gold for selected
+        else
+            self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white
+        end
+    end
+end
+
+function CategoryButtonMixin:OnClick()
+    -- Handle tab selection if this category has a TabName
+    if self.category and self.category.TabName then
+        local settingsFrame = self:GetParent():GetParent() -- Get the main settings frame
+        if settingsFrame and settingsFrame.SetTab then
+            settingsFrame:SetTab(self.category.TabName)
+
+            -- Update visual selection state for all category buttons
+            self:UpdateCategorySelection()
+        end
+    end
+end
+
+function CategoryButtonMixin:UpdateCategorySelection()
+    local settingsFrame = self:GetParent():GetParent()
+    if not settingsFrame or not settingsFrame.Buttons then
+        return
+    end
+
+    -- Clear selection from all buttons
+    for _, button in pairs(settingsFrame.Buttons) do
+        if button.SetSelected then
+            button:SetSelected(false)
+        end
+    end
+
+    -- Set this button as selected
+    self:SetSelected(true)
+end
+
+function CategoryButtonMixin:SetData(category, index)
+    self.category = category
+    self.index = index
+
+    -- Set the button text
+    if self.Text then
+        self.Text:SetText(category.text)
+    end
+
+    -- Store any additional category properties
+    self.eventTypeId = category.eventTypeId
+end
+
+function CategoryButtonMixin:GetData()
+    return self.category, self.index
+end
+
+function CategoryButtonMixin:SetSelected(selected)
+    self.isSelected = selected
+
+    if selected then
+        if self.SelectedTexture then
+            self.SelectedTexture:Show()
+        end
+        if self.Text then
+            self.Text:SetTextColor(1.0, 0.82, 0.0) -- Gold for selected
+        end
+    else
+        if self.SelectedTexture then
+            self.SelectedTexture:Hide()
+        end
+        if self.Text then
+            self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white
+        end
     end
 end
