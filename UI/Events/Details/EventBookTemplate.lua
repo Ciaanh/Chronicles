@@ -9,6 +9,19 @@ function EventBookMixin:OnLoad()
 	-- Use safe event registration
 	private.Core.registerCallback(private.constants.events.EventSelected, self.OnEventSelected, self)
 	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	
+	-- Subscribe to state changes for the selected event
+	if private.Core.StateManager then
+		private.Core.StateManager.subscribe(
+			"ui.selectedEvent",
+			function(newEvent, oldEvent)
+				if newEvent then
+					self:OnEventSelected(newEvent)
+				end
+			end,
+			"EventBookMixin"
+		)
+	end
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

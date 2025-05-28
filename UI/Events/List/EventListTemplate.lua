@@ -46,13 +46,22 @@ end
 
 EventListMixin = {}
 function EventListMixin:OnLoad()
-	-- Use safe event registration
-	private.Core.registerCallback(
-		private.constants.events.TimelinePeriodSelected,
-		self.OnTimelinePeriodSelected,
-		self
-	)
+	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	
+	-- Use state-based subscription for period selection
+	-- This aligns with the architectural direction of using state for UI updates
+	if private.Core.StateManager then
+		private.Core.StateManager.subscribe(
+			"ui.selectedPeriod",
+			function(newPeriod, oldPeriod)
+				if newPeriod then
+					self:UpdateFromSelectedPeriod(newPeriod)
+				end
+			end,
+			"EventListMixin"
+		)
+	end
 
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
@@ -66,17 +75,16 @@ function EventListMixin:OnTimelineClean()
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
+	self:UpdateFromSelectedPeriod(period)
+end
+
+function EventListMixin:UpdateFromSelectedPeriod(period)
 	local data = {}
 
 	local eventList = Chronicles.Data:SearchEvents(period.lower, period.upper)
 	private.Core.Timeline:SetYear(math.floor((period.lower + period.upper) / 2))
 
-	-- TODO find other place for the dates of the period
 	local content = {
-		-- header = {
-		-- 	templateKey = private.constants.templateKeys.PERIOD_TITLE,
-		-- 	text = tostring(period.lower) .. " " .. tostring(period.upper)
-		-- },
 		elements = {}
 	}
 
