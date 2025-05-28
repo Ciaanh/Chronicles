@@ -65,7 +65,7 @@ function ExamplePlugin:SetupEventListeners()
     private.Core.registerCallback(
         private.constants.events.TimelinePeriodSelected,
         function(periodData)
-            ExamplePlugin:OnPeriodSelected(periodData)
+            ExamplePlugin:OnTimelinePeriodSelected(periodData)
         end,
         "ExamplePlugin"
     )
@@ -99,7 +99,7 @@ function ExamplePlugin:OnEventSelected(eventData)
     )
 end
 
-function ExamplePlugin:OnPeriodSelected(periodData)
+function ExamplePlugin:OnTimelinePeriodSelected(periodData)
     print("|cFF00FF9A[ExamplePlugin]|r Period selected: " .. periodData.lower .. " - " .. periodData.upper)
 
     -- Example: Batch multiple events together

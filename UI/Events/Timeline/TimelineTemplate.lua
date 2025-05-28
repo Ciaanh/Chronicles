@@ -24,12 +24,12 @@ function TimelineMixin:OnLoad()
     private.Core.registerCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
     private.Core.registerCallback(
         private.constants.events.TimelinePreviousButtonVisible,
-        self.OnTimelinePreviousVisible,
+        self.OnTimelinePreviousButtonVisible,
         self
     )
     private.Core.registerCallback(
         private.constants.events.TimelineNextButtonVisible,
-        self.OnTimelineNextVisible,
+        self.OnTimelineNextButtonVisible,
         self
     )
     private.Core.registerCallback(
@@ -48,7 +48,7 @@ function TimelineMixin:TimelinePrevious()
     private.Core.Timeline:ChangePage(-1)
 end
 
-function TimelineMixin:OnTimelinePreviousVisible(isVisible)
+function TimelineMixin:OnTimelinePreviousButtonVisible(isVisible)
     if isVisible then
         self.Previous:Enable()
     else
@@ -60,7 +60,7 @@ function TimelineMixin:TimelineNext()
     private.Core.Timeline:ChangePage(1)
 end
 
-function TimelineMixin:OnTimelineNextVisible(isVisible)
+function TimelineMixin:OnTimelineNextButtonVisible(isVisible)
     if isVisible then
         self.Next:Enable()
     else
@@ -130,9 +130,12 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
 end
 
 function TimelinePeriodMixin:OnClick()
+    -- Create a period data structure for state storage
+    -- Only store essential data, not calculated values
     local periodData = {
         lower = self.data.lowerBound,
-        upper = self.data.upperBound
+        upper = self.data.upperBound,
+        text = self.data.text
     }
 
     -- Use safe event triggering
