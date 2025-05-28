@@ -12,6 +12,9 @@ function SettingsMixin:OnLoad()
     self.ConfiguredCategories = {
         {
             text = "Settings",
+            TabName = "SettingsHome",
+            TabFrame = self.TabUI.SettingsHome,
+            Load = self.LoadSettingsHome,
             subMenu = {
                 {
                     text = "Event types",
@@ -47,7 +50,6 @@ function SettingsMixin:OnLoad()
     for _, category in ipairs(self.categories) do
         if (category.TabName ~= nil and category.TabFrame ~= nil) then
             local tabKey = category.TabName
-            local element = category.TabFrame
 
             local currentTab = self.TabUI.currentTab
             if not currentTab then
@@ -56,7 +58,9 @@ function SettingsMixin:OnLoad()
 
             self.TabUI.Tabs[tabKey] = category
         end
-    end -- Use EventManager for safe event registration with error handling
+    end
+
+    -- Use EventManager for safe event registration with error handling
     if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
         private.Core.EventManager.safeRegisterCallback(private.constants.events.SettingsTabSelected, self.SetTab, self)
         private.Core.EventManager.safeRegisterCallback(
@@ -90,7 +94,7 @@ function SettingsMixin:UpdateTabs()
 end
 
 function SettingsMixin:SetTab(tabName)
-    self.TabUI.currentTab = tabKey
+    self.TabUI.currentTab = tabName
     for key, tab in pairs(self.TabUI.Tabs) do
         if (tab.Load and tab.TabFrame and not tab.IsLoaded) then
             tab.Load(self, tab.TabFrame)
@@ -141,14 +145,12 @@ end
 function SettingsMixin:Change_EventType(eventTypeId, checked)
     Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
     Chronicles.Data:RefreshPeriods()
+
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
     -- TODO clean select period and event
-
-    -- print("SettingsMixin:Change_EventType " .. tostring(eventTypeId) .. " " .. tostring(checked))
-
-    -- Use safe event triggering
+    -- Use safe event triggering (without self-triggering to prevent recursion)
     if private.Core.EventManager then
         private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_EventType")
         private.Core.EventManager.safeTrigger(
@@ -157,16 +159,8 @@ function SettingsMixin:Change_EventType(eventTypeId, checked)
             "Settings:Change_EventType"
         )
     else
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelineClean,
-                nil,
-                "Settings:Change_EventType"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
-        end
+        EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+        EventRegistry:TriggerEvent(private.constants.events.SettingsEventTypeChecked, eventTypeId, checked)
     end
 end
 
@@ -178,7 +172,7 @@ function SettingsMixin:Change_Library(libraryId, checked)
     private.Core.Timeline:DisplayTimelineWindow()
 
     -- Use safe event triggering
-    if private.Core.EventManager then
+    if private.Core.EventManager and private.Core.EventManager.safeTrigger then
         private.Core.EventManager.safeTrigger(private.constants.events.TimelineClean, nil, "Settings:Change_Library")
         private.Core.EventManager.safeTrigger(
             private.constants.events.SettingsLibraryChecked,
@@ -186,20 +180,21 @@ function SettingsMixin:Change_Library(libraryId, checked)
             "Settings:Change_Library"
         )
     else
-        -- Use EventManager for safe event triggering
-        if private.Core.EventManager and private.Core.EventManager.safeTrigger then
-            private.Core.EventManager.safeTrigger(
-                private.constants.events.TimelineClean,
-                nil,
-                "Settings:Change_Library"
-            )
-        else
-            EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
-        end
+        EventRegistry:TriggerEvent(private.constants.events.TimelineClean)
+        EventRegistry:TriggerEvent(private.constants.events.SettingsLibraryChecked, libraryId, checked)
     end
 end
 
-function SettingsMixin:LoadEventTypes(frame)    local previousCheckbox = nil
+function SettingsMixin:LoadSettingsHome(frame)
+    -- The SettingsHome frame is primarily static content
+    -- Just ensure it's visible and properly configured
+    if frame then
+        frame:Show()
+    end
+end
+
+function SettingsMixin:LoadEventTypes(frame)
+    local previousCheckbox = nil
     for eventTypeId, eventTypeName in ipairs(private.constants.eventType) do
         local text = Locale[eventTypeName]
 
@@ -243,7 +238,9 @@ function SettingsMixin:LoadEventTypes(frame)    local previousCheckbox = nil
 end
 
 function SettingsMixin:LoadLibraries(frame)
-    local previousCheckbox = nil    local libraries = Chronicles.Data:GetLibrariesNames()
+    local previousCheckbox = nil
+
+    local libraries = Chronicles.Data:GetLibrariesNames()
     for _, library in ipairs(libraries) do
         local libraryName = library.name
         local text = Locale[libraryName] or ""
@@ -288,25 +285,15 @@ function SettingsMixin:LoadLibraries(frame)
 end
 
 function SettingsMixin:LoadMyJournal(frame)
-    print("SettingsMixin:LoadMyJournal")
-
     frame.IsActive:SetChecked(Chronicles.db.global.options.myjournal)
 end
 
 function SettingsMixin:MyJournalIsActive_OnClick(chkBox)
-    print("SettingsMixin:MyJournalIsActive_OnClick")
-
     Chronicles.db.global.options.myjournal = chkBox:GetChecked()
     Chronicles.Data:SetLibraryStatus(
         private.constants.configurationName.myjournal,
         Chronicles.db.global.options.myjournal
     )
-
-    -- EventRegistry:TriggerEvent(
-    --                 private.constants.events.SettingsLibraryChecked,
-    --                 data.libraryName,
-    --                 data.isActive
-    --             )
 
     if (Chronicles.db.global.options.myjournal) then
         MyJournalViewShow:Show()
@@ -318,6 +305,7 @@ function SettingsMixin:MyJournalIsActive_OnClick(chkBox)
 end
 
 CategoryButtonMixin = {}
+
 function CategoryButtonMixin:OnLoad()
     self:SetPushedTextOffset(0, 0)
 
@@ -369,6 +357,7 @@ function CategoryButtonMixin:Button_OnClick(button)
     for _, menuButton in pairs(self:GetParent().Buttons) do
         menuButton.SelectedTexture:SetShown(false)
     end
+
     if data.TabName and data.TabFrame then
         -- Use EventManager for safe event triggering
         if private.Core.EventManager and private.Core.EventManager.safeTrigger then
@@ -384,88 +373,3 @@ function CategoryButtonMixin:Button_OnClick(button)
         self.SelectedTexture:SetShown(true)
     end
 end
-
--- function CategoryButtonMixin:SetCategory(text)
---     self:SetText(text)
---     self.Text:SetPoint("LEFT", self, "LEFT", 8, 0)
---     self.Lines:Hide()
---     self:SetNormalFontObject(GameFontNormalSmall)
-
---     local texture = self.NormalTexture
---     texture:SetAtlas("auctionhouse-nav-button", false)
---     texture:SetSize(156, 32)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPLEFT", -2, 0)
---     texture:SetAlpha(1.0)
-
---     texture = self.SelectedTexture
---     texture:SetAtlas("auctionhouse-nav-button-select", false)
---     texture:SetSize(152, 21)
---     texture:ClearAllPoints()
---     texture:SetPoint("CENTER")
-
---     texture = self.HighlightTexture
---     texture:SetAtlas("auctionhouse-nav-button-highlight", false)
---     texture:SetSize(152, 21)
---     texture:ClearAllPoints()
---     texture:SetPoint("CENTER")
---     texture:SetBlendMode("BLEND")
-
---     self:Show()
--- end
-
--- function CategoryButtonMixin:SetSubCategory(text)
---     self:SetText(text)
---     self.Text:SetPoint("LEFT", self, "LEFT", 18, 0)
---     self.Lines:Hide()
---     self:SetNormalFontObject(GameFontHighlightSmall)
-
---     local texture = self.NormalTexture
---     texture:SetAtlas("auctionhouse-nav-button-secondary", false)
---     texture:SetSize(153, 32)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPLEFT", 1, 0)
---     texture:SetAlpha(1.0)
-
---     texture = self.SelectedTexture
---     texture:SetAtlas("auctionhouse-nav-button-secondary-select", false)
---     texture:SetSize(142, 21)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPLEFT", 10, 0)
-
---     texture = self.HighlightTexture
---     texture:SetAtlas("auctionhouse-nav-button-secondary-highlight", false)
---     texture:SetSize(142, 21)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPLEFT", 10, 0)
---     texture:SetBlendMode("BLEND")
-
---     self:Show()
--- end
-
--- function CategoryButtonMixin:SetSubSubCategory(text)
---     self:SetText(text)
---     self.Text:SetPoint("LEFT", self, "LEFT", 26, 0)
---     self.Lines:Show()
---     self:SetNormalFontObject(GameFontHighlightSmall)
-
---     local texture = self.NormalTexture
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPLEFT", 10, 0)
---     texture:SetAlpha(0.0)
-
---     texture = self.SelectedTexture
---     texture:SetAtlas("auctionhouse-ui-row-select", false)
---     texture:SetSize(136, 18)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPRIGHT", 0, -2)
-
---     texture = self.HighlightTexture
---     texture:SetAtlas("auctionhouse-ui-row-highlight", false)
---     texture:SetSize(136, 18)
---     texture:ClearAllPoints()
---     texture:SetPoint("TOPRIGHT", 0, -2)
---     texture:SetBlendMode("ADD")
-
---     self:Show()
--- end

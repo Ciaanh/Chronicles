@@ -1,10 +1,30 @@
 <Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns="http://www.blizzard.com/wow/ui/">
+
     <Script file="Settings.lua"></Script>
 
+<CheckButton name="ChroniclesSettingsCheckboxTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true">
+        <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="0">
+                <Texture parentKey="BackgroundHighlight" setAllPoints="true" alpha="0" hidden="true">
+                    <Color r="0.3" g="0.3" b="0.5"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnEnter>
+                self.BackgroundHighlight:SetAlpha(0.2)
+                self.BackgroundHighlight:Show()
+            </OnEnter>
+            <OnLeave>
+                self.BackgroundHighlight:Hide()
+            </OnLeave>
+        </Scripts>
+    </CheckButton>
+
     <Button name="CategoryButtonTemplate" parentArray="Buttons" inherits="TruncatedTooltipScriptTemplate" virtual="true" mixin="CategoryButtonMixin">
-        <Size x="152" y="21"/>
+        <Size x="165" y="24"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="Lines" atlas="auctionhouse-nav-button-tertiary-filterline" useAtlasSize="true">
@@ -13,7 +33,7 @@
                     </Anchors>
                 </Texture>
                 <Texture parentKey="NormalTexture" atlas="auctionhouse-nav-button" useAtlasSize="false">
-                    <Size x="156" y="32"/>
+                    <Size x="169" y="35"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="-2" y="0"/>
                     </Anchors>
@@ -21,7 +41,7 @@
             </Layer>
             <Layer level="BORDER">
                 <Texture parentKey="HighlightTexture" atlas="auctionhouse-nav-button-highlight" hidden="true">
-                    <Size x="152" y="21"/>
+                    <Size x="165" y="24"/>
                     <Anchors>
                         <Anchor point="CENTER" />
                     </Anchors>
@@ -29,7 +49,7 @@
             </Layer>
             <Layer level="ARTWORK">
                 <Texture parentKey="SelectedTexture" atlas="auctionhouse-nav-button-select" alphaMode="ADD" hidden="true">
-                    <Size x="152" y="21"/>
+                    <Size x="165" y="24"/>
                     <Anchors>
                         <Anchor point="CENTER" />
                     </Anchors>
@@ -38,10 +58,10 @@
         </Layers>
 
         <ButtonText parentKey="Text" justifyH="LEFT">
-            <Size x="0" y="8"/>
+            <Size x="0" y="10"/>
             <Anchors>
-                <Anchor point="TOPLEFT" x="4" y="0"/>
-                <Anchor point="BOTTOMRIGHT" x="-4" y="0"/>
+                <Anchor point="TOPLEFT" x="6" y="0"/>
+                <Anchor point="BOTTOMRIGHT" x="-6" y="0"/>
             </Anchors>
             <Shadow>
                 <Offset>
@@ -65,14 +85,21 @@
         <KeyValues>
             <KeyValue key="layoutType" value="BFAMissionAlliance" type="string"/>
         </KeyValues>
+
         <Size x="1200" y="650"/>
+
         <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="-6">
+            <Layer level="BACKGROUND" textureSubLevel="-8">
                 <Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
                     <Anchors>
                         <Anchor point="TOPLEFT" x="2" y="-21"/>
                         <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
                     </Anchors>
+                </Texture>
+            </Layer>
+            <Layer level="BACKGROUND" textureSubLevel="-7">
+                <Texture parentKey="OverlayBg" setAllPoints="true" alpha="0.3">
+                    <Color r="0.05" g="0.05" b="0.1"/>
                 </Texture>
             </Layer>
             <Layer level="OVERLAY">
@@ -84,28 +111,44 @@
                 </FontString>
             </Layer>
         </Layers>
-        <!-- <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="0">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="0.0" g="0.0" b="255.0"/>
-                        </Texture>
-                    </Layer>
-                </Layers> -->
+
         <Frames>
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
 
             <Frame parentKey="CategoriesList">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="20" y="-68"/>
+                    <Anchor point="TOPLEFT" x="25" y="-65"/>
                 </Anchors>
-
-                <Size x="188" y="438"/>
+                <Size x="200" y="445"/>
                 <Layers>
-                    <Layer level="BACKGROUND">
+                    <Layer level="BACKGROUND" textureSubLevel="-3">
                         <Texture parentKey="Background" atlas="auctionhouse-background-categories">
-                            <Size x="182" y="432"/>
+                            <Size x="194" y="439"/>
                             <Anchors>
                                 <Anchor point="TOPLEFT" x="3" y="-3"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <!-- <Layer level="BACKGROUND" textureSubLevel="-2">
+                        <Texture parentKey="Border" file="Interface\Tooltips\UI-Tooltip-Border" alpha="0.4">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer> -->
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="Header" inherits="SystemFont_Large2" justifyH="CENTER" text="Configuration">
+                            <Size y="25"/>
+                            <Anchors>
+                                <Anchor point="TOP" x="0" y="-8"/>
+                            </Anchors>
+                            <Color r="0.9" g="0.9" b="0.9"/>
+                        </FontString>
+                        <Texture parentKey="HeaderSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                            <Size x="150" y="8"/>
+                            <Anchors>
+                                <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Header" x="0" y="-5"/>
                             </Anchors>
                         </Texture>
                     </Layer>
@@ -115,141 +158,425 @@
 
             <Frame parentKey="TabUI">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="4" y="0"/>
-                    <Anchor point="RIGHT" x="-30" y="0"/>
-                    <Anchor point="BOTTOM" x="0" y="28"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="8" y="0"/>
+                    <Anchor point="RIGHT" x="-35" y="0"/>
+                    <Anchor point="BOTTOM" x="0" y="30"/>
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND" textureSubLevel="-5">
-                        <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="true" />
-                    </Layer>
-                </Layers>
-                <!-- <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="0">
-                        <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                            <Color r="255.0" g="0.0" b="0.0"/>
+                        <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="false">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                            </Anchors>
                         </Texture>
                     </Layer>
-                </Layers> -->
-                <Frames>
+                    <!-- <Layer level="BACKGROUND" textureSubLevel="-4">
+                        <Texture parentKey="ContentBorder" file="Interface\Tooltips\UI-Tooltip-Border" alpha="0.3">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="5" y="-5"/>
+                                <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
+                            </Anchors>
+                        </Texture>
+                    </Layer> -->
+                </Layers>
 
+                <Frames>
+                    <!-- Home/Welcome Tab -->
+                    <Frame parentKey="SettingsHome" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="-1">
+                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
+                                    <Color r="0.1" g="0.1" b="0.2"/>
+                                </Texture>
+                            </Layer>
+                            <Layer level="OVERLAY">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Settings">
+                                    <Size y="25"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                                    <Size x="400" y="8"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                                    </Anchors>
+                                </Texture>
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Welcome to Chronicles settings. Use the categories on the left to configure your preferences.">
+                                    <Size x="450" y="40"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+                            <!-- Settings Overview Section -->
+                            <Frame parentKey="OverviewSection">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
+                                    <Anchor point="TOPRIGHT" x="-20" y="-80"/>
+                                </Anchors>
+                                <Size y="150"/>
+                                <Layers>
+                                    <Layer level="BACKGROUND" textureSubLevel="0">
+                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                            </Anchors>
+                                        </Texture>
+                                    </Layer>
+                                    <Layer level="OVERLAY">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="Configuration Overview">
+                                            <Size y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="15" y="-20"/>
+                                            </Anchors>
+                                            <Color r="1" g="0.82" b="0"/>
+                                        </FontString>
+                                        <FontString parentKey="EventTypesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Event Types: Configure which event categories appear in your timeline">
+                                            <Size x="400" y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                        <FontString parentKey="LibrariesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Libraries: Enable or disable content libraries from different expansions">
+                                            <Size x="400" y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                        <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• My Journal: Create and manage your own custom events and storylines">
+                                            <Size x="400" y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.LibrariesInfo" x="0" y="-5"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                    </Layer>
+                                </Layers>
+                            </Frame>
+
+                            <!-- Quick Actions Section -->
+                            <Frame parentKey="QuickActionsSection">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativeKey="$parent.OverviewSection" relativePoint="BOTTOMLEFT" x="0" y="-15"/>
+                                    <Anchor point="TOPRIGHT" relativeKey="$parent.OverviewSection" relativePoint="BOTTOMRIGHT" x="0" y="-15"/>
+                                </Anchors>
+                                <Size y="120"/>
+                                <Layers>
+                                    <Layer level="BACKGROUND" textureSubLevel="0">
+                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                            </Anchors>
+                                        </Texture>
+                                    </Layer>
+                                    <Layer level="OVERLAY">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="Getting Started">
+                                            <Size y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="15" y="-10"/>
+                                            </Anchors>
+                                            <Color r="1" g="0.82" b="0"/>
+                                        </FontString>
+                                        <FontString parentKey="Tip1" inherits="SystemFont_Med3" justifyH="LEFT" text="1. Start with Event Types to customize which events you want to see">
+                                            <Size x="450" y="18"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                        <FontString parentKey="Tip2" inherits="SystemFont_Med3" justifyH="LEFT" text="2. Use Libraries to enable content from specific expansions or lore sources">
+                                            <Size x="450" y="18"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip1" x="0" y="-3"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                        <FontString parentKey="Tip3" inherits="SystemFont_Med3" justifyH="LEFT" text="3. Enable My Journal to add your own custom events and characters">
+                                            <Size x="450" y="18"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip2" x="0" y="-3"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                    </Layer>
+                                </Layers>
+                            </Frame>
+
+                            <!-- Version Info Section -->
+                            <Frame parentKey="VersionSection">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" relativeKey="$parent.QuickActionsSection" relativePoint="BOTTOMLEFT" x="0" y="-15"/>
+                                    <Anchor point="TOPRIGHT" relativeKey="$parent.QuickActionsSection" relativePoint="BOTTOMRIGHT" x="0" y="-15"/>
+                                </Anchors>
+                                <Size y="80"/>
+                                <Layers>
+                                    <Layer level="BACKGROUND" textureSubLevel="0">
+                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                            </Anchors>
+                                        </Texture>
+                                    </Layer>
+                                    <Layer level="OVERLAY">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="About Chronicles">
+                                            <Size y="20"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="15" y="-10"/>
+                                            </Anchors>
+                                            <Color r="1" g="0.82" b="0"/>
+                                        </FontString>
+                                        <FontString parentKey="VersionInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="A comprehensive timeline addon for World of Warcraft lore and events.">
+                                            <Size x="400" y="18"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-8"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                        <FontString parentKey="ConfigNote" inherits="SystemFont_Med3" justifyH="LEFT" text="Settings are automatically saved and will persist between sessions.">
+                                            <Size x="400" y="18"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.VersionInfo" x="0" y="-3"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                    </Layer>
+                                </Layers>
+                            </Frame>
+                        </Frames>
+                    </Frame>
+
+                    <!-- Event Types Configuration Tab -->
                     <Frame parentKey="EventTypes" frameLevel="100" hidden="true">
                         <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
+                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
                         </Anchors>
                         <Layers>
-                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="0.0" g="0.0" b="255.0"/>
+                            <Layer level="BACKGROUND" textureSubLevel="-1">
+                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
+                                    <Color r="0.1" g="0.1" b="0.2"/>
                                 </Texture>
-                            </Layer> -->
+                            </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT" text="Event Types">
-                                    <Size y="20"/>
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Event Types">
+                                    <Size y="25"/>
                                     <Anchors>
-                                        <Anchor point="TOP" x="0" y="0"/>
+                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
                                     </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                                    <Size x="400" y="8"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                                    </Anchors>
+                                </Texture>
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Configure which types of events to display in the timeline and event lists.">
+                                    <Size x="450" y="40"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                             </Layer>
                         </Layers>
+                        <Frames>
+                            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
+                                <KeyValues>
+                                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
+                                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                                    <KeyValue key="scrollBarX" value="10" type="number"/>
+                                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
+                                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
+                                </KeyValues>
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
+                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
+                                </Anchors>
+                                <ScrollChild>
+                                    <Frame parentKey="Content">
+                                        <Size x="1" y="1"/>
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT"/>
+                                        </Anchors>
+                                    </Frame>
+                                </ScrollChild>
+                                <Scripts>
+                                    <OnLoad method="OnLoad"/>
+                                </Scripts>
+                            </ScrollFrame>
+                        </Frames>
+                        <Scripts>
+                            <OnShow>
+                                local parent = self:GetParent():GetParent()
+                                if parent and parent.TabUI and parent.TabUI.currentTab == "EventTypes" then
+                                    local scrollFrame = self.ScrollFrame
+                                    if scrollFrame and scrollFrame.Content then
+                                        scrollFrame:Show()
+                                        scrollFrame.Content:Show()
+                                    end
+                                end
+                            </OnShow>
+                        </Scripts>
                     </Frame>
 
+                    <!-- Event Libraries Configuration Tab -->
                     <Frame parentKey="Libraries" frameLevel="100" hidden="true">
                         <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
+                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
                         </Anchors>
                         <Layers>
-                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="0.0" g="255.0" b="0.0"/>
+                            <Layer level="BACKGROUND" textureSubLevel="-1">
+                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
+                                    <Color r="0.1" g="0.1" b="0.2"/>
                                 </Texture>
-                            </Layer> -->
+                            </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT">
-                                    <Size y="20"/>
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Event Libraries">
+                                    <Size y="25"/>
                                     <Anchors>
-                                        <Anchor point="TOP" y="-10"/>
+                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
                                     </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                                    <Size x="400" y="8"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                                    </Anchors>
+                                </Texture>
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable or disable event libraries to customize which content is available.">
+                                    <Size x="450" y="40"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                             </Layer>
                         </Layers>
                         <Frames>
-                            <!-- <CheckButton name="LibrariesFilterBlock1" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
+                                <KeyValues>
+                                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
+                                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                                    <KeyValue key="scrollBarX" value="10" type="number"/>
+                                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
+                                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
+                                </KeyValues>
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" />
+                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
+                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
                                 </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock2" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock1" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock3" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock2" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock4" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock3" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock5" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock4" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock6" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock5" />
-                                </Anchors>
-                            </CheckButton>
-                            <CheckButton name="LibrariesFilterBlock7" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                <Anchors>
-                                    <Anchor point="TOP" relativePoint="BOTTOM" relativeTo="LibrariesFilterBlock6" />
-                                </Anchors>
-                            </CheckButton> -->
+                                <ScrollChild>
+                                    <Frame parentKey="Content">
+                                        <Size x="1" y="1"/>
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT"/>
+                                        </Anchors>
+                                    </Frame>
+                                </ScrollChild>
+                                <Scripts>
+                                    <OnLoad method="OnLoad"/>
+                                </Scripts>
+                            </ScrollFrame>
                         </Frames>
                     </Frame>
 
+                    <!-- My Journal Configuration Tab -->
                     <Frame parentKey="MyJournal" frameLevel="100" hidden="true">
                         <Anchors>
-                            <Anchor point="TOPLEFT" />
-                            <Anchor point="BOTTOMRIGHT" />
+                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
                         </Anchors>
                         <Layers>
-                            <!-- <Layer level="BACKGROUND" textureSubLevel="0">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="255.0" g="0.0" b="0.0"/>
+                            <Layer level="BACKGROUND" textureSubLevel="-1">
+                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
+                                    <Color r="0.1" g="0.1" b="0.2"/>
                                 </Texture>
-                            </Layer> -->
+                            </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="ChroniclesFontLargeWhite" justifyH="LEFT" Text="My Journal">
-                                    <Size y="20"/>
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="My Journal">
+                                    <Size y="25"/>
                                     <Anchors>
-                                        <Anchor point="TOP" y="-10"/>
+                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
                                     </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                                    <Size x="400" y="8"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                                    </Anchors>
+                                </Texture>
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable personal journal features to create and manage your own custom content.">
+                                    <Size x="450" y="40"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                             </Layer>
                         </Layers>
                         <Frames>
-                            <CheckButton parentKey="IsActive" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                            <Frame parentKey="SettingsContainer">
                                 <Anchors>
-                                    <Anchor point="TOPLEFT" x="10" y="-25"/>
+                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
+                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
                                 </Anchors>
-                                <!-- <Scripts>
-                                    <OnClick function="MyJournalIsActive_OnClick" />
-                                </Scripts> -->
-                            </CheckButton>
+                                <Layers>
+                                    <Layer level="BACKGROUND" textureSubLevel="0">
+                                        <Texture parentKey="SettingsBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.3">
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                            </Anchors>
+                                        </Texture>
+                                    </Layer>
+                                </Layers>
+                                <Frames>                                    <CheckButton parentKey="IsActive" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                                        </Anchors>
+                                        <ButtonText text="Enable My Journal Features"/>
+                                        <Scripts>
+                                            <OnClick>
+                                                local settingsFrame = self:GetParent():GetParent():GetParent():GetParent()
+                                                settingsFrame:MyJournalIsActive_OnClick(self)
+                                            </OnClick>
+                                        </Scripts>
+                                    </CheckButton>
+                                </Frames>
+                                <Layers>
+                                    <Layer level="OVERLAY">
+                                        <FontString parentKey="FeatureDescription" inherits="SystemFont_Med3" justifyH="LEFT" text="When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content.">
+                                            <Size x="400" y="60"/>
+                                            <Anchors>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.IsActive" x="0" y="-10"/>
+                                            </Anchors>
+                                            <Color r="0.9" g="0.9" b="0.9"/>
+                                        </FontString>
+                                    </Layer>
+                                </Layers>
+                            </Frame>
                         </Frames>
                     </Frame>
-
                 </Frames>
-                <!-- <Scripts>
-                    <OnLoad method="OnLoad"/>
-                </Scripts> -->
             </Frame>
 
         </Frames>
