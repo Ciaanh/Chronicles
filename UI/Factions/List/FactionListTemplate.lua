@@ -73,15 +73,42 @@ function FactionListMixin:LoadFactions()
 	local content = {
 		elements = {}
 	}
-
 	-- Create list items for each faction
 	for key, faction in pairs(factions) do
-		local factionSummary = {
-			templateKey = private.constants.templateKeys.FACTION_LIST_ITEM,
-			name = faction.name,
-			faction = faction
-		}
-		table.insert(content.elements, factionSummary)
+		if faction and type(faction) == "table" and faction.name then
+			local factionSummary = {
+				templateKey = private.constants.templateKeys.FACTION_LIST_ITEM,
+				name = faction.name,
+				faction = faction
+			}
+			table.insert(content.elements, factionSummary)
+		else
+			private.Core.Logger.warn("FactionList", "Invalid faction data at key: " .. tostring(key))
+		end
+	end
+
+	-- Ensure content.elements is valid before calling CreateDataProvider
+	if not content.elements or type(content.elements) ~= "table" then
+		private.Core.Logger.error("FactionList", "content.elements is invalid: " .. type(content.elements))
+		return
+	end
+
+	-- Additional validation for elements table
+	if #content.elements == 0 then
+		private.Core.Logger.info("FactionList", "No factions to display")
+		-- Create empty data provider to clear the list
+		local success, errorMsg =
+			pcall(
+			function()
+				local dataProvider = CreateDataProvider({})
+				local retainScrollPosition = false
+				self.PagedFactionList:SetDataProvider(dataProvider, retainScrollPosition)
+			end
+		)
+		if not success then
+			private.Core.Logger.error("FactionList", "Error setting empty data provider - " .. tostring(errorMsg))
+		end
+		return
 	end
 
 	-- Protected call to SetDataProvider to catch any remaining errors
@@ -89,6 +116,9 @@ function FactionListMixin:LoadFactions()
 		pcall(
 		function()
 			local dataProvider = CreateDataProvider(content.elements)
+			if not dataProvider then
+				error("CreateDataProvider returned nil")
+			end
 			local retainScrollPosition = false
 			self.PagedFactionList:SetDataProvider(dataProvider, retainScrollPosition)
 		end
