@@ -132,7 +132,7 @@
                         </Texture>
                     </Layer>
                     <Layer level="OVERLAY">
-                        <FontString parentKey="Header" inherits="SystemFont_Large2" justifyH="CENTER" text="Configuration">
+                        <FontString parentKey="Header" inherits="SystemFont_Large2" justifyH="CENTER">
                             <Size y="25"/>
                             <Anchors>
                                 <Anchor point="TOP" x="0" y="-8"/>
@@ -181,7 +181,7 @@
                                 </Texture>
                             </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Settings">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
                                     <Size y="25"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" x="20" y="-10"/>
@@ -194,7 +194,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Welcome to Chronicles settings. Use the categories on the left to configure your preferences.">
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -221,28 +221,28 @@
                                         </Texture>
                                     </Layer>
                                     <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="Configuration Overview">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
                                             <Size y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" x="15" y="-20"/>
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="EventTypesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Event Types: Configure which event categories appear in your timeline">
+                                        <FontString parentKey="EventTypesInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="LibrariesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Libraries: Enable or disable content libraries from different expansions">
+                                        <FontString parentKey="LibrariesInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• My Journal: Create and manage your own custom events and storylines">
+                                        <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.LibrariesInfo" x="0" y="-5"/>
@@ -270,28 +270,28 @@
                                         </Texture>
                                     </Layer>
                                     <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="Getting Started">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
                                             <Size y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" x="15" y="-10"/>
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="Tip1" inherits="SystemFont_Med3" justifyH="LEFT" text="1. Start with Event Types to customize which events you want to see">
+                                        <FontString parentKey="Tip1" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="Tip2" inherits="SystemFont_Med3" justifyH="LEFT" text="2. Use Libraries to enable content from specific expansions or lore sources">
+                                        <FontString parentKey="Tip2" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip1" x="0" y="-3"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="Tip3" inherits="SystemFont_Med3" justifyH="LEFT" text="3. Enable My Journal to add your own custom events and characters">
+                                        <FontString parentKey="Tip3" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip2" x="0" y="-3"/>
@@ -319,21 +319,21 @@
                                         </Texture>
                                     </Layer>
                                     <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT" text="About Chronicles">
+                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
                                             <Size y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" x="15" y="-10"/>
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="VersionInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="A comprehensive timeline addon for World of Warcraft lore and events.">
+                                        <FontString parentKey="VersionInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-8"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="ConfigNote" inherits="SystemFont_Med3" justifyH="LEFT" text="Settings are automatically saved and will persist between sessions.">
+                                        <FontString parentKey="ConfigNote" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.VersionInfo" x="0" y="-3"/>
@@ -359,7 +359,7 @@
                                 </Texture>
                             </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Event Types">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
                                     <Size y="25"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" x="20" y="-10"/>
@@ -372,7 +372,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Configure which types of events to display in the timeline and event lists.">
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -434,7 +434,7 @@
                                 </Texture>
                             </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="Event Libraries">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
                                     <Size y="25"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" x="20" y="-10"/>
@@ -447,7 +447,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable or disable event libraries to customize which content is available.">
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -497,7 +497,7 @@
                                 </Texture>
                             </Layer>
                             <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT" text="My Journal">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
                                     <Size y="25"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" x="20" y="-10"/>
@@ -510,7 +510,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable personal journal features to create and manage your own custom content.">
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -540,12 +540,12 @@
                                         <Anchors>
                                             <Anchor point="TOPLEFT" x="15" y="-15"/>
                                         </Anchors>
-                                        <ButtonText text="Enable My Journal Features"/>
+                                        <ButtonText/>
                                     </CheckButton>
                                 </Frames>
                                 <Layers>
                                     <Layer level="OVERLAY">
-                                        <FontString parentKey="FeatureDescription" inherits="SystemFont_Med3" justifyH="LEFT" text="When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content.">
+                                        <FontString parentKey="FeatureDescription" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="60"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.IsActive" x="0" y="-10"/>

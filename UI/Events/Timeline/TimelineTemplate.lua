@@ -15,6 +15,10 @@ TimelineMixin = {}
 -- ui color ideas UI-Tuskarr-Highlight-Middle
 
 function TimelineMixin:OnLoad()
+    -- Set localized button text
+    self.ZoomOut:SetText(Locale["Zoom Out"])
+    self.ZoomIn:SetText(Locale["Zoom In"])
+    
     self.ZoomOut:SetScript("OnClick", self.OnZooming)
     self.ZoomIn:SetScript("OnClick", self.OnZooming)
     self.Previous:SetScript("OnClick", self.TimelinePrevious)

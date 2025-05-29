@@ -63,7 +63,7 @@
 
         <Frames>
 
-            <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate" Text="-">
+            <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
                 <KeyValues>
                     <KeyValue key="direction" value="-1" type="number"/>
                 </KeyValues>
@@ -73,7 +73,7 @@
                 </Anchors>
             </Button>
 
-            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate" Text="+">
+            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate">
                 <KeyValues>
                     <KeyValue key="direction" value="1" type="number"/>
                 </KeyValues>

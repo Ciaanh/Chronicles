@@ -11,19 +11,19 @@ function SettingsMixin:OnLoad()
     self.prefix = "Entry"
     self.ConfiguredCategories = {
         {
-            text = "Settings",
+            text = Locale["Settings"],
             TabName = "SettingsHome",
             TabFrame = self.TabUI.SettingsHome,
             Load = self.LoadSettingsHome,
             subMenu = {
                 {
-                    text = "Event types",
+                    text = Locale["Event types"],
                     TabName = "EventTypes",
                     TabFrame = self.TabUI.EventTypes,
                     Load = self.LoadEventTypes
                 },
                 {
-                    text = "Libraries",
+                    text = Locale["Libraries"],
                     TabName = "Libraries",
                     TabFrame = self.TabUI.Libraries,
                     Load = self.LoadLibraries
@@ -31,7 +31,7 @@ function SettingsMixin:OnLoad()
             }
         },
         {
-            text = "My Journal",
+            text = Locale["My Journal"],
             TabName = "MyJournal",
             TabFrame = self.TabUI.MyJournal,
             Load = self.LoadMyJournal
@@ -89,6 +89,125 @@ function SettingsMixin:OnLoad()
 
             currentTab.TabFrame:Show()
             self:UpdateCategoryButtonSelection()
+        end
+    end
+
+    -- Initialize localized text
+    self:InitializeLocalizedText()
+end
+
+function SettingsMixin:InitializeLocalizedText()
+    -- Initialize category list header
+    if self.CategoriesList and self.CategoriesList.Header then
+        self.CategoriesList.Header:SetText(Locale["Configuration"])
+    end
+    
+    -- Initialize Settings Home tab
+    if self.TabUI and self.TabUI.SettingsHome then
+        local settingsHome = self.TabUI.SettingsHome
+        
+        if settingsHome.Title then
+            settingsHome.Title:SetText(Locale["Settings"])
+        end
+        if settingsHome.Description then
+            settingsHome.Description:SetText(Locale["SettingsHomeDescription"])
+        end
+        
+        -- Overview Section
+        if settingsHome.OverviewSection then
+            local overview = settingsHome.OverviewSection
+            if overview.SectionTitle then
+                overview.SectionTitle:SetText(Locale["SettingsHomeOverviewSectionTitle"])
+            end
+            if overview.EventTypesInfo then
+                overview.EventTypesInfo:SetText(Locale["SettingsHomeOverviewEventTypesInfo"])
+            end
+            if overview.LibrariesInfo then
+                overview.LibrariesInfo:SetText(Locale["SettingsHomeOverviewLibrariesInfo"])
+            end
+            if overview.MyJournalInfo then
+                overview.MyJournalInfo:SetText(Locale["SettingsHomeOverviewMyJournalInfo"])
+            end
+        end
+        
+        -- Getting Started Section
+        if settingsHome.QuickActionsSection then
+            local quickActions = settingsHome.QuickActionsSection
+            if quickActions.SectionTitle then
+                quickActions.SectionTitle:SetText(Locale["SettingsHomeQuickActionsSectionTitle"])
+            end
+            if quickActions.Tip1 then
+                quickActions.Tip1:SetText(Locale["SettingsHomeQuickActionsTip1"])
+            end
+            if quickActions.Tip2 then
+                quickActions.Tip2:SetText(Locale["SettingsHomeQuickActionsTip2"])
+            end
+            if quickActions.Tip3 then
+                quickActions.Tip3:SetText(Locale["SettingsHomeQuickActionsTip3"])
+            end
+        end
+        
+        -- About Section
+        if settingsHome.VersionSection then
+            local version = settingsHome.VersionSection
+            if version.SectionTitle then
+                version.SectionTitle:SetText(Locale["SettingsHomeVersionSectionTitle"] )
+            end
+            if version.VersionInfo then
+                version.VersionInfo:SetText(Locale["SettingsHomeVersionVersionInfo"])
+            end
+            if version.ConfigNote then
+                version.ConfigNote:SetText(Locale["SettingsHomeVersionConfigNote"])
+            end
+        end
+    end
+    
+    -- Initialize Event Types tab
+    if self.TabUI and self.TabUI.EventTypes then
+        local eventTypes = self.TabUI.EventTypes
+        if eventTypes.Title then
+            eventTypes.Title:SetText(Locale["Event Types"])
+        end
+        if eventTypes.Description then
+            eventTypes.Description:SetText(Locale["EventTypesDescription"])
+        end
+    end
+    
+    -- Initialize Libraries tab
+    if self.TabUI and self.TabUI.Libraries then
+        local libraries = self.TabUI.Libraries
+        if libraries.Title then
+            libraries.Title:SetText(Locale["Event Libraries"])
+        end
+        if libraries.Description then
+            libraries.Description:SetText(Locale["LibrariesDescription"])
+        end
+    end
+    
+    -- Initialize My Journal tab
+    if self.TabUI and self.TabUI.MyJournal then
+        local myJournal = self.TabUI.MyJournal
+        if myJournal.Title then
+            myJournal.Title:SetText(Locale["My Journal"])
+        end
+        if myJournal.Description then
+            myJournal.Description:SetText(Locale["MyJournalDescription"])
+        end
+        
+        -- Initialize My Journal checkbox and description
+        if myJournal.SettingsContainer and myJournal.SettingsContainer.IsActive then
+            local checkbox = myJournal.SettingsContainer.IsActive
+            if checkbox.Text then
+                checkbox.Text:SetText(Locale["MyJournalCheckboxText"])
+            end
+            -- Set button text using SetText on the CheckButton
+            if checkbox.SetText then
+                checkbox:SetText(Locale["MyJournalCheckboxText"])
+            end
+        end
+        
+        if myJournal.SettingsContainer and myJournal.SettingsContainer.FeatureDescription then
+            myJournal.SettingsContainer.FeatureDescription:SetText(Locale["SettingsContainerFeatureDescription"])
         end
     end
 end

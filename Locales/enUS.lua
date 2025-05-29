@@ -64,4 +64,42 @@ if L then
     L["death"] = "Death"
     L["birth"] = "Birth"
     L["other"] = "Other"
+
+    -- Settings UI strings
+    L["Configuration"] = "Configuration"
+    L["Settings"] = "Settings"
+    L["Event types"] = "Event types"
+    L["Libraries"] = "Libraries"
+    L["My Journal"] = "My Journal"
+    L["Event Types"] = "Event Types"
+    L["Event Libraries"] = "Event Libraries"
+
+    -- Settings descriptions and content
+    L["SettingsHomeDescription"] =
+        "Welcome to Chronicles settings. Use the categories on the left to configure your preferences."
+    L["SettingsHomeOverviewSectionTitle"] = "Configuration Overview"
+    L["SettingsHomeOverviewEventTypesInfo"] = "• Event Types: Configure which event categories appear in your timeline"
+    L["SettingsHomeOverviewLibrariesInfo"] =
+        "• Libraries: Enable or disable content libraries from different expansions"
+    L["MyJournalInfo"] = "• My Journal: Create and manage your own custom events and storylines"
+
+    L["SettingsHomeQuickActionsSectionTitle"] = "Getting Started"
+    L["SettingsHomeQuickActionsTip1"] = "1. Start with Event Types to customize which events you want to see"
+    L["SettingsHomeQuickActionsTip2"] = "2. Use Libraries to enable content from specific expansions or lore sources"
+    L["SettingsHomeQuickActionsTip1"] = "3. Enable My Journal to add your own custom events and characters"
+
+    L["SettingsHomeVersionSectionTitle"] = "About Chronicles"
+    L["SettingsHomeVersionVersionInfo"] = "A comprehensive timeline addon for World of Warcraft lore and events."
+    L["SettingsHomeVersionConfigNote"] = "Settings are automatically saved and will persist between sessions."
+
+    -- Timeline zoom button text
+    L["Zoom Out"] = "-"
+    L["Zoom In"] = "+"
+
+    L["EventTypesDescription"] = "Configure which types of events to display in the timeline and event lists."
+    L["LibrariesDescription"] = "Enable or disable event libraries to customize which content is available."
+    L["MyJournalDescription"] = "Enable personal journal features to create and manage your own custom content."
+    L["MyJournalCheckboxText"] = "Enable My Journal Features"
+    L["SettingsContainerFeatureDescription"] =
+        "When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content."
 end
