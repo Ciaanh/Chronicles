@@ -195,66 +195,83 @@ end
 -----------------------------------------------------------------------------------------
 
 local function setupEventListeners()
+    -- Use centralized event constants to avoid string duplication errors
+    local events = private.constants.events
+    
     -- Event selection
     private.Core.registerCallback(
-        private.constants.events.EventSelected,
+        events.EventSelected,
         function(eventData)
             private.Core.StateManager.setState("ui.selectedEvent", eventData, "Event selected")
         end,
         "StateManager"
-    ) -- Character selection
+    )
+    
+    -- Character selection
     private.Core.registerCallback(
-        private.constants.events.CharacterSelected,
+        events.CharacterSelected,
         function(characterData)
             private.Core.StateManager.setState("ui.selectedCharacter", characterData, "Character selected")
         end,
         "StateManager"
-    ) -- Faction selection
+    )
+    
+    -- Faction selection
     private.Core.registerCallback(
-        private.constants.events.FactionSelected,
+        events.FactionSelected,
         function(factionData)
             private.Core.StateManager.setState("ui.selectedFaction", factionData, "Faction selected")
         end,
         "StateManager"
-    ) -- Timeline period selection
+    )
+    
+    -- Timeline period selection
     private.Core.registerCallback(
-        private.constants.events.TimelinePeriodSelected,
+        events.TimelinePeriodSelected,
         function(periodData)
             private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
         end,
         "StateManager"
-    ) -- Timeline step changes
+    )
+    
+    -- Timeline step changes
     private.Core.registerCallback(
-        private.constants.events.TimelineStepChanged,
+        events.TimelineStepChanged,
         function(stepData)
             private.Core.StateManager.setState("timeline.currentStep", stepData, "Timeline step changed")
         end,
         "StateManager"
-    ) -- Main frame state
+    )
+    
+    -- Main frame state
     private.Core.registerCallback(
-        private.constants.events.MainFrameUIOpenFrame,
+        events.MainFrameUIOpenFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
         end,
         "StateManager"
     )
+    
     private.Core.registerCallback(
-        private.constants.events.MainFrameUICloseFrame,
+        events.MainFrameUICloseFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
         end,
         "StateManager"
-    ) -- Settings changes
+    )
+    
+    -- Settings changes
     private.Core.registerCallback(
-        private.constants.events.SettingsEventTypeChecked,
+        events.SettingsEventTypeChecked,
         function(data)
             local path = "settings.eventTypes." .. tostring(data.eventType)
             private.Core.StateManager.setState(path, data.checked, "Event type setting changed")
         end,
         "StateManager"
     )
+    
     private.Core.registerCallback(
-        private.constants.events.SettingsLibraryChecked,
+        events.SettingsLibraryChecked,
         function(data)
             local path = "settings.libraries." .. tostring(data.library)
             private.Core.StateManager.setState(path, data.checked, "Library setting changed")
