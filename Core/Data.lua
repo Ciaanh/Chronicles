@@ -429,13 +429,13 @@ end
 -----------------------------------------------------------------------------------------
 function Chronicles.Data:RegisterEventDB(libraryName, db)
     if Chronicles.Data.Events[libraryName] ~= nil then
-        error(libraryName .. " is already registered by another plugin in Events.")
+        private.Core.Logger.error("Data", libraryName .. " is already registered by another plugin in Events.")
+        return false
     else
-        -- Log warning if db is nil
         if db == nil then
-            print(
-                "|cFFFF0000Chronicles Warning:|r Library '" ..
-                    libraryName .. "' is trying to register a nil events database."
+            private.Core.Logger.warn(
+            "Data",
+                "Library '" .. libraryName .. "' is trying to register a nil events database."
             )
         end
 
@@ -443,46 +443,45 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.EventDBStatuses[libraryName] = isActive
-        end
-
-        Chronicles.Data.Events[libraryName] = {
+        end        Chronicles.Data.Events[libraryName] = {
             data = db or {}, -- Ensure data is never nil
             name = libraryName
         }
+        return true
     end
 end
 
 function Chronicles.Data:RegisterCharacterDB(libraryName, db)
     if Chronicles.Data.Characters[libraryName] ~= nil then
-        error(libraryName .. " is already registered by another plugin in Characters.")
+        private.Core.Logger.error("Data", libraryName .. " is already registered by another plugin in Characters.")
+        return false
     else
         local isActive = Chronicles.db.global.CharacterDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
-        end
-
-        Chronicles.Data.Characters[libraryName] = {
+        end        Chronicles.Data.Characters[libraryName] = {
             data = db,
             name = libraryName
         }
+        return true
     end
 end
 
 function Chronicles.Data:RegisterFactionDB(libraryName, db)
     if Chronicles.Data.Factions[libraryName] ~= nil then
-        error(libraryName .. " is already registered by another plugin in Factions.")
+        private.Core.Logger.error("Data", libraryName .. " is already registered by another plugin in Factions.")
+        return false
     else
         local isActive = Chronicles.db.global.FactionDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
-        end
-
-        Chronicles.Data.Factions[libraryName] = {
+        end        Chronicles.Data.Factions[libraryName] = {
             data = db,
             name = libraryName
         }
+        return true
     end
 end
 

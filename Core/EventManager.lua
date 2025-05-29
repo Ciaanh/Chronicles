@@ -119,11 +119,11 @@ private.Core.EventManager.Debugger = {
     maxHistorySize = 100,
     enable = function(self)
         self.enabled = true
-        print("|cFF00FF00[Chronicles EventManager]|r Debug mode enabled")
+        private.Core.Logger.info("EventManager", "Debug mode enabled")
     end,
     disable = function(self)
         self.enabled = false
-        print("|cFF00FF00[Chronicles EventManager]|r Debug mode disabled")
+        private.Core.Logger.info("EventManager", "Debug mode disabled")
     end,
     logEvent = function(self, eventName, data, source, isError)
         if not self.enabled and not isError then
@@ -144,14 +144,15 @@ private.Core.EventManager.Debugger = {
         -- Maintain history size limit
         if #self.logHistory > self.maxHistorySize then
             table.remove(self.logHistory, 1)
-        end
-
-        -- Print to chat if debug enabled or if error
+        end -- Print to chat if debug enabled or if error
         if self.enabled or isError then
-            local color = isError and "|cFFFF0000" or "|cFF00FF9A"
+            local logLevel = isError and "error" or "debug"
             local prefix = isError and "[ERROR]" or "[EVENT]"
             local dataStr = data and tostring(data.id or data.lower or "data") or "nil"
-            print(string.format("%s%s|r %s from %s: %s", color, prefix, eventName, source, dataStr))
+            private.Core.Logger[logLevel](
+                "EventManager",
+                string.format("%s %s from %s: %s", prefix, eventName, source, dataStr)
+            )
         end
     end,
     getHistory = function(self, count)
@@ -167,12 +168,15 @@ private.Core.EventManager.Debugger = {
     end,
     printHistory = function(self, count)
         local history = self:getHistory(count)
-        print("|cFF00FF00[Chronicles EventManager]|r Event History:")
+        private.Core.Logger.info("EventManager", "Event History:")
 
         for _, entry in ipairs(history) do
-            local color = entry.isError and "|cFFFF0000" or "|cFFFFFFFF"
+            local logLevel = entry.isError and "error" or "info"
             local timeStr = date("%H:%M:%S", entry.timestamp)
-            print(string.format("%s[%s] %s from %s|r", color, timeStr, entry.eventName, entry.source))
+            private.Core.Logger[logLevel](
+                "EventManager",
+                string.format("[%s] %s from %s", timeStr, entry.eventName, entry.source)
+            )
         end
     end
 }
@@ -210,7 +214,7 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
         private.Core.EventManager.Debugger:logEvent(eventName, data, source, true)
-        print("|cFFFF0000[Chronicles EventManager Error]|r Event validation failed for " .. eventName .. ": " .. error)
+        private.Core.Logger.error("EventManager", "Event validation failed for " .. eventName .. ": " .. error)
         return false
     end
 
@@ -227,9 +231,9 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
         return true
     else
         private.Core.EventManager.Debugger:logEvent(eventName, data, source, true)
-        print(
-            "|cFFFF0000[Chronicles EventManager Error]|r Event trigger failed for " ..
-                eventName .. ": " .. tostring(errorMsg)
+        private.Core.Logger.error(
+            "EventManager",
+            "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
         )
         return false
     end
@@ -282,10 +286,7 @@ private.Core.EventManager.safeRegisterCallback = function(eventName, callback, o
         local success, errorMsg = pcall(callback, ...)
         if not success then
             private.Core.EventManager.Debugger:logEvent(eventName, nil, tostring(owner), true)
-            print(
-                "|cFFFF0000[Chronicles EventManager Error]|r Callback failed for " ..
-                    eventName .. ": " .. tostring(errorMsg)
-            )
+            private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
         end
     end
 
@@ -300,9 +301,8 @@ private.Core.EventManager.PluginEvents = {
     registeredEvents = {},
     registerPluginEvent = function(self, pluginName, eventName, schema)
         local fullEventName = "Plugin." .. pluginName .. "." .. eventName
-
         if self.registeredEvents[fullEventName] then
-            print("|cFFFF0000[Chronicles EventManager Warning]|r Plugin event already registered: " .. fullEventName)
+            private.Core.Logger.warn("EventManager", "Plugin event already registered: " .. fullEventName)
             return false
         end
 
@@ -310,21 +310,18 @@ private.Core.EventManager.PluginEvents = {
             pluginName = pluginName,
             eventName = eventName,
             schema = schema
-        }
-
-        -- Add schema to validator if provided
+        } -- Add schema to validator if provided
         if schema then
             private.Core.EventManager.Validator:addSchema(fullEventName, schema)
         end
 
-        print("|cFF00FF00[Chronicles EventManager]|r Plugin event registered: " .. fullEventName)
+        private.Core.Logger.info("EventManager", "Plugin event registered: " .. fullEventName)
         return true
     end,
     triggerPluginEvent = function(self, pluginName, eventName, data, source)
         local fullEventName = "Plugin." .. pluginName .. "." .. eventName
-
         if not self.registeredEvents[fullEventName] then
-            print("|cFFFF0000[Chronicles EventManager Warning]|r Unknown plugin event: " .. fullEventName)
+            private.Core.Logger.warn("EventManager", "Unknown plugin event: " .. fullEventName)
             return false
         end
 
@@ -350,15 +347,18 @@ SlashCmdList["CHRONICLESEVENTDEBUG"] = function(msg)
         local count = tonumber(args[2]) or 10
         private.Core.EventManager.Debugger:printHistory(count)
     elseif command == "schemas" then
-        print("|cFF00FF00[Chronicles EventManager]|r Available event schemas:")
+        private.Core.Logger.info("EventManager", "Available event schemas:")
         for eventName, schema in pairs(eventSchemas) do
-            print("- " .. eventName .. ": " .. (schema.description or "No description"))
+            private.Core.Logger.info(
+                "EventManager",
+                "- " .. eventName .. ": " .. (schema.description or "No description")
+            )
         end
     else
-        print("|cFF00FF00[Chronicles EventManager]|r Commands:")
-        print("  /ceventdebug on - Enable event debugging")
-        print("  /ceventdebug off - Disable event debugging")
-        print("  /ceventdebug history [count] - Show event history")
-        print("  /ceventdebug schemas - List available event schemas")
+        private.Core.Logger.info("EventManager", "Commands:")
+        private.Core.Logger.info("EventManager", "  /ceventdebug on - Enable event debugging")
+        private.Core.Logger.info("EventManager", "  /ceventdebug off - Disable event debugging")
+        private.Core.Logger.info("EventManager", "  /ceventdebug history [count] - Show event history")
+        private.Core.Logger.info("EventManager", "  /ceventdebug schemas - List available event schemas")
     end
 end

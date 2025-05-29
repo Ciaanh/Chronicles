@@ -40,16 +40,15 @@ function CharacterListMixin:OnLoad()
 	)
 end
 
-function CharacterListMixin:LoadCharacters()
-	-- Safety check: Ensure PagedCharacterList exists and is properly initialized
+function CharacterListMixin:LoadCharacters() 
 	if not self.PagedCharacterList then
-		print("Chronicles: Error - PagedCharacterList frame not found")
+		private.Core.Logger.error("CharacterList", "PagedCharacterList frame not found")
 		return
 	end
 
 	-- Safety check: Ensure ViewFrames is initialized before proceeding
 	if not self.PagedCharacterList.ViewFrames then
-		print("Chronicles: Warning - ViewFrames not initialized for PagedCharacterList, attempting retry...")
+		private.Core.Logger.warn("CharacterList", "ViewFrames not initialized for PagedCharacterList, attempting retry...")
 		-- Retry after a short delay to allow for proper initialization
 		C_Timer.After(
 			0.1,
@@ -57,7 +56,7 @@ function CharacterListMixin:LoadCharacters()
 				if self.PagedCharacterList.ViewFrames then
 					self:LoadCharacters()
 				else
-					print("Chronicles: Error - ViewFrames still not initialized after retry")
+					private.Core.Logger.error("CharacterList", "ViewFrames still not initialized after retry")
 				end
 			end
 		)
@@ -67,7 +66,7 @@ function CharacterListMixin:LoadCharacters()
 	-- Get all characters using the data search function
 	local characters = Chronicles.Data:SearchCharacters()
 	if not characters then
-		print("Chronicles: Warning - No character data available")
+		private.Core.Logger.warn("CharacterList", "No character data available")
 		return
 	end
 
@@ -94,11 +93,10 @@ function CharacterListMixin:LoadCharacters()
 			self.PagedCharacterList:SetDataProvider(dataProvider, retainScrollPosition)
 		end
 	)
-
 	if not success then
-		print("Chronicles: Error setting data provider - " .. tostring(errorMsg))
+		private.Core.Logger.error("CharacterList", "Error setting data provider - " .. tostring(errorMsg))
 	else
-		print("Chronicles: Successfully loaded " .. #content.elements .. " characters")
+		private.Core.Logger.info("CharacterList", "Successfully loaded " .. #content.elements .. " characters")
 	end
 end
 
@@ -117,10 +115,9 @@ function CharacterListMixin:OnTimelineClean()
 			end
 		end
 	)
-
 	if not success then
-		print("Chronicles: Error clearing character list data - " .. tostring(errorMsg))
+		private.Core.Logger.error("CharacterList", "Error clearing character list data - " .. tostring(errorMsg))
 	else
-		print("Chronicles: Character list data cleared for timeline clean")
+		private.Core.Logger.info("CharacterList", "Character list data cleared for timeline clean")
 	end
 end

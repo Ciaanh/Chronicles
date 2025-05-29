@@ -41,15 +41,14 @@ function FactionListMixin:OnLoad()
 end
 
 function FactionListMixin:LoadFactions()
-	-- Safety check: Ensure PagedFactionList exists and is properly initialized
 	if not self.PagedFactionList then
-		print("Chronicles: Error - PagedFactionList frame not found")
+		private.Core.Logger.error("FactionList", "PagedFactionList frame not found")
 		return
 	end
 
 	-- Safety check: Ensure ViewFrames is initialized before proceeding
 	if not self.PagedFactionList.ViewFrames then
-		print("Chronicles: Warning - ViewFrames not initialized for PagedFactionList, attempting retry...")
+		private.Core.Logger.warn("FactionList", "ViewFrames not initialized for PagedFactionList, attempting retry...")
 		-- Retry after a short delay to allow for proper initialization
 		C_Timer.After(
 			0.1,
@@ -57,7 +56,7 @@ function FactionListMixin:LoadFactions()
 				if self.PagedFactionList.ViewFrames then
 					self:LoadFactions()
 				else
-					print("Chronicles: Error - ViewFrames still not initialized after retry")
+					private.Core.Logger.error("FactionList", "ViewFrames still not initialized after retry")
 				end
 			end
 		)
@@ -67,7 +66,7 @@ function FactionListMixin:LoadFactions()
 	-- Get all factions using the data search function
 	local factions = Chronicles.Data:SearchFactions()
 	if not factions then
-		print("Chronicles: Warning - No faction data available")
+		private.Core.Logger.warn("FactionList", "No faction data available")
 		return
 	end
 
@@ -94,11 +93,10 @@ function FactionListMixin:LoadFactions()
 			self.PagedFactionList:SetDataProvider(dataProvider, retainScrollPosition)
 		end
 	)
-
 	if not success then
-		print("Chronicles: Error setting data provider - " .. tostring(errorMsg))
+		private.Core.Logger.error("FactionList", "Error setting data provider - " .. tostring(errorMsg))
 	else
-		print("Chronicles: Successfully loaded " .. #content.elements .. " factions")
+		private.Core.Logger.info("FactionList", "Successfully loaded " .. #content.elements .. " factions")
 	end
 end
 
@@ -117,10 +115,9 @@ function FactionListMixin:OnTimelineClean()
 			end
 		end
 	)
-
 	if not success then
-		print("Chronicles: Error clearing faction list data - " .. tostring(errorMsg))
+		private.Core.Logger.error("FactionList", "Error clearing faction list data - " .. tostring(errorMsg))
 	else
-		print("Chronicles: Faction list data cleared for timeline clean")
+		private.Core.Logger.info("FactionList", "Faction list data cleared for timeline clean")
 	end
 end

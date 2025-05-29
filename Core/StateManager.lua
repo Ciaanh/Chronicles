@@ -202,48 +202,49 @@ local function setupEventListeners()
             private.Core.StateManager.setState("ui.selectedEvent", eventData, "Event selected")
         end,
         "StateManager"
-    )    -- Character selection
+    ) -- Character selection
     private.Core.registerCallback(
         private.constants.events.CharacterSelected,
         function(characterData)
             private.Core.StateManager.setState("ui.selectedCharacter", characterData, "Character selected")
         end,
         "StateManager"
-    )    -- Faction selection
+    ) -- Faction selection
     private.Core.registerCallback(
         private.constants.events.FactionSelected,
         function(factionData)
             private.Core.StateManager.setState("ui.selectedFaction", factionData, "Faction selected")
         end,
         "StateManager"
-    )    -- Timeline period selection
+    ) -- Timeline period selection
     private.Core.registerCallback(
         private.constants.events.TimelinePeriodSelected,
         function(periodData)
             private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
         end,
         "StateManager"
-    )    -- Timeline step changes
+    ) -- Timeline step changes
     private.Core.registerCallback(
         private.constants.events.TimelineStepChanged,
         function(stepData)
             private.Core.StateManager.setState("timeline.currentStep", stepData, "Timeline step changed")
         end,
         "StateManager"
-    )    -- Main frame state
+    ) -- Main frame state
     private.Core.registerCallback(
         private.constants.events.MainFrameUIOpenFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
         end,
         "StateManager"
-    )    private.Core.registerCallback(
+    )
+    private.Core.registerCallback(
         private.constants.events.MainFrameUICloseFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
         end,
         "StateManager"
-    )    -- Settings changes
+    ) -- Settings changes
     private.Core.registerCallback(
         private.constants.events.SettingsEventTypeChecked,
         function(data)
@@ -251,7 +252,8 @@ local function setupEventListeners()
             private.Core.StateManager.setState(path, data.checked, "Event type setting changed")
         end,
         "StateManager"
-    )    private.Core.registerCallback(
+    )
+    private.Core.registerCallback(
         private.constants.events.SettingsLibraryChecked,
         function(data)
             local path = "settings.libraries." .. tostring(data.library)
@@ -289,7 +291,7 @@ end
 
 function private.Core.StateManager.dumpState(path)
     local state = private.Core.StateManager.getState(path)
-    print("|cFF00FF00[Chronicles StateManager]|r State dump" .. (path and (" for " .. path) or "") .. ":")
+    private.Core.Logger.info("StateManager", "State dump" .. (path and (" for " .. path) or "") .. ":")
     private.Core.StateManager.printTable(state, 0)
 end
 
@@ -298,16 +300,16 @@ function private.Core.StateManager.printTable(t, indent)
     local prefix = string.rep("  ", indent)
 
     if type(t) ~= "table" then
-        print(prefix .. tostring(t))
+        private.Core.Logger.info("StateManager", prefix .. tostring(t))
         return
     end
 
     for k, v in pairs(t) do
         if type(v) == "table" then
-            print(prefix .. tostring(k) .. ":")
+            private.Core.Logger.info("StateManager", prefix .. tostring(k) .. ":")
             private.Core.StateManager.printTable(v, indent + 1)
         else
-            print(prefix .. tostring(k) .. ": " .. tostring(v))
+            private.Core.Logger.info("StateManager", prefix .. tostring(k) .. ": " .. tostring(v))
         end
     end
 end
@@ -356,18 +358,18 @@ SlashCmdList["CHRONICLESSTATEDEBUG"] = function(msg)
     elseif command == "history" then
         local count = tonumber(args[2]) or 5
         local history = private.Core.StateManager.getHistory(count)
-        print("|cFF00FF00[Chronicles StateManager]|r State History:")
+        private.Core.Logger.info("StateManager", "State History:")
         for _, entry in ipairs(history) do
             local timeStr = date("%H:%M:%S", entry.timestamp)
-            print(string.format("[%s] %s", timeStr, entry.description))
+            private.Core.Logger.info("StateManager", string.format("[%s] %s", timeStr, entry.description))
         end
     elseif command == "get" then
         local path = args[2]
         if path then
             local value = private.Core.StateManager.getState(path)
-            print("|cFF00FF00[Chronicles StateManager]|r " .. path .. ": " .. tostring(value))
+            private.Core.Logger.info("StateManager", path .. ": " .. tostring(value))
         else
-            print("|cFFFF0000Error:|r Please specify a state path")
+            private.Core.Logger.error("StateManager", "Please specify a state path")
         end
     elseif command == "set" then
         local path = args[2]
@@ -384,17 +386,16 @@ SlashCmdList["CHRONICLESSTATEDEBUG"] = function(msg)
             elseif value == "nil" then
                 value = nil
             end
-
             private.Core.StateManager.setState(path, value, "Manual state change")
-            print("|cFF00FF00[Chronicles StateManager]|r Set " .. path .. " to " .. tostring(value))
+            private.Core.Logger.info("StateManager", "Set " .. path .. " to " .. tostring(value))
         else
-            print("|cFFFF0000Error:|r Please specify path and value")
+            private.Core.Logger.error("StateManager", "Please specify path and value")
         end
     else
-        print("|cFF00FF00[Chronicles StateManager]|r Commands:")
-        print("  /cstatedebug dump [path] - Dump current state")
-        print("  /cstatedebug history [count] - Show state change history")
-        print("  /cstatedebug get <path> - Get state value")
-        print("  /cstatedebug set <path> <value> - Set state value")
+        private.Core.Logger.info("StateManager", "Commands:")
+        private.Core.Logger.info("StateManager", "  /cstatedebug dump [path] - Dump current state")
+        private.Core.Logger.info("StateManager", "  /cstatedebug history [count] - Show state change history")
+        private.Core.Logger.info("StateManager", "  /cstatedebug get <path> - Get state value")
+        private.Core.Logger.info("StateManager", "  /cstatedebug set <path> <value> - Set state value")
     end
 end

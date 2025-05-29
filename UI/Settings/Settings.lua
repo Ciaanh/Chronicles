@@ -241,10 +241,16 @@ end
 function SettingsMixin:OnSettingsTabSelected(tabNameOrData)
     -- Handle both string and table format for backward compatibility
     local tabName = tabNameOrData
-    if type(tabNameOrData) == "table" and tabNameOrData.tabName then
-        tabName = tabNameOrData.tabName
-    else
-        print("SettingsMixin:OnSettingsTabSelected - Invalid tabNameOrData format")
+    if type(tabNameOrData) == "table" then
+        if tabNameOrData.tabName then
+            tabName = tabNameOrData.tabName
+        else
+            private.Core.Logger.warn("Settings", "OnSettingsTabSelected - Table format missing 'tabName' property")
+            return
+        end
+    elseif type(tabNameOrData) ~= "string" then
+        private.Core.Logger.warn("Settings", "OnSettingsTabSelected - Invalid tabNameOrData format: " .. type(tabNameOrData))
+        return
     end
 
     self.TabUI.currentTab = tabName
