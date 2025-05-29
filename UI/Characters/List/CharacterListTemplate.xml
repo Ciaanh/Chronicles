@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
     <Script file="CharacterListTemplate.lua" />
 
     <!-- Character List Item Template -->
@@ -37,19 +38,11 @@
         </Scripts>
     </Button>
 
-
     <Frame name="CharacterListTemplate" mixin="CharacterListMixin" virtual="true">
         <Size x="1200" y="125" />
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
         </KeyValues>
-
-        <!-- 
-TooltipAzeriteLayout 
-TooltipDefaultDarkLayout
-TooltipGluesLayout
--->
-
         <Frames>
             <Button parentKey="Previous">
                 <Size x="50" y="50" />
@@ -152,6 +145,20 @@ TooltipGluesLayout
                             <Anchor point="TOPRIGHT" x="0" y="-10"/>
                             <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-480" y="10"/>
                         </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
+                        </Anchors>
+                        <KeyValues>
+                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
+                            <KeyValue key="fontName" value="SystemFont_Med3" type="string" />
+                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
+                            <KeyValue key="spacing" value="8" type="number"/>
+                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                        </KeyValues>
                     </Frame>
                 </Frames>
             </Frame>

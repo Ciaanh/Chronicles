@@ -1,14 +1,15 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-
 	<Include file="Fonts.xml" />
 
 	<Include file="Templates\BookPages.xml" />
+
 	<Include file="Events\Timeline\TimelineTemplate.xml" />
 	<Include file="Events\List\EventListTemplate.xml" />
 	<Include file="Events\List\EventListPagingControls.xml" />
 	<Include file="Events\Details\EventBookContentTemplates.xml" />
+	
 	<Include file="Characters\Details\CharacterBookContentTemplates.xml" />
 	<Include file="Characters\List\CharacterListTemplate.xml" />
 

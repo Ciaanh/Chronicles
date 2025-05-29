@@ -45,12 +45,11 @@ end
 -----------------------------------------------------------------------------------------
 -- Event List ---------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
 EventListMixin = {}
 function EventListMixin:OnLoad()
 	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	
+
 	-- Use state-based subscription for period selection
 	-- This aligns with the architectural direction of using state for UI updates
 	if private.Core.StateManager then
@@ -64,7 +63,6 @@ function EventListMixin:OnLoad()
 			"EventListMixin"
 		)
 	end
-
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 
@@ -81,8 +79,6 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period)
-	local data = {}
-
 	local eventList = Chronicles.Data:SearchEvents(period.lower, period.upper)
 	private.Core.Timeline:SetYear(math.floor((period.lower + period.upper) / 2))
 
@@ -101,6 +97,7 @@ function EventListMixin:UpdateFromSelectedPeriod(period)
 		table.insert(content.elements, eventSummary)
 	end
 
+	local data = {}
 	table.insert(data, content)
 
 	local dataProvider = CreateDataProvider(data)
