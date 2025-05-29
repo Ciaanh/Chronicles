@@ -56,9 +56,7 @@ function Chronicles:OnInitialize()
         function()
             self.NewUi:DisplayWindow()
         end
-    )
-
-    Chronicles.Data:Init()    
+    )    Chronicles.Data:Init()    
     
     -- Initialize event system
     -- Enable debug mode if configured
