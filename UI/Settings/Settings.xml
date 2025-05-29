@@ -189,13 +189,13 @@
                                     <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                                 <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="400" y="8"/>
+                                    <Size x="700" y="8"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
                                 <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Welcome to Chronicles settings. Use the categories on the left to configure your preferences.">
-                                    <Size x="450" y="40"/>
+                                    <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
                                     </Anchors>
@@ -229,21 +229,21 @@
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
                                         <FontString parentKey="EventTypesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Event Types: Configure which event categories appear in your timeline">
-                                            <Size x="400" y="20"/>
+                                            <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
                                         <FontString parentKey="LibrariesInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• Libraries: Enable or disable content libraries from different expansions">
-                                            <Size x="400" y="20"/>
+                                            <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
                                         <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="• My Journal: Create and manage your own custom events and storylines">
-                                            <Size x="400" y="20"/>
+                                            <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.LibrariesInfo" x="0" y="-5"/>
                                             </Anchors>
@@ -278,21 +278,21 @@
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
                                         <FontString parentKey="Tip1" inherits="SystemFont_Med3" justifyH="LEFT" text="1. Start with Event Types to customize which events you want to see">
-                                            <Size x="450" y="18"/>
+                                            <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
                                         <FontString parentKey="Tip2" inherits="SystemFont_Med3" justifyH="LEFT" text="2. Use Libraries to enable content from specific expansions or lore sources">
-                                            <Size x="450" y="18"/>
+                                            <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip1" x="0" y="-3"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
                                         <FontString parentKey="Tip3" inherits="SystemFont_Med3" justifyH="LEFT" text="3. Enable My Journal to add your own custom events and characters">
-                                            <Size x="450" y="18"/>
+                                            <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip2" x="0" y="-3"/>
                                             </Anchors>
@@ -327,14 +327,14 @@
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
                                         <FontString parentKey="VersionInfo" inherits="SystemFont_Med3" justifyH="LEFT" text="A comprehensive timeline addon for World of Warcraft lore and events.">
-                                            <Size x="400" y="18"/>
+                                            <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-8"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
                                         <FontString parentKey="ConfigNote" inherits="SystemFont_Med3" justifyH="LEFT" text="Settings are automatically saved and will persist between sessions.">
-                                            <Size x="400" y="18"/>
+                                            <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.VersionInfo" x="0" y="-3"/>
                                             </Anchors>
@@ -367,13 +367,13 @@
                                     <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                                 <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="400" y="8"/>
+                                    <Size x="700" y="8"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
                                 <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Configure which types of events to display in the timeline and event lists.">
-                                    <Size x="450" y="40"/>
+                                    <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
                                     </Anchors>
@@ -442,13 +442,13 @@
                                     <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                                 <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="400" y="8"/>
+                                    <Size x="700" y="8"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
                                 <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable or disable event libraries to customize which content is available.">
-                                    <Size x="450" y="40"/>
+                                    <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
                                     </Anchors>
@@ -505,13 +505,13 @@
                                     <Color r="0.9" g="0.9" b="0.9"/>
                                 </FontString>
                                 <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="400" y="8"/>
+                                    <Size x="700" y="8"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
                                 <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT" text="Enable personal journal features to create and manage your own custom content.">
-                                    <Size x="450" y="40"/>
+                                    <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
                                     </Anchors>
@@ -546,7 +546,7 @@
                                 <Layers>
                                     <Layer level="OVERLAY">
                                         <FontString parentKey="FeatureDescription" inherits="SystemFont_Med3" justifyH="LEFT" text="When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content.">
-                                            <Size x="400" y="60"/>
+                                            <Size x="700" y="60"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.IsActive" x="0" y="-10"/>
                                             </Anchors>
