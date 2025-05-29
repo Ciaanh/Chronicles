@@ -6,17 +6,19 @@ EventBookMixin = {}
 function EventBookMixin:OnLoad()
 	self.PagedEventDetails:SetElementTemplateData(private.constants.templates)
 
-	-- Use safe event registration
-	private.Core.registerCallback(private.constants.events.EventSelected, self.OnEventSelected, self)
+	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
 	
-	-- Subscribe to state changes for the selected event
+	-- Use state-based subscription for event selection
+	-- This provides a single source of truth for the selected event
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
 			"ui.selectedEvent",
 			function(newEvent, oldEvent)
 				if newEvent then
 					self:OnEventSelected(newEvent)
+				else
+					self:OnTimelineClean()
 				end
 			end,
 			"EventBookMixin"

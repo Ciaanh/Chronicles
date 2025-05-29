@@ -24,15 +24,19 @@ end
 
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs()
-	-- Use safe event triggering with fallback
-	private.Core.triggerEvent(private.constants.events.MainFrameUIOpenFrame, nil, "MainFrameUI:OnShow")
+	-- Update state instead of triggering event - provides single source of truth
+	if private.Core.StateManager then
+		private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
+	end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
 
 function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW)
-	-- Use safe event triggering with fallback
-	private.Core.triggerEvent(private.constants.events.MainFrameUICloseFrame, nil, "MainFrameUI:OnHide")
+	-- Update state instead of triggering event - provides single source of truth
+	if private.Core.StateManager then
+		private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
+	end
 end
 
 -----------------------------------------------------------------------------------------

@@ -5,12 +5,20 @@ CharacterDetailPageMixin = {}
 
 function CharacterDetailPageMixin:OnLoad()
 	self.PagedCharacterDetails:SetElementTemplateData(private.constants.templates)
-	-- Use safe event registration with fallback
-	private.Core.registerCallback(
-		private.constants.events.CharacterSelected,
-		self.OnCharacterSelected,
-		self
-	)
+	
+	-- Use state-based subscription for character selection
+	-- This provides a single source of truth for the selected character
+	if private.Core.StateManager then
+		private.Core.StateManager.subscribe(
+			"ui.selectedCharacter",
+			function(newCharacter, oldCharacter)
+				if newCharacter then
+					self:OnCharacterSelected(newCharacter)
+				end
+			end,
+			"CharacterDetailPageMixin"
+		)
+	end
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

@@ -31,8 +31,10 @@ function EventListItemMixin:Init(eventData)
 end
 
 function EventListItemMixin:OnClick()
-	-- Use safe event triggering
-	private.Core.triggerEvent(private.constants.events.EventSelected, self.Event, "EventListItem:OnClick")
+	-- Update state instead of triggering event - provides single source of truth
+	if private.Core.StateManager then
+		private.Core.StateManager.setState("ui.selectedEvent", self.Event, "Event selected from list")
+	end
 end
 
 EventListTitleMixin = {}

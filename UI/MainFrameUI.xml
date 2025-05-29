@@ -78,8 +78,6 @@
                     </Frame> -->
                 </Frames>
             </Frame>
-
-
             <Frame parentKey="Factions" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
@@ -89,6 +87,12 @@
                     <Frame parentKey="Book" inherits="FactionBookTemplate">
                         <Anchors>
                             <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="FactionList" inherits="FactionListTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
                         </Anchors>
                     </Frame>
 

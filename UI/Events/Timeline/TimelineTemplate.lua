@@ -20,7 +20,7 @@ function TimelineMixin:OnLoad()
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
 
-    -- Use safe event registration
+    -- Use safe event registration for events that don't have state equivalents
     private.Core.registerCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
     private.Core.registerCallback(
         private.constants.events.TimelinePreviousButtonVisible,
@@ -32,11 +32,20 @@ function TimelineMixin:OnLoad()
         self.OnTimelineNextButtonVisible,
         self
     )
-    private.Core.registerCallback(
-        private.constants.events.TimelineStepChanged,
-        self.OnTimelineStepChanged,
-        self
-    )
+
+    -- Use state-based subscription for timeline step changes
+    -- This provides a single source of truth for the current timeline step
+    if private.Core.StateManager then
+        private.Core.StateManager.subscribe(
+            "timeline.currentStep",
+            function(newStep, oldStep)
+                if newStep then
+                    self:OnTimelineStepChanged(newStep)
+                end
+            end,
+            "TimelineMixin"
+        )
+    end
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
@@ -136,14 +145,10 @@ function TimelinePeriodMixin:OnClick()
         lower = self.data.lowerBound,
         upper = self.data.upperBound,
         text = self.data.text
-    }
-
-    -- Use safe event triggering
-    private.Core.triggerEvent(
-        private.constants.events.TimelinePeriodSelected,
-        periodData,
-        "TimelinePeriod:OnClick"
-    )
+    } -- Update state instead of triggering event - provides single source of truth
+    if private.Core.StateManager then
+        private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
+    end
 
     Timeline.Period:Show()
 

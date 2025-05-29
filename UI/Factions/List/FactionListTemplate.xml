@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-    <Script file="CharacterListTemplate.lua" />
+    <Script file="FactionListTemplate.lua" />
 
-    <!-- Character List Item Template -->
-    <Button name="CharacterListItemTemplate" mixin="CharacterListItemMixin" virtual="true">
+    <!-- Faction List Item Template -->
+    <Button name="FactionListItemTemplate" mixin="FactionListItemMixin" virtual="true">
         <Size y="110"/>
         <KeyValues>
             <KeyValue key="textureHeight" value="80" type="number"/>
@@ -37,18 +37,11 @@
         </Scripts>
     </Button>
 
-
-    <Frame name="CharacterListTemplate" mixin="CharacterListMixin" virtual="true">
+    <Frame name="FactionListTemplate" mixin="FactionListMixin" virtual="true">
         <Size x="1200" y="125" />
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
         </KeyValues>
-
-        <!-- 
-TooltipAzeriteLayout 
-TooltipDefaultDarkLayout
-TooltipGluesLayout
--->
 
         <Frames>
             <Button parentKey="Previous">
@@ -76,6 +69,14 @@ TooltipGluesLayout
                         <Anchor point="CENTER" y="1"/>
                     </Anchors>
                 </HighlightTexture>
+                <Scripts>
+                    <OnLoad >
+                        self:GetNormalTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetHighlightTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetPushedTexture():SetTexCoord(1, 0, 0, 1)
+                        self:GetDisabledTexture():SetTexCoord(1, 0, 0, 1)
+                    </OnLoad >
+                </Scripts>
             </Button>
 
             <Button parentKey="Next">
@@ -119,9 +120,10 @@ TooltipGluesLayout
                     <Anchor point="BOTTOMRIGHT" x="-7" y="6" />
                 </Anchors>
             </Frame>
+
             <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate" />
             <!-- Content -->
-            <Frame parentKey="PagedCharacterList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+            <Frame parentKey="PagedFactionList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
                 <KeyValues>
                     <KeyValue key="viewsPerPage" value="2" type="number"/>
                     <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
@@ -159,7 +161,6 @@ TooltipGluesLayout
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />
-            <!-- <OnMouseWheel method="OnMouseWheel" /> -->
         </Scripts>
     </Frame>
 </Ui>

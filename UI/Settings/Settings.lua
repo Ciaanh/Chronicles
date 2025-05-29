@@ -59,14 +59,26 @@ function SettingsMixin:OnLoad()
             self.TabUI.Tabs[tabKey] = category
         end
     end
-
-    private.Core.registerCallback(private.constants.events.SettingsTabSelected, self.OnSettingsTabSelected, self)
     private.Core.registerCallback(
         private.constants.events.SettingsEventTypeChecked,
         self.OnSettingsEventTypeChecked,
         self
     )
     private.Core.registerCallback(private.constants.events.SettingsLibraryChecked, self.OnSettingsLibraryChecked, self)
+
+    -- Use state-based subscription for tab selection
+    -- This provides a single source of truth for the active tab
+    if private.Core.StateManager then
+        private.Core.StateManager.subscribe(
+            "ui.activeTab",
+            function(newTab, oldTab)
+                if newTab then
+                    self:OnSettingsTabSelected(newTab)
+                end
+            end,
+            "SettingsMixin"
+        )
+    end
 
     self:UpdateTabs()
     if self.TabUI.currentTab then
@@ -510,13 +522,17 @@ end
 function CategoryButtonMixin:OnClick()
     -- Handle tab selection if this category has a TabName
     if self.category and self.category.TabName then
-        local settingsFrame = self:GetParent():GetParent() -- Get the main settings frame
-        if settingsFrame and settingsFrame.OnSettingsTabSelected then
-            settingsFrame:OnSettingsTabSelected(self.category.TabName)
-
-            -- Update visual selection state for all category buttons
-            self:UpdateCategorySelection()
+        -- Update state instead of calling method directly - provides single source of truth
+        if private.Core.StateManager then
+            private.Core.StateManager.setState(
+                "ui.activeTab",
+                self.category.TabName,
+                "Settings tab selected from category button"
+            )
         end
+
+        -- Update visual selection state for all category buttons
+        self:UpdateCategorySelection()
     end
 end
 

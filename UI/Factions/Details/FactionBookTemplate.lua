@@ -5,8 +5,20 @@ FactionDetailPageMixin = {}
 
 function FactionDetailPageMixin:OnLoad()
 	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)
-	-- Use safe event registration with fallback
-	private.Core.registerCallback(private.constants.events.FactionSelected, self.OnFactionSelected, self)
+	
+	-- Use state-based subscription for faction selection
+	-- This provides a single source of truth for the selected faction
+	if private.Core.StateManager then
+		private.Core.StateManager.subscribe(
+			"ui.selectedFaction",
+			function(newFaction, oldFaction)
+				if newFaction then
+					self:OnFactionSelected(newFaction)
+				end
+			end,
+			"FactionDetailPageMixin"
+		)
+	end
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)

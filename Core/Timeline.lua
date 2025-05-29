@@ -549,6 +549,11 @@ function private.Core.Timeline:ChangeCurrentStepValue(direction)
 
     Timeline.CurrentStepValue = nextStepValue
 
+    -- Update state instead of triggering event - provides single source of truth
+    if private.Core.StateManager then
+        private.Core.StateManager.setState("timeline.currentStep", nextStepValue, "Timeline step changed via zoom")
+    end
+
     private.Core.Timeline:ComputeTimelinePeriods()
     Timeline.CurrentPage = GetYearPageIndex(Timeline.SelectedYear)
     private.Core.Timeline:DisplayTimelineWindow()
