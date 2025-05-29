@@ -125,18 +125,10 @@ end
 
 function private.Core.StateManager.notifyStateChange(path, newValue, oldValue)
     local listeners = StateManager.listeners[path] or {}
-
     for _, listener in ipairs(listeners) do
         local success, error = pcall(listener.callback, newValue, oldValue, path)
         if not success then
-            if private.Core.EventManager then
-                private.Core.EventManager.Debugger:logEvent(
-                    "StateManager.ListenerError",
-                    {path = path, error = error},
-                    listener.owner,
-                    true
-                )
-            end
+            private.Core.Logger.error("StateManager", "Listener error for path " .. path .. ": " .. tostring(error))
         end
     end
 
@@ -145,16 +137,13 @@ function private.Core.StateManager.notifyStateChange(path, newValue, oldValue)
     for i = 1, #pathParts - 1 do
         local parentPath = table.concat(pathParts, ".", 1, i)
         local parentListeners = StateManager.listeners[parentPath] or {}
-
         for _, listener in ipairs(parentListeners) do
             if listener.includeChildren then
                 local success, error = pcall(listener.callback, newValue, oldValue, path)
-                if not success and private.Core.EventManager then
-                    private.Core.EventManager.Debugger:logEvent(
-                        "StateManager.ListenerError",
-                        {path = parentPath, error = error},
-                        listener.owner,
-                        true
+                if not success then
+                    private.Core.Logger.error(
+                        "StateManager",
+                        "Parent listener error for path " .. parentPath .. ": " .. tostring(error)
                     )
                 end
             end
@@ -197,7 +186,7 @@ end
 local function setupEventListeners()
     -- Use centralized event constants to avoid string duplication errors
     local events = private.constants.events
-    
+
     -- Event selection
     private.Core.registerCallback(
         events.EventSelected,
@@ -206,7 +195,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Character selection
     private.Core.registerCallback(
         events.CharacterSelected,
@@ -215,7 +204,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Faction selection
     private.Core.registerCallback(
         events.FactionSelected,
@@ -224,7 +213,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Timeline period selection
     private.Core.registerCallback(
         events.TimelinePeriodSelected,
@@ -233,7 +222,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Timeline step changes
     private.Core.registerCallback(
         events.TimelineStepChanged,
@@ -242,7 +231,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Main frame state
     private.Core.registerCallback(
         events.MainFrameUIOpenFrame,
@@ -251,7 +240,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     private.Core.registerCallback(
         events.MainFrameUICloseFrame,
         function()
@@ -259,7 +248,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     -- Settings changes
     private.Core.registerCallback(
         events.SettingsEventTypeChecked,
@@ -269,7 +258,7 @@ local function setupEventListeners()
         end,
         "StateManager"
     )
-    
+
     private.Core.registerCallback(
         events.SettingsLibraryChecked,
         function(data)

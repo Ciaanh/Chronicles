@@ -110,78 +110,6 @@ local eventSchemas = {
 }
 
 -----------------------------------------------------------------------------------------
--- Event Debugger & Logging ------------------------------------------------------------
------------------------------------------------------------------------------------------
-
-private.Core.EventManager.Debugger = {
-    enabled = false,
-    logHistory = {},
-    maxHistorySize = 100,
-    enable = function(self)
-        self.enabled = true
-        private.Core.Logger.info("EventManager", "Debug mode enabled")
-    end,
-    disable = function(self)
-        self.enabled = false
-        private.Core.Logger.info("EventManager", "Debug mode disabled")
-    end,
-    logEvent = function(self, eventName, data, source, isError)
-        if not self.enabled and not isError then
-            return
-        end
-
-        local timestamp = GetServerTime()
-        local logEntry = {
-            timestamp = timestamp,
-            eventName = eventName,
-            data = data,
-            source = source or "unknown",
-            isError = isError or false
-        }
-
-        table.insert(self.logHistory, logEntry)
-
-        -- Maintain history size limit
-        if #self.logHistory > self.maxHistorySize then
-            table.remove(self.logHistory, 1)
-        end -- Print to chat if debug enabled or if error
-        if self.enabled or isError then
-            local logLevel = isError and "error" or "debug"
-            local prefix = isError and "[ERROR]" or "[EVENT]"
-            local dataStr = data and tostring(data.id or data.lower or "data") or "nil"
-            private.Core.Logger[logLevel](
-                "EventManager",
-                string.format("%s %s from %s: %s", prefix, eventName, source, dataStr)
-            )
-        end
-    end,
-    getHistory = function(self, count)
-        count = count or 10
-        local history = {}
-        local startIndex = math.max(1, #self.logHistory - count + 1)
-
-        for i = startIndex, #self.logHistory do
-            table.insert(history, self.logHistory[i])
-        end
-
-        return history
-    end,
-    printHistory = function(self, count)
-        local history = self:getHistory(count)
-        private.Core.Logger.info("EventManager", "Event History:")
-
-        for _, entry in ipairs(history) do
-            local logLevel = entry.isError and "error" or "info"
-            local timeStr = date("%H:%M:%S", entry.timestamp)
-            private.Core.Logger[logLevel](
-                "EventManager",
-                string.format("[%s] %s from %s", timeStr, entry.eventName, entry.source)
-            )
-        end
-    end
-}
-
------------------------------------------------------------------------------------------
 -- Event Validator ----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -213,7 +141,6 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     -- Validate event data
     local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
-        private.Core.EventManager.Debugger:logEvent(eventName, data, source, true)
         private.Core.Logger.error("EventManager", "Event validation failed for " .. eventName .. ": " .. error)
         return false
     end
@@ -225,12 +152,9 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
             EventRegistry:TriggerEvent(eventName, data)
         end
     )
-
     if success then
-        private.Core.EventManager.Debugger:logEvent(eventName, data, source, false)
         return true
     else
-        private.Core.EventManager.Debugger:logEvent(eventName, data, source, true)
         private.Core.Logger.error(
             "EventManager",
             "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
@@ -285,7 +209,6 @@ private.Core.EventManager.safeRegisterCallback = function(eventName, callback, o
     local wrappedCallback = function(...)
         local success, errorMsg = pcall(callback, ...)
         if not success then
-            private.Core.EventManager.Debugger:logEvent(eventName, nil, tostring(owner), true)
             private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
         end
     end
@@ -328,37 +251,3 @@ private.Core.EventManager.PluginEvents = {
         return private.Core.EventManager.safeTrigger(fullEventName, data, source)
     end
 }
-
------------------------------------------------------------------------------------------
--- Console Commands ---------------------------------------------------------------------
------------------------------------------------------------------------------------------
-
--- Add slash commands for debugging
-SLASH_CHRONICLESEVENTDEBUG1 = "/ceventdebug"
-SlashCmdList["CHRONICLESEVENTDEBUG"] = function(msg)
-    local args = {strsplit(" ", msg)}
-    local command = args[1]
-
-    if command == "on" then
-        private.Core.EventManager.Debugger:enable()
-    elseif command == "off" then
-        private.Core.EventManager.Debugger:disable()
-    elseif command == "history" then
-        local count = tonumber(args[2]) or 10
-        private.Core.EventManager.Debugger:printHistory(count)
-    elseif command == "schemas" then
-        private.Core.Logger.info("EventManager", "Available event schemas:")
-        for eventName, schema in pairs(eventSchemas) do
-            private.Core.Logger.info(
-                "EventManager",
-                "- " .. eventName .. ": " .. (schema.description or "No description")
-            )
-        end
-    else
-        private.Core.Logger.info("EventManager", "Commands:")
-        private.Core.Logger.info("EventManager", "  /ceventdebug on - Enable event debugging")
-        private.Core.Logger.info("EventManager", "  /ceventdebug off - Disable event debugging")
-        private.Core.Logger.info("EventManager", "  /ceventdebug history [count] - Show event history")
-        private.Core.Logger.info("EventManager", "  /ceventdebug schemas - List available event schemas")
-    end
-end

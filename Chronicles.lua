@@ -56,23 +56,19 @@ function Chronicles:OnInitialize()
         function()
             self.NewUi:DisplayWindow()
         end
-    )    Chronicles.Data:Init()    
-    
-    -- Initialize event system
-    -- Enable debug mode if configured
-    if private.Core.EventManager and private.constants.eventSystem.debugMode then
-        private.Core.EventManager.Debugger:enable()
-    end
+    )
+    Chronicles.Data:Init()
 
     -- Initialize state manager
     if private.Core.StateManager then
         private.Core.StateManager.init()
-    end    -- Use safe event triggering
+    end
+     -- Use safe event triggering
     private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:OnInitialize")
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.Data:RegisterEventDB(pluginName, db)    -- Use safe event triggering
+    Chronicles.Data:RegisterEventDB(pluginName, db) -- Use safe event triggering
     private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
 end
 
