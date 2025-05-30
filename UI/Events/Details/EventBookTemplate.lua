@@ -7,8 +7,8 @@ function EventBookMixin:OnLoad()
 	self.PagedEventDetails:SetElementTemplateData(private.constants.templates)
 
 	-- Register only for events that don't have a state equivalent
-	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
-	
+	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
+
 	-- Use state-based subscription for event selection
 	-- This provides a single source of truth for the selected event
 	if private.Core.StateManager then
@@ -18,7 +18,7 @@ function EventBookMixin:OnLoad()
 				if newEvent then
 					self:OnEventSelected(newEvent)
 				else
-					self:OnTimelineClean()
+					self:OnUIRefresh()
 				end
 			end,
 			"EventBookMixin"
@@ -51,8 +51,8 @@ function EventBookMixin:OnEventSelected(data)
 	self.PagedEventDetails:SetDataProvider(dataProvider, retainScrollPosition)
 end
 
-function EventBookMixin:OnTimelineClean()
-	local data = {}
+function EventBookMixin:OnUIRefresh()
+	local data = private.Core.Events.EmptyBook()
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
 

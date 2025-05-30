@@ -349,8 +349,8 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
 
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
-
-    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:OnSettingsEventTypeChecked")
+    
+    private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
 end
 
 function SettingsMixin:OnSettingsLibraryChecked(libraryId, checked)
@@ -360,7 +360,7 @@ function SettingsMixin:OnSettingsLibraryChecked(libraryId, checked)
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
 
-    private.Core.triggerEvent(private.constants.events.TimelineClean, nil, "Settings:OnSettingsLibraryChecked")
+    private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsLibraryChecked")
 end
 
 function SettingsMixin:LoadSettingsHome(frame)
@@ -586,11 +586,6 @@ function SettingsMixin:LoadMyJournal(frame)
                 else
                     MyJournalViewShow:Hide()
                 end
-            end
-
-            -- Refresh UI if method exists
-            if Chronicles.UI and Chronicles.UI.Refresh then
-                Chronicles.UI:Refresh()
             end
         end
     )

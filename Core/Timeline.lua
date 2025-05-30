@@ -9,11 +9,43 @@ local Chronicles = private.Chronicles
 -- Timeline -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 local Timeline = {}
+-- KEEP: Core timeline data that's not in state
 Timeline.MaxStepIndex = #private.constants.config.stepValues
-Timeline.CurrentStepValue = nil
-Timeline.CurrentPage = nil
-Timeline.SelectedYear = nil
 Timeline.Periods = {}
+
+-- Helper functions to access state values
+local function getCurrentStepValue()
+    local value = private.Core.StateManager.getState("timeline.currentStep")
+    private.Core.Logger.trace("Timeline", "Retrieved current step value: " .. tostring(value))
+    return value
+end
+
+local function getCurrentPage()
+    local value = private.Core.StateManager.getState("timeline.currentPage")
+    private.Core.Logger.trace("Timeline", "Retrieved current page: " .. tostring(value))
+    return value
+end
+
+local function getSelectedYear()
+    local value = private.Core.StateManager.getState("timeline.selectedYear")
+    private.Core.Logger.trace("Timeline", "Retrieved selected year: " .. tostring(value))
+    return value
+end
+
+local function setCurrentStepValue(value, description)
+    private.Core.Logger.debug("Timeline", "Setting timeline step to: " .. tostring(value))
+    private.Core.StateManager.setState("timeline.currentStep", value, description or "Timeline step changed")
+end
+
+local function setCurrentPage(value, description)
+    private.Core.Logger.debug("Timeline", "Setting timeline page to: " .. tostring(value))
+    private.Core.StateManager.setState("timeline.currentPage", value, description or "Timeline page changed")
+end
+
+local function setSelectedYear(value, description)
+    private.Core.Logger.debug("Timeline", "Setting selected year to: " .. tostring(value))
+    private.Core.StateManager.setState("timeline.selectedYear", value, description or "Timeline year changed")
+end
 
 local function GetDateCurrentStepIndex(date)
     local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
@@ -23,19 +55,20 @@ local function GetDateCurrentStepIndex(date)
         return 0
     end
 
-    if (Timeline.CurrentStepValue == 1000) then
+    local currentStepValue = getCurrentStepValue()
+    if (currentStepValue == 1000) then
         return dateProfile.mod1000 or 0
-    elseif (Timeline.CurrentStepValue == 500) then
+    elseif (currentStepValue == 500) then
         return dateProfile.mod500 or 0
-    elseif (Timeline.CurrentStepValue == 250) then
+    elseif (currentStepValue == 250) then
         return dateProfile.mod250 or 0
-    elseif (Timeline.CurrentStepValue == 100) then
+    elseif (currentStepValue == 100) then
         return dateProfile.mod100 or 0
-    elseif (Timeline.CurrentStepValue == 50) then
+    elseif (currentStepValue == 50) then
         return dateProfile.mod50 or 0
-    elseif (Timeline.CurrentStepValue == 10) then
+    elseif (currentStepValue == 10) then
         return dateProfile.mod10 or 0
-    elseif (Timeline.CurrentStepValue == 1) then
+    elseif (currentStepValue == 1) then
         --     return dateProfile.mod1
         return 0 -- Return default value for step 1 (not implemented)
     else
@@ -52,19 +85,20 @@ local function GetCurrentStepPeriodsFilling()
         return {}
     end
 
-    if (Timeline.CurrentStepValue == 1000) then
+    local currentStepValue = getCurrentStepValue()
+    if (currentStepValue == 1000) then
         return eventDates.mod1000 or {}
-    elseif (Timeline.CurrentStepValue == 500) then
+    elseif (currentStepValue == 500) then
         return eventDates.mod500 or {}
-    elseif (Timeline.CurrentStepValue == 250) then
+    elseif (currentStepValue == 250) then
         return eventDates.mod250 or {}
-    elseif (Timeline.CurrentStepValue == 100) then
+    elseif (currentStepValue == 100) then
         return eventDates.mod100 or {}
-    elseif (Timeline.CurrentStepValue == 50) then
+    elseif (currentStepValue == 50) then
         return eventDates.mod50 or {}
-    elseif (Timeline.CurrentStepValue == 10) then
+    elseif (currentStepValue == 10) then
         return eventDates.mod10 or {}
-    elseif (Timeline.CurrentStepValue == 1) then
+    elseif (currentStepValue == 1) then
         --     return eventDates.mod1
         return {} -- Return empty table for step 1 (not implemented)
     else
@@ -223,7 +257,7 @@ local function GetYearPageIndex(year)
     local selectedYear = year
 
     if (selectedYear == nil) then
-        local page = Timeline.CurrentPage
+        local page = getCurrentPage()
         local pageSize = private.constants.config.timeline.pageSize
         local numberOfCells = #Timeline.Periods
 
@@ -257,26 +291,33 @@ local function GetYearPageIndex(year)
 
     local minYear = Chronicles.Data:MinEventYear()
     local length = math.abs(minYear - selectedYear)
-    local yearIndex = math.floor(length / Timeline.CurrentStepValue)
+    local currentStepValue = getCurrentStepValue()
+    local yearIndex = math.floor(length / currentStepValue)
     local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
 
     return result
 end
 
 function private.Core.Timeline:ChangePage(value)
-    Timeline.CurrentPage = Timeline.CurrentPage + value
+    local currentPage = getCurrentPage() or 1
+    local newPage = currentPage + value
+    setCurrentPage(newPage, "Timeline page changed via navigation")
     self:DisplayTimelineWindow()
 end
 
 function private.Core.Timeline:SetYear(year)
-    Timeline.SelectedYear = year
+    setSelectedYear(year, "Timeline year set")
 end
 
 function private.Core.Timeline:ComputeTimelinePeriods()
-    local stepValue = Timeline.CurrentStepValue
+    local stepValue = getCurrentStepValue()
     if (stepValue == nil) then
-        Timeline.CurrentStepValue = private.constants.config.stepValues[1]
-        stepValue = Timeline.CurrentStepValue
+        stepValue = private.constants.config.stepValues[1]
+
+        private.Core.Logger.debug("Timeline", "Initializing timeline step to default value: " .. tostring(stepValue))
+
+        -- Update state when initializing for the first time
+        setCurrentStepValue(stepValue, "Timeline step initialized")
     end
 
     local minYear = Chronicles.Data:MinEventYear()
@@ -387,7 +428,7 @@ end
 
 -- Calculate pagination parameters for the timeline window
 local function CalculateTimelinePagination()
-    local pageIndex = Timeline.CurrentPage
+    local pageIndex = getCurrentPage()
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #Timeline.Periods
     local maxPageValue = math.ceil(numberOfCells / pageSize)
@@ -478,9 +519,9 @@ local function DistributeTimelineLabels(paginationData)
         local labelData = Timeline.Periods[periodIndex]
         local eventName = eventNamePrefix .. tostring(labelIndex)
         local isLastLabel = (labelIndex == pageSize + 1)
-        
+
         local labelText = ""
-        
+
         if labelData then
             labelText = GenerateLabelText(labelData, isLastLabel, firstIndex, labelIndex)
         elseif isLastLabel then
@@ -515,7 +556,7 @@ function private.Core.Timeline:DisplayTimelineWindow()
     local paginationData = CalculateTimelinePagination()
 
     -- Update the current page state
-    Timeline.CurrentPage = paginationData.pageIndex
+    setCurrentPage(paginationData.pageIndex, "Timeline page updated during display")
 
     -- Update UI state
     UpdateNavigationButtons(paginationData)
@@ -527,7 +568,7 @@ end
 
 function private.Core.Timeline:ChangeCurrentStepValue(direction)
     -- TODO investigate performance issue with step 1 and 10
-    local currentStepValue = Timeline.CurrentStepValue
+    local currentStepValue = getCurrentStepValue()
     local curentStepIndex = GetStepValueIndex(currentStepValue)
     local nextStepValue = private.constants.config.stepValues[1]
 
@@ -547,14 +588,39 @@ function private.Core.Timeline:ChangeCurrentStepValue(direction)
         nextStepValue = private.constants.config.stepValues[curentStepIndex - 1]
     end
 
-    Timeline.CurrentStepValue = nextStepValue
+    private.Core.Logger.debug(
+        "Timeline",
+        "Changing timeline step from " .. tostring(currentStepValue) .. " to " .. tostring(nextStepValue)
+    )
 
     -- Update state instead of triggering event - provides single source of truth
-    if private.Core.StateManager then
-        private.Core.StateManager.setState("timeline.currentStep", nextStepValue, "Timeline step changed via zoom")
-    end
+    setCurrentStepValue(nextStepValue, "Timeline step changed via zoom")
 
     private.Core.Timeline:ComputeTimelinePeriods()
-    Timeline.CurrentPage = GetYearPageIndex(Timeline.SelectedYear)
+    local selectedYear = getSelectedYear()
+    local newPage = GetYearPageIndex(selectedYear)
+    setCurrentPage(newPage, "Timeline page updated after step change")
     private.Core.Timeline:DisplayTimelineWindow()
+end
+
+-----------------------------------------------------------------------------------------
+-- Initialization -----------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+
+function private.Core.Timeline:Init()
+    private.Core.Logger.debug("Timeline", "Initializing Timeline module")
+
+    -- Initialize default values if not already set
+    local currentStep = getCurrentStepValue()
+    if not currentStep then
+        local defaultStep = private.constants.config.stepValues[1]
+        setCurrentStepValue(defaultStep, "Timeline step initialized to default")
+    end
+
+    local currentPage = getCurrentPage()
+    if not currentPage then
+        setCurrentPage(1, "Timeline page initialized to default")
+    end
+
+    private.Core.Logger.debug("Timeline", "Timeline module initialization complete")
 end

@@ -63,6 +63,12 @@ local function CreateChapter(title, pages)
 	return chapter
 end
 
+function private.Core.Events.EmptyBook()
+	local data = {}
+
+	return data
+end
+
 --[[
 	Transform the event into a book
 	@param event [event]]

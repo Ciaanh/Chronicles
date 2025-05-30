@@ -28,7 +28,7 @@ function CharacterListMixin:OnLoad()
 	self.PagedCharacterList:SetElementTemplateData(private.constants.templates)
 
 	-- Register for timeline clean events to refresh character data
-	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
 
 	-- Load initial data
 	self:LoadCharacters()
@@ -82,10 +82,6 @@ function CharacterListMixin:LoadCharacters()
 	end
 end
 
-function CharacterListMixin:OnTimelineClean()
-	local data = {}
-	local dataProvider = CreateDataProvider(data)
-	local retainScrollPosition = false
-
-	self.PagedCharacterList:SetDataProvider(dataProvider, retainScrollPosition)
+function CharacterListMixin:OnUIRefresh()
+	self:LoadCharacters()
 end

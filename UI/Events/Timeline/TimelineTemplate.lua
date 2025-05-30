@@ -18,9 +18,19 @@ function TimelineMixin:OnLoad()
     -- Set localized button text
     self.ZoomOut:SetText(Locale["Zoom Out"])
     self.ZoomIn:SetText(Locale["Zoom In"])
-    
-    self.ZoomOut:SetScript("OnClick", self.OnZooming)
-    self.ZoomIn:SetScript("OnClick", self.OnZooming)
+
+    self.ZoomOut:SetScript(
+        "OnClick",
+        function()
+            private.Core.Timeline:ChangeCurrentStepValue(-1)
+        end
+    )
+    self.ZoomIn:SetScript(
+        "OnClick",
+        function()
+            private.Core.Timeline:ChangeCurrentStepValue(1)
+        end
+    )
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
 
@@ -43,9 +53,11 @@ function TimelineMixin:OnLoad()
         private.Core.StateManager.subscribe(
             "timeline.currentStep",
             function(newStep, oldStep)
-                if newStep then
-                    self:OnTimelineStepChanged(newStep)
-                end
+                -- Timeline step changed - any specific UI updates can be added here
+                private.Core.Logger.debug(
+                    "TimelineMixin",
+                    "Timeline step changed from " .. tostring(oldStep) .. " to " .. tostring(newStep)
+                )
             end,
             "TimelineMixin"
         )
@@ -89,12 +101,6 @@ function TimelineMixin:OnMouseWheel(value)
     end
 end
 
-function TimelineMixin:OnTimelineStepChanged(eventData)
-end
-
-function TimelineMixin:OnZooming()
-    private.Core.Timeline:ChangeCurrentStepValue(self.direction)
-end
 -----------------------------------------------------------------------------------------
 -- TimelineLabel ------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------

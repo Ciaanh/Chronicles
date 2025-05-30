@@ -48,7 +48,7 @@ end
 EventListMixin = {}
 function EventListMixin:OnLoad()
 	-- Register only for events that don't have a state equivalent
-	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
 
 	-- Use state-based subscription for period selection
 	-- This aligns with the architectural direction of using state for UI updates
@@ -66,12 +66,17 @@ function EventListMixin:OnLoad()
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 
-function EventListMixin:OnTimelineClean()
+function EventListMixin:OnUIRefresh()
+	private.Core.Logger.debug("EventListMixin", "OnUIRefresh triggered - clearing event list data")
+
 	local data = {}
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
 
+	private.Core.Logger.debug("EventListMixin", "Setting empty data provider to PagedEventList")
 	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
+
+	private.Core.Logger.debug("EventListMixin", "OnUIRefresh completed - event list cleared")
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)

@@ -185,7 +185,47 @@ end
 
 local function setupEventListeners()
     -- Use centralized event constants to avoid string duplication errors
-    local events = private.constants.events
+    local events = private.constants.events    -- Application startup event
+    private.Core.registerCallback(
+        events.AddonStartup,
+        function(startupData)
+            print("StateManager: AddonStartup event received - version: " .. tostring(startupData.version))
+            private.Core.Logger.info("StateManager", "Application startup event received - version: " .. tostring(startupData.version))
+            
+            -- Initialize state with startup data
+            private.Core.StateManager.setState("settings.debugMode", startupData.debugMode or false, "Debug mode initialized")
+            private.Core.StateManager.setState("data.lastRefreshTime", startupData.timestamp, "Startup timestamp recorded")
+            
+            -- Load saved state from database
+            private.Core.StateManager.loadState()
+            
+            -- Initialize Timeline component
+            if private.Core.Timeline and private.Core.Timeline.Init then
+                private.Core.Logger.debug("StateManager", "Initializing Timeline component")
+                private.Core.Timeline.Init()
+            end
+            
+            private.Core.Logger.info("StateManager", "Application startup initialization completed")
+        end,
+        "StateManager"
+    )
+
+    -- Application shutdown event
+    private.Core.registerCallback(
+        events.AddonShutdown,
+        function(shutdownData)
+            private.Core.Logger.info("StateManager", "Application shutdown event received - version: " .. tostring(shutdownData.version))
+            
+            -- Save current state before shutdown
+            private.Core.StateManager.saveState()
+            
+            -- Clean up listeners and state
+            StateManager.listeners = {}
+            
+            private.Core.Logger.info("StateManager", "Application shutdown cleanup completed")
+        end,
+        "StateManager"
+    )
 
     -- Event selection
     private.Core.registerCallback(
@@ -219,15 +259,6 @@ local function setupEventListeners()
         events.TimelinePeriodSelected,
         function(periodData)
             private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
-        end,
-        "StateManager"
-    )
-
-    -- Timeline step changes
-    private.Core.registerCallback(
-        events.TimelineStepChanged,
-        function(stepData)
-            private.Core.StateManager.setState("timeline.currentStep", stepData, "Timeline step changed")
         end,
         "StateManager"
     )

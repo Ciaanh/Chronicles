@@ -31,6 +31,40 @@ end
 -----------------------------------------------------------------------------------------
 
 local eventSchemas = {
+    [private.constants.events.AddonStartup] = {
+        description = "Fired when the addon is starting up and initializing components",
+        required = {"version", "timestamp"},
+        optional = {"debugMode", "profile"},
+        validate = function(data)
+            if not data then
+                return false, "Startup data is nil"
+            end
+            if type(data.version) ~= "string" then
+                return false, "Version must be a string"
+            end
+            if type(data.timestamp) ~= "number" then
+                return false, "Timestamp must be a number"
+            end
+            return true, nil
+        end
+    },
+    [private.constants.events.AddonShutdown] = {
+        description = "Fired when the addon is shutting down",
+        required = {"version", "timestamp"},
+        optional = {"profile"},
+        validate = function(data)
+            if not data then
+                return false, "Shutdown data is nil"
+            end
+            if type(data.version) ~= "string" then
+                return false, "Version must be a string"
+            end
+            if type(data.timestamp) ~= "number" then
+                return false, "Timestamp must be a number"
+            end
+            return true, nil
+        end
+    },
     [private.constants.events.EventSelected] = {
         description = "Fired when an event is selected in the timeline or list",
         required = {"id", "label", "yearStart", "yearEnd"},
@@ -137,10 +171,13 @@ private.Core.EventManager.Validator = {
 
 private.Core.EventManager.safeTrigger = function(eventName, data, source)
     source = source or debug.getinfo(2, "S").source
+    
+    print("EventManager: Attempting to trigger event: " .. eventName)
 
     -- Validate event data
     local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
+        print("EventManager: Event validation failed for " .. eventName .. ": " .. tostring(error))
         private.Core.Logger.error("EventManager", "Event validation failed for " .. eventName .. ": " .. error)
         return false
     end
@@ -149,12 +186,15 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     local success, errorMsg =
         pcall(
         function()
+            print("EventManager: Triggering event via EventRegistry: " .. eventName)
             EventRegistry:TriggerEvent(eventName, data)
         end
     )
     if success then
+        print("EventManager: Event triggered successfully: " .. eventName)
         return true
     else
+        print("EventManager: Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg))
         private.Core.Logger.error(
             "EventManager",
             "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
@@ -206,9 +246,13 @@ private.Core.EventManager.Batcher = {
 -----------------------------------------------------------------------------------------
 
 private.Core.EventManager.safeRegisterCallback = function(eventName, callback, owner)
+    print("EventManager: Registering callback for event: " .. eventName .. " (owner: " .. tostring(owner) .. ")")
+    
     local wrappedCallback = function(...)
+        print("EventManager: Callback triggered for event: " .. eventName)
         local success, errorMsg = pcall(callback, ...)
         if not success then
+            print("EventManager: Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
             private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
         end
     end

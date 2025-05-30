@@ -3,8 +3,8 @@ local Chronicles = private.Chronicles
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-Chronicles.NewUi = {}
-function Chronicles.NewUi.DisplayWindow()
+Chronicles.UI = {}
+function Chronicles.UI.DisplayWindow()
 	local alreadyShowing = MainFrameUI:IsShown()
 
 	if alreadyShowing then

@@ -27,7 +27,7 @@ function FactionListMixin:OnLoad()
 	self.PagedFactionList:SetElementTemplateData(private.constants.templates)
 
 	-- Register for timeline clean events to refresh faction data
-	private.Core.registerCallback(private.constants.events.TimelineClean, self.OnTimelineClean, self)
+	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
 
 	-- Load initial data
 	self:LoadFactions()
@@ -78,10 +78,6 @@ function FactionListMixin:LoadFactions()
 	end
 end
 
-function FactionListMixin:OnTimelineClean()
-	local data = {}
-	local dataProvider = CreateDataProvider(data)
-	local retainScrollPosition = false
-
-	self.PagedFactionList:SetDataProvider(dataProvider, retainScrollPosition)
+function FactionListMixin:OnUIRefresh()
+	self:LoadFactions()
 end

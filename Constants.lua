@@ -75,12 +75,14 @@ constants.configurationName = {
 }
 
 constants.events = {
+	-- Application lifecycle events
+	AddonStartup = "Addon.STARTUP",
+	AddonShutdown = "Addon.SHUTDOWN",
 	TimelineInit = "Timeline.INIT",
-	TimelineClean = "Timeline.CLEAN",
+	UIRefresh = "Timeline.CLEAN",
 	TimelinePeriodSelected = "Timeline.PERIOD_SELECTED",
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
-	TimelineStepChanged = "Timeline.STEP_CHANGED",
 	EventSelected = "Event.SELECTED",
 	CharacterSelected = "Character.SELECTED",
 	FactionSelected = "Faction.SELECTED",
