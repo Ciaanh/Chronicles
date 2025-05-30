@@ -554,6 +554,177 @@
                                         </FontString>
                                     </Layer>
                                 </Layers>
+                            </Frame>                        </Frames>
+                    </Frame>
+
+                    <!-- Logs Configuration Tab -->
+                    <Frame parentKey="Logs" frameLevel="100" hidden="true">
+                        <Anchors>
+                            <Anchor point="TOPLEFT" x="15" y="-15"/>
+                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND" textureSubLevel="-1">
+                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
+                                    <Color r="0.1" g="0.1" b="0.2"/>
+                                </Texture>
+                            </Layer>
+                            <Layer level="OVERLAY">
+                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
+                                    <Size y="25"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                                    <Size x="700" y="8"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                                    </Anchors>
+                                </Texture>
+                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
+                                    <Size x="700" y="40"/>
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                                    </Anchors>
+                                    <Color r="0.9" g="0.9" b="0.9"/>
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                        <Frames>
+                            <Frame parentKey="LogsContainer">
+                                <Anchors>
+                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
+                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
+                                </Anchors>
+                                <Frames>
+                                    <!-- Log Level Controls -->
+                                    <Frame parentKey="LogLevelContainer">
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT" x="0" y="0"/>
+                                            <Anchor point="TOPRIGHT" x="0" y="0"/>
+                                        </Anchors>
+                                        <Size y="40"/>
+                                        <Layers>
+                                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                                <Texture parentKey="ControlsBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
+                                                    <Anchors>
+                                                        <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                        <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                                    </Anchors>
+                                                </Texture>
+                                            </Layer>
+                                            <Layer level="OVERLAY">
+                                                <FontString parentKey="LogLevelLabel" inherits="GameFontNormal" justifyH="LEFT">
+                                                    <Size x="80" y="20"/>
+                                                    <Anchors>
+                                                        <Anchor point="LEFT" x="10" y="0"/>
+                                                    </Anchors>
+                                                    <Color r="1.0" g="0.82" b="0"/>
+                                                </FontString>
+                                            </Layer>
+                                        </Layers>
+                                        <Frames>
+                                            <Button parentKey="LogLevelDropdown" inherits="UIDropDownMenuTemplate">
+                                                <Anchors>
+                                                    <Anchor point="LEFT" relativeKey="$parent.LogLevelLabel" relativePoint="RIGHT" x="10" y="0"/>
+                                                </Anchors>
+                                                <Size x="120" y="32"/>
+                                            </Button>
+                                            <CheckButton parentKey="EnabledCheckbox" inherits="InterfaceOptionsCheckButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="LEFT" relativeKey="$parent.LogLevelDropdown" relativePoint="RIGHT" x="20" y="0"/>
+                                                </Anchors>
+                                                <ButtonText/>
+                                            </CheckButton>
+                                        </Frames>
+                                        <Scripts>
+                                            <OnLoad>
+                                                self.LogLevelLabel:SetText("Log Level:")
+                                                self.EnabledCheckbox.Text:SetText("Enable Logging")
+                                            </OnLoad>
+                                        </Scripts>
+                                    </Frame>
+
+                                    <!-- Control Buttons -->
+                                    <Frame parentKey="ControlsContainer">
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT" relativeKey="$parent.LogLevelContainer" relativePoint="BOTTOMLEFT" x="0" y="-5"/>
+                                            <Anchor point="TOPRIGHT" relativeKey="$parent.LogLevelContainer" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
+                                        </Anchors>
+                                        <Size y="35"/>
+                                        <Layers>
+                                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                                <Texture parentKey="ControlsBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
+                                                    <Anchors>
+                                                        <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                        <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                                    </Anchors>
+                                                </Texture>
+                                            </Layer>
+                                        </Layers>
+                                        <Frames>
+                                            <Button parentKey="RefreshButton" inherits="UIPanelButtonTemplate">
+                                                <Anchors>
+                                                    <Anchor point="LEFT" x="10" y="0"/>
+                                                </Anchors>
+                                                <Size x="80" y="22"/>
+                                                <ButtonText text="Refresh"/>
+                                            </Button>
+                                            <Button parentKey="ClearButton" inherits="UIPanelButtonTemplate">                                                <Anchors>
+                                                    <Anchor point="LEFT" relativeKey="$parent.RefreshButton" relativePoint="RIGHT" x="10" y="0"/>
+                                                </Anchors>
+                                                <Size x="80" y="22"/>
+                                                <ButtonText text="Clear"/>
+                                            </Button>
+                                        </Frames>
+                                    </Frame>
+
+                                    <!-- Log Display Area -->
+                                    <Frame parentKey="LogDisplayContainer">
+                                        <Anchors>
+                                            <Anchor point="TOPLEFT" relativeKey="$parent.ControlsContainer" relativePoint="BOTTOMLEFT" x="0" y="-10"/>
+                                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                        </Anchors>
+                                        <Layers>
+                                            <Layer level="BACKGROUND" textureSubLevel="0">
+                                                <Texture parentKey="LogBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.3">
+                                                    <Anchors>
+                                                        <Anchor point="TOPLEFT" x="0" y="0"/>
+                                                        <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                                                    </Anchors>
+                                                </Texture>
+                                            </Layer>
+                                        </Layers>
+                                        <Frames>
+                                            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
+                                                <KeyValues>
+                                                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
+                                                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                                                    <KeyValue key="scrollBarX" value="10" type="number"/>
+                                                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
+                                                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
+                                                </KeyValues>
+                                                <Anchors>
+                                                    <Anchor point="TOPLEFT" x="5" y="-5"/>
+                                                    <Anchor point="BOTTOMRIGHT" x="-15" y="5"/>
+                                                </Anchors>
+                                                <ScrollChild>
+                                                    <Frame parentKey="Content">
+                                                        <Size x="1" y="1"/>
+                                                        <Anchors>
+                                                            <Anchor point="TOPLEFT"/>
+                                                        </Anchors>
+                                                    </Frame>
+                                                </ScrollChild>
+                                                <Scripts>
+                                                    <OnLoad method="OnLoad"/>
+                                                </Scripts>
+                                            </ScrollFrame>
+                                        </Frames>
+                                    </Frame>
+                                </Frames>
                             </Frame>
                         </Frames>
                     </Frame>
