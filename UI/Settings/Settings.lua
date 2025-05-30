@@ -347,8 +347,8 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
     Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
     Chronicles.Data:RefreshPeriods()
 
-    private.Core.Timeline:ComputeTimelinePeriods()
-    private.Core.Timeline:DisplayTimelineWindow()
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.DisplayTimelineWindow()
 
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
 end
@@ -357,8 +357,8 @@ function SettingsMixin:OnSettingsLibraryChecked(libraryId, checked)
     Chronicles.Data:SetLibraryStatus(libraryId, checked)
     Chronicles.Data:RefreshPeriods()
 
-    private.Core.Timeline:ComputeTimelinePeriods()
-    private.Core.Timeline:DisplayTimelineWindow()
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.DisplayTimelineWindow()
 
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsLibraryChecked")
 end

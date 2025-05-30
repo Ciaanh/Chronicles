@@ -10,7 +10,7 @@ private.Core.Logger = {}
 private.Core.Logger.LOG_LEVELS = {
     TRACE = 1,
     WARN = 2,
-    ERROR = 3,
+    ERROR = 3
 }
 
 -- Color codes for log levels
@@ -18,6 +18,7 @@ private.Core.Logger.LOG_COLORS = {
     TRACE = "|cFF00FFFF", -- Cyan
     WARN = "|cFFFFFF00", -- Yellow
     ERROR = "|cFFFF0000", -- Red
+    INFO = "|cFF00FF00", -- Green
     RESET = "|r"
 }
 
@@ -110,6 +111,19 @@ function private.Core.Logger.setEnabled(enabled)
 end
 
 function private.Core.Logger.setLogLevel(level)
+    if not level then
+        local message =
+            string.format(
+            "%s[Chronicles Logger]%s Invalid log level: nil",
+            private.Core.Logger.LOG_COLORS.ERROR,
+            private.Core.Logger.LOG_COLORS.RESET
+        )
+        if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage(message)
+        end
+        return
+    end
+
     level = string.upper(level)
     if private.Core.Logger.LOG_LEVELS[level] then
         config.logLevel = level

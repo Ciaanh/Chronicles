@@ -47,377 +47,53 @@ local function setSelectedYear(value, description)
     private.Core.StateManager.setState("timeline.selectedYear", value, description or "Timeline year changed")
 end
 
+-- Delegate to business logic module
 local function GetDateCurrentStepIndex(date)
-    local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
-
-    -- Safety check: if dateProfile is nil, return default value
-    if dateProfile == nil then
-        return 0
-    end
-
-    local currentStepValue = getCurrentStepValue()
-    if (currentStepValue == 1000) then
-        return dateProfile.mod1000 or 0
-    elseif (currentStepValue == 500) then
-        return dateProfile.mod500 or 0
-    elseif (currentStepValue == 250) then
-        return dateProfile.mod250 or 0
-    elseif (currentStepValue == 100) then
-        return dateProfile.mod100 or 0
-    elseif (currentStepValue == 50) then
-        return dateProfile.mod50 or 0
-    elseif (currentStepValue == 10) then
-        return dateProfile.mod10 or 0
-    elseif (currentStepValue == 1) then
-        --     return dateProfile.mod1
-        return 0 -- Return default value for step 1 (not implemented)
-    else
-        -- Return default value for unsupported step values
-        return 0
-    end
+    -- Phase 3 Debug: Log delegation
+    private.Core.Logger.trace("Timeline", "Delegating GetDateCurrentStepIndex to TimelineBusiness")
+    return private.Core.TimelineBusiness.getDateCurrentStepIndex(date)
 end
 
+-- Delegate to business logic module
 local function GetCurrentStepPeriodsFilling()
-    local eventDates = Chronicles.Data:GetCachedPeriodsFillingBySteps()
-
-    -- Safety check: if eventDates is nil, return empty table
-    if eventDates == nil then
-        return {}
-    end
-
-    local currentStepValue = getCurrentStepValue()
-    if (currentStepValue == 1000) then
-        return eventDates.mod1000 or {}
-    elseif (currentStepValue == 500) then
-        return eventDates.mod500 or {}
-    elseif (currentStepValue == 250) then
-        return eventDates.mod250 or {}
-    elseif (currentStepValue == 100) then
-        return eventDates.mod100 or {}
-    elseif (currentStepValue == 50) then
-        return eventDates.mod50 or {}
-    elseif (currentStepValue == 10) then
-        return eventDates.mod10 or {}
-    elseif (currentStepValue == 1) then
-        --     return eventDates.mod1
-        return {} -- Return empty table for step 1 (not implemented)
-    else
-        -- Return empty table for unsupported step values to prevent errors
-        return {}
-    end
+    return private.Core.TimelineBusiness.getCurrentStepPeriodsFilling()
 end
 
+-- Delegate to business logic module
 local function CountEvents(block)
-    local eventCount = 0
-
-    local originalLowerBound = block.lowerBound
-    local originalUpperBound = block.upperBound
-
-    -- Handle special periods differently
-    local isMytosPeriod = (originalLowerBound == private.constants.config.mythos)
-    local isFuturePeriod = (originalUpperBound == private.constants.config.futur)
-    if isMytosPeriod then -- For mythos period: manually search for events before historyStartYear
-        -- since the date index system might not properly handle extreme negative values
-        local mythosYearEnd = private.constants.config.historyStartYear - 1
-        local foundEvents = Chronicles.Data:GetCachedSearchEvents(private.constants.config.mythos, mythosYearEnd)
-
-        if foundEvents ~= nil then
-            eventCount = #foundEvents
-        end
-    elseif isFuturePeriod then
-        -- For future period: manually search for events beyond currentYear
-        -- since the date index system doesn't cover future dates
-        local futureYearStart = private.constants.config.currentYear + 1
-        local foundEvents = Chronicles.Data:GetCachedSearchEvents(futureYearStart, private.constants.config.futur)
-
-        if foundEvents ~= nil then
-            eventCount = #foundEvents
-        end
-    else
-        -- Regular period processing - use original logic with bounds clamping for index calculation
-        local lowerBound = originalLowerBound
-        local upperBound = originalUpperBound
-
-        -- Clamp bounds to valid date range for date index calculation only
-        if (lowerBound < private.constants.config.historyStartYear) then
-            lowerBound = private.constants.config.historyStartYear
-        end
-
-        if (upperBound > private.constants.config.currentYear) then
-            upperBound = private.constants.config.currentYear
-        end
-
-        local lowerDateIndex = GetDateCurrentStepIndex(lowerBound)
-        local upperDateIndex = GetDateCurrentStepIndex(upperBound)
-
-        if upperDateIndex == nil or lowerDateIndex == nil then
-            return eventCount
-        end
-
-        local periodsFilling = GetCurrentStepPeriodsFilling()
-        if periodsFilling == nil then
-            return eventCount
-        end
-
-        if (lowerDateIndex < upperDateIndex) then
-            for i = lowerDateIndex, upperDateIndex - 1, 1 do
-                local periodEvents = periodsFilling[i]
-
-                if (periodEvents ~= nil) then
-                    local periodsCount = #periodEvents
-                    eventCount = eventCount + periodsCount
-                end
-            end
-        elseif lowerDateIndex == upperDateIndex then
-            local periodEvents = periodsFilling[lowerDateIndex]
-            if (periodEvents ~= nil) then
-                eventCount = #periodEvents
-            end
-        end
-    end
-
-    return eventCount
+    return private.Core.TimelineBusiness.countEventsInPeriod(block)
 end
 
+-- Delegate to business logic module
 local function GetTimelineConfig(minYear, maxYear, stepValue)
-    local timelineConfig = {
-        isOverlapping = false,
-        pastEvents = false,
-        futurEvents = false,
-        before = 0,
-        after = 0,
-        minYear = minYear,
-        maxYear = maxYear,
-        numberOfTimelineBlock = 0
-    }
-
-    -- Define the boundaries of the timeline
-    if (minYear < private.constants.config.historyStartYear) then -- there is event before the history start year
-        timelineConfig.minYear = private.constants.config.historyStartYear
-        timelineConfig.pastEvents = true
-    end
-
-    if (maxYear > private.constants.config.currentYear) then -- there is event after the current year
-        timelineConfig.maxYear = private.constants.config.currentYear
-        timelineConfig.futurEvents = true
-    end
-
-    if (timelineConfig.minYear < 0 and timelineConfig.maxYear > 0) then -- there is event before and after the 0 year
-        timelineConfig.isOverlapping = true
-    end
-
-    if (timelineConfig.minYear < 0) then
-        local beforeLength = math.abs(timelineConfig.minYear)
-
-        timelineConfig.before = math.ceil((beforeLength) / stepValue)
-    end
-
-    if (timelineConfig.maxYear > 0) then
-        local afterLength = math.abs(timelineConfig.maxYear)
-        local ceil = math.ceil(afterLength / stepValue)
-
-        timelineConfig.after = ceil
-    end
-
-    -- Define the total number of timeline blocks
-    if (timelineConfig.isOverlapping) then
-        timelineConfig.numberOfTimelineBlock = timelineConfig.before + timelineConfig.after
-    else
-        local length = math.abs(timelineConfig.minYear - timelineConfig.maxYear)
-        timelineConfig.numberOfTimelineBlock = math.ceil(length / stepValue)
-    end
-
-    if (timelineConfig.pastEvents == true) then
-        timelineConfig.numberOfTimelineBlock = timelineConfig.numberOfTimelineBlock + 1
-        if (timelineConfig.isOverlapping) then
-            timelineConfig.before = timelineConfig.before + 1
-        end
-    end
-    if (timelineConfig.futurEvents == true) then
-        timelineConfig.numberOfTimelineBlock = timelineConfig.numberOfTimelineBlock + 1
-
-        if (timelineConfig.isOverlapping) then
-            timelineConfig.after = timelineConfig.after + 1
-        end
-    end
-
-    return timelineConfig
+    return private.Core.TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
 end
 
+-- Delegate to business logic module
 local function GetStepValueIndex(stepValue)
-    local index = {}
-    for k, v in pairs(private.constants.config.stepValues) do
-        index[v] = k
-    end
-    return index[stepValue]
+    return private.Core.TimelineBusiness.getStepValueIndex(stepValue)
 end
 
+-- Delegate to business logic module
 local function GetYearPageIndex(year)
-    local selectedYear = year
-
-    if (selectedYear == nil) then
-        local page = getCurrentPage()
-        local pageSize = private.constants.config.timeline.pageSize
-        local numberOfCells = #Timeline.Periods
-
-        if (page == nil) then
-            page = 1
-        end
-
-        local firstIndex = 1 + ((page - 1) * pageSize)
-        local lastIndex = page * pageSize
-
-        if (firstIndex <= 1) then
-            firstIndex = 1
-        end
-        if (lastIndex > numberOfCells) then
-            firstIndex = numberOfCells - (pageSize)
-            lastIndex = numberOfCells - 1
-        end
-
-        local firstIndexBounds = Timeline.Periods[firstIndex]
-        local lastIndexBounds = Timeline.Periods[lastIndex]
-
-        if (firstIndexBounds ~= nil and upperBoundYear ~= nil) then
-            local lowerBoundYear = firstIndexBounds.lowerBound
-            local upperBoundYear = lastIndexBounds.upperBound
-
-            selectedYear = (lowerBoundYear + upperBoundYear) / 2
-        else
-            selectedYear = 0
-        end
-    end
-
-    local minYear = Chronicles.Data:MinEventYear()
-    local length = math.abs(minYear - selectedYear)
-    local currentStepValue = getCurrentStepValue()
-    local yearIndex = math.floor(length / currentStepValue)
-    local result = yearIndex - (yearIndex % private.constants.config.timeline.pageSize)
-
-    return result
+    return private.Core.TimelineBusiness.getYearPageIndex(year, Timeline.Periods)
 end
 
-function private.Core.Timeline:ChangePage(value)
+function private.Core.Timeline.ChangePage(value)
     local currentPage = getCurrentPage() or 1
     local newPage = currentPage + value
     setCurrentPage(newPage, "Timeline page changed via navigation")
-    self:DisplayTimelineWindow()
+    private.Core.Timeline.DisplayTimelineWindow()
 end
 
-function private.Core.Timeline:SetYear(year)
+function private.Core.Timeline.SetYear(year)
     setSelectedYear(year, "Timeline year set")
 end
 
-function private.Core.Timeline:ComputeTimelinePeriods()
-    local stepValue = getCurrentStepValue()
-    if (stepValue == nil) then
-        stepValue = private.constants.config.stepValues[1]
-
-        private.Core.Logger.trace("Timeline", "Initializing timeline step to default value: " .. tostring(stepValue))
-
-        -- Update state when initializing for the first time
-        setCurrentStepValue(stepValue, "Timeline step initialized")
-    end
-
-    local minYear = Chronicles.Data:MinEventYear()
-    local maxYear = Chronicles.Data:MaxEventYear()
-    local timelineConfig = GetTimelineConfig(minYear, maxYear, stepValue)
-    local timelineBlocks = {}
-
-    for blockIndex = 1, timelineConfig.numberOfTimelineBlock do
-        local minValue = 0
-        local maxValue = 0
-
-        if (timelineConfig.isOverlapping) then
-            if (blockIndex <= timelineConfig.before) then
-                minValue = -((timelineConfig.before - blockIndex + 1) * stepValue)
-                maxValue = -((timelineConfig.before - blockIndex) * stepValue) - 1
-            else
-                minValue = ((blockIndex - timelineConfig.before - 1) * stepValue)
-                maxValue = ((blockIndex - timelineConfig.before) * stepValue) - 1
-            end
-        else
-            if (timelineConfig.pastEvents == true and blockIndex == 1) then
-                minValue = timelineConfig.minYear - 2
-                maxValue = timelineConfig.minYear - 1
-            elseif (timelineConfig.futurEvents == true and blockIndex == timelineConfig.numberOfTimelineBlock) then
-                minValue = timelineConfig.maxYear + 1
-                maxValue = timelineConfig.maxYear + 2
-            else
-                minValue = timelineConfig.minYear + ((blockIndex - 1) * stepValue) + 1
-                maxValue = timelineConfig.minYear + (blockIndex * stepValue)
-            end
-        end
-
-        local period = {
-            lowerBound = minValue,
-            upperBound = maxValue,
-            text = nil,
-            hasEvents = nil
-        }
-
-        if (maxValue > private.constants.config.currentYear) then
-            if (minValue > private.constants.config.currentYear) then
-                period.lowerBound = private.constants.config.currentYear + 1
-                period.upperBound = private.constants.config.futur
-                period.text = Locale["Futur"]
-            else
-                period.upperBound = private.constants.config.currentYear
-            end
-        elseif (maxValue < private.constants.config.historyStartYear) then
-            if (minValue < private.constants.config.historyStartYear) then
-                period.lowerBound = private.constants.config.mythos
-                period.upperBound = private.constants.config.historyStartYear - 1
-                period.text = Locale["Mythos"]
-            else
-                period.upperBound = private.constants.config.historyStartYear
-            end
-        end
-
-        local nbEvents = CountEvents(period)
-        period.hasEvents = nbEvents > 0
-        period.nbEvents = nbEvents
-
-        table.insert(timelineBlocks, period)
-    end
-
-    local displayableTimeFrames = {}
-    for j, value in ipairs(timelineBlocks) do
-        local nextValue = timelineBlocks[j + 1]
-
-        if (nextValue ~= nil) then
-            if (value.hasEvents == true or (value.hasEvents == false and nextValue.hasEvents == true)) then
-                table.insert(
-                    displayableTimeFrames,
-                    {
-                        lowerBound = value.lowerBound,
-                        upperBound = value.upperBound,
-                        text = value.text,
-                        hasEvents = value.hasEvents,
-                        nbEvents = value.nbEvents
-                    }
-                )
-            end
-
-            if (value.hasEvents == false and nextValue.hasEvents == false) then
-                nextValue.lowerBound = value.lowerBound
-            end
-        else
-            table.insert(
-                displayableTimeFrames,
-                {
-                    lowerBound = value.lowerBound,
-                    upperBound = value.upperBound,
-                    text = value.text,
-                    hasEvents = value.hasEvents,
-                    nbEvents = value.nbEvents
-                }
-            )
-        end
-    end
-
-    Timeline.Periods = displayableTimeFrames
-    return displayableTimeFrames
+function private.Core.Timeline.ComputeTimelinePeriods()
+    -- Delegate to business logic module and store result in Timeline.Periods
+    Timeline.Periods = private.Core.TimelineBusiness.computeTimelinePeriods()
+    return Timeline.Periods
 end
 
 -- Helper function to safely trigger events
@@ -425,58 +101,22 @@ local function SafeTriggerEvent(eventName, eventData, source)
     private.Core.triggerEvent(eventName, eventData, source)
 end
 
--- Calculate pagination parameters for the timeline window
+-- Calculate pagination parameters for the timeline window using business logic
 local function CalculateTimelinePagination()
-    local pageIndex = getCurrentPage()
-    local pageSize = private.constants.config.timeline.pageSize
-    local numberOfCells = #Timeline.Periods
-    local maxPageValue = math.ceil(numberOfCells / pageSize)
-
-    -- Validate and normalize page index
-    if (pageIndex == nil) then
-        pageIndex = maxPageValue
-    elseif (pageIndex < 1) then
-        pageIndex = 1
-    elseif (pageIndex > maxPageValue) then
-        pageIndex = maxPageValue
-    end
-
-    local firstIndex = 1 + ((pageIndex - 1) * pageSize)
-
-    -- Adjust for boundary conditions
-    if (firstIndex <= 1) then
-        firstIndex = 1
-        pageIndex = 1
-    end
-
-    if ((firstIndex + pageSize - 1) >= numberOfCells) then
-        firstIndex = numberOfCells - 7
-        pageIndex = maxPageValue
-    end
-
-    return {
-        pageIndex = pageIndex,
-        firstIndex = firstIndex,
-        pageSize = pageSize,
-        numberOfCells = numberOfCells,
-        maxPageValue = maxPageValue
-    }
+    return private.Core.TimelineBusiness.calculateTimelinePagination(Timeline.Periods, getCurrentPage())
 end
 
 -- Update navigation button visibility based on pagination state
 local function UpdateNavigationButtons(paginationData)
-    local showPrevious = paginationData.firstIndex > 1
-    local showNext = (paginationData.firstIndex + paginationData.pageSize - 1) < paginationData.numberOfCells
-
     SafeTriggerEvent(
         private.constants.events.TimelinePreviousButtonVisible,
-        showPrevious and {visible = true} or {visible = false},
+        paginationData.showPrevious and {visible = true} or {visible = false},
         "Timeline:UpdateNavigationButtons"
     )
 
     SafeTriggerEvent(
         private.constants.events.TimelineNextButtonVisible,
-        showNext and {visible = true} or {visible = false},
+        paginationData.showNext and {visible = true} or {visible = false},
         "Timeline:UpdateNavigationButtons"
     )
 end
@@ -550,12 +190,12 @@ local function DistributeTimelinePeriods(paginationData)
 end
 
 -- Main function to display the timeline window - now orchestrates the separated responsibilities
-function private.Core.Timeline:DisplayTimelineWindow()
+function private.Core.Timeline.DisplayTimelineWindow()
     -- Calculate pagination parameters
     local paginationData = CalculateTimelinePagination()
 
     -- Update the current page state
-    setCurrentPage(paginationData.pageIndex, "Timeline page updated during display")
+    setCurrentPage(paginationData.currentPage, "Timeline page updated during display")
 
     -- Update UI state
     UpdateNavigationButtons(paginationData)
@@ -565,7 +205,7 @@ function private.Core.Timeline:DisplayTimelineWindow()
     DistributeTimelinePeriods(paginationData)
 end
 
-function private.Core.Timeline:ChangeCurrentStepValue(direction)
+function private.Core.Timeline.ChangeCurrentStepValue(direction)
     -- TODO investigate performance issue with step 1 and 10
     local currentStepValue = getCurrentStepValue()
     local curentStepIndex = GetStepValueIndex(currentStepValue)
@@ -595,18 +235,18 @@ function private.Core.Timeline:ChangeCurrentStepValue(direction)
     -- Update state instead of triggering event - provides single source of truth
     setCurrentStepValue(nextStepValue, "Timeline step changed via zoom")
 
-    private.Core.Timeline:ComputeTimelinePeriods()
+    private.Core.Timeline.ComputeTimelinePeriods()
     local selectedYear = getSelectedYear()
     local newPage = GetYearPageIndex(selectedYear)
     setCurrentPage(newPage, "Timeline page updated after step change")
-    private.Core.Timeline:DisplayTimelineWindow()
+    private.Core.Timeline.DisplayTimelineWindow()
 end
 
 -----------------------------------------------------------------------------------------
 -- Initialization -----------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-function private.Core.Timeline:Init()
+function private.Core.Timeline.Init()
     private.Core.Logger.trace("Timeline", "Initializing Timeline module")
 
     -- Initialize default values if not already set
@@ -620,6 +260,12 @@ function private.Core.Timeline:Init()
     if not currentPage then
         setCurrentPage(1, "Timeline page initialized to default")
     end
+
+    -- Ensure timeline periods are computed during initialization
+    private.Core.Timeline.ComputeTimelinePeriods()
+
+    -- Explicitly trigger TimelineInit event to ensure UI components update
+    SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
 
     private.Core.Logger.trace("Timeline", "Timeline module initialization complete")
 end

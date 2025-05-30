@@ -203,10 +203,8 @@ local function setupEventListeners() -- Use centralized event constants to avoid
                 "settings.debugMode",
                 startupData.debugMode or false,
                 "Debug mode initialized"
-            )
-
-            -- Initialize Timeline component
-            if private.Core.Timeline and private.Core.Timeline.Init then
+            ) -- Initialize Timeline component
+            if private.Core.Timeline then
                 private.Core.Logger.trace("StateManager", "Initializing Timeline component")
                 private.Core.Timeline.Init()
             end

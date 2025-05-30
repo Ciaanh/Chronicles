@@ -57,7 +57,6 @@ function Chronicles:OnInitialize()
             self.UI:DisplayWindow()
         end
     )
-
     Chronicles.Data:Load()
 
     -- Initialize state manager first
@@ -74,6 +73,9 @@ function Chronicles:OnInitialize()
             }
             private.Core.Logger.trace("Chronicles", "Triggering AddonStartup event")
             private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
+
+            -- Explicitly trigger TimelineInit event after startup
+            private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
         end
     )
 end

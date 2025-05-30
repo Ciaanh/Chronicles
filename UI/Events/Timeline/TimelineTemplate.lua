@@ -18,17 +18,16 @@ function TimelineMixin:OnLoad()
     -- Set localized button text
     self.ZoomOut:SetText(Locale["Zoom Out"])
     self.ZoomIn:SetText(Locale["Zoom In"])
-
     self.ZoomOut:SetScript(
         "OnClick",
         function()
-            private.Core.Timeline:ChangeCurrentStepValue(-1)
+            private.Core.Timeline.ChangeCurrentStepValue(-1)
         end
     )
     self.ZoomIn:SetScript(
         "OnClick",
         function()
-            private.Core.Timeline:ChangeCurrentStepValue(1)
+            private.Core.Timeline.ChangeCurrentStepValue(1)
         end
     )
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
@@ -45,6 +44,15 @@ function TimelineMixin:OnLoad()
         private.constants.events.TimelineNextButtonVisible,
         self.OnTimelineNextButtonVisible,
         self
+    )
+
+    -- Immediately initialize the timeline when UI is loaded
+    -- This ensures timeline is populated even if TimelineInit event hasn't been triggered
+    C_Timer.After(
+        0.1,
+        function()
+            self:OnTimelineInit()
+        end
     )
 
     -- Use state-based subscription for timeline step changes
@@ -65,12 +73,12 @@ function TimelineMixin:OnLoad()
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
-    private.Core.Timeline:ComputeTimelinePeriods()
-    private.Core.Timeline:DisplayTimelineWindow()
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.DisplayTimelineWindow()
 end
 
 function TimelineMixin:TimelinePrevious()
-    private.Core.Timeline:ChangePage(-1)
+    private.Core.Timeline.ChangePage(-1)
 end
 
 function TimelineMixin:OnTimelinePreviousButtonVisible(isVisible)
@@ -82,7 +90,7 @@ function TimelineMixin:OnTimelinePreviousButtonVisible(isVisible)
 end
 
 function TimelineMixin:TimelineNext()
-    private.Core.Timeline:ChangePage(1)
+    private.Core.Timeline.ChangePage(1)
 end
 
 function TimelineMixin:OnTimelineNextButtonVisible(isVisible)
@@ -95,9 +103,9 @@ end
 
 function TimelineMixin:OnMouseWheel(value)
     if (value > 0) then
-        private.Core.Timeline:ChangePage(-1)
+        private.Core.Timeline.ChangePage(-1)
     else
-        private.Core.Timeline:ChangePage(1)
+        private.Core.Timeline.ChangePage(1)
     end
 end
 

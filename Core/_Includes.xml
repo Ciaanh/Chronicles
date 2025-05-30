@@ -5,6 +5,7 @@
     <Script file="Cache.lua"/>
     <Script file="EventManager.lua"/>
     <Script file="StateManager.lua"/>
+    <Include file="Data\_Includes.xml"/>
     <Script file="Data.lua"/>
 
     <Script file="Characters.lua"/>
