@@ -33,17 +33,17 @@ local function getSelectedYear()
 end
 
 local function setCurrentStepValue(value, description)
-    private.Core.Logger.debug("Timeline", "Setting timeline step to: " .. tostring(value))
+    private.Core.Logger.trace("Timeline", "Setting timeline step to: " .. tostring(value))
     private.Core.StateManager.setState("timeline.currentStep", value, description or "Timeline step changed")
 end
 
 local function setCurrentPage(value, description)
-    private.Core.Logger.debug("Timeline", "Setting timeline page to: " .. tostring(value))
+    private.Core.Logger.trace("Timeline", "Setting timeline page to: " .. tostring(value))
     private.Core.StateManager.setState("timeline.currentPage", value, description or "Timeline page changed")
 end
 
 local function setSelectedYear(value, description)
-    private.Core.Logger.debug("Timeline", "Setting selected year to: " .. tostring(value))
+    private.Core.Logger.trace("Timeline", "Setting selected year to: " .. tostring(value))
     private.Core.StateManager.setState("timeline.selectedYear", value, description or "Timeline year changed")
 end
 
@@ -78,7 +78,7 @@ local function GetDateCurrentStepIndex(date)
 end
 
 local function GetCurrentStepPeriodsFilling()
-    local eventDates = Chronicles.Data.PeriodsFillingBySteps
+    local eventDates = Chronicles.Data:GetCachedPeriodsFillingBySteps()
 
     -- Safety check: if eventDates is nil, return empty table
     if eventDates == nil then
@@ -116,11 +116,10 @@ local function CountEvents(block)
     -- Handle special periods differently
     local isMytosPeriod = (originalLowerBound == private.constants.config.mythos)
     local isFuturePeriod = (originalUpperBound == private.constants.config.futur)
-    if isMytosPeriod then
-        -- For mythos period: manually search for events before historyStartYear
+    if isMytosPeriod then -- For mythos period: manually search for events before historyStartYear
         -- since the date index system might not properly handle extreme negative values
         local mythosYearEnd = private.constants.config.historyStartYear - 1
-        local foundEvents = Chronicles.Data:SearchEvents(private.constants.config.mythos, mythosYearEnd)
+        local foundEvents = Chronicles.Data:GetCachedSearchEvents(private.constants.config.mythos, mythosYearEnd)
 
         if foundEvents ~= nil then
             eventCount = #foundEvents
@@ -129,7 +128,7 @@ local function CountEvents(block)
         -- For future period: manually search for events beyond currentYear
         -- since the date index system doesn't cover future dates
         local futureYearStart = private.constants.config.currentYear + 1
-        local foundEvents = Chronicles.Data:SearchEvents(futureYearStart, private.constants.config.futur)
+        local foundEvents = Chronicles.Data:GetCachedSearchEvents(futureYearStart, private.constants.config.futur)
 
         if foundEvents ~= nil then
             eventCount = #foundEvents
@@ -314,7 +313,7 @@ function private.Core.Timeline:ComputeTimelinePeriods()
     if (stepValue == nil) then
         stepValue = private.constants.config.stepValues[1]
 
-        private.Core.Logger.debug("Timeline", "Initializing timeline step to default value: " .. tostring(stepValue))
+        private.Core.Logger.trace("Timeline", "Initializing timeline step to default value: " .. tostring(stepValue))
 
         -- Update state when initializing for the first time
         setCurrentStepValue(stepValue, "Timeline step initialized")
@@ -588,7 +587,7 @@ function private.Core.Timeline:ChangeCurrentStepValue(direction)
         nextStepValue = private.constants.config.stepValues[curentStepIndex - 1]
     end
 
-    private.Core.Logger.debug(
+    private.Core.Logger.trace(
         "Timeline",
         "Changing timeline step from " .. tostring(currentStepValue) .. " to " .. tostring(nextStepValue)
     )
@@ -608,7 +607,7 @@ end
 -----------------------------------------------------------------------------------------
 
 function private.Core.Timeline:Init()
-    private.Core.Logger.debug("Timeline", "Initializing Timeline module")
+    private.Core.Logger.trace("Timeline", "Initializing Timeline module")
 
     -- Initialize default values if not already set
     local currentStep = getCurrentStepValue()
@@ -622,5 +621,5 @@ function private.Core.Timeline:Init()
         setCurrentPage(1, "Timeline page initialized to default")
     end
 
-    private.Core.Logger.debug("Timeline", "Timeline module initialization complete")
+    private.Core.Logger.trace("Timeline", "Timeline module initialization complete")
 end

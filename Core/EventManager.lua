@@ -39,12 +39,6 @@ local eventSchemas = {
             if not data then
                 return false, "Startup data is nil"
             end
-            if type(data.version) ~= "string" then
-                return false, "Version must be a string"
-            end
-            if type(data.timestamp) ~= "number" then
-                return false, "Timestamp must be a number"
-            end
             return true, nil
         end
     },
@@ -53,15 +47,6 @@ local eventSchemas = {
         required = {"version", "timestamp"},
         optional = {"profile"},
         validate = function(data)
-            if not data then
-                return false, "Shutdown data is nil"
-            end
-            if type(data.version) ~= "string" then
-                return false, "Version must be a string"
-            end
-            if type(data.timestamp) ~= "number" then
-                return false, "Timestamp must be a number"
-            end
             return true, nil
         end
     },
@@ -171,13 +156,16 @@ private.Core.EventManager.Validator = {
 
 private.Core.EventManager.safeTrigger = function(eventName, data, source)
     source = source or debug.getinfo(2, "S").source
-    
-    print("EventManager: Attempting to trigger event: " .. eventName)
+
+    private.Core.Logger.trace("EventManager", "Attempting to trigger event: " .. eventName)
 
     -- Validate event data
     local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
-        print("EventManager: Event validation failed for " .. eventName .. ": " .. tostring(error))
+        private.Core.Logger.error(
+            "EventManager",
+            "Event validation failed for " .. eventName .. ": " .. tostring(error)
+        )
         private.Core.Logger.error("EventManager", "Event validation failed for " .. eventName .. ": " .. error)
         return false
     end
@@ -186,15 +174,18 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     local success, errorMsg =
         pcall(
         function()
-            print("EventManager: Triggering event via EventRegistry: " .. eventName)
+            private.Core.Logger.trace("EventManager", "Triggering event via EventRegistry: " .. eventName)
             EventRegistry:TriggerEvent(eventName, data)
         end
     )
     if success then
-        print("EventManager: Event triggered successfully: " .. eventName)
+        private.Core.Logger.trace("EventManager", "Event triggered successfully: " .. eventName)
         return true
     else
-        print("EventManager: Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg))
+        private.Core.Logger.error(
+            "EventManager",
+            "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
+        )
         private.Core.Logger.error(
             "EventManager",
             "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
@@ -204,55 +195,20 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
 end
 
 -----------------------------------------------------------------------------------------
--- Event Batching -----------------------------------------------------------------------
------------------------------------------------------------------------------------------
-
-private.Core.EventManager.Batcher = {
-    batches = {},
-    addToBatch = function(self, batchId, eventName, data, source)
-        if not self.batches[batchId] then
-            self.batches[batchId] = {}
-        end
-
-        table.insert(
-            self.batches[batchId],
-            {
-                eventName = eventName,
-                data = data,
-                source = source
-            }
-        )
-    end,
-    executeBatch = function(self, batchId)
-        local batch = self.batches[batchId]
-        if not batch then
-            return
-        end
-
-        for _, event in ipairs(batch) do
-            private.Core.EventManager.safeTrigger(event.eventName, event.data, event.source)
-        end
-
-        -- Clear the batch
-        self.batches[batchId] = nil
-    end,
-    clearBatch = function(self, batchId)
-        self.batches[batchId] = nil
-    end
-}
-
------------------------------------------------------------------------------------------
 -- Enhanced Event Registry Wrapper -----------------------------------------------------
 -----------------------------------------------------------------------------------------
 
 private.Core.EventManager.safeRegisterCallback = function(eventName, callback, owner)
-    print("EventManager: Registering callback for event: " .. eventName .. " (owner: " .. tostring(owner) .. ")")
-    
+    private.Core.Logger.trace(
+        "EventManager",
+        "Registering callback for event: " .. eventName .. " (owner: " .. tostring(owner) .. ")"
+    )
+
     local wrappedCallback = function(...)
-        print("EventManager: Callback triggered for event: " .. eventName)
+        private.Core.Logger.trace("EventManager", "Callback triggered for event: " .. eventName)
         local success, errorMsg = pcall(callback, ...)
         if not success then
-            print("EventManager: Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
+            private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
             private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
         end
     end
@@ -282,7 +238,7 @@ private.Core.EventManager.PluginEvents = {
             private.Core.EventManager.Validator:addSchema(fullEventName, schema)
         end
 
-        private.Core.Logger.info("EventManager", "Plugin event registered: " .. fullEventName)
+        private.Core.Logger.trace("EventManager", "Plugin event registered: " .. fullEventName)
         return true
     end,
     triggerPluginEvent = function(self, pluginName, eventName, data, source)

@@ -349,7 +349,7 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
 
     private.Core.Timeline:ComputeTimelinePeriods()
     private.Core.Timeline:DisplayTimelineWindow()
-    
+
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
 end
 
@@ -502,7 +502,7 @@ function SettingsMixin:LoadLibraries(frame)
     end
     content.checkboxes = {}
 
-    local libraries = Chronicles.Data:GetLibrariesNames()
+    local libraries = Chronicles.Data:GetCachedLibrariesNames()
     for _, library in ipairs(libraries) do
         local libraryName = library.name
         local text = Locale[libraryName] or libraryName
@@ -592,7 +592,7 @@ function SettingsMixin:LoadMyJournal(frame)
 end
 
 function SettingsMixin:LoadLogs(frame)
-    private.Core.Logger.debug("Settings", "Loading Logs tab")
+    private.Core.Logger.trace("Settings", "Loading Logs tab")
 
     if not frame.LogsContainer then
         private.Core.Logger.warn("Settings", "LogsContainer not found in frame")
@@ -625,8 +625,8 @@ function SettingsMixin:InitializeLogLevelControls(container)
         return
     end
     local dropdown = container.LogLevelDropdown
-    local levels = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
-    local currentLevel = "INFO" -- Default fallback
+    local levels = {"TRACE", "WARN", "ERROR"}
+    local currentLevel = "WARN" -- Default fallback
 
     -- Safely get current log level
     if private.Core.Logger.getLogLevel then
@@ -646,7 +646,7 @@ function SettingsMixin:InitializeLogLevelControls(container)
                 if private.Core.Logger.setLogLevel then
                     private.Core.Logger.setLogLevel(logLevel)
                     UIDropDownMenu_SetText(dropdown, logLevel)
-                    private.Core.Logger.info("Settings", "Log level changed to: " .. logLevel)
+                    private.Core.Logger.trace("Settings", "Log level changed to: " .. logLevel)
                     -- Refresh the log display to apply new filter
                     local settingsFrame = dropdown:GetParent():GetParent():GetParent():GetParent()
                     if settingsFrame and settingsFrame.RefreshLogDisplay then
@@ -675,7 +675,7 @@ function SettingsMixin:InitializeLogLevelControls(container)
                 local isChecked = self:GetChecked()
                 if private.Core.Logger.setEnabled then
                     private.Core.Logger.setEnabled(isChecked)
-                    private.Core.Logger.info("Settings", "Logger " .. (isChecked and "enabled" or "disabled"))
+                    private.Core.Logger.trace("Settings", "Logger " .. (isChecked and "enabled" or "disabled"))
                 end
             end
         )
@@ -729,7 +729,7 @@ function SettingsMixin:InitializeLogControls(container)
                 if private.Core.Logger.clearLogHistory then
                     private.Core.Logger.clearLogHistory()
                     settingsFrame:RefreshLogDisplay(settingsFrame.TabUI.Logs)
-                    private.Core.Logger.info("Settings", "Log history cleared from UI")
+                    private.Core.Logger.trace("Settings", "Log history cleared from UI")
                 end
             end
         )
@@ -755,8 +755,8 @@ function SettingsMixin:RefreshLogDisplay(frame)
     else
         -- Fallback: create sample entries if Logger doesn't have getLogHistory
         logHistory = {
-            {level = "INFO", module = "Settings", message = "Logs tab initialized", timestamp = time()},
-            {level = "DEBUG", module = "Core", message = "Logger system ready", timestamp = time()},
+            {level = "TRACE", module = "Settings", message = "Logs tab initialized", timestamp = time()},
+            {level = "TRACE", module = "Core", message = "Logger system ready", timestamp = time()},
             {
                 level = "WARN",
                 module = "Settings",
@@ -767,8 +767,8 @@ function SettingsMixin:RefreshLogDisplay(frame)
     end
 
     -- Get current log level filter from dropdown
-    local currentLogLevel = private.Core.Logger.getLogLevel and private.Core.Logger.getLogLevel() or "INFO"
-    local logLevels = {TRACE = 1, DEBUG = 2, INFO = 3, WARN = 4, ERROR = 5, FATAL = 6}
+    local currentLogLevel = private.Core.Logger.getLogLevel and private.Core.Logger.getLogLevel() or "WARN"
+    local logLevels = {TRACE = 1, WARN = 2, ERROR = 3}
     local minLevel = logLevels[currentLogLevel] or 3
 
     -- Filter log history based on current log level
@@ -838,7 +838,7 @@ function SettingsMixin:RefreshLogDisplay(frame)
 
     -- Update scroll indicators
     self:UpdateScrollIndicators(scrollFrame)
-    private.Core.Logger.debug(
+    private.Core.Logger.trace(
         "Settings",
         "Refreshed log display with " .. #filteredHistory .. " entries (filtered from " .. #logHistory .. " total)"
     )
@@ -857,12 +857,9 @@ function SettingsMixin:CreateLogEntryFrame(parent, logEntry)
 
     -- Color level text based on log level
     local colors = {
-        TRACE = {0.5, 0.5, 0.5},
-        DEBUG = {0.0, 1.0, 1.0},
-        INFO = {0.0, 1.0, 0.0},
+        TRACE = {0.0, 1.0, 1.0},
         WARN = {1.0, 1.0, 0.0},
-        ERROR = {1.0, 0.0, 0.0},
-        FATAL = {1.0, 0.0, 1.0}
+        ERROR = {1.0, 0.0, 0.0}
     }
 
     local color = colors[logEntry.level] or {1.0, 1.0, 1.0}

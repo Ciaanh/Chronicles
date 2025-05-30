@@ -54,7 +54,7 @@ function TimelineMixin:OnLoad()
             "timeline.currentStep",
             function(newStep, oldStep)
                 -- Timeline step changed - any specific UI updates can be added here
-                private.Core.Logger.debug(
+                private.Core.Logger.trace(
                     "TimelineMixin",
                     "Timeline step changed from " .. tostring(oldStep) .. " to " .. tostring(newStep)
                 )

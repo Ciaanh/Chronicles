@@ -67,16 +67,16 @@ function EventListMixin:OnLoad()
 end
 
 function EventListMixin:OnUIRefresh()
-	private.Core.Logger.debug("EventListMixin", "OnUIRefresh triggered - clearing event list data")
+	private.Core.Logger.trace("EventListMixin", "OnUIRefresh triggered - clearing event list data")
 
 	local data = {}
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
 
-	private.Core.Logger.debug("EventListMixin", "Setting empty data provider to PagedEventList")
+	private.Core.Logger.trace("EventListMixin", "Setting empty data provider to PagedEventList")
 	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
 
-	private.Core.Logger.debug("EventListMixin", "OnUIRefresh completed - event list cleared")
+	private.Core.Logger.trace("EventListMixin", "OnUIRefresh completed - event list cleared")
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
@@ -84,7 +84,7 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period)
-	local eventList = Chronicles.Data:SearchEvents(period.lower, period.upper)
+	local eventList = Chronicles.Data:GetCachedSearchEvents(period.lower, period.upper)
 	private.Core.Timeline:SetYear(math.floor((period.lower + period.upper) / 2))
 
 	local content = {

@@ -74,7 +74,7 @@ function FactionListMixin:LoadFactions()
 	if not success then
 		private.Core.Logger.error("FactionList", "Error setting faction list data - " .. tostring(errorMsg))
 	else
-		private.Core.Logger.info("FactionList", "Faction list loaded successfully with " .. #content.elements .. " factions")
+		private.Core.Logger.trace("FactionList", "Faction list loaded successfully with " .. #content.elements .. " factions")
 	end
 end
 

@@ -11,23 +11,64 @@ Chronicles.Data.RP = {}
 
 RPEventsDB = {}
 
-function Chronicles.Data:Init()
+function Chronicles.Data:Load()
     self:RegisterEventDB("RP", RPEventsDB)
 
     -- load data for my journal
     self:RegisterEventDB("myjournal", Chronicles.Data:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.Data:GetMyJournalFactions())
     self:RegisterCharacterDB("myjournal", Chronicles.Data:GetMyJournalCharacters())
-
     if (Chronicles.Custom ~= nil and Chronicles.Custom.DB ~= nil) then
         Chronicles.Custom.DB:Init()
     end
 
-    Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+    -- Initialize the cache system
+    private.Core.Cache.init()
 end
 
 function Chronicles.Data:RefreshPeriods()
-    Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+    private.Core.Cache.invalidate("periodsFillingBySteps")
+end
+
+-- Cache management methods (delegate to Core.Cache)
+function Chronicles.Data:InvalidateCache(cacheType)
+    return private.Core.Cache.invalidate(cacheType)
+end
+
+function Chronicles.Data:GetCachedPeriodsFillingBySteps()
+    return private.Core.Cache.getPeriodsFillingBySteps()
+end
+
+function Chronicles.Data:GetCachedMinEventYear()
+    return private.Core.Cache.getMinEventYear()
+end
+
+function Chronicles.Data:GetCachedMaxEventYear()
+    return private.Core.Cache.getMaxEventYear()
+end
+
+function Chronicles.Data:GetCachedLibrariesNames()
+    return private.Core.Cache.getLibrariesNames()
+end
+
+function Chronicles.Data:GetCachedSearchEvents(yearStart, yearEnd)
+    return private.Core.Cache.getSearchEvents(yearStart, yearEnd)
+end
+
+function Chronicles.Data:PreWarmSearchCache()
+    return private.Core.Cache.preWarmSearchCache()
+end
+
+function Chronicles.Data:WarmCache()
+    return private.Core.Cache.warmAllCaches()
+end
+
+function Chronicles.Data:ClearCache()
+    return private.Core.Cache.clearAll()
+end
+
+function Chronicles.Data:RebuildCache()
+    return private.Core.Cache.rebuildAll()
 end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -42,6 +83,12 @@ function Chronicles.Data:AddRPEvent(event)
         event.id = table.maxn(RPEventsDB) + 1
     end
     table.insert(RPEventsDB, event.id, self:CleanEventObject(event, "RP"))
+
+    -- Invalidate caches since we added new event data
+    private.Core.Cache.invalidate("periodsFillingBySteps")
+    private.Core.Cache.invalidate("minEventYear")
+    private.Core.Cache.invalidate("maxEventYear")
+    private.Core.Cache.invalidate("searchCache")
 end
 
 -- function to retrieve the list of dates for all eventsGroup
@@ -434,7 +481,7 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
     else
         if db == nil then
             private.Core.Logger.warn(
-            "Data",
+                "Data",
                 "Library '" .. libraryName .. "' is trying to register a nil events database."
             )
         end
@@ -443,10 +490,19 @@ function Chronicles.Data:RegisterEventDB(libraryName, db)
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.EventDBStatuses[libraryName] = isActive
-        end        Chronicles.Data.Events[libraryName] = {
+        end
+        Chronicles.Data.Events[libraryName] = {
             data = db or {}, -- Ensure data is never nil
             name = libraryName
         }
+
+        -- Invalidate caches since we registered new event data
+        self:InvalidateCache("periodsFillingBySteps")
+        self:InvalidateCache("minEventYear")
+        self:InvalidateCache("maxEventYear")
+        self:InvalidateCache("librariesNames")
+        self:InvalidateCache("searchCache")
+
         return true
     end
 end
@@ -460,7 +516,8 @@ function Chronicles.Data:RegisterCharacterDB(libraryName, db)
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
-        end        Chronicles.Data.Characters[libraryName] = {
+        end
+        Chronicles.Data.Characters[libraryName] = {
             data = db,
             name = libraryName
         }
@@ -477,7 +534,8 @@ function Chronicles.Data:RegisterFactionDB(libraryName, db)
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
-        end        Chronicles.Data.Factions[libraryName] = {
+        end
+        Chronicles.Data.Factions[libraryName] = {
             data = db,
             name = libraryName
         }
@@ -546,9 +604,14 @@ function Chronicles.Data:GetLibrariesNames()
 end
 
 function Chronicles.Data:SetLibraryStatus(libraryName, status)
+    local hadChange = false
+
     if Chronicles.Data.Events[libraryName] ~= nil then
+        local oldStatus = Chronicles.db.global.EventDBStatuses[libraryName]
         Chronicles.db.global.EventDBStatuses[libraryName] = status
-        Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+        if oldStatus ~= status then
+            hadChange = true
+        end
     end
 
     if Chronicles.Data.Factions[libraryName] ~= nil then
@@ -557,6 +620,10 @@ function Chronicles.Data:SetLibraryStatus(libraryName, status)
 
     if Chronicles.Data.Characters[libraryName] ~= nil then
         Chronicles.db.global.CharacterDBStatuses[libraryName] = status
+    end -- Only invalidate cache if there was an actual change to event status
+    if hadChange then
+        private.Core.Cache.invalidate("periodsFillingBySteps")
+        private.Core.Cache.invalidate("searchCache")
     end
 end
 
@@ -564,13 +631,13 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
     local isEventActive = nil
     local isFactionActive = nil
     local isCharacterActive = nil
-
     if Chronicles.Data.Events[libraryName] ~= nil then
         local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
         if (isActive == nil) then
             isActive = true
             Chronicles.db.global.EventDBStatuses[libraryName] = isActive
-            Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+            private.Core.Cache.invalidate("periodsFillingBySteps")
+            private.Core.Cache.invalidate("searchCache")
         end
         isEventActive = isActive
     end
@@ -602,22 +669,22 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
         end
         return true
     end
-
     if (isFactionActive) then
         if Chronicles.Data.Events[libraryName] ~= nil then
             Chronicles.db.global.EventDBStatuses[libraryName] = true
-            Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+            private.Core.Cache.invalidate("periodsFillingBySteps")
+            private.Core.Cache.invalidate("searchCache")
         end
         if Chronicles.Data.Characters[libraryName] ~= nil then
             Chronicles.db.global.CharacterDBStatuses[libraryName] = true
         end
         return true
     end
-
     if (isCharacterActive) then
         if Chronicles.Data.Events[libraryName] ~= nil then
             Chronicles.db.global.EventDBStatuses[libraryName] = true
-            Chronicles.Data.PeriodsFillingBySteps = Chronicles.Data:GetPeriodsFillingBySteps()
+            private.Core.Cache.invalidate("periodsFillingBySteps")
+            private.Core.Cache.invalidate("searchCache")
         end
         if Chronicles.Data.Factions[libraryName] ~= nil then
             Chronicles.db.global.FactionDBStatuses[libraryName] = true
@@ -629,7 +696,12 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
 end
 
 function Chronicles.Data:SetEventTypeStatus(eventType, isActive)
-    Chronicles.db.global.EventTypesStatuses[eventType] = isActive
+    local oldStatus = Chronicles.db.global.EventTypesStatuses[eventType]
+    Chronicles.db.global.EventTypesStatuses[eventType] = isActive -- Only invalidate cache if there was an actual change
+    if oldStatus ~= isActive then
+        private.Core.Cache.invalidate("periodsFillingBySteps")
+        private.Core.Cache.invalidate("searchCache")
+    end
 end
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
@@ -650,10 +722,20 @@ end
 
 function Chronicles.Data:SetMyJournalEvents(event)
     Chronicles.Data:AddToMyJournal(event, Chronicles.db.global.MyJournalEventDB)
+    -- Invalidate caches since we added new event data
+    private.Core.Cache.invalidate("periodsFillingBySteps")
+    private.Core.Cache.invalidate("minEventYear")
+    private.Core.Cache.invalidate("maxEventYear")
+    private.Core.Cache.invalidate("searchCache")
 end
 
 function Chronicles.Data:RemoveMyJournalEvent(eventId)
     Chronicles.Data:RemoveFromMyJournal(eventId, Chronicles.db.global.MyJournalEventDB)
+    -- Invalidate caches since we removed event data
+    private.Core.Cache.invalidate("periodsFillingBySteps")
+    private.Core.Cache.invalidate("minEventYear")
+    private.Core.Cache.invalidate("maxEventYear")
+    private.Core.Cache.invalidate("searchCache")
 end
 
 function Chronicles.Data:GetMyJournalFactions()

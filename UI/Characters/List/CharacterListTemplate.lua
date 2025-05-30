@@ -75,7 +75,7 @@ function CharacterListMixin:LoadCharacters()
 	if not success then
 		private.Core.Logger.error("CharacterList", "Error setting character list data - " .. tostring(errorMsg))
 	else
-		private.Core.Logger.info(
+		private.Core.Logger.trace(
 			"CharacterList",
 			"Character list loaded successfully with " .. #content.elements .. " characters"
 		)

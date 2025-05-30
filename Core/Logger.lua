@@ -9,28 +9,22 @@ private.Core.Logger = {}
 -- Log levels
 private.Core.Logger.LOG_LEVELS = {
     TRACE = 1,
-    DEBUG = 2,
-    INFO = 3,
-    WARN = 4,
-    ERROR = 5,
-    FATAL = 6
+    WARN = 2,
+    ERROR = 3,
 }
 
 -- Color codes for log levels
 private.Core.Logger.LOG_COLORS = {
-    TRACE = "|cFF808080", -- Gray
-    DEBUG = "|cFF00FFFF", -- Cyan
-    INFO = "|cFF00FF00", -- Green
+    TRACE = "|cFF00FFFF", -- Cyan
     WARN = "|cFFFFFF00", -- Yellow
     ERROR = "|cFFFF0000", -- Red
-    FATAL = "|cFFFF00FF", -- Magenta
     RESET = "|r"
 }
 
 -- Simple configuration
 local config = {
     enabled = true,
-    logLevel = "WARN", -- Only show warnings, errors, and fatal by default
+    logLevel = "WARN", -- Only show warnings, errors by default
     maxLogHistory = 500
 }
 
@@ -71,27 +65,20 @@ function private.Core.Logger.log(level, module, message)
             message = message,
             formattedMessage = formattedMessage
         }
-    )
-
-    -- Maintain history size
+    ) -- Maintain history size
     if #logHistory > config.maxLogHistory then
         table.remove(logHistory, 1)
     end
 
-    print(formattedMessage)
+    -- Output to default chat frame instead of print
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(formattedMessage)
+    end
 end
 
 -- Convenience logging functions
 function private.Core.Logger.trace(module, message)
     private.Core.Logger.log("TRACE", module, message)
-end
-
-function private.Core.Logger.debug(module, message)
-    private.Core.Logger.log("DEBUG", module, message)
-end
-
-function private.Core.Logger.info(module, message)
-    private.Core.Logger.log("INFO", module, message)
 end
 
 function private.Core.Logger.warn(module, message)
@@ -103,10 +90,6 @@ function private.Core.Logger.error(module, message)
     --error(message) -- Use error to throw an error in Lua
 end
 
-function private.Core.Logger.fatal(module, message)
-    private.Core.Logger.log("FATAL", module, message)
-end
-
 -----------------------------------------------------------------------------------------
 -- Simple Configuration Functions ------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -114,37 +97,43 @@ end
 function private.Core.Logger.setEnabled(enabled)
     config.enabled = enabled
     local status = enabled and "enabled" or "disabled"
-    print(
+    local message =
         string.format(
-            "%s[Chronicles Logger]%s Debug logging %s",
-            private.Core.Logger.LOG_COLORS.INFO,
-            private.Core.Logger.LOG_COLORS.RESET,
-            status
-        )
+        "%s[Chronicles Logger]%s Debug logging %s",
+        private.Core.Logger.LOG_COLORS.INFO,
+        private.Core.Logger.LOG_COLORS.RESET,
+        status
     )
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(message)
+    end
 end
 
 function private.Core.Logger.setLogLevel(level)
     level = string.upper(level)
     if private.Core.Logger.LOG_LEVELS[level] then
         config.logLevel = level
-        print(
+        local message =
             string.format(
-                "%s[Chronicles Logger]%s Log level set to %s",
-                private.Core.Logger.LOG_COLORS.INFO,
-                private.Core.Logger.LOG_COLORS.RESET,
-                level
-            )
+            "%s[Chronicles Logger]%s Log level set to %s",
+            private.Core.Logger.LOG_COLORS.INFO,
+            private.Core.Logger.LOG_COLORS.RESET,
+            level
         )
+        if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage(message)
+        end
     else
-        print(
+        local message =
             string.format(
-                "%s[Chronicles Logger]%s Invalid log level: %s",
-                private.Core.Logger.LOG_COLORS.ERROR,
-                private.Core.Logger.LOG_COLORS.RESET,
-                tostring(level)
-            )
+            "%s[Chronicles Logger]%s Invalid log level: %s",
+            private.Core.Logger.LOG_COLORS.ERROR,
+            private.Core.Logger.LOG_COLORS.RESET,
+            tostring(level)
         )
+        if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage(message)
+        end
     end
 end
 
@@ -194,23 +183,27 @@ function private.Core.Logger.printLogHistory(count, level, module)
         end
         filterDesc = " (" .. table.concat(parts, ", ") .. ")"
     end
-    print(
+    local headerMessage =
         string.format(
-            "%s[Chronicles Logger]%s Log History%s:",
-            private.Core.Logger.LOG_COLORS.INFO,
-            private.Core.Logger.LOG_COLORS.RESET,
-            filterDesc
-        )
+        "%s[Chronicles Logger]%s Log History%s:",
+        private.Core.Logger.LOG_COLORS.INFO,
+        private.Core.Logger.LOG_COLORS.RESET,
+        filterDesc
     )
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(headerMessage)
+    end
 
     for i = #history, 1, -1 do
-        print(history[i].formattedMessage)
+        if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage(history[i].formattedMessage)
+        end
     end
 end
 
 function private.Core.Logger.clearLogHistory()
     logHistory = {}
-    private.Core.Logger.info("Logger", "Log history cleared")
+    private.Core.Logger.trace("Logger", "Log history cleared")
 end
 
 -----------------------------------------------------------------------------------------

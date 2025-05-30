@@ -183,29 +183,35 @@ end
 -- Event-Driven State Updates ----------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
-local function setupEventListeners()
-    -- Use centralized event constants to avoid string duplication errors
-    local events = private.constants.events    -- Application startup event
+local function setupEventListeners() -- Use centralized event constants to avoid string duplication errors
+    local events = private.constants.events
+
+    -- Application startup event
     private.Core.registerCallback(
         events.AddonStartup,
         function(startupData)
-            print("StateManager: AddonStartup event received - version: " .. tostring(startupData.version))
-            private.Core.Logger.info("StateManager", "Application startup event received - version: " .. tostring(startupData.version))
-            
-            -- Initialize state with startup data
-            private.Core.StateManager.setState("settings.debugMode", startupData.debugMode or false, "Debug mode initialized")
-            private.Core.StateManager.setState("data.lastRefreshTime", startupData.timestamp, "Startup timestamp recorded")
-            
+            private.Core.Logger.trace(
+                "StateManager",
+                "AddonStartup event received - version: " .. tostring(startupData.version)
+            )
+
             -- Load saved state from database
             private.Core.StateManager.loadState()
-            
+
+            -- Initialize state with startup data
+            private.Core.StateManager.setState(
+                "settings.debugMode",
+                startupData.debugMode or false,
+                "Debug mode initialized"
+            )
+
             -- Initialize Timeline component
             if private.Core.Timeline and private.Core.Timeline.Init then
-                private.Core.Logger.debug("StateManager", "Initializing Timeline component")
+                private.Core.Logger.trace("StateManager", "Initializing Timeline component")
                 private.Core.Timeline.Init()
             end
-            
-            private.Core.Logger.info("StateManager", "Application startup initialization completed")
+
+            private.Core.Logger.trace("StateManager", "Application startup initialization completed")
         end,
         "StateManager"
     )
@@ -213,16 +219,16 @@ local function setupEventListeners()
     -- Application shutdown event
     private.Core.registerCallback(
         events.AddonShutdown,
-        function(shutdownData)
-            private.Core.Logger.info("StateManager", "Application shutdown event received - version: " .. tostring(shutdownData.version))
-            
+        function()
+            private.Core.Logger.trace("StateManager", "Application shutdown event received")
+
             -- Save current state before shutdown
             private.Core.StateManager.saveState()
-            
+
             -- Clean up listeners and state
             StateManager.listeners = {}
-            
-            private.Core.Logger.info("StateManager", "Application shutdown cleanup completed")
+
+            private.Core.Logger.trace("StateManager", "Application shutdown cleanup completed")
         end,
         "StateManager"
     )
@@ -328,7 +334,7 @@ end
 
 function private.Core.StateManager.dumpState(path)
     local state = private.Core.StateManager.getState(path)
-    private.Core.Logger.info("StateManager", "State dump" .. (path and (" for " .. path) or "") .. ":")
+    private.Core.Logger.trace("StateManager", "State dump" .. (path and (" for " .. path) or "") .. ":")
     private.Core.StateManager.printTable(state, 0)
 end
 
@@ -337,16 +343,16 @@ function private.Core.StateManager.printTable(t, indent)
     local prefix = string.rep("  ", indent)
 
     if type(t) ~= "table" then
-        private.Core.Logger.info("StateManager", prefix .. tostring(t))
+        private.Core.Logger.trace("StateManager", prefix .. tostring(t))
         return
     end
 
     for k, v in pairs(t) do
         if type(v) == "table" then
-            private.Core.Logger.info("StateManager", prefix .. tostring(k) .. ":")
+            private.Core.Logger.trace("StateManager", prefix .. tostring(k) .. ":")
             private.Core.StateManager.printTable(v, indent + 1)
         else
-            private.Core.Logger.info("StateManager", prefix .. tostring(k) .. ": " .. tostring(v))
+            private.Core.Logger.trace("StateManager", prefix .. tostring(k) .. ": " .. tostring(v))
         end
     end
 end
@@ -395,16 +401,16 @@ SlashCmdList["CHRONICLESSTATEDEBUG"] = function(msg)
     elseif command == "history" then
         local count = tonumber(args[2]) or 5
         local history = private.Core.StateManager.getHistory(count)
-        private.Core.Logger.info("StateManager", "State History:")
+        private.Core.Logger.trace("StateManager", "State History:")
         for _, entry in ipairs(history) do
             local timeStr = date("%H:%M:%S", entry.timestamp)
-            private.Core.Logger.info("StateManager", string.format("[%s] %s", timeStr, entry.description))
+            private.Core.Logger.trace("StateManager", string.format("[%s] %s", timeStr, entry.description))
         end
     elseif command == "get" then
         local path = args[2]
         if path then
             local value = private.Core.StateManager.getState(path)
-            private.Core.Logger.info("StateManager", path .. ": " .. tostring(value))
+            private.Core.Logger.trace("StateManager", path .. ": " .. tostring(value))
         else
             private.Core.Logger.error("StateManager", "Please specify a state path")
         end
@@ -424,15 +430,15 @@ SlashCmdList["CHRONICLESSTATEDEBUG"] = function(msg)
                 value = nil
             end
             private.Core.StateManager.setState(path, value, "Manual state change")
-            private.Core.Logger.info("StateManager", "Set " .. path .. " to " .. tostring(value))
+            private.Core.Logger.trace("StateManager", "Set " .. path .. " to " .. tostring(value))
         else
             private.Core.Logger.error("StateManager", "Please specify path and value")
         end
     else
-        private.Core.Logger.info("StateManager", "Commands:")
-        private.Core.Logger.info("StateManager", "  /cstatedebug dump [path] - Dump current state")
-        private.Core.Logger.info("StateManager", "  /cstatedebug history [count] - Show state change history")
-        private.Core.Logger.info("StateManager", "  /cstatedebug get <path> - Get state value")
-        private.Core.Logger.info("StateManager", "  /cstatedebug set <path> <value> - Set state value")
+        private.Core.Logger.trace("StateManager", "Commands:")
+        private.Core.Logger.trace("StateManager", "  /cstatedebug dump [path] - Dump current state")
+        private.Core.Logger.trace("StateManager", "  /cstatedebug history [count] - Show state change history")
+        private.Core.Logger.trace("StateManager", "  /cstatedebug get <path> - Get state value")
+        private.Core.Logger.trace("StateManager", "  /cstatedebug set <path> <value> - Set state value")
     end
 end

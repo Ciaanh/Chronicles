@@ -50,60 +50,36 @@ function Chronicles:OnInitialize()
             end
         }
     )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)    self:RegisterChatCommand(
+    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
+    self:RegisterChatCommand(
         "chronicles",
         function()
             self.UI:DisplayWindow()
         end
     )
 
-    Chronicles.Data:Init()
+    Chronicles.Data:Load()
 
     -- Initialize state manager first
     if private.Core.StateManager then
         private.Core.StateManager.init()
-    end    -- Delay the startup event to ensure all event listeners are registered
+    end
+
+    -- Delay the startup event to ensure all event listeners are registered
     C_Timer.After(
         0.2,
         function()
-            -- Trigger application startup event to orchestrate component initialization
-            local version = "development"
-            if GetAddOnMetadata then
-                version = GetAddOnMetadata(FOLDER_NAME, "Version") or "development"
-            end
-            
             local startupData = {
-                version = version,
-                timestamp = GetServerTime(),
-                debugMode = private.constants.eventSystem.debugMode or false,
-                profile = self.db:GetCurrentProfile()
+                debugMode = private.constants.eventSystem.debugMode or false
             }
-
-            print("Chronicles: Triggering AddonStartup event with version: " .. startupData.version)
+            private.Core.Logger.trace("Chronicles", "Triggering AddonStartup event")
             private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
         end
     )
 end
 
 function Chronicles:OnDisable()
-    -- Trigger application shutdown event
-    local version = "development"
-    if GetAddOnMetadata then
-        version = GetAddOnMetadata(FOLDER_NAME, "Version") or "development"
-    end
-    
-    local shutdownData = {
-        version = version,
-        timestamp = GetServerTime(),
-        profile = self.db:GetCurrentProfile()
-    }
-
-    private.Core.triggerEvent(private.constants.events.AddonShutdown, shutdownData, "Chronicles:OnDisable")
-
-    -- Save state before shutdown
-    if private.Core.StateManager then
-        private.Core.StateManager.saveState()
-    end
+    private.Core.triggerEvent(private.constants.events.AddonShutdown, nil, "Chronicles:OnDisable")
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
