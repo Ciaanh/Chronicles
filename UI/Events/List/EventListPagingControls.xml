@@ -54,6 +54,9 @@
                         <KeyValue key="align" value="center" type="string"/>
                     </KeyValues>
                     <Size x="0" y="32"/>
+                    <!-- <Anchors>
+                        <Anchor point="CENTER" x="-50" y="0"/>
+                    </Anchors> -->
                 </FontString>
             </Layer>
         </Layers>

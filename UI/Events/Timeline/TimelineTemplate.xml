@@ -59,8 +59,6 @@
 
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Size x="1200" y="125" />
-
-
         <Frames>
 
             <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
@@ -152,7 +150,7 @@
             <Frame parentKey="Period" hidden="true">
                 <Size x="233" y="70"/>
                 <Anchors>
-                    <Anchor point="BOTTOM" relativePoint="TOP" x="0" y="-10"/>
+                    <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="10"/>
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">

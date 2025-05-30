@@ -70,14 +70,6 @@
                         <Anchor point="CENTER" y="1"/>
                     </Anchors>
                 </HighlightTexture>
-                <Scripts>
-                    <OnLoad >
-                        self:GetNormalTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetHighlightTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetPushedTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetDisabledTexture():SetTexCoord(1, 0, 0, 1)
-                    </OnLoad >
-                </Scripts>
             </Button>
 
             <Button parentKey="Next">
