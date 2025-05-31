@@ -70,7 +70,6 @@
                     <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="20" y="-5" />
                 </Anchors>
             </Button>
-
             <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate">
                 <KeyValues>
                     <KeyValue key="direction" value="1" type="number"/>
@@ -80,6 +79,32 @@
                     <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomOut" x="5" y="0" />
                 </Anchors>
             </Button>
+
+            <Frame parentKey="ZoomLevelIndicator">
+                <Size x="120" y="25" />
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomIn" x="10" y="0" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\timeline\label">
+                            <Size x="120" y="25"/>
+                            <Anchors>
+                                <Anchor point="CENTER" />
+                            </Anchors>
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="SystemFont_Med3" justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="5" y="-3" />
+                                <Anchor point="BOTTOMRIGHT" x="-5" y="3" />
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR" />
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
 
 
 

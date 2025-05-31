@@ -61,7 +61,8 @@ function TimelineMixin:OnLoad()
         private.Core.StateManager.subscribe(
             "timeline.currentStep",
             function(newStep, oldStep)
-                -- Timeline step changed - any specific UI updates can be added here
+                -- Timeline step changed - update zoom level indicator
+                self:UpdateZoomLevelIndicator(newStep)
                 private.Core.Logger.trace(
                     "TimelineMixin",
                     "Timeline step changed from " .. tostring(oldStep) .. " to " .. tostring(newStep)
@@ -70,6 +71,11 @@ function TimelineMixin:OnLoad()
             "TimelineMixin"
         )
     end
+
+    -- Initialize zoom level indicator
+    self:UpdateZoomLevelIndicator(
+        private.Core.StateManager.getState("timeline.currentStep") or private.constants.config.stepValues[1]
+    )
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
@@ -107,6 +113,21 @@ function TimelineMixin:OnMouseWheel(value)
     else
         private.Core.Timeline.ChangePage(1)
     end
+end
+
+function TimelineMixin:UpdateZoomLevelIndicator(stepValue)
+    if not self.ZoomLevelIndicator or not self.ZoomLevelIndicator.Text then
+        return
+    end
+
+    local displayText = ""
+    if stepValue then
+        displayText = tostring(stepValue) .. Locale["years"]
+    else
+        displayText = "?" .. Locale["years"]
+    end
+
+    self.ZoomLevelIndicator.Text:SetText(displayText)
 end
 
 -----------------------------------------------------------------------------------------
