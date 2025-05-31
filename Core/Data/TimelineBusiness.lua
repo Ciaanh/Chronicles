@@ -648,19 +648,19 @@ function TimelineBusiness.computeTimelinePeriods()
 
     private.Core.Logger.trace("TimelineBusiness", "Generated " .. #consolidatedPeriods .. " timeline periods")
 
-    -- Debug print of periods
-    for i, period in ipairs(consolidatedPeriods) do
-        print(
-            string.format(
-                "Period %d: lowerBound=%s, upperBound=%s, hasEvents=%s, nbEvents=%s",
-                i,
-                tostring(period.lowerBound),
-                tostring(period.upperBound),
-                tostring(period.hasEvents),
-                tostring(period.nbEvents)
-            )
-        )
-    end
+    -- -- Debug print of periods
+    -- for i, period in ipairs(consolidatedPeriods) do
+    --     print(
+    --         string.format(
+    --             "Period %d: lowerBound=%s, upperBound=%s, hasEvents=%s, nbEvents=%s",
+    --             i,
+    --             tostring(period.lowerBound),
+    --             tostring(period.upperBound),
+    --             tostring(period.hasEvents),
+    --             tostring(period.nbEvents)
+    --         )
+    --     )
+    -- end
 
     return consolidatedPeriods
 end

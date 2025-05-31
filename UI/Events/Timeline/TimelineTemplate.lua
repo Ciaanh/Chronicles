@@ -141,19 +141,59 @@ end
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
     self.data = periodData
 
+    -- Highlight logic
+    local selectedPeriod = private.Core.StateManager.getState("ui.selectedPeriod")
+    local isSelected =
+        selectedPeriod and periodData and selectedPeriod.lower == periodData.lowerBound and
+        selectedPeriod.upper == periodData.upperBound
+
     if (periodData ~= nil and periodData.hasEvents) then
         self.Text:SetText(periodData.nbEvents)
+        local select = isSelected and "-selected" or "" -- gold for selected, white for unselected
+
         if periodData.nbEvents < 10 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events" .. select)
         elseif periodData.nbEvents < 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events" .. select)
         elseif periodData.nbEvents >= 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events" .. select)
         end
     else
         self.Text:SetText("")
         self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
     end
+
+    -- Always reset background color to normal
+    self.Background:SetVertexColor(1, 1, 1)
+end
+
+function TimelinePeriodMixin:ResetAllPeriodTextures()
+    local periods = {
+        Period1,
+        Period2,
+        Period3,
+        Period4,
+        Period5,
+        Period6,
+        Period7,
+        Period8
+    }
+
+    for _, period in ipairs(periods) do
+        if period.data and period.data.hasEvents then
+            if period.data.nbEvents < 10 then
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events")
+            elseif period.data.nbEvents < 25 then
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events")
+            elseif period.data.nbEvents >= 25 then
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events")
+            end
+        else
+            period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
+        end
+    end
+
+    -- Highlight the period when hovered
 end
 
 function TimelinePeriodMixin:OnClick()
@@ -162,10 +202,27 @@ function TimelinePeriodMixin:OnClick()
     local periodData = {
         lower = self.data.lowerBound,
         upper = self.data.upperBound,
-        text = self.data.text
-    } -- Update state instead of triggering event - provides single source of truth
+        text = self.data.text,
+        nbEvents = self.data.nbEvents,
+        hasEvents = self.data.hasEvents
+    }
+
+    -- Update state instead of triggering event - provides single source of truth
     if private.Core.StateManager then
         private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
+    end
+
+    self:ResetAllPeriodTextures()
+
+    -- Set the selected texture for this period
+    if (periodData ~= nil and periodData.hasEvents) then
+        if periodData.nbEvents < 10 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events-selected")
+        elseif periodData.nbEvents < 25 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events-selected")
+        elseif periodData.nbEvents >= 25 then
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events-selected")
+        end
     end
 
     Timeline.Period:Show()
