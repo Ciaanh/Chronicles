@@ -147,32 +147,6 @@
 
 
 
-            <Frame parentKey="Period" hidden="true">
-                <Size x="233" y="70"/>
-                <Anchors>
-                    <Anchor point="TOP" relativePoint="BOTTOM" x="0" y="10"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="background" atlas="GarrMission_RewardsBanner-Desaturate">
-                            <Anchors>
-                                <Anchor point="TOPLEFT"/>
-                                <Anchor point="BOTTOMRIGHT"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="CENTER" x="0" y="5"/>
-                            </Anchors>
-                            <Color color="SPELLBOOK_FONT_COLOR" />
-                        </FontString>
-                    </Layer>
-                </Layers>
-            </Frame>
-
             <Frame name="Label1" inherits="TimelineLabelTemplate">
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" x="15" y="10" />

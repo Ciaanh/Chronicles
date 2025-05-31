@@ -224,24 +224,4 @@ function TimelinePeriodMixin:OnClick()
             self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events-selected")
         end
     end
-
-    Timeline.Period:Show()
-
-    if self.data.lowerBound == private.constants.config.mythos then
-        Timeline.Period.Text:SetText(Locale["Mythos"])
-        return
-    end
-
-    if self.data.upperBound == private.constants.config.futur then
-        Timeline.Period.Text:SetText(Locale["Futur"])
-        return
-    end
-
-    local left = tostring(self.data.lowerBound)
-    local right = tostring(self.data.upperBound)
-    if self.data.lowerBound == self.data.upperBound then
-        Timeline.Period.Text:SetText(left)
-    else
-        Timeline.Period.Text:SetText(left .. " / " .. right)
-    end
 end
