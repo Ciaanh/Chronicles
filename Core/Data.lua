@@ -1,28 +1,8 @@
 --[[
     Chronicles Data Module
     
-    Main data management module for Chronicles addon. This module has been refactored as part of 
-    the Clean Code reorganization initiative.
-    
-    PHASE 1 COMPLETED: Search functionality has been extracted to SearchEngine module
-    - All search methods now delegate to private.Core.Data.SearchEngine
-    - Backward compatibility maintained through facade methods
-    - Single responsibility principle applied
-    
-    PHASE 2 COMPLETED: Data Registry functionality has been extracted to DataRegistry module
-    - All registry methods now delegate to private.Core.Data.DataRegistry
-    - Database registration: RegisterEventDB, RegisterFactionDB, RegisterCharacterDB
-    - Library status management: GetLibraryStatus, SetLibraryStatus, GetLibrariesNames
-    - Backward compatibility maintained through facade methods
-    
-    ERROR FIXES COMPLETED: Runtime error resolution
-    - Added initialization guards to all delegation methods
-    - Prevents nil access errors during module loading
-    - Graceful error handling with fallback values
-    
-    Future Phases:
-    - Phase 3: Extract Timeline Business Logic
-    - Phase 4: Complete domain separation
+    Main data management module for Chronicles addon.
+    Handles database registration, MyJournal operations, and integration with StateManager.
 --]]
 local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
@@ -59,46 +39,6 @@ function Chronicles.Data:RefreshPeriods()
     private.Core.Cache.invalidate("periodsFillingBySteps")
 end
 
--- Cache management methods (delegate to Core.Cache)
-function Chronicles.Data:InvalidateCache(cacheType)
-    return private.Core.Cache.invalidate(cacheType)
-end
-
-function Chronicles.Data:GetCachedPeriodsFillingBySteps()
-    return private.Core.Cache.getPeriodsFillingBySteps()
-end
-
-function Chronicles.Data:GetCachedMinEventYear()
-    return private.Core.Cache.getMinEventYear()
-end
-
-function Chronicles.Data:GetCachedMaxEventYear()
-    return private.Core.Cache.getMaxEventYear()
-end
-
-function Chronicles.Data:GetCachedLibrariesNames()
-    return private.Core.Cache.getLibrariesNames()
-end
-
-function Chronicles.Data:GetCachedSearchEvents(yearStart, yearEnd)
-    return private.Core.Cache.getSearchEvents(yearStart, yearEnd)
-end
-
-function Chronicles.Data:PreWarmSearchCache()
-    return private.Core.Cache.preWarmSearchCache()
-end
-
-function Chronicles.Data:WarmCache()
-    return private.Core.Cache.warmAllCaches()
-end
-
-function Chronicles.Data:ClearCache()
-    return private.Core.Cache.clearAll()
-end
-
-function Chronicles.Data:RebuildCache()
-    return private.Core.Cache.rebuildAll()
-end
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -416,8 +356,24 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
 end
 
 function Chronicles.Data:SetEventTypeStatus(eventType, isActive)
-    local oldStatus = Chronicles.db.global.EventTypesStatuses[eventType]
-    Chronicles.db.global.EventTypesStatuses[eventType] = isActive -- Only invalidate cache if there was an actual change
+    -- Ensure StateManager is available
+    if not private.Core.StateManager then
+        private.Core.Logger.error("Data", "StateManager not available when trying to set event type status")
+        return
+    end -- Get current status to check for changes
+    local oldStatus = private.Core.StateManager.getState("settings.libraries.eventTypes." .. eventType)
+    if oldStatus == nil then
+        oldStatus = true
+    end
+
+    -- Update through StateManager
+    private.Core.StateManager.setState(
+        "settings.libraries.eventTypes." .. eventType,
+        isActive,
+        "Event type status update"
+    )
+
+    -- Only invalidate cache if there was an actual change
     if oldStatus ~= isActive then
         private.Core.Cache.invalidate("periodsFillingBySteps")
         private.Core.Cache.invalidate("searchCache")
@@ -425,23 +381,84 @@ function Chronicles.Data:SetEventTypeStatus(eventType, isActive)
 end
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
-    local isActive = Chronicles.db.global.EventTypesStatuses[eventTypeId]
-    if (isActive == nil) then
-        isActive = true
-        Chronicles.db.global.EventTypesStatuses[eventTypeId] = isActive
-    end
-    return isActive
+    -- Ensure StateManager is available
+    if not private.Core.StateManager then
+        private.Core.Logger.error("Data", "StateManager not available when trying to get event type status")
+        return true -- Default to active
+    end -- Delegate to StateManager
+    local status = private.Core.StateManager.getState("settings.libraries.eventTypes." .. eventTypeId)
+    return status ~= nil and status or true
 end
 
 -----------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
 function Chronicles.Data:GetMyJournalEvents()
-    return Chronicles.db.global.MyJournalEventDB
+    -- Ensure StateManager is available
+    if not private.Core.StateManager then
+        private.Core.Logger.error("Data", "StateManager not available when trying to get MyJournal events")
+        return {}
+    end -- Delegate to StateManager
+    local newData = private.Core.StateManager.getState("data.userContent.events.byId")
+    if newData and next(newData) then
+        local result = {}
+        for id, event in pairs(newData) do
+            table.insert(result, event)
+        end
+        return result
+    end
+    return {}
 end
 
 function Chronicles.Data:SetMyJournalEvents(event)
-    Chronicles.Data:AddToMyJournal(event, Chronicles.db.global.MyJournalEventDB)
+    -- Ensure StateManager is available
+    if not private.Core.StateManager then
+        private.Core.Logger.error("Data", "StateManager not available when trying to set MyJournal event")
+        return
+    end -- Set source and ensure ID is assigned
+    event.source = "myjournal"
+    if (event.id == nil) then
+        local newData = private.Core.StateManager.getState("data.userContent.events.byId")
+        local currentEvents = {}
+        if newData and next(newData) then
+            for id, evt in pairs(newData) do
+                table.insert(currentEvents, evt)
+            end
+        end
+        event.id = Chronicles.Data:AvailableDbId(currentEvents)
+    end
+
+    -- Add through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.events")
+    if currentData and currentData.byId and event and event.id then
+        currentData.byId[event.id] = event
+        currentData.metadata.count = currentData.metadata.count + 1
+        currentData.metadata.lastModified = GetServerTime()
+
+        local startYear = event.yearStart or 0
+        local eventType = event.eventType or 1
+
+        if not currentData.index.byYear[startYear] then
+            currentData.index.byYear[startYear] = {}
+        end
+        if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], event.id) then
+            table.insert(currentData.index.byYear[startYear], event.id)
+        end
+
+        if not currentData.index.byType[eventType] then
+            currentData.index.byType[eventType] = {}
+        end
+        if not private.Core.Utils.TableUtils.containsValue(currentData.index.byType[eventType], event.id) then
+            table.insert(currentData.index.byType[eventType], event.id)
+        end
+
+        private.Core.StateManager.setState(
+            "data.userContent.events",
+            currentData,
+            "Added MyJournal event: " .. (event.label or event.id)
+        )
+    end
+
     -- Invalidate caches since we added new event data
     private.Core.Cache.invalidate("periodsFillingBySteps")
     private.Core.Cache.invalidate("minEventYear")
@@ -450,36 +467,185 @@ function Chronicles.Data:SetMyJournalEvents(event)
 end
 
 function Chronicles.Data:RemoveMyJournalEvent(eventId)
-    Chronicles.Data:RemoveFromMyJournal(eventId, Chronicles.db.global.MyJournalEventDB)
-    -- Invalidate caches since we removed event data
-    private.Core.Cache.invalidate("periodsFillingBySteps")
-    private.Core.Cache.invalidate("minEventYear")
-    private.Core.Cache.invalidate("maxEventYear")
-    private.Core.Cache.invalidate("searchCache")
+    -- Remove through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.events")
+    if currentData and currentData.byId and eventId then
+        currentData.byId[eventId] = nil
+        currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
+        currentData.metadata.lastModified = GetServerTime()
+
+        -- Remove from indexes
+        for year, eventIds in pairs(currentData.index.byYear or {}) do
+            for i, id in ipairs(eventIds) do
+                if id == eventId then
+                    table.remove(eventIds, i)
+                    break
+                end
+            end
+        end
+
+        for eventType, eventIds in pairs(currentData.index.byType or {}) do
+            for i, id in ipairs(eventIds) do
+                if id == eventId then
+                    table.remove(eventIds, i)
+                    break
+                end
+            end
+        end
+        private.Core.StateManager.setState(
+            "data.userContent.events",
+            currentData,
+            "Removed MyJournal event: " .. eventId
+        )
+
+        -- Invalidate caches
+        private.Core.Cache.invalidate("periodsFillingBySteps")
+        private.Core.Cache.invalidate("minEventYear")
+        private.Core.Cache.invalidate("maxEventYear")
+        private.Core.Cache.invalidate("searchCache")
+    end
 end
 
 function Chronicles.Data:GetMyJournalFactions()
-    return Chronicles.db.global.MyJournalFactionDB
+    -- Use StateManager directly for clean implementation
+    local newData = private.Core.StateManager.getState("data.userContent.factions.byId")
+    if newData and next(newData) then
+        local result = {}
+        for id, faction in pairs(newData) do
+            table.insert(result, faction)
+        end
+        return result
+    end
+    return {}
 end
 
 function Chronicles.Data:SetMyJournalFactions(faction)
-    Chronicles.Data:AddToMyJournal(faction, Chronicles.db.global.MyJournalFactionDB)
+    -- Set source and ensure ID is assigned
+    faction.source = "myjournal"
+    if (faction.id == nil) then
+        local currentFactions = Chronicles.Data:GetMyJournalFactions()
+        faction.id = Chronicles.Data:AvailableDbId(currentFactions)
+    end
+
+    -- Add through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.factions")
+    if currentData and currentData.byId and faction and faction.id then
+        currentData.byId[faction.id] = faction
+        currentData.metadata.count = currentData.metadata.count + 1
+        currentData.metadata.lastModified = GetServerTime()
+
+        local startYear = faction.yearStart or 0
+
+        if not currentData.index.byYear[startYear] then
+            currentData.index.byYear[startYear] = {}
+        end
+        if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], faction.id) then
+            table.insert(currentData.index.byYear[startYear], faction.id)
+        end
+
+        private.Core.StateManager.setState(
+            "data.userContent.factions",
+            currentData,
+            "Added MyJournal faction: " .. (faction.label or faction.id)
+        )
+    end
 end
 
 function Chronicles.Data:RemoveMyJournalFaction(factionId)
-    Chronicles.Data:RemoveFromMyJournal(factionId, Chronicles.db.global.MyJournalFactionDB)
+    -- Remove through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.factions")
+    if currentData and currentData.byId and factionId then
+        currentData.byId[factionId] = nil
+        currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
+        currentData.metadata.lastModified = GetServerTime()
+
+        -- Remove from indexes
+        for year, factionIds in pairs(currentData.index.byYear or {}) do
+            for i, id in ipairs(factionIds) do
+                if id == factionId then
+                    table.remove(factionIds, i)
+                    break
+                end
+            end
+        end
+
+        private.Core.StateManager.setState(
+            "data.userContent.factions",
+            currentData,
+            "Removed MyJournal faction: " .. factionId
+        )
+    end
 end
 
 function Chronicles.Data:GetMyJournalCharacters()
-    return Chronicles.db.global.MyJournalCharacterDB
+    -- Use StateManager directly for clean implementation
+    local newData = private.Core.StateManager.getState("data.userContent.characters.byId")
+    if newData and next(newData) then
+        local result = {}
+        for id, character in pairs(newData) do
+            table.insert(result, character)
+        end
+        return result
+    end
+    return {}
 end
 
 function Chronicles.Data:SetMyJournalCharacters(character)
-    Chronicles.Data:AddToMyJournal(character, Chronicles.db.global.MyJournalCharacterDB)
+    -- Set source and ensure ID is assigned
+    character.source = "myjournal"
+    if (character.id == nil) then
+        local currentCharacters = Chronicles.Data:GetMyJournalCharacters()
+        character.id = Chronicles.Data:AvailableDbId(currentCharacters)
+    end
+
+    -- Add through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.characters")
+    if currentData and currentData.byId and character and character.id then
+        currentData.byId[character.id] = character
+        currentData.metadata.count = currentData.metadata.count + 1
+        currentData.metadata.lastModified = GetServerTime()
+
+        local startYear = character.yearStart or 0
+
+        if not currentData.index.byYear[startYear] then
+            currentData.index.byYear[startYear] = {}
+        end
+        if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], character.id) then
+            table.insert(currentData.index.byYear[startYear], character.id)
+        end
+
+        private.Core.StateManager.setState(
+            "data.userContent.characters",
+            currentData,
+            "Added MyJournal character: " .. (character.label or character.id)
+        )
+    end
 end
 
 function Chronicles.Data:RemoveMyJournalCharacter(characterId)
-    Chronicles.Data:RemoveFromMyJournal(characterId, Chronicles.db.global.MyJournalCharacterDB)
+    -- Remove through StateManager
+    local currentData = private.Core.StateManager.getState("data.userContent.characters")
+    if currentData and currentData.byId and characterId then
+        currentData.byId[characterId] = nil
+        currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
+        currentData.metadata.lastModified = GetServerTime()
+
+        -- Remove from indexes
+        for year, characterIds in pairs(currentData.index.byYear or {}) do
+            for i, id in ipairs(characterIds) do
+                if id == characterId then
+                    table.remove(characterIds, i)
+                    break
+                end
+            end
+        end
+
+        private.Core.StateManager.setState(
+            "data.userContent.characters",
+            currentData,
+            "Removed MyJournal character: " .. characterId
+        )
+    end
 end
 
 function Chronicles.Data:AvailableDbId(db)
@@ -503,25 +669,6 @@ function Chronicles.Data:AvailableDbId(db)
     end
 
     return maxId
-end
-
-function Chronicles.Data:AddToMyJournal(object, db)
-    object.source = "myjournal"
-
-    if (object.id == nil) then
-        object.id = Chronicles.Data:AvailableDbId(db)
-        table.insert(db, object)
-    else
-        db[object.id] = object
-    end
-end
-
-function Chronicles.Data:RemoveFromMyJournal(objectId, db)
-    for key, value in ipairs(db) do
-        if (value.id == objectId) then
-            table.remove(db, key)
-        end
-    end
 end
 
 -----------------------------------------------------------------------------------------

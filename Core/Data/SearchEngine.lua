@@ -1,22 +1,3 @@
---[[
-    Chronicles Data SearchEngine Module
-    
-    This module implements the search functionality for Chronicles addon following Clean Code principles.
-    It provides dedicated search operations for events, factions, and characters with proper separation
-    of concerns from the main Data.lua module.
-    
-    Clean Code Benefits:
-    - Single Responsibility: Focused solely on search operations
-    - Separation of Concerns: Search logic isolated from data management
-    - Maintainability: Easier to modify and extend search functionality
-    - Testability: Can be tested independently
-    
-    Usage: This module is accessed through Chronicles.Data delegation methods for backward compatibility.
-    Direct access: private.Core.Data.SearchEngine.searchEvents(yearStart, yearEnd)
-    Via Data facade: Chronicles.Data:SearchEvents(yearStart, yearEnd)
-    
-    Phase 1 of Clean Code reorganization - COMPLETED
---]]
 local FOLDER_NAME, private = ...
 
 -- Initialize SearchEngine module with proper namespace creation

@@ -502,7 +502,7 @@ function SettingsMixin:LoadLibraries(frame)
     end
     content.checkboxes = {}
 
-    local libraries = Chronicles.Data:GetCachedLibrariesNames()
+    local libraries = private.Core.Cache.getLibrariesNames()
     for _, library in ipairs(libraries) do
         local libraryName = library.name
         local text = Locale[libraryName] or libraryName

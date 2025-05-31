@@ -3,11 +3,9 @@
     xmlns="http://www.blizzard.com/wow/ui/">
 
     <Include file="Libs\_Includes.xml"/>
-
     <Include file="Locales\Locales.xml"/>
     <Include file="Custom\Locales\Locales.xml"/>
     <Script file="Constants.lua"/>
-    <Script file="Functions.lua"/>
     <Script file="Chronicles.lua"/>
 
     <Include file="Core\_Includes.xml"/>

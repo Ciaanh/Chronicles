@@ -1,21 +1,13 @@
 --[[
     Chronicles DataRegistry Module
     
-    Part of the Clean Code reorganization initiative - Phase 2
-    
-    This module handles all database registration and library status management functionality.
-    Extracted from Data.lua to follow Single Responsibility Principle.
+    Handles database registration and library status management functionality.
     
     RESPONSIBILITIES:
     - Database registration (Events, Factions, Characters)
     - Library status management (Get/Set library status)
     - Library enumeration and state management
     - Cross-database status synchronization
-    
-    USAGE:
-    - Called by Data.lua through delegation pattern
-    - Used by external plugins for database registration
-    - Maintains backward compatibility through Data.lua facade
 --]]
 local FOLDER_NAME, private = ...
 
@@ -65,12 +57,12 @@ function DataRegistry.registerEventDB(libraryName, db)
             "DataRegistry",
             "Library '" .. libraryName .. "' is trying to register a nil events database."
         )
-    end
-
-    local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
+    end -- Use StateManager path for status management
+    local dbTypePath = "settings.libraries.databases.events." .. libraryName
+    local isActive = private.Core.StateManager.getState(dbTypePath)
     if (isActive == nil) then
         isActive = true
-        Chronicles.db.global.EventDBStatuses[libraryName] = isActive
+        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
     Chronicles.Data.Events[libraryName] = {
@@ -104,19 +96,18 @@ function DataRegistry.registerFactionDB(libraryName, db)
         )
         return false
     end
-
     if Chronicles.Data.Factions[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Factions."
         )
         return false
-    end
-
-    local isActive = Chronicles.db.global.FactionDBStatuses[libraryName]
+    end -- Use StateManager path for status management
+    local dbTypePath = "settings.libraries.databases.factions." .. libraryName
+    local isActive = private.Core.StateManager.getState(dbTypePath)
     if (isActive == nil) then
         isActive = true
-        Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
+        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
     Chronicles.Data.Factions[libraryName] = {
@@ -143,19 +134,18 @@ function DataRegistry.registerCharacterDB(libraryName, db)
         )
         return false
     end
-
     if Chronicles.Data.Characters[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Characters."
         )
         return false
-    end
-
-    local isActive = Chronicles.db.global.CharacterDBStatuses[libraryName]
+    end -- Use StateManager path for status management
+    local dbTypePath = "settings.libraries.databases.characters." .. libraryName
+    local isActive = private.Core.StateManager.getState(dbTypePath)
     if (isActive == nil) then
         isActive = true
-        Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
+        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
     Chronicles.Data.Characters[libraryName] = {
@@ -188,71 +178,90 @@ function DataRegistry.getLibraryStatus(libraryName)
 
     local isEventActive = nil
     local isFactionActive = nil
-    local isCharacterActive = nil
-
-    -- Check Events database status
+    local isCharacterActive = nil -- Check Events database status using StateManager paths
     if Chronicles.Data.Events[libraryName] ~= nil then
-        local isActive = Chronicles.db.global.EventDBStatuses[libraryName]
+        local dbTypePath = "settings.libraries.databases.events." .. libraryName
+        local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.EventDBStatuses[libraryName] = isActive
+            private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
             private.Core.Cache.invalidate("periodsFillingBySteps")
             private.Core.Cache.invalidate("searchCache")
         end
         isEventActive = isActive
-    end
-
-    -- Check Factions database status
+    end -- Check Factions database status using StateManager paths
     if Chronicles.Data.Factions[libraryName] ~= nil then
-        local isActive = Chronicles.db.global.FactionDBStatuses[libraryName]
+        local dbTypePath = "settings.libraries.databases.factions." .. libraryName
+        local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.FactionDBStatuses[libraryName] = isActive
+            private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
         end
         isFactionActive = isActive
-    end
-
-    -- Check Characters database status
+    end -- Check Characters database status using StateManager paths
     if Chronicles.Data.Characters[libraryName] ~= nil then
-        local isActive = Chronicles.db.global.CharacterDBStatuses[libraryName]
+        local dbTypePath = "settings.libraries.databases.characters." .. libraryName
+        local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
             isActive = true
-            Chronicles.db.global.CharacterDBStatuses[libraryName] = isActive
+            private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
         end
         isCharacterActive = isActive
-    end
-
-    -- Cross-database status synchronization logic
+    end -- Cross-database status synchronization logic using StateManager paths
     if (isEventActive) then
         if Chronicles.Data.Factions[libraryName] ~= nil then
-            Chronicles.db.global.FactionDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.factions." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
         end
         if Chronicles.Data.Characters[libraryName] ~= nil then
-            Chronicles.db.global.CharacterDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.characters." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
         end
         return true
     end
 
     if (isFactionActive) then
         if Chronicles.Data.Events[libraryName] ~= nil then
-            Chronicles.db.global.EventDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.events." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
             private.Core.Cache.invalidate("periodsFillingBySteps")
             private.Core.Cache.invalidate("searchCache")
         end
         if Chronicles.Data.Characters[libraryName] ~= nil then
-            Chronicles.db.global.CharacterDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.characters." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
         end
         return true
     end
 
     if (isCharacterActive) then
         if Chronicles.Data.Events[libraryName] ~= nil then
-            Chronicles.db.global.EventDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.events." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
             private.Core.Cache.invalidate("periodsFillingBySteps")
             private.Core.Cache.invalidate("searchCache")
         end
         if Chronicles.Data.Factions[libraryName] ~= nil then
-            Chronicles.db.global.FactionDBStatuses[libraryName] = true
+            private.Core.StateManager.setState(
+                "settings.libraries.databases.factions." .. libraryName,
+                true,
+                "Library status sync: " .. libraryName
+            )
         end
         return true
     end
@@ -275,26 +284,32 @@ function DataRegistry.setLibraryStatus(libraryName, status)
         )
         return
     end
-
-    local hadChange = false
-
-    -- Update Events database status
+    local hadChange = false -- Update Events database status using StateManager paths
     if Chronicles.Data.Events[libraryName] ~= nil then
-        local oldStatus = Chronicles.db.global.EventDBStatuses[libraryName]
-        Chronicles.db.global.EventDBStatuses[libraryName] = status
+        local dbTypePath = "settings.libraries.databases.events." .. libraryName
+        local oldStatus = private.Core.StateManager.getState(dbTypePath)
+        private.Core.StateManager.setState(dbTypePath, status, "Library status update: " .. libraryName)
         if oldStatus ~= status then
             hadChange = true
         end
     end
 
-    -- Update Factions database status
+    -- Update Factions database status using StateManager paths
     if Chronicles.Data.Factions[libraryName] ~= nil then
-        Chronicles.db.global.FactionDBStatuses[libraryName] = status
+        private.Core.StateManager.setState(
+            "settings.libraries.databases.factions." .. libraryName,
+            status,
+            "Library status update: " .. libraryName
+        )
     end
 
-    -- Update Characters database status
+    -- Update Characters database status using StateManager paths
     if Chronicles.Data.Characters[libraryName] ~= nil then
-        Chronicles.db.global.CharacterDBStatuses[libraryName] = status
+        private.Core.StateManager.setState(
+            "settings.libraries.databases.characters." .. libraryName,
+            status,
+            "Library status update: " .. libraryName
+        )
     end
 
     -- Only invalidate cache if there was an actual change to event status
@@ -335,14 +350,18 @@ function DataRegistry.getLibrariesNames()
         return {}
     end
 
-    local dataGroups = {}
-
-    -- Process Events libraries
+    local dataGroups = {} -- Process Events libraries using StateManager paths
     for eventLibraryName, group in pairs(Chronicles.Data.Events) do
         if (eventLibraryName ~= "myjournal") then
+            local dbTypePath = "settings.libraries.databases.events." .. eventLibraryName
+            local isActive = private.Core.StateManager.getState(dbTypePath)
+            if isActive == nil then
+                isActive = true
+            end
+
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.EventDBStatuses[eventLibraryName]
+                isActive = isActive
             }
 
             DataRegistry.setLibraryStatus(groupProjection.name, groupProjection.isActive)
@@ -351,14 +370,18 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end
-
-    -- Process Factions libraries
+    end -- Process Factions libraries using StateManager paths
     for factionLibraryName, group in pairs(Chronicles.Data.Factions) do
         if (factionLibraryName ~= "myjournal") then
+            local dbTypePath = "settings.libraries.databases.factions." .. factionLibraryName
+            local isActive = private.Core.StateManager.getState(dbTypePath)
+            if isActive == nil then
+                isActive = true
+            end
+
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.FactionDBStatuses[factionLibraryName]
+                isActive = isActive
             }
 
             DataRegistry.setLibraryStatus(groupProjection.name, groupProjection.isActive)
@@ -367,14 +390,18 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end
-
-    -- Process Characters libraries
+    end -- Process Characters libraries using StateManager paths
     for characterLibraryName, group in pairs(Chronicles.Data.Characters) do
         if (characterLibraryName ~= "myjournal") then
+            local dbTypePath = "settings.libraries.databases.characters." .. characterLibraryName
+            local isActive = private.Core.StateManager.getState(dbTypePath)
+            if isActive == nil then
+                isActive = true
+            end
+
             local groupProjection = {
                 name = group.name,
-                isActive = Chronicles.db.global.CharacterDBStatuses[characterLibraryName]
+                isActive = isActive
             }
 
             DataRegistry.setLibraryStatus(groupProjection.name, groupProjection.isActive)

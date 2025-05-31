@@ -3,70 +3,77 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Events = {}
 
---  Event
---  id = [integer]					-- Id of the event
--- 	label = [string]				--
--- 	description = { [string] }		-- descriptions
--- 	chapters = { [chapter] }		--
--- 	yearStart = [integer]			--
--- 	yearEnd = [integer]				--
--- 	eventType = [integer]			--
--- 	timeline = [integer]			-- id of the timeline
--- 	order = [integer]				--
--- 	characters = { [character] }	--
--- 	factions = { [faction] }		--
---  author = [string]				-- Author of the event
-
---  Chapter
---  header = [integer]				-- Title of the chapter
--- 	pages = { [string] }			-- Content of the chapter, either text or HTML
+-- Import utilities
+local StringUtils = private.Core.Utils.StringUtils
+local TableUtils = private.Core.Utils.TableUtils
+local ValidationUtils = private.Core.Utils.ValidationUtils
 
 --[[
-	Transform the title and pages into a chapter
-	@param title [string] Title of the chapter
-	@param pages { [string] } Content of the chapter
---]]
+    Event Data Structure:
+    id = [integer]					-- Id of the event
+    label = [string]				-- Event name/title
+    description = { [string] }		-- Event descriptions
+    chapters = { [chapter] }		-- Event chapters/content
+    yearStart = [integer]			-- Start year
+    yearEnd = [integer]				-- End year
+    eventType = [integer]			-- Type/category of event
+    timeline = [integer]			-- Timeline ID
+    order = [integer]				-- Display order
+    characters = { [character] }	-- Associated characters
+    factions = { [faction] }		-- Associated factions
+    author = [string]				-- Author of the event
+
+    Chapter Data Structure:
+    header = [integer]				-- Title of the chapter
+    pages = { [string] }			-- Content of the chapter, either text or HTML
+]]
+--[[
+    Transform the title and pages into a chapter
+    @param title [string] Title of the chapter
+    @param pages { [string] } Content of the chapter
+    @return [table] Chapter object
+]]
 local function CreateChapter(title, pages)
-	local chapter = {elements = {}}
+    local chapter = {elements = {}}
 
-	if (title ~= nil) then
-		chapter.header = {
-			templateKey = private.constants.templateKeys.HEADER,
-			text = title
-		}
-	end
+    if (title ~= nil) then
+        chapter.header = {
+            templateKey = private.constants.templateKeys.HEADER,
+            text = title
+        }
+    end
 
-	for key, text in pairs(pages) do
-		if (containsHTML(text)) then
-			table.insert(
-				chapter.elements,
-				{
-					templateKey = private.constants.templateKeys.HTML_CONTENT,
-					text = cleanHTML(text)
-				}
-			)
-		else
-			-- transform text => adjust line to width
-			-- then for each line add itemEntry
-			local lines = SplitTextToFitWidth(text, private.constants.viewWidth)
-			for i, value in ipairs(lines) do
-				local line = {
-					templateKey = private.constants.templateKeys.TEXT_CONTENT,
-					text = value
-				}
+    for key, text in pairs(pages) do
+        if (StringUtils.ContainsHTML(text)) then
+            table.insert(
+                chapter.elements,
+                {
+                    templateKey = private.constants.templateKeys.HTML_CONTENT,
+                    text = StringUtils.CleanHTML(text)
+                }
+            )
+        else
+            -- transform text => adjust line to width
+            -- then for each line add itemEntry
+            local lines = StringUtils.SplitTextToFitWidth(text, private.constants.viewWidth)
+            for i, value in ipairs(lines) do
+                local line = {
+                    templateKey = private.constants.templateKeys.TEXT_CONTENT,
+                    text = value
+                }
 
-				table.insert(chapter.elements, line)
-			end
-		end
-	end
+                table.insert(chapter.elements, line)
+            end
+        end
+    end
 
-	return chapter
+    return chapter
 end
 
 function private.Core.Events.EmptyBook()
-	local data = {}
+    local data = {}
 
-	return data
+    return data
 end
 
 --[[
@@ -74,50 +81,50 @@ end
 	@param event [event]]
 --]]
 function private.Core.Events.TransformEventToBook(event)
-	if (event == nil) then
-		return nil
-	end
+    if (event == nil) then
+        return nil
+    end
 
-	local data = {}
+    local data = {}
 
-	local title = {
-		header = {
-			templateKey = private.constants.templateKeys.EVENT_TITLE,
-			text = event.label,
-			yearStart = event.yearStart,
-			yearEnd = event.yearEnd
-		},
-		elements = {}
-	}
+    local title = {
+        header = {
+            templateKey = private.constants.templateKeys.EVENT_TITLE,
+            text = event.label,
+            yearStart = event.yearStart,
+            yearEnd = event.yearEnd
+        },
+        elements = {}
+    }
 
-	local author = ""
-	if (event.author ~= nil) then
-		author = Locale["Author"] .. event.author
-	end
+    local author = ""
+    if (event.author ~= nil) then
+        author = Locale["Author"] .. event.author
+    end
 
-	table.insert(
-		title.elements,
-		{
-			templateKey = private.constants.templateKeys.AUTHOR,
-			text = author
-		}
-	)
-	table.insert(data, title)
+    table.insert(
+        title.elements,
+        {
+            templateKey = private.constants.templateKeys.AUTHOR,
+            text = author
+        }
+    )
+    table.insert(data, title)
 
-	local chaptersLength = #event.chapters
-	if chaptersLength <= 0 then
-		for key, description in pairs(event.description) do
-			local chapter = CreateChapter(nil, {description})
-			table.insert(data, chapter)
-		end
-	else
-		for key, chapter in pairs(event.chapters) do
-			local bookChapter = CreateChapter(chapter.header, chapter.pages)
-			table.insert(data, bookChapter)
-		end
-	end
+    local chaptersLength = #event.chapters
+    if chaptersLength <= 0 then
+        for key, description in pairs(event.description) do
+            local chapter = CreateChapter(nil, {description})
+            table.insert(data, chapter)
+        end
+    else
+        for key, chapter in pairs(event.chapters) do
+            local bookChapter = CreateChapter(chapter.header, chapter.pages)
+            table.insert(data, bookChapter)
+        end
+    end
 
-	return data
+    return data
 end
 
 --[[
@@ -127,35 +134,258 @@ end
 	@param events { [event] }
 --]]
 function private.Core.Events.FilterEvents(events)
-	local foundEvents = {}
-	for eventIndex in pairs(events) do
-		local event = events[eventIndex]
+    local foundEvents = {}
+    for eventIndex in pairs(events) do
+        local event = events[eventIndex]
 
-		local eventGroupStatus = private.Chronicles.Data:GetLibraryStatus(event.source)
-		local eventTypeStatus = private.Chronicles.Data:GetEventTypeStatus(event.eventType)
+        local eventGroupStatus = private.Chronicles.Data:GetLibraryStatus(event.source)
+        local eventTypeStatus = private.Chronicles.Data:GetEventTypeStatus(event.eventType)
 
-		if eventGroupStatus and eventTypeStatus then
-			table.insert(foundEvents, event)
-		end
-	end
+        if eventGroupStatus and eventTypeStatus then
+            table.insert(foundEvents, event)
+        end
+    end
 
-	table.sort(
-		foundEvents,
-		function(a, b)
-			if (a.yearStart == b.yearStart) then
-				return a.order < b.order
-			end
-			return a.yearStart < b.yearStart
-		end
-	)
-	return foundEvents
+    table.sort(
+        foundEvents,
+        function(a, b)
+            if (a.yearStart == b.yearStart) then
+                return a.order < b.order
+            end
+            return a.yearStart < b.yearStart
+        end
+    )
+    return foundEvents
+end
+
+--[[
+    Get events by character ID
+    @param events [table] List of events
+    @param characterId [number] Character ID to filter by
+    @return [table] Events associated with the character
+]]
+function private.Core.Events.GetEventsByCharacter(events, characterId)
+    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidNumber(characterId) then
+        return {}
+    end
+
+    return TableUtils.Filter(
+        events,
+        function(event)
+            if not ValidationUtils.IsValidTable(event.characters) then
+                return false
+            end
+
+            for _, character in pairs(event.characters) do
+                if character.id == characterId then
+                    return true
+                end
+            end
+            return false
+        end
+    )
+end
+
+--[[
+    Get events by faction ID
+    @param events [table] List of events
+    @param factionId [number] Faction ID to filter by
+    @return [table] Events associated with the faction
+]]
+function private.Core.Events.GetEventsByFaction(events, factionId)
+    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidNumber(factionId) then
+        return {}
+    end
+
+    return TableUtils.Filter(
+        events,
+        function(event)
+            if not ValidationUtils.IsValidTable(event.factions) then
+                return false
+            end
+
+            for _, faction in pairs(event.factions) do
+                if faction.id == factionId then
+                    return true
+                end
+            end
+            return false
+        end
+    )
+end
+
+--[[
+    Get events within a year range
+    @param events [table] List of events
+    @param startYear [number] Start year of range
+    @param endYear [number] End year of range
+    @return [table] Events within the year range
+]]
+function private.Core.Events.GetEventsByYearRange(events, startYear, endYear)
+    if
+        not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidYear(startYear) or
+            not ValidationUtils.IsValidYear(endYear)
+     then
+        return {}
+    end
+
+    return TableUtils.Filter(
+        events,
+        function(event)
+            if not ValidationUtils.IsValidEvent(event) then
+                return false
+            end
+
+            -- Check if event overlaps with the year range
+            return not (event.yearEnd < startYear or event.yearStart > endYear)
+        end
+    )
+end
+
+--[[
+    Get events by timeline ID
+    @param events [table] List of events
+    @param timelineId [number] Timeline ID to filter by
+    @return [table] Events from the specified timeline
+]]
+function private.Core.Events.GetEventsByTimeline(events, timelineId)
+    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidNumber(timelineId) then
+        return {}
+    end
+
+    return TableUtils.Filter(
+        events,
+        function(event)
+            return ValidationUtils.IsValidEvent(event) and event.timeline == timelineId
+        end
+    )
+end
+
+--[[
+    Search events by text in label or description
+    @param events [table] List of events
+    @param searchText [string] Text to search for
+    @return [table] Events matching the search text
+]]
+function private.Core.Events.SearchEvents(events, searchText)
+    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidString(searchText) then
+        return {}
+    end
+
+    local lowerSearchText = string.lower(searchText)
+
+    return TableUtils.Filter(
+        events,
+        function(event)
+            if not ValidationUtils.IsValidEvent(event) then
+                return false
+            end
+
+            -- Search in label
+            if string.find(string.lower(event.label), lowerSearchText) then
+                return true
+            end
+
+            -- Search in descriptions
+            if ValidationUtils.IsValidTable(event.description) then
+                for _, desc in pairs(event.description) do
+                    if string.find(string.lower(desc), lowerSearchText) then
+                        return true
+                    end
+                end
+            end
+
+            return false
+        end
+    )
+end
+
+--[[
+    Sort events by multiple criteria
+    @param events [table] List of events to sort
+    @param sortBy [string] Sort criteria: "year", "name", "order", "type"
+    @param ascending [boolean] Sort direction (default: true)
+    @return [table] Sorted events
+]]
+function private.Core.Events.SortEvents(events, sortBy, ascending)
+    if not ValidationUtils.IsValidTable(events) then
+        return {}
+    end
+
+    local sortedEvents = TableUtils.DeepCopy(events)
+    ascending = ascending ~= false -- default to true
+
+    table.sort(
+        sortedEvents,
+        function(a, b)
+            local comparison = false
+
+            if sortBy == "year" then
+                if a.yearStart == b.yearStart then
+                    comparison = a.order < b.order
+                else
+                    comparison = a.yearStart < b.yearStart
+                end
+            elseif sortBy == "name" then
+                comparison = a.label < b.label
+            elseif sortBy == "order" then
+                comparison = a.order < b.order
+            elseif sortBy == "type" then
+                if a.eventType == b.eventType then
+                    comparison = a.yearStart < b.yearStart
+                else
+                    comparison = a.eventType < b.eventType
+                end
+            else
+                -- Default sort by year and order
+                if a.yearStart == b.yearStart then
+                    comparison = a.order < b.order
+                else
+                    comparison = a.yearStart < b.yearStart
+                end
+            end
+
+            return ascending and comparison or not comparison
+        end
+    )
+
+    return sortedEvents
+end
+
+--[[
+    Validate an event object
+    @param event [table] Event to validate
+    @return [boolean] True if event is valid
+    @return [string] Error message if invalid
+]]
+function private.Core.Events.ValidateEvent(event)
+    if not ValidationUtils.IsValidEvent(event) then
+        return false, "Event object is invalid or missing required fields"
+    end
+
+    -- Additional event-specific validation
+    if event.yearStart > event.yearEnd then
+        return false, "Event start year cannot be after end year"
+    end
+
+    if ValidationUtils.IsValidTable(event.characters) then
+        for _, character in pairs(event.characters) do
+            if not ValidationUtils.IsValidCharacter(character) then
+                return false, "Event contains invalid character data"
+            end
+        end
+    end
+
+    if ValidationUtils.IsValidTable(event.factions) then
+        for _, faction in pairs(event.factions) do
+            if not ValidationUtils.IsValidFaction(faction) then
+                return false, "Event contains invalid faction data"
+            end
+        end
+    end
+
+    return true, nil
 end
 
 -- local textToDisplay =
 -- 	"The orcs begin launching sporadic attacks against draenei hunting parties. \nThe draenei, assuming that the orcs have simply been agitated by the elemental turmoil, begin organizing and constructing new defenses.\n\nNer'zhul's apprehension about the war with the draenei grows. \nKil'jaeden appears to him in the form of Rulkan and tells him of powerful beings who could aid the orcs, and the night after Kil'jaeden appears again as a radiant elemental entity and urges him to push the Horde to victory and exterminate the draenei. \n\nNer'zhul secretly embarks on a journey to Oshu'gun to seek the guidance of the ancestors, but Kil'jaeden is aware of his plans and tells Gul'dan to gather allies to control the Shadowmoon, since Ner'zhul can no longer be relied upon. Gul'dan recruits Teron'gor and several other shaman and begin teaching them fel magic.\n\nAt Oshu'gun, the real Rulkan and the other ancestors tell Ner'zhul that he was being manipulated by Kil'jaeden and condemn the shaman for having been used by the demon lord. \n\nNer'zhul falls into despair and is captured by Gul'dan's followers, who treat him as little more than a slave.\nThe orcs begin launching sporadic attacks against draenei hunting parties. \nThe draenei, assuming that the orcs have simply been agitated by the elemental turmoil, begin organizing and constructing new defenses."
-
--- local textToDisplayHTML =
--- 	'<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'
-
--- local textToDisplayHTMLlong =
--- 	'<html><body><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/><h1>|cFF0000FF HTML Demo: blue H1|r</h1><img src="Interface\\Icons\\Ability_Ambush" width="32" height="32" align="right"/><p align="center">|cffee4400\'Centered text after an image from the game\'|r</p><br/><p>This is a paragraph,<br/>this is text in the same paragraph after a line break.</p><br/><br/><br/><p>This is an image from the addon, for better compatibility use power of 2 for width/height (16, 32, 64...)</p><img src="Interface\\AddOns\\Chronicles\\Images\\Example-image" width="256" height="256" align="center"/></body></html>'

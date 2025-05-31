@@ -6,13 +6,30 @@ local defaults = {
             minimap = {hide = false},
             myjournal = true
         },
-        EventTypesStatuses = {},
-        EventDBStatuses = {},
-        FactionDBStatuses = {},
-        CharacterDBStatuses = {},
-        MyJournalEventDB = {},
-        MyJournalFactionDB = {},
-        MyJournalCharacterDB = {}
+        -- StateManager state defaults
+        uiState = {
+            selectedEvent = nil,
+            selectedCharacter = nil,
+            selectedFaction = nil,
+            selectedPeriod = nil,
+            activeTab = nil,
+            isMainFrameOpen = false
+        },
+        timelineState = {
+            currentStep = nil,
+            currentPage = nil,
+            selectedYear = nil,
+            periodsCache = {}
+        },
+        settingsState = {
+            eventTypes = {},
+            libraries = {},
+            debugMode = false
+        },
+        dataState = {
+            lastRefreshTime = 0,
+            isDirty = false
+        }
     }
 }
 

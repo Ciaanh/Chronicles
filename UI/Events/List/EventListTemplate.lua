@@ -84,7 +84,7 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period)
-	local eventList = Chronicles.Data:GetCachedSearchEvents(period.lower, period.upper)
+	local eventList = private.Core.Cache.getSearchEvents(period.lower, period.upper)
 	private.Core.Timeline.SetYear(math.floor((period.lower + period.upper) / 2))
 
 	local content = {

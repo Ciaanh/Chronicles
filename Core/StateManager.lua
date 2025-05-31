@@ -4,6 +4,25 @@ local Chronicles = private.Chronicles
 private.Core.StateManager = {}
 
 -----------------------------------------------------------------------------------------
+-- Local Utilities ---------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+
+-- Local deep copy function (to avoid dependency on TableUtils)
+local function deepCopy(original)
+    local copy
+    if type(original) == "table" then
+        copy = {}
+        for key, value in next, original, nil do
+            copy[deepCopy(key)] = deepCopy(value)
+        end
+        setmetatable(copy, deepCopy(getmetatable(original)))
+    else
+        copy = original
+    end
+    return copy
+end
+
+-----------------------------------------------------------------------------------------
 -- State Management ---------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
@@ -46,7 +65,7 @@ local function saveStateSnapshot(description)
     local snapshot = {
         timestamp = GetServerTime(),
         description = description or "State change",
-        state = private.Core.StateManager.deepCopy(StateManager.state)
+        state = deepCopy(StateManager.state)
     }
 
     table.insert(StateManager.history, snapshot)
@@ -60,20 +79,6 @@ end
 -----------------------------------------------------------------------------------------
 -- State Utilities ---------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-
-function private.Core.StateManager.deepCopy(original)
-    local copy
-    if type(original) == "table" then
-        copy = {}
-        for key, value in next, original, nil do
-            copy[private.Core.StateManager.deepCopy(key)] = private.Core.StateManager.deepCopy(value)
-        end
-        setmetatable(copy, private.Core.StateManager.deepCopy(getmetatable(original)))
-    else
-        copy = original
-    end
-    return copy
-end
 
 function private.Core.StateManager.getState(path)
     if not path then
@@ -310,18 +315,32 @@ end
 
 function private.Core.StateManager.saveState()
     if Chronicles and Chronicles.db then
-        Chronicles.db.global.uiState = private.Core.StateManager.deepCopy(StateManager.state.ui)
-        Chronicles.db.global.timelineState = private.Core.StateManager.deepCopy(StateManager.state.timeline)
+        Chronicles.db.global.uiState = deepCopy(StateManager.state.ui)
+        Chronicles.db.global.timelineState = deepCopy(StateManager.state.timeline)
+        Chronicles.db.global.settingsState = deepCopy(StateManager.state.settings)
+        Chronicles.db.global.dataState = deepCopy(StateManager.state.data)
     end
 end
 
 function private.Core.StateManager.loadState()
     if Chronicles and Chronicles.db then
+        -- Load UI state with fallback to defaults
         if Chronicles.db.global.uiState then
-            StateManager.state.ui = private.Core.StateManager.deepCopy(Chronicles.db.global.uiState)
+            StateManager.state.ui = deepCopy(Chronicles.db.global.uiState)
         end
+
+        -- Load timeline state with fallback to defaults
         if Chronicles.db.global.timelineState then
-            StateManager.state.timeline = private.Core.StateManager.deepCopy(Chronicles.db.global.timelineState)
+            StateManager.state.timeline = deepCopy(Chronicles.db.global.timelineState)
+        end
+
+        -- Load settings state with fallback to defaults
+        if Chronicles.db.global.settingsState then
+            StateManager.state.settings = deepCopy(Chronicles.db.global.settingsState)
+        end
+        -- Load data state with fallback to defaults
+        if Chronicles.db.global.dataState then
+            StateManager.state.data = deepCopy(Chronicles.db.global.dataState)
         end
     end
 end
@@ -372,19 +391,21 @@ end
 -----------------------------------------------------------------------------------------
 
 function private.Core.StateManager.init()
-    -- Set up event listeners
-    C_Timer.After(0.1, setupEventListeners) -- Delay to ensure EventManager is loaded
-
-    -- Load saved state
+    -- Load state from database
     private.Core.StateManager.loadState()
 
-    -- Auto-save state periodically
-    C_Timer.NewTicker(
-        30,
-        function()
-            private.Core.StateManager.saveState()
-        end
-    )
+    -- Set up auto-save timer (save every 30 seconds)
+    if not StateManager.autoSaveTimer then
+        StateManager.autoSaveTimer =
+            C_Timer.NewTicker(
+            30,
+            function()
+                private.Core.StateManager.saveState()
+            end
+        )
+    end
+
+    private.Core.Logger.trace("StateManager", "StateManager initialized successfully")
 end
 
 -- Console commands for state debugging

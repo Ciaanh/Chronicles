@@ -180,7 +180,7 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
         return {}
     end
 
-    local eventDates = Chronicles.Data:GetCachedPeriodsFillingBySteps()
+    local eventDates = private.Core.Cache.getPeriodsFillingBySteps()
     if eventDates == nil then
         return {}
     end
@@ -229,14 +229,14 @@ function TimelineBusiness.countEventsInPeriod(block)
     if isMytosPeriod then
         -- For mythos period: manually search for events before historyStartYear
         local mythosYearEnd = private.constants.config.historyStartYear - 1
-        local foundEvents = Chronicles.Data:GetCachedSearchEvents(private.constants.config.mythos, mythosYearEnd)
+        local foundEvents = private.Core.Cache.getSearchEvents(private.constants.config.mythos, mythosYearEnd)
         if foundEvents ~= nil then
             eventCount = #foundEvents
         end
     elseif isFuturePeriod then
         -- For future period: manually search for events beyond currentYear
         local futureYearStart = private.constants.config.currentYear + 1
-        local foundEvents = Chronicles.Data:GetCachedSearchEvents(futureYearStart, private.constants.config.futur)
+        local foundEvents = private.Core.Cache.getSearchEvents(futureYearStart, private.constants.config.futur)
         if foundEvents ~= nil then
             eventCount = #foundEvents
         end

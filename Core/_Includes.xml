@@ -1,13 +1,27 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
+    <!-- Core Infrastructure -->
     <Script file="Logger.lua"/>
     <Script file="Cache.lua"/>
     <Script file="EventManager.lua"/>
     <Script file="StateManager.lua"/>
+
+    <!-- Utility Modules (loaded first for dependencies) -->
+    <Script file="Utils/StringUtils.lua"/>
+    <Script file="Utils/TableUtils.lua"/>
+    <Script file="Utils/MathUtils.lua"/>
+    <Script file="Utils/ValidationUtils.lua"/>
+
+    <!-- Data Layer -->
     <Include file="Data\_Includes.xml"/>
     <Script file="Data.lua"/>
 
+    <!-- Business Logic Modules -->
+    <Script file="Business/DateCalculator.lua"/>
+    <Script file="Business/FilterEngine.lua"/>
+
+    <!-- Domain Modules -->
     <Script file="Characters.lua"/>
     <Script file="Events.lua"/>
     <Script file="Timeline.lua"/>
