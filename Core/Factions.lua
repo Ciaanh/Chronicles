@@ -11,16 +11,10 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     Faction Data Structure:
     id = [integer]					-- Id of the faction
     name = [string]				    -- Faction name
-    description = { [string] }		-- Faction descriptions/history
     chapters = { [chapter] }		-- Faction chapters/content
     yearStart = [integer]			-- Foundation/first appearance year
     yearEnd = [integer]				-- Dissolution/last appearance year (optional)
     timeline = [integer]			-- Timeline ID
-    parentFactionId = [integer]		-- Parent faction ID (for sub-factions)
-    leaderIds = { [integer] }		-- Character IDs of faction leaders
-    territories = { [string] }		-- Controlled territories
-    factionType = [string]			-- Type: "nation", "organization", "guild", etc.
-    alignment = [string]			-- Alignment: "alliance", "horde", "neutral", etc.
     author = [string]				-- Author of the faction entry
 ]]
 --[[
