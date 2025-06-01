@@ -343,8 +343,12 @@ function SettingsMixin:AddCategory(index, category)
     self.Buttons[self.prefix .. index] = categoryButton
 end
 
-function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
-    Chronicles.Data:SetEventTypeStatus(eventTypeId, checked)
+function SettingsMixin:OnSettingsEventTypeChecked(eventData)
+    -- Extract the event type ID and checked status from the event data
+    local eventTypeId = eventData.eventTypeId
+    local isActive = eventData.isActive
+
+    Chronicles.Data:SetEventTypeStatus(eventTypeId, isActive)
     Chronicles.Data:RefreshPeriods()
 
     private.Core.Timeline.ComputeTimelinePeriods()
@@ -353,8 +357,12 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventTypeId, checked)
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
 end
 
-function SettingsMixin:OnSettingsLibraryChecked(libraryId, checked)
-    Chronicles.Data:SetLibraryStatus(libraryId, checked)
+function SettingsMixin:OnSettingsLibraryChecked(eventData)
+    -- Extract the library name and checked status from the event data
+    local libraryName = eventData.libraryName
+    local isActive = eventData.isActive
+
+    Chronicles.Data:SetLibraryStatus(libraryName, isActive)
     Chronicles.Data:RefreshPeriods()
 
     private.Core.Timeline.ComputeTimelinePeriods()
@@ -427,7 +435,6 @@ function SettingsMixin:LoadEventTypes(frame)
                 newCheckbox:UnlockHighlight()
             end
         )
-
         newCheckbox:SetScript(
             "OnClick",
             function(self)

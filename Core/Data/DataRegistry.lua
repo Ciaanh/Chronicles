@@ -50,18 +50,31 @@ function DataRegistry.registerEventDB(libraryName, db)
     if Chronicles.Data.Events[libraryName] ~= nil then
         private.Core.Logger.error("DataRegistry", libraryName .. " is already registered by another plugin in Events.")
         return false
-    end
-
-    if db == nil then
+    end    if db == nil then
         private.Core.Logger.warn(
             "DataRegistry",
             "Library '" .. libraryName .. "' is trying to register a nil events database."
         )
-    end -- Use StateManager path for status management
+    end 
+    
+    -- Use StateManager path for status management
     local dbTypePath = "settings.libraries.databases.events." .. libraryName
     local isActive = private.Core.StateManager.getState(dbTypePath)
+    
+    -- Only set default value if:
+    -- 1. No saved state exists AND
+    -- 2. StateManager hasn't loaded saved state yet (first-time run)
     if (isActive == nil) then
-        isActive = true
+        -- Check if StateManager has loaded saved state - if so, respect the absence of this library
+        -- (it might have been disabled and removed from saved state)
+        if private.Core.StateManager.isStateLoaded() then
+            -- StateManager has loaded, so absence means this library is new or was removed
+            -- For new libraries after initial setup, default to true
+            isActive = true
+        else
+            -- StateManager hasn't loaded yet, default to true for first-time initialization
+            isActive = true
+        end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
@@ -95,18 +108,25 @@ function DataRegistry.registerFactionDB(libraryName, db)
             "Chronicles.Data not initialized when trying to register " .. libraryName
         )
         return false
-    end
-    if Chronicles.Data.Factions[libraryName] ~= nil then
+    end    if Chronicles.Data.Factions[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Factions."
         )
         return false
-    end -- Use StateManager path for status management
+    end 
+    
+    -- Use StateManager path for status management
     local dbTypePath = "settings.libraries.databases.factions." .. libraryName
     local isActive = private.Core.StateManager.getState(dbTypePath)
+    
+    -- Only set default value if no saved state exists and StateManager hasn't loaded yet
     if (isActive == nil) then
-        isActive = true
+        if private.Core.StateManager.isStateLoaded() then
+            isActive = true -- New library after initial setup
+        else
+            isActive = true -- First-time initialization
+        end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
@@ -133,18 +153,25 @@ function DataRegistry.registerCharacterDB(libraryName, db)
             "Chronicles.Data not initialized when trying to register " .. libraryName
         )
         return false
-    end
-    if Chronicles.Data.Characters[libraryName] ~= nil then
+    end    if Chronicles.Data.Characters[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Characters."
         )
         return false
-    end -- Use StateManager path for status management
+    end 
+    
+    -- Use StateManager path for status management
     local dbTypePath = "settings.libraries.databases.characters." .. libraryName
     local isActive = private.Core.StateManager.getState(dbTypePath)
+    
+    -- Only set default value if no saved state exists and StateManager hasn't loaded yet
     if (isActive == nil) then
-        isActive = true
+        if private.Core.StateManager.isStateLoaded() then
+            isActive = true -- New library after initial setup
+        else
+            isActive = true -- First-time initialization
+        end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
 
@@ -178,36 +205,51 @@ function DataRegistry.getLibraryStatus(libraryName)
 
     local isEventActive = nil
     local isFactionActive = nil
-    local isCharacterActive = nil -- Check Events database status using StateManager paths
+    local isCharacterActive = nil    -- Check Events database status using StateManager paths
     if Chronicles.Data.Events[libraryName] ~= nil then
         local dbTypePath = "settings.libraries.databases.events." .. libraryName
         local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
-            isActive = true
+            -- Only set default if StateManager hasn't loaded saved state yet
+            if private.Core.StateManager.isStateLoaded() then
+                isActive = true -- New library after initial setup
+            else
+                isActive = true -- First-time initialization
+            end
             private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
             private.Core.Cache.invalidate("periodsFillingBySteps")
             private.Core.Cache.invalidate("searchCache")
         end
         isEventActive = isActive
-    end -- Check Factions database status using StateManager paths
+    end    -- Check Factions database status using StateManager paths
     if Chronicles.Data.Factions[libraryName] ~= nil then
         local dbTypePath = "settings.libraries.databases.factions." .. libraryName
         local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
-            isActive = true
+            -- Only set default if StateManager hasn't loaded saved state yet
+            if private.Core.StateManager.isStateLoaded() then
+                isActive = true -- New library after initial setup
+            else
+                isActive = true -- First-time initialization
+            end
             private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
         end
         isFactionActive = isActive
-    end -- Check Characters database status using StateManager paths
+    end    -- Check Characters database status using StateManager paths
     if Chronicles.Data.Characters[libraryName] ~= nil then
         local dbTypePath = "settings.libraries.databases.characters." .. libraryName
         local isActive = private.Core.StateManager.getState(dbTypePath)
         if (isActive == nil) then
-            isActive = true
+            -- Only set default if StateManager hasn't loaded saved state yet
+            if private.Core.StateManager.isStateLoaded() then
+                isActive = true -- New library after initial setup
+            else
+                isActive = true -- First-time initialization
+            end
             private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
         end
         isCharacterActive = isActive
-    end -- Cross-database status synchronization logic using StateManager paths
+    end-- Cross-database status synchronization logic using StateManager paths
     if (isEventActive) then
         if Chronicles.Data.Factions[libraryName] ~= nil then
             private.Core.StateManager.setState(
@@ -350,13 +392,18 @@ function DataRegistry.getLibrariesNames()
         return {}
     end
 
-    local dataGroups = {} -- Process Events libraries using StateManager paths
+    local dataGroups = {}    -- Process Events libraries using StateManager paths
     for eventLibraryName, group in pairs(Chronicles.Data.Events) do
         if (eventLibraryName ~= "myjournal") then
             local dbTypePath = "settings.libraries.databases.events." .. eventLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                isActive = true
+                -- Only set default if StateManager hasn't loaded saved state yet
+                if private.Core.StateManager.isStateLoaded() then
+                    isActive = true -- New library after initial setup
+                else
+                    isActive = true -- First-time initialization
+                end
             end
 
             local groupProjection = {
@@ -370,13 +417,18 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end -- Process Factions libraries using StateManager paths
+    end    -- Process Factions libraries using StateManager paths
     for factionLibraryName, group in pairs(Chronicles.Data.Factions) do
         if (factionLibraryName ~= "myjournal") then
             local dbTypePath = "settings.libraries.databases.factions." .. factionLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                isActive = true
+                -- Only set default if StateManager hasn't loaded saved state yet
+                if private.Core.StateManager.isStateLoaded() then
+                    isActive = true -- New library after initial setup
+                else
+                    isActive = true -- First-time initialization
+                end
             end
 
             local groupProjection = {
@@ -390,13 +442,18 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end -- Process Characters libraries using StateManager paths
+    end    -- Process Characters libraries using StateManager paths
     for characterLibraryName, group in pairs(Chronicles.Data.Characters) do
         if (characterLibraryName ~= "myjournal") then
             local dbTypePath = "settings.libraries.databases.characters." .. characterLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                isActive = true
+                -- Only set default if StateManager hasn't loaded saved state yet
+                if private.Core.StateManager.isStateLoaded() then
+                    isActive = true -- New library after initial setup
+                else
+                    isActive = true -- First-time initialization
+                end
             end
 
             local groupProjection = {

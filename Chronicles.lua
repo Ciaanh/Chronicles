@@ -66,20 +66,20 @@ function Chronicles:OnInitialize()
                 tt:AddLine(Locale["Icon tooltip"])
             end
         }
-    )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
+    )    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
     self:RegisterChatCommand(
         "chronicles",
         function()
             self.UI:DisplayWindow()
         end
     )
-    Chronicles.Data:Load()
 
-    -- Initialize state manager first
+    -- Initialize state manager BEFORE loading data to ensure saved state is available during library registration
     if private.Core.StateManager then
         private.Core.StateManager.init()
     end
+
+    Chronicles.Data:Load()
 
     -- Delay the startup event to ensure all event listeners are registered
     C_Timer.After(
