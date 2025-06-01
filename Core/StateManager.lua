@@ -29,9 +29,9 @@ end
 local StateManager = {
     state = {
         ui = {
-            selectedEvent = nil,
-            selectedCharacter = nil,
-            selectedFaction = nil,
+            selectedEvent = nil, -- Stores event ID (number) instead of full event object
+            selectedCharacter = nil, -- Stores character ID (number) instead of full character object
+            selectedFaction = nil, -- Stores faction ID (number) instead of full faction object
             selectedPeriod = nil,
             activeTab = nil,
             isMainFrameOpen = false
@@ -240,30 +240,33 @@ local function setupEventListeners() -- Use centralized event constants to avoid
         end,
         "StateManager"
     )
-
     -- Event selection
     private.Core.registerCallback(
         events.EventSelected,
         function(eventData)
-            private.Core.StateManager.setState("ui.selectedEvent", eventData, "Event selected")
+            -- Store only the event ID instead of the full object
+            local eventId = eventData and eventData.id or nil
+            private.Core.StateManager.setState("ui.selectedEvent", eventId, "Event selected")
         end,
         "StateManager"
     )
-
     -- Character selection
     private.Core.registerCallback(
         events.CharacterSelected,
         function(characterData)
-            private.Core.StateManager.setState("ui.selectedCharacter", characterData, "Character selected")
+            -- Store only the character ID instead of the full object
+            local characterId = characterData and characterData.id or nil
+            private.Core.StateManager.setState("ui.selectedCharacter", characterId, "Character selected")
         end,
         "StateManager"
     )
-
     -- Faction selection
     private.Core.registerCallback(
         events.FactionSelected,
         function(factionData)
-            private.Core.StateManager.setState("ui.selectedFaction", factionData, "Faction selected")
+            -- Store only the faction ID instead of the full object
+            local factionId = factionData and factionData.id or nil
+            private.Core.StateManager.setState("ui.selectedFaction", factionId, "Faction selected")
         end,
         "StateManager"
     )
@@ -290,29 +293,6 @@ local function setupEventListeners() -- Use centralized event constants to avoid
         events.MainFrameUICloseFrame,
         function()
             private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
-        end,
-        "StateManager"
-    )
-
-    -- Settings changes
-    private.Core.registerCallback(
-        events.SettingsEventTypeChecked,
-        function(data)
-            local path = "settings.eventTypes." .. tostring(data.eventTypeId)
-            private.Core.StateManager.setState(path, data.isActive, "Event type setting changed")
-        end,
-        "StateManager"
-    )
-    private.Core.registerCallback(
-        events.SettingsLibraryChecked,
-        function(data)
-            -- Update the actual DataRegistry state paths that control library filtering
-            local path = "settings.libraries.databases.events." .. tostring(data.libraryName)
-            private.Core.StateManager.setState(path, data.isActive, "Library setting changed")
-
-            -- Also invalidate relevant caches when library status changes
-            private.Core.Cache.invalidate("periodsFillingBySteps")
-            private.Core.Cache.invalidate("searchCache")
         end,
         "StateManager"
     )
@@ -351,10 +331,49 @@ function private.Core.StateManager.loadState()
         if Chronicles.db.global.dataState then
             StateManager.state.data = deepCopy(Chronicles.db.global.dataState)
         end
-    end
-    
-    -- Mark as loaded to prevent library registrations from overriding saved state
+    end -- Mark as loaded to prevent library registrations from overriding saved state
     StateManager.isLoaded = true
+
+    -- Trigger notifications for loaded state values that UI components need to react to
+    -- This ensures UI components respond to loaded state even if they weren't initialized when state was loaded
+    if StateManager.state.ui.selectedPeriod then
+        private.Core.Logger.trace("StateManager", "Triggering selectedPeriod notification after state load")
+        private.Core.StateManager.notifyStateChange("ui.selectedPeriod", StateManager.state.ui.selectedPeriod, nil)
+    end
+
+    if StateManager.state.ui.selectedEvent then
+        private.Core.Logger.trace("StateManager", "Triggering selectedEvent notification after state load")
+        private.Core.StateManager.notifyStateChange("ui.selectedEvent", StateManager.state.ui.selectedEvent, nil)
+    end
+
+    if StateManager.state.ui.selectedCharacter then
+        private.Core.Logger.trace("StateManager", "Triggering selectedCharacter notification after state load")
+        private.Core.StateManager.notifyStateChange(
+            "ui.selectedCharacter",
+            StateManager.state.ui.selectedCharacter,
+            nil
+        )
+    end
+
+    if StateManager.state.ui.selectedFaction then
+        private.Core.Logger.trace("StateManager", "Triggering selectedFaction notification after state load")
+        private.Core.StateManager.notifyStateChange("ui.selectedFaction", StateManager.state.ui.selectedFaction, nil)
+    end
+
+    -- Also schedule a delayed notification to catch any UI components that subscribe after initial load
+    C_Timer.After(
+        0.5,
+        function()
+            if StateManager.state.ui.selectedPeriod then
+                private.Core.Logger.trace("StateManager", "Triggering delayed selectedPeriod notification")
+                private.Core.StateManager.notifyStateChange(
+                    "ui.selectedPeriod",
+                    StateManager.state.ui.selectedPeriod,
+                    nil
+                )
+            end
+        end
+    )
 end
 
 -----------------------------------------------------------------------------------------
@@ -403,6 +422,9 @@ end
 -----------------------------------------------------------------------------------------
 
 function private.Core.StateManager.init()
+    -- Set up event listeners first
+    setupEventListeners()
+
     -- Load state from database
     private.Core.StateManager.loadState()
 

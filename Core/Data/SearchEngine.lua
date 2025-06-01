@@ -33,6 +33,12 @@ local MIN_CHARACTER_SEARCH = 3
     @return [table] Array of found events
 ]]
 function SearchEngine.searchEvents(yearStart, yearEnd)
+    -- Validate input parameters
+    if not yearStart or not yearEnd then
+        private.Core.Logger.warn("SearchEngine", "Invalid parameters: yearStart and yearEnd must not be nil")
+        return {}
+    end
+
     private.Core.Logger.trace(
         "SearchEngine",
         "Searching events from " .. tostring(yearStart) .. " to " .. tostring(yearEnd)
@@ -50,9 +56,13 @@ function SearchEngine.searchEvents(yearStart, yearEnd)
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events")
         return foundEvents
     end
-
     for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
         local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+
+        private.Core.Logger.trace(
+            "SearchEngine",
+            "Checking library: " .. libraryName .. " (active: " .. tostring(isLibraryActive) .. ")"
+        )
 
         if isLibraryActive and eventsGroup and eventsGroup.data then
             local pluginEvents = SearchEngine.searchEventsInDB(yearStart, yearEnd, eventsGroup.data)

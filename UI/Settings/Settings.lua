@@ -344,11 +344,21 @@ function SettingsMixin:AddCategory(index, category)
 end
 
 function SettingsMixin:OnSettingsEventTypeChecked(eventData)
+    -- Validate event data
+    if not eventData or not eventData.eventTypeId then
+        private.Core.Logger.warn("Settings", "OnSettingsEventTypeChecked called with invalid eventData")
+        return
+    end
+
     -- Extract the event type ID and checked status from the event data
     local eventTypeId = eventData.eventTypeId
     local isActive = eventData.isActive
 
-    Chronicles.Data:SetEventTypeStatus(eventTypeId, isActive)
+    -- Update StateManager for event type status
+    local path = "eventTypes." .. tostring(eventTypeId)
+    private.Core.StateManager.setState(path, isActive, "Event type setting changed")
+
+    --Chronicles.Data:SetEventTypeStatus(eventTypeId, isActive)
     Chronicles.Data:RefreshPeriods()
 
     private.Core.Timeline.ComputeTimelinePeriods()
@@ -358,12 +368,26 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
 end
 
 function SettingsMixin:OnSettingsLibraryChecked(eventData)
+    -- Validate event data
+    if not eventData or not eventData.libraryName then
+        private.Core.Logger.warn("Settings", "OnSettingsLibraryChecked called with invalid eventData")
+        return
+    end
+
     -- Extract the library name and checked status from the event data
     local libraryName = eventData.libraryName
     local isActive = eventData.isActive
 
-    Chronicles.Data:SetLibraryStatus(libraryName, isActive)
+    -- Update StateManager for library status
+    local path = "libraries." .. libraryName
+    private.Core.StateManager.setState(path, isActive, "Library setting changed")
+
+    -- Chronicles.Data:SetLibraryStatus(libraryName, isActive)
     Chronicles.Data:RefreshPeriods()
+
+    -- Invalidate caches when library status changes
+    private.Core.Cache.invalidate("periodsFillingBySteps")
+    private.Core.Cache.invalidate("searchCache")
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -584,7 +608,11 @@ function SettingsMixin:LoadMyJournal(frame)
                 private.Chronicles.db.global.options = private.Chronicles.db.global.options or {}
             end
             private.Chronicles.db.global.options.myjournal = isChecked
-            Chronicles.Data:SetLibraryStatus(private.constants.configurationName.myjournal, isChecked)
+            private.Core.StateManager.setState(
+                "libraries." .. private.constants.configurationName.myjournal,
+                isChecked,
+                "MyJournal setting changed"
+            )
 
             -- Update UI
             if MyJournalViewShow then

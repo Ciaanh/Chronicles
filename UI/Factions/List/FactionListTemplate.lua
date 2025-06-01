@@ -15,7 +15,9 @@ end
 function FactionListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		private.Core.StateManager.setState("ui.selectedFaction", self.Faction, "Faction selected from list")
+		-- Pass only the faction ID instead of the full object
+		local factionId = self.Faction and self.Faction.id or nil
+		private.Core.StateManager.setState("ui.selectedFaction", factionId, "Faction selected from list")
 	end
 end
 

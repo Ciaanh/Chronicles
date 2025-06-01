@@ -70,6 +70,36 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
         }
     end
 
+    -- Safety check: ensure constants are available
+    if not private.constants or not private.constants.config then
+        private.Core.Logger.warn("TimelineBusiness", "Constants not available when calculating timeline config")
+        return {
+            isOverlapping = false,
+            pastEvents = false,
+            futurEvents = false,
+            before = 0,
+            after = 0,
+            minYear = 0,
+            maxYear = 0,
+            numberOfTimelineBlock = 0
+        }
+    end
+
+    local config = private.constants.config
+    if not config.historyStartYear or not config.currentYear then
+        private.Core.Logger.warn("TimelineBusiness", "Required config values are nil for timeline config")
+        return {
+            isOverlapping = false,
+            pastEvents = false,
+            futurEvents = false,
+            before = 0,
+            after = 0,
+            minYear = 0,
+            maxYear = 0,
+            numberOfTimelineBlock = 0
+        }
+    end
+
     local timelineConfig = {
         isOverlapping = false,
         pastEvents = false,
@@ -82,13 +112,13 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
     }
 
     -- Define the boundaries of the timeline
-    if (minYear < private.constants.config.historyStartYear) then
-        timelineConfig.minYear = private.constants.config.historyStartYear
+    if (minYear < config.historyStartYear) then
+        timelineConfig.minYear = config.historyStartYear
         timelineConfig.pastEvents = true
     end
 
-    if (maxYear > private.constants.config.currentYear) then
-        timelineConfig.maxYear = private.constants.config.currentYear
+    if (maxYear > config.currentYear) then
+        timelineConfig.maxYear = config.currentYear
         timelineConfig.futurEvents = true
     end
 
@@ -218,39 +248,48 @@ function TimelineBusiness.countEventsInPeriod(block)
         return 0
     end
 
+    -- Safety check: ensure constants are available
+    if not private.constants or not private.constants.config then
+        private.Core.Logger.warn("TimelineBusiness", "Constants not available when counting events, returning 0")
+        return 0
+    end
+
+    local config = private.constants.config
+    if not config.mythos or not config.futur or not config.historyStartYear or not config.currentYear then
+        private.Core.Logger.warn("TimelineBusiness", "Required config values are nil, returning 0")
+        return 0
+    end
+
     local eventCount = 0
     local originalLowerBound = block.lowerBound
     local originalUpperBound = block.upperBound
 
     -- Handle special periods differently
-    local isMytosPeriod = (originalLowerBound == private.constants.config.mythos)
-    local isFuturePeriod = (originalUpperBound == private.constants.config.futur)
-
+    local isMytosPeriod = (originalLowerBound == config.mythos)
+    local isFuturePeriod = (originalUpperBound == config.futur)
     if isMytosPeriod then
         -- For mythos period: manually search for events before historyStartYear
-        local mythosYearEnd = private.constants.config.historyStartYear - 1
-        local foundEvents = private.Core.Cache.getSearchEvents(private.constants.config.mythos, mythosYearEnd)
+        local mythosYearEnd = config.historyStartYear - 1
+        local foundEvents = private.Core.Cache.getSearchEvents(config.mythos, mythosYearEnd)
         if foundEvents ~= nil then
             eventCount = #foundEvents
         end
     elseif isFuturePeriod then
         -- For future period: manually search for events beyond currentYear
-        local futureYearStart = private.constants.config.currentYear + 1
-        local foundEvents = private.Core.Cache.getSearchEvents(futureYearStart, private.constants.config.futur)
+        local futureYearStart = config.currentYear + 1
+        local foundEvents = private.Core.Cache.getSearchEvents(futureYearStart, config.futur)
         if foundEvents ~= nil then
             eventCount = #foundEvents
         end
     else
         -- Regular period processing
         local lowerBound = originalLowerBound
-        local upperBound = originalUpperBound
-
-        -- Clamp bounds to valid date range for date index calculation only
-        if (lowerBound < private.constants.config.historyStartYear) then
-            lowerBound = private.constants.config.historyStartYear
+        local upperBound = originalUpperBound -- Clamp bounds to valid date range for date index calculation only
+        if (lowerBound < config.historyStartYear) then
+            lowerBound = config.historyStartYear
         end
-        if (upperBound > private.constants.config.currentYear) then
-            upperBound = private.constants.config.currentYear
+        if (upperBound > config.currentYear) then
+            upperBound = config.currentYear
         end
 
         local lowerDateIndex = TimelineBusiness.getDateCurrentStepIndex(lowerBound)
@@ -663,16 +702,6 @@ function TimelineBusiness.computeTimelinePeriods()
     -- end
 
     return consolidatedPeriods
-end
-
--- Phase 3 Debug: Log successful module loading
-if private.Core.Logger and private.Core.Logger.info then
-    private.Core.Logger.info(
-        "TimelineBusiness",
-        "Timeline Business Logic module loaded successfully - Phase 3 complete"
-    )
-else
-    print("[Chronicles] TimelineBusiness module loaded - Phase 3 extraction complete")
 end
 
 return TimelineBusiness

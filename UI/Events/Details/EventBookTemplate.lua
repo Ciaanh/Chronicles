@@ -8,15 +8,18 @@ function EventBookMixin:OnLoad()
 
 	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
-
 	-- Use state-based subscription for event selection
 	-- This provides a single source of truth for the selected event
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
 			"ui.selectedEvent",
-			function(newEvent, oldEvent)
-				if newEvent then
-					self:OnEventSelected(newEvent)
+			function(newEventId, oldEventId)
+				if newEventId then
+					-- Fetch the full event object from the ID
+					local eventData = self:GetEventById(newEventId)
+					if eventData then
+						self:OnEventSelected(eventData)
+					end
 				else
 					self:OnUIRefresh()
 				end
@@ -41,6 +44,22 @@ function EventBookMixin:OnPagingButtonLeave()
 	local reverse = true
 
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
+end
+
+function EventBookMixin:GetEventById(eventId)
+	-- Use the Chronicles Data API to find the event by ID
+	if Chronicles and Chronicles.Data then
+		-- Search all events across the entire timeline
+		local events = Chronicles.Data:SearchEvents()
+		if events then
+			for _, event in pairs(events) do
+				if event.id == eventId then
+					return event
+				end
+			end
+		end
+	end
+	return nil
 end
 
 function EventBookMixin:OnEventSelected(data)

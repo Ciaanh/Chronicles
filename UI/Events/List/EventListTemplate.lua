@@ -33,7 +33,9 @@ end
 function EventListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		private.Core.StateManager.setState("ui.selectedEvent", self.Event, "Event selected from list")
+		-- Pass only the event ID instead of the full object
+		local eventId = self.Event and self.Event.id or nil
+		private.Core.StateManager.setState("ui.selectedEvent", eventId, "Event selected from list")
 	end
 end
 
@@ -49,7 +51,6 @@ EventListMixin = {}
 function EventListMixin:OnLoad()
 	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
-
 	-- Use state-based subscription for period selection
 	-- This aligns with the architectural direction of using state for UI updates
 	if private.Core.StateManager then
@@ -57,7 +58,10 @@ function EventListMixin:OnLoad()
 			"ui.selectedPeriod",
 			function(newPeriod, oldPeriod)
 				if newPeriod then
+					private.Core.Logger.trace("EventListMixin", "Received selectedPeriod state change notification")
 					self:UpdateFromSelectedPeriod(newPeriod)
+				else
+					private.Core.Logger.trace("EventListMixin", "Received selectedPeriod state change with nil period")
 				end
 			end,
 			"EventListMixin"
@@ -84,6 +88,12 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period)
+	private.Core.Logger.trace(
+		"EventListMixin",
+		"UpdateFromSelectedPeriod called with period: " ..
+			tostring(period and period.lower) .. "-" .. tostring(period and period.upper)
+	)
+
 	local eventList = private.Core.Cache.getSearchEvents(period.lower, period.upper)
 	private.Core.Timeline.SetYear(math.floor((period.lower + period.upper) / 2))
 

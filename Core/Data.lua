@@ -157,7 +157,8 @@ function Chronicles.Data:MinEventYear()
     local MinEventYear = 0
 
     for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = self:GetLibraryStatus(libraryName)        if (isActive) then
+        local isActive = self:GetLibraryStatus(libraryName)
+        if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
 
@@ -174,7 +175,8 @@ function Chronicles.Data:MaxEventYear()
     local MaxEventYear = 0
 
     for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = self:GetLibraryStatus(libraryName)        if (isActive) then
+        local isActive = self:GetLibraryStatus(libraryName)
+        if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
 
@@ -195,6 +197,18 @@ function Chronicles.Data:SearchEvents(yearStart, yearEnd)
         private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to search events")
         return {}
     end
+
+    -- If no parameters provided, search entire range
+    if not yearStart or not yearEnd then
+        if private.constants and private.constants.config then
+            yearStart = private.constants.config.mythos
+            yearEnd = private.constants.config.futur
+        else
+            private.Core.Logger.warn("Data", "SearchEvents called without parameters and constants not available")
+            return {}
+        end
+    end
+
     -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.searchEvents(yearStart, yearEnd)
 end
@@ -329,15 +343,6 @@ function Chronicles.Data:GetLibrariesNames()
     return private.Core.Data.DataRegistry.getLibrariesNames()
 end
 
-function Chronicles.Data:SetLibraryStatus(libraryName, status)
-    -- Ensure DataRegistry module is loaded
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to set library status")
-        return
-    end
-    -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.setLibraryStatus(libraryName, status)
-end
 
 function Chronicles.Data:GetLibraryStatus(libraryName)
     -- Ensure DataRegistry module is loaded
@@ -345,42 +350,21 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
         private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get library status")
         return false
     end
+
     -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.getLibraryStatus(libraryName)
 end
 
-function Chronicles.Data:SetEventTypeStatus(eventType, isActive)
-    -- Ensure StateManager is available
-    if not private.Core.StateManager then
-        private.Core.Logger.error("Data", "StateManager not available when trying to set event type status")
-        return
-    end -- Get current status to check for changes
-    local oldStatus = private.Core.StateManager.getState("settings.libraries.eventTypes." .. eventType)
-    if oldStatus == nil then
-        oldStatus = true
-    end
-
-    -- Update through StateManager
-    private.Core.StateManager.setState(
-        "settings.libraries.eventTypes." .. eventType,
-        isActive,
-        "Event type status update"
-    )
-
-    -- Only invalidate cache if there was an actual change
-    if oldStatus ~= isActive then
-        private.Core.Cache.invalidate("periodsFillingBySteps")
-        private.Core.Cache.invalidate("searchCache")
-    end
-end
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
     -- Ensure StateManager is available
     if not private.Core.StateManager then
         private.Core.Logger.error("Data", "StateManager not available when trying to get event type status")
         return true -- Default to active
-    end -- Delegate to StateManager
-    local status = private.Core.StateManager.getState("settings.libraries.eventTypes." .. eventTypeId)
+    end
+
+    -- Delegate to StateManager
+    local status = private.Core.StateManager.getState("eventTypes." .. eventTypeId)
     return status ~= nil and status or true
 end
 

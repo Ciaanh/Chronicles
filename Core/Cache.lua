@@ -151,6 +151,16 @@ end
 
 -- Get cached search results
 function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
+    -- Validate input parameters
+    if not yearStart or not yearEnd then
+        private.Core.Logger.warn(
+            "Cache",
+            "getSearchEvents called with nil parameters: yearStart=" ..
+                tostring(yearStart) .. ", yearEnd=" .. tostring(yearEnd)
+        )
+        return {}
+    end
+
     local cacheKey = yearStart .. "_" .. yearEnd
     local cached = private.Core.Cache.get("searchCache", cacheKey)
     if cached then
@@ -175,18 +185,32 @@ function private.Core.Cache.preWarmSearchCache()
 
     private.Core.Logger.trace("Cache", "Pre-warming search cache with common ranges")
 
+    -- Safety check: ensure constants are available before accessing them
+    if not private.constants or not private.constants.config then
+        private.Core.Logger.warn("Cache", "Constants not available yet, skipping cache pre-warming")
+        return
+    end
+
+    local config = private.constants.config
+
+    -- Validate that required config values are not nil
+    if not config.mythos or not config.historyStartYear or not config.currentYear or not config.futur then
+        private.Core.Logger.warn("Cache", "Config values incomplete, skipping cache pre-warming")
+        return
+    end
+
     -- Pre-cache some common search ranges that are likely to be used frequently
     local commonRanges = {
-        {private.constants.config.mythos, private.constants.config.historyStartYear - 1}, -- Mythos period
-        {private.constants.config.currentYear + 1, private.constants.config.futur}, -- Future period
-        {private.constants.config.historyStartYear, private.constants.config.currentYear}, -- Main history
+        {config.mythos, config.historyStartYear - 1}, -- Mythos period
+        {config.currentYear + 1, config.futur}, -- Future period
+        {config.historyStartYear, config.currentYear}, -- Main history
         {-10000, 0}, -- Common ancient period
         {0, 50} -- Common modern period
     }
 
     for _, range in ipairs(commonRanges) do
         local yearStart, yearEnd = range[1], range[2]
-        if yearStart <= yearEnd then
+        if yearStart and yearEnd and yearStart <= yearEnd then
             private.Core.Cache.getSearchEvents(yearStart, yearEnd)
         end
     end

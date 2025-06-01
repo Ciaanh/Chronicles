@@ -8,9 +8,9 @@ local defaults = {
         },
         -- StateManager state defaults
         uiState = {
-            selectedEvent = nil,
-            selectedCharacter = nil,
-            selectedFaction = nil,
+            selectedEvent = nil, -- Stores event ID (number)
+            selectedCharacter = nil, -- Stores character ID (number)
+            selectedFaction = nil, -- Stores faction ID (number)
             selectedPeriod = nil,
             activeTab = nil,
             isMainFrameOpen = false
@@ -66,7 +66,8 @@ function Chronicles:OnInitialize()
                 tt:AddLine(Locale["Icon tooltip"])
             end
         }
-    )    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
+    )
+    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
     self:RegisterChatCommand(
         "chronicles",
         function()
