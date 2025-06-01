@@ -155,14 +155,11 @@ end
 
 function Chronicles.Data:MinEventYear()
     local MinEventYear = 0
-    local GetLibraryStatus = Chronicles.Data.GetLibraryStatus
-    local getEventTypeStatus = Chronicles.Data.GetEventTypeStatus
 
     for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = GetLibraryStatus(self, libraryName)
-        if (isActive) then
+        local isActive = self:GetLibraryStatus(libraryName)        if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
-                local isEventTypeActive = getEventTypeStatus(self, event.eventType)
+                local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
 
                 if (isEventTypeActive and event.yearStart < MinEventYear) then
                     MinEventYear = event.yearStart
@@ -175,14 +172,11 @@ end
 
 function Chronicles.Data:MaxEventYear()
     local MaxEventYear = 0
-    local GetLibraryStatus = Chronicles.Data.GetLibraryStatus
-    local getEventTypeStatus = Chronicles.Data.GetEventTypeStatus
 
     for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = GetLibraryStatus(self, libraryName)
-        if (isActive) then
+        local isActive = self:GetLibraryStatus(libraryName)        if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
-                local isEventTypeActive = getEventTypeStatus(self, event.eventType)
+                local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
 
                 if (isEventTypeActive and event.yearEnd > MaxEventYear) then
                     MaxEventYear = event.yearEnd

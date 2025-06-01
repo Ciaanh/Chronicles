@@ -54,7 +54,8 @@ local StateManager = {
     },
     history = {},
     maxHistorySize = 50,
-    listeners = {}
+    listeners = {},
+    isLoaded = false -- Track if saved state has been loaded
 }
 
 -----------------------------------------------------------------------------------------
@@ -96,6 +97,10 @@ function private.Core.StateManager.getState(path)
     end
 
     return current
+end
+
+function private.Core.StateManager.isStateLoaded()
+    return StateManager.isLoaded
 end
 
 function private.Core.StateManager.setState(path, value, description)
@@ -293,17 +298,21 @@ local function setupEventListeners() -- Use centralized event constants to avoid
     private.Core.registerCallback(
         events.SettingsEventTypeChecked,
         function(data)
-            local path = "settings.eventTypes." .. tostring(data.eventType)
-            private.Core.StateManager.setState(path, data.checked, "Event type setting changed")
+            local path = "settings.eventTypes." .. tostring(data.eventTypeId)
+            private.Core.StateManager.setState(path, data.isActive, "Event type setting changed")
         end,
         "StateManager"
     )
-
     private.Core.registerCallback(
         events.SettingsLibraryChecked,
         function(data)
-            local path = "settings.libraries." .. tostring(data.library)
-            private.Core.StateManager.setState(path, data.checked, "Library setting changed")
+            -- Update the actual DataRegistry state paths that control library filtering
+            local path = "settings.libraries.databases.events." .. tostring(data.libraryName)
+            private.Core.StateManager.setState(path, data.isActive, "Library setting changed")
+
+            -- Also invalidate relevant caches when library status changes
+            private.Core.Cache.invalidate("periodsFillingBySteps")
+            private.Core.Cache.invalidate("searchCache")
         end,
         "StateManager"
     )
@@ -343,6 +352,9 @@ function private.Core.StateManager.loadState()
             StateManager.state.data = deepCopy(Chronicles.db.global.dataState)
         end
     end
+    
+    -- Mark as loaded to prevent library registrations from overriding saved state
+    StateManager.isLoaded = true
 end
 
 -----------------------------------------------------------------------------------------
