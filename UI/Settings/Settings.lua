@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- Event types
@@ -352,14 +351,12 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
 
     -- Extract the event type ID and checked status from the event data
     local eventTypeId = eventData.eventTypeId
-    local isActive = eventData.isActive
-
-    -- Update StateManager for event type status
+    local isActive = eventData.isActive -- Update StateManager for event type status
     local path = "eventTypes." .. tostring(eventTypeId)
     private.Core.StateManager.setState(path, isActive, "Event type setting changed")
 
-    --Chronicles.Data:SetEventTypeStatus(eventTypeId, isActive)
-    Chronicles.Data:RefreshPeriods()
+    --private.Core.Utils.HelperUtils.getChronicles().Data:SetEventTypeStatus(eventTypeId, isActive)
+    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods()
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -376,14 +373,11 @@ function SettingsMixin:OnSettingsLibraryChecked(eventData)
 
     -- Extract the library name and checked status from the event data
     local libraryName = eventData.libraryName
-    local isActive = eventData.isActive
-
-    -- Update StateManager for library status
+    local isActive = eventData.isActive -- Update StateManager for library status
     local path = "libraries." .. libraryName
     private.Core.StateManager.setState(path, isActive, "Library setting changed")
 
-    -- Chronicles.Data:SetLibraryStatus(libraryName, isActive)
-    Chronicles.Data:RefreshPeriods()
+    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods()
 
     -- Invalidate caches when library status changes
     private.Core.Cache.invalidate("periodsFillingBySteps")
@@ -444,7 +438,7 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
-        newCheckbox:SetChecked(Chronicles.Data:GetEventTypeStatus(eventTypeId))
+        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(eventTypeId))
 
         -- Add hover effect to container
         checkboxContainer:SetScript(
@@ -546,7 +540,7 @@ function SettingsMixin:LoadLibraries(frame)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.libraryName = libraryName
 
-        newCheckbox:SetChecked(Chronicles.Data:GetLibraryStatus(libraryName))
+        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetLibraryStatus(libraryName))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
@@ -583,31 +577,33 @@ end
 
 function SettingsMixin:LoadMyJournal(frame)
     local isActive = frame.SettingsContainer.IsActive
+
     -- Check if the setting exists in the database
-    if not private.Chronicles.db or not private.Chronicles.db.global or not private.Chronicles.db.global.options then
-        private.Chronicles.db = private.Chronicles.db or {}
-        private.Chronicles.db.global = private.Chronicles.db.global or {}
-        private.Chronicles.db.global.options = private.Chronicles.db.global.options or {}
-        private.Chronicles.db.global.options.myjournal = false
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
+        chronicles.db = chronicles.db or {}
+        chronicles.db.global = chronicles.db.global or {}
+        chronicles.db.global.options = chronicles.db.global.options or {}
+        chronicles.db.global.options.myjournal = false
     end
 
-    isActive:SetChecked(private.Chronicles.db.global.options.myjournal)
+    isActive:SetChecked(chronicles.db.global.options.myjournal)
 
     -- Apply enhanced styling to the checkbox
     isActive.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
     isActive.Text:SetTextColor(0.9, 0.9, 0.9)
-
     isActive:SetScript(
         "OnClick",
         function(self)
             local isChecked = self:GetChecked()
+            local chronicles = private.Core.Utils.HelperUtils.getChronicles()
 
-            if not private.Chronicles.db or not private.Chronicles.db.global or not private.Chronicles.db.global.options then
-                private.Chronicles.db = private.Chronicles.db or {}
-                private.Chronicles.db.global = private.Chronicles.db.global or {}
-                private.Chronicles.db.global.options = private.Chronicles.db.global.options or {}
+            if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
+                chronicles.db = chronicles.db or {}
+                chronicles.db.global = chronicles.db.global or {}
+                chronicles.db.global.options = chronicles.db.global.options or {}
             end
-            private.Chronicles.db.global.options.myjournal = isChecked
+            chronicles.db.global.options.myjournal = isChecked
             private.Core.StateManager.setState(
                 "libraries." .. private.constants.configurationName.myjournal,
                 isChecked,

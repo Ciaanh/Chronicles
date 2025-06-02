@@ -11,11 +11,6 @@ private.Core.Data.SearchEngine = {}
 
 local SearchEngine = private.Core.Data.SearchEngine
 
--- Helper function to safely access Chronicles
-local function getChronicles()
-    return private.Chronicles
-end
-
 -----------------------------------------------------------------------------------------
 -- Constants and Configuration ---------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -45,19 +40,17 @@ function SearchEngine.searchEvents(yearStart, yearEnd)
     )
 
     local foundEvents = {}
-
     if yearStart > yearEnd then
         private.Core.Logger.warn("SearchEngine", "Invalid date range: start year is after end year")
         return foundEvents
     end
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events")
         return foundEvents
     end
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+    for libraryName, eventsGroup in pairs(chronicles.Data.Events) do
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         private.Core.Logger.trace(
             "SearchEngine",
@@ -89,20 +82,18 @@ end
 ]]
 function SearchEngine.searchEventsInDB(yearStart, yearEnd, db)
     local foundEvents = {}
-
     if not db then
         return foundEvents
     end
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events in DB")
         return foundEvents
     end
 
     for _, event in pairs(db) do
         if event then
-            local isEventTypeActive = Chronicles.Data:GetEventTypeStatus(event.eventType)
+            local isEventTypeActive = chronicles.Data:GetEventTypeStatus(event.eventType)
 
             if isEventTypeActive and SearchEngine.isEventInRange(event, yearStart, yearEnd) then
                 table.insert(foundEvents, event)
@@ -188,15 +179,14 @@ function SearchEngine.searchFactions(name)
 
     local foundFactions = {}
     local searchTerm = name and string.lower(name) or nil
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching factions")
         return foundFactions
     end
 
-    for libraryName, factionsGroup in pairs(Chronicles.Data.Factions) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+    for libraryName, factionsGroup in pairs(chronicles.Data.Factions) do
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         if isLibraryActive and factionsGroup and factionsGroup.data then
             for _, faction in pairs(factionsGroup.data) do
@@ -249,18 +239,17 @@ function SearchEngine.findFactions(ids)
     private.Core.Logger.trace("SearchEngine", "Finding factions by IDs")
 
     local foundFactions = {}
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when finding factions")
         return foundFactions
     end
 
     for libraryName, factionIds in pairs(ids) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         if isLibraryActive then
-            local factionsGroup = Chronicles.Data.Factions[libraryName]
+            local factionsGroup = chronicles.Data.Factions[libraryName]
 
             if factionsGroup and factionsGroup.data and #factionsGroup.data > 0 then
                 for _, faction in pairs(factionsGroup.data) do
@@ -324,18 +313,16 @@ end
 ]]
 function SearchEngine.searchCharacters(name)
     private.Core.Logger.trace("SearchEngine", "Searching characters with name: " .. tostring(name or "all"))
-
     local foundCharacters = {}
     local searchTerm = name and string.lower(name) or nil
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching characters")
         return foundCharacters
     end
 
-    for libraryName, charactersGroup in pairs(Chronicles.Data.Characters) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+    for libraryName, charactersGroup in pairs(chronicles.Data.Characters) do
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         if isLibraryActive and charactersGroup and charactersGroup.data then
             for _, character in pairs(charactersGroup.data) do
@@ -388,18 +375,17 @@ function SearchEngine.findCharacters(ids)
     private.Core.Logger.trace("SearchEngine", "Finding characters by IDs")
 
     local foundCharacters = {}
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when finding characters")
         return foundCharacters
     end
 
     for libraryName, characterIds in pairs(ids) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         if isLibraryActive then
-            local charactersGroup = Chronicles.Data.Characters[libraryName]
+            local charactersGroup = chronicles.Data.Characters[libraryName]
 
             if charactersGroup and charactersGroup.data and #charactersGroup.data > 0 then
                 for _, character in pairs(charactersGroup.data) do
@@ -467,15 +453,14 @@ function SearchEngine.hasEvents(yearStart, yearEnd)
     if yearStart > yearEnd then
         return false
     end
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when checking for events")
         return false
     end
 
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isLibraryActive = Chronicles.Data:GetLibraryStatus(libraryName)
+    for libraryName, eventsGroup in pairs(chronicles.Data.Events) do
+        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
 
         if isLibraryActive and eventsGroup and eventsGroup.data then
             if SearchEngine.hasEventsInDB(yearStart, yearEnd, eventsGroup.data) then
@@ -498,10 +483,10 @@ function SearchEngine.hasEventsInDB(yearStart, yearEnd, db)
     if not db then
         return false
     end
-
     for _, event in pairs(db) do
         if event then
-            local isEventTypeActive = Chronicles.Data:GetEventTypeStatus(event.eventType)
+            local isEventTypeActive =
+                private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(event.eventType)
 
             if isEventTypeActive and SearchEngine.isEventInRange(event, yearStart, yearEnd) then
                 return true

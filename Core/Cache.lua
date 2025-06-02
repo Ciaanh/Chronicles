@@ -1,4 +1,6 @@
 local FOLDER_NAME, private = ...
+
+-- Get Chronicles reference
 local Chronicles = private.Chronicles
 
 -- Centralized Cache Management System
@@ -103,9 +105,8 @@ function private.Core.Cache.getPeriodsFillingBySteps()
     if cached then
         return cached
     end
-
     private.Core.Logger.trace("Cache", "Rebuilding periods cache")
-    local result = Chronicles.Data:GetPeriodsFillingBySteps()
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetPeriodsFillingBySteps()
     private.Core.Cache.set("periodsFillingBySteps", result)
     return result
 end
@@ -116,9 +117,8 @@ function private.Core.Cache.getMinEventYear()
     if cached then
         return cached
     end
-
     private.Core.Logger.trace("Cache", "Rebuilding min event year cache")
-    local result = Chronicles.Data:MinEventYear()
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:MinEventYear()
     private.Core.Cache.set("minEventYear", result)
     return result
 end
@@ -129,9 +129,8 @@ function private.Core.Cache.getMaxEventYear()
     if cached then
         return cached
     end
-
     private.Core.Logger.trace("Cache", "Rebuilding max event year cache")
-    local result = Chronicles.Data:MaxEventYear()
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:MaxEventYear()
     private.Core.Cache.set("maxEventYear", result)
     return result
 end
@@ -142,9 +141,8 @@ function private.Core.Cache.getLibrariesNames()
     if cached then
         return cached
     end
-
     private.Core.Logger.trace("Cache", "Rebuilding libraries names cache")
-    local result = Chronicles.Data:GetLibrariesNames()
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetLibrariesNames()
     private.Core.Cache.set("librariesNames", result)
     return result
 end
@@ -166,9 +164,8 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
     if cached then
         return cached
     end
-
     private.Core.Logger.trace("Cache", "Caching search results for " .. cacheKey)
-    local result = Chronicles.Data:SearchEvents(yearStart, yearEnd)
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:SearchEvents(yearStart, yearEnd)
     private.Core.Cache.set("searchCache", result, cacheKey)
     return result
 end

@@ -32,13 +32,11 @@ local FOLDER_NAME, private = ...
 if not private.Core then
     private.Core = {}
 end
-private.Core.TimelineBusiness = {}
-local TimelineBusiness = private.Core.TimelineBusiness
-
--- Helper function to safely access Chronicles
-local function getChronicles()
-    return private.Chronicles
+if not private.Core.Data then
+    private.Core.Data = {}
 end
+private.Core.Data.TimelineBusiness = {}
+local TimelineBusiness = private.Core.Data.TimelineBusiness
 
 -----------------------------------------------------------------------------------------
 -- Timeline Configuration Logic ---------------------------------------------------------
@@ -52,8 +50,8 @@ end
     @return [table] Timeline configuration object
 ]]
 function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "TimelineBusiness",
             "Chronicles.Data not initialized when calculating timeline config"
@@ -150,7 +148,6 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
             timelineConfig.before = timelineConfig.before + 1
         end
     end
-
     if (timelineConfig.futurEvents == true) then
         timelineConfig.numberOfTimelineBlock = timelineConfig.numberOfTimelineBlock + 1
         if (timelineConfig.isOverlapping) then
@@ -171,13 +168,13 @@ end
     @return [number] Date index for current step
 ]]
 function TimelineBusiness.getDateCurrentStepIndex(date)
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when getting date index")
         return 0
     end
 
-    local dateProfile = Chronicles.Data:ComputeEventDateProfile(date)
+    local dateProfile = chronicles.Data:ComputeEventDateProfile(date)
     local currentStepValue = private.Core.StateManager.getState("timeline.currentStep")
 
     if (currentStepValue == 1000) then
@@ -204,8 +201,8 @@ end
     @return [table] Periods filling data organized by step value
 ]]
 function TimelineBusiness.getCurrentStepPeriodsFilling()
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when getting periods filling")
         return {}
     end
@@ -242,8 +239,8 @@ end
     @return [number] Number of events in the period
 ]]
 function TimelineBusiness.countEventsInPeriod(block)
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when counting events")
         return 0
     end
@@ -333,16 +330,16 @@ end
     @return [table] Array of timeline periods with bounds and event data
 ]]
 function TimelineBusiness.generateTimelinePeriods(stepValue)
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when generating periods")
         -- Return default empty periods instead of empty table
         -- This ensures timeline UI has something to display
         return TimelineBusiness.generateDefaultPeriods(stepValue)
     end
 
-    local minYear = Chronicles.Data:MinEventYear()
-    local maxYear = Chronicles.Data:MaxEventYear()
+    local minYear = chronicles.Data:MinEventYear()
+    local maxYear = chronicles.Data:MaxEventYear()
 
     -- If no events are loaded or found, use default range
     if not minYear or not maxYear or minYear > maxYear then
@@ -543,6 +540,20 @@ end
     @return [table] Pagination data with bounds and navigation info
 ]]
 function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
+    -- Safety check: ensure periods is not nil
+    if periods == nil then
+        private.Core.Logger.error("TimelineBusiness", "periods parameter is nil in calculateTimelinePagination")
+        return {
+            currentPage = 1,
+            maxPage = 1,
+            firstIndex = 1,
+            pageSize = private.constants.config.timeline.pageSize,
+            totalPeriods = 0,
+            showPrevious = false,
+            showNext = false
+        }
+    end
+
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #periods
     local maxPageValue = math.ceil(numberOfCells / pageSize)
@@ -630,13 +641,12 @@ function TimelineBusiness.getYearPageIndex(year, periods)
             selectedYear = 0
         end
     end
-
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         return 1
     end
 
-    local minYear = Chronicles.Data:MinEventYear()
+    local minYear = chronicles.Data:MinEventYear()
     local length = math.abs(minYear - selectedYear)
     local currentStepValue = private.Core.StateManager.getState("timeline.currentStep")
     local yearIndex = math.floor(length / currentStepValue)
@@ -686,8 +696,6 @@ function TimelineBusiness.computeTimelinePeriods()
     local consolidatedPeriods = TimelineBusiness.consolidateTimelinePeriods(rawPeriods)
 
     private.Core.Logger.trace("TimelineBusiness", "Generated " .. #consolidatedPeriods .. " timeline periods")
-
-    -- -- Debug print of periods
     -- for i, period in ipairs(consolidatedPeriods) do
     --     print(
     --         string.format(

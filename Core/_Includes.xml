@@ -6,8 +6,8 @@
     <Script file="Cache.lua"/>
     <Script file="EventManager.lua"/>
     <Script file="StateManager.lua"/>
-
     <!-- Utility Modules (loaded first for dependencies) -->
+    <Script file="Utils/HelperUtils.lua"/>
     <Script file="Utils/StringUtils.lua"/>
     <Script file="Utils/TableUtils.lua"/>
     <Script file="Utils/MathUtils.lua"/>

@@ -21,11 +21,6 @@ end
 private.Core.Data.DataRegistry = {}
 local DataRegistry = private.Core.Data.DataRegistry
 
--- Helper function to safely access Chronicles
-local function getChronicles()
-    return private.Chronicles
-end
-
 -----------------------------------------------------------------------------------------
 -- Database Registration Operations ----------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -36,10 +31,9 @@ end
     @param db [table] Events database to register
     @return [boolean] Success status
 ]]
-function DataRegistry.registerEventDB(libraryName, db)
-    -- Ensure Chronicles.Data is initialized
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+function DataRegistry.registerEventDB(libraryName, db) -- Ensure Chronicles.Data is initialized
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
             "Chronicles.Data not initialized when trying to register " .. libraryName
@@ -47,7 +41,7 @@ function DataRegistry.registerEventDB(libraryName, db)
         return false
     end
 
-    if Chronicles.Data.Events[libraryName] ~= nil then
+    if chronicles.Data.Events[libraryName] ~= nil then
         private.Core.Logger.error("DataRegistry", libraryName .. " is already registered by another plugin in Events.")
         return false
     end
@@ -75,9 +69,8 @@ function DataRegistry.registerEventDB(libraryName, db)
         end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
-    -- If isActive is not nil, the library status is already set - don't override it
 
-    Chronicles.Data.Events[libraryName] = {
+    chronicles.Data.Events[libraryName] = {
         data = db or {}, -- Ensure data is never nil
         name = libraryName
     }
@@ -100,15 +93,15 @@ end
 ]]
 function DataRegistry.registerFactionDB(libraryName, db)
     -- Ensure Chronicles.Data is initialized
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
             "Chronicles.Data not initialized when trying to register " .. libraryName
         )
         return false
     end
-    if Chronicles.Data.Factions[libraryName] ~= nil then
+    if chronicles.Data.Factions[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Factions."
@@ -129,9 +122,8 @@ function DataRegistry.registerFactionDB(libraryName, db)
         end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
-    -- If isActive is not nil, the library status is already set - don't override it
 
-    Chronicles.Data.Factions[libraryName] = {
+    chronicles.Data.Factions[libraryName] = {
         data = db,
         name = libraryName
     }
@@ -147,15 +139,15 @@ end
 ]]
 function DataRegistry.registerCharacterDB(libraryName, db)
     -- Ensure Chronicles.Data is initialized
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
             "Chronicles.Data not initialized when trying to register " .. libraryName
         )
         return false
     end
-    if Chronicles.Data.Characters[libraryName] ~= nil then
+    if chronicles.Data.Characters[libraryName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
             libraryName .. " is already registered by another plugin in Characters."
@@ -175,9 +167,8 @@ function DataRegistry.registerCharacterDB(libraryName, db)
         end
         private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
     end
-    -- If isActive is not nil, the library status is already set - don't override it
 
-    Chronicles.Data.Characters[libraryName] = {
+    chronicles.Data.Characters[libraryName] = {
         data = db,
         name = libraryName
     }
@@ -194,10 +185,9 @@ end
     @param libraryName [string] Name of the library
     @return [boolean] Library status (true if active)
 ]]
-function DataRegistry.getLibraryStatus(libraryName)
-    -- Ensure Chronicles.Data is initialized
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+function DataRegistry.getLibraryStatus(libraryName) -- Ensure Chronicles.Data is initialized
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
             "Chronicles.Data not initialized when trying to get library status for " .. libraryName
@@ -240,14 +230,14 @@ end
 ]]
 function DataRegistry.getLibrariesNames()
     -- Ensure Chronicles.Data is initialized
-    local Chronicles = getChronicles()
-    if not Chronicles or not Chronicles.Data then
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
         private.Core.Logger.error("DataRegistry", "Chronicles.Data not initialized when trying to get libraries names")
         return {}
     end
 
     local dataGroups = {} -- Process Events libraries using StateManager paths
-    for eventLibraryName, group in pairs(Chronicles.Data.Events) do
+    for eventLibraryName, group in pairs(chronicles.Data.Events) do
         if (eventLibraryName ~= "myjournal") then
             local dbTypePath = "libraries." .. eventLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)
@@ -268,8 +258,9 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end -- Process Factions libraries using StateManager paths
-    for factionLibraryName, group in pairs(Chronicles.Data.Factions) do
+    end
+    -- Process Factions libraries using StateManager paths
+    for factionLibraryName, group in pairs(chronicles.Data.Factions) do
         if (factionLibraryName ~= "myjournal") then
             local dbTypePath = "libraries." .. factionLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)
@@ -290,8 +281,9 @@ function DataRegistry.getLibrariesNames()
                 table.insert(dataGroups, groupProjection)
             end
         end
-    end -- Process Characters libraries using StateManager paths
-    for characterLibraryName, group in pairs(Chronicles.Data.Characters) do
+    end
+    -- Process Characters libraries using StateManager paths
+    for characterLibraryName, group in pairs(chronicles.Data.Characters) do
         if (characterLibraryName ~= "myjournal") then
             local dbTypePath = "libraries." .. characterLibraryName
             local isActive = private.Core.StateManager.getState(dbTypePath)

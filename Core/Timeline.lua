@@ -5,6 +5,11 @@ private.Core.Timeline = {}
 
 local Chronicles = private.Chronicles
 
+-- Create convenience accessor for TimelineBusiness (accessed lazily)
+local function getTimelineBusiness()
+    return private.Core.Data.TimelineBusiness
+end
+
 -----------------------------------------------------------------------------------------
 -- Timeline -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
@@ -51,32 +56,32 @@ end
 local function GetDateCurrentStepIndex(date)
     -- Phase 3 Debug: Log delegation
     private.Core.Logger.trace("Timeline", "Delegating GetDateCurrentStepIndex to TimelineBusiness")
-    return private.Core.TimelineBusiness.getDateCurrentStepIndex(date)
+    return getTimelineBusiness().getDateCurrentStepIndex(date)
 end
 
 -- Delegate to business logic module
 local function GetCurrentStepPeriodsFilling()
-    return private.Core.TimelineBusiness.getCurrentStepPeriodsFilling()
+    return getTimelineBusiness().getCurrentStepPeriodsFilling()
 end
 
 -- Delegate to business logic module
 local function CountEvents(block)
-    return private.Core.TimelineBusiness.countEventsInPeriod(block)
+    return getTimelineBusiness().countEventsInPeriod(block)
 end
 
 -- Delegate to business logic module
 local function GetTimelineConfig(minYear, maxYear, stepValue)
-    return private.Core.TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
+    return getTimelineBusiness().calculateTimelineConfig(minYear, maxYear, stepValue)
 end
 
 -- Delegate to business logic module
 local function GetStepValueIndex(stepValue)
-    return private.Core.TimelineBusiness.getStepValueIndex(stepValue)
+    return getTimelineBusiness().getStepValueIndex(stepValue)
 end
 
 -- Delegate to business logic module
 local function GetYearPageIndex(year)
-    return private.Core.TimelineBusiness.getYearPageIndex(year, Timeline.Periods)
+    return getTimelineBusiness().getYearPageIndex(year, Timeline.Periods)
 end
 
 function private.Core.Timeline.ChangePage(value)
@@ -92,7 +97,7 @@ end
 
 function private.Core.Timeline.ComputeTimelinePeriods()
     -- Delegate to business logic module and store result in Timeline.Periods
-    Timeline.Periods = private.Core.TimelineBusiness.computeTimelinePeriods()
+    Timeline.Periods = getTimelineBusiness().computeTimelinePeriods()
     return Timeline.Periods
 end
 
@@ -103,7 +108,7 @@ end
 
 -- Calculate pagination parameters for the timeline window using business logic
 local function CalculateTimelinePagination()
-    return private.Core.TimelineBusiness.calculateTimelinePagination(Timeline.Periods, getCurrentPage())
+    return getTimelineBusiness().calculateTimelinePagination(Timeline.Periods, getCurrentPage())
 end
 
 -- Update navigation button visibility based on pagination state
