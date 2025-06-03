@@ -15,9 +15,16 @@ end
 function FactionListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		-- Pass only the faction ID instead of the full object
+		-- Store both faction ID and library name for unique identification
 		local factionId = self.Faction and self.Faction.id or nil
-		private.Core.StateManager.setState("ui.selectedFaction", factionId, "Faction selected from list")
+		local libraryName = self.Faction and self.Faction.source or nil
+		
+		if factionId and libraryName then
+			private.Core.Logger.debug("FactionList", "Faction selected - ID: " .. factionId .. ", Library: " .. libraryName)
+			private.Core.StateManager.setState("ui.selectedFaction", {factionId = factionId, libraryName = libraryName}, "Faction selected from list")
+		else
+			private.Core.Logger.warn("FactionList", "Faction selection missing required data - ID: " .. tostring(factionId) .. ", Library: " .. tostring(libraryName))
+		end
 	end
 end
 

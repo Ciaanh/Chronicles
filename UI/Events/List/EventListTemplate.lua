@@ -32,9 +32,15 @@ end
 function EventListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		-- Pass only the event ID instead of the full object
-		local eventId = self.Event and self.Event.id or nil
-		private.Core.StateManager.setState("ui.selectedEvent", eventId, "Event selected from list")
+		-- Pass both event ID and library name for unique identification
+		local eventSelection = nil
+		if self.Event and self.Event.id then
+			eventSelection = {
+				eventId = self.Event.id,
+				libraryName = self.Event.source or "Origins" -- Default to Origins if source not available
+			}
+		end
+		private.Core.StateManager.setState("ui.selectedEvent", eventSelection, "Event selected from list")
 	end
 end
 

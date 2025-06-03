@@ -124,19 +124,18 @@ function private.Core.StateManager.setState(path, value, description)
 
     -- Set the value
     local finalKey = keys[#keys]
-    local oldValue = current[finalKey]
     current[finalKey] = value
 
     -- Notify listeners
-    private.Core.StateManager.notifyStateChange(path, value, oldValue)
+    private.Core.StateManager.notifyStateChange(path, value)
 
     return true
 end
 
-function private.Core.StateManager.notifyStateChange(path, newValue, oldValue)
+function private.Core.StateManager.notifyStateChange(path, newValue)
     local listeners = StateManager.listeners[path] or {}
     for _, listener in ipairs(listeners) do
-        local success, error = pcall(listener.callback, newValue, oldValue, path)
+        local success, error = pcall(listener.callback, newValue, path)
         if not success then
             private.Core.Logger.error("StateManager", "Listener error for path " .. path .. ": " .. tostring(error))
         end
@@ -149,7 +148,7 @@ function private.Core.StateManager.notifyStateChange(path, newValue, oldValue)
         local parentListeners = StateManager.listeners[parentPath] or {}
         for _, listener in ipairs(parentListeners) do
             if listener.includeChildren then
-                local success, error = pcall(listener.callback, newValue, oldValue, path)
+                local success, error = pcall(listener.callback, newValue, path)
                 if not success then
                     private.Core.Logger.error(
                         "StateManager",
@@ -338,12 +337,12 @@ function private.Core.StateManager.loadState()
     -- This ensures UI components respond to loaded state even if they weren't initialized when state was loaded
     if StateManager.state.ui.selectedPeriod then
         private.Core.Logger.trace("StateManager", "Triggering selectedPeriod notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedPeriod", StateManager.state.ui.selectedPeriod, nil)
+        private.Core.StateManager.notifyStateChange("ui.selectedPeriod", StateManager.state.ui.selectedPeriod)
     end
 
     if StateManager.state.ui.selectedEvent then
         private.Core.Logger.trace("StateManager", "Triggering selectedEvent notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedEvent", StateManager.state.ui.selectedEvent, nil)
+        private.Core.StateManager.notifyStateChange("ui.selectedEvent", StateManager.state.ui.selectedEvent)
     end
 
     if StateManager.state.ui.selectedCharacter then

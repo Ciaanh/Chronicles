@@ -4,22 +4,38 @@ local Chronicles = private.Chronicles
 FactionDetailPageMixin = {}
 
 function FactionDetailPageMixin:OnLoad()
-	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)
-	-- Use state-based subscription for faction selection
+	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)	-- Use state-based subscription for faction selection
 	-- This provides a single source of truth for the selected faction
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
 			"ui.selectedFaction",
-			function(newFactionId, oldFactionId)
-				if newFactionId then
-					-- Fetch the full faction object from the ID
-					local factionData = self:GetFactionById(newFactionId)
+			function(newFactionSelection, oldFactionSelection)
+				if newFactionSelection then
+					local factionData = nil
+					
+					-- Handle both new format {factionId, libraryName} and legacy format (just ID)
+					if type(newFactionSelection) == "table" and newFactionSelection.factionId and newFactionSelection.libraryName then
+						-- New format with library-specific lookup
+						local factionId = newFactionSelection.factionId
+						local libraryName = newFactionSelection.libraryName
+						private.Core.Logger.debug("FactionBook", "Faction selection received - ID: " .. factionId .. ", Library: " .. libraryName)
+						factionData = self:GetFactionById(factionId, libraryName)
+					else
+						-- Legacy format or fallback - treat as just faction ID
+						local factionId = type(newFactionSelection) == "table" and newFactionSelection.factionId or newFactionSelection
+						if factionId then
+							private.Core.Logger.debug("FactionBook", "Faction selection received (legacy format) - ID: " .. factionId)
+							factionData = self:GetFactionById(factionId)
+						end
+					end
+					
 					if factionData then
 						self:OnFactionSelected(factionData)
+					else
+						private.Core.Logger.warn("FactionBook", "Could not find faction data for selection")
 					end
 				end
-			end,
-			"FactionDetailPageMixin"
+			end
 		)
 	end
 
@@ -40,17 +56,41 @@ function FactionDetailPageMixin:OnPagingButtonLeave()
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
 
-function FactionDetailPageMixin:GetFactionById(factionId)
+function FactionDetailPageMixin:GetFactionById(factionId, libraryName)
 	-- Use the Chronicles Data API to find the faction by ID
 	if Chronicles and Chronicles.Data then
 		local factions = Chronicles.Data:SearchFactions()
 		if factions then
+			-- If library name is provided, try direct lookup first for performance
+			if libraryName then
+				private.Core.Logger.debug("FactionBook", "Attempting direct library lookup for faction ID: " .. factionId .. " in library: " .. libraryName)
+				
+				for _, faction in pairs(factions) do
+					if faction.id == factionId and faction.source == libraryName then
+						private.Core.Logger.debug("FactionBook", "Found faction via direct library lookup")
+						return faction
+					end
+				end
+				
+				private.Core.Logger.warn("FactionBook", "Faction not found in specified library, falling back to general search")
+			end
+			
+			-- Fallback: search through all factions (maintains backward compatibility)
 			for _, faction in pairs(factions) do
 				if faction.id == factionId then
+					if libraryName then
+						private.Core.Logger.debug("FactionBook", "Found faction via fallback search (different library than expected)")
+					end
 					return faction
 				end
 			end
 		end
+	end
+	
+	if libraryName then
+		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId .. ", Library: " .. libraryName)
+	else
+		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId)
 	end
 	return nil
 end

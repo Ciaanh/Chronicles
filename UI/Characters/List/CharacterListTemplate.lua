@@ -15,9 +15,20 @@ end
 function CharacterListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		-- Pass only the character ID instead of the full object
+		-- Pass character ID and library name for unique identification
 		local characterId = self.Character and self.Character.id or nil
-		private.Core.StateManager.setState("ui.selectedCharacter", characterId, "Character selected from list")
+		local libraryName = self.Character and self.Character.source or nil
+		
+		if characterId and libraryName then
+			local characterSelection = {
+				characterId = characterId,
+				libraryName = libraryName
+			}
+			private.Core.StateManager.setState("ui.selectedCharacter", characterSelection, "Character selected from list: " .. characterId .. " (" .. libraryName .. ")")
+			private.Core.Logger.debug("CharacterList", "Character selected - ID: " .. characterId .. ", Library: " .. libraryName)
+		else
+			private.Core.Logger.warn("CharacterList", "Character selection failed - missing ID or source")
+		end
 	end
 end
 
