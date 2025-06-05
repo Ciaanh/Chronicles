@@ -14,7 +14,7 @@ Chronicles is a World of Warcraft addon that provides a timeline of historical e
 
 ### Core Components
 1. **Data Structure**: 
-   - Events with start and end years, descriptions, characters, and factions involved
+   - Events with start and end years, description as book chapters, characters, and factions involved
    - Chapters within events for detailed storytelling
    - Factions and characters data
 

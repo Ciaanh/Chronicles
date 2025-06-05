@@ -12,7 +12,6 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     Event Data Structure:
     id = [integer]					-- Id of the event
     label = [string]				-- Event name/title
-    description = { [string] }		-- Event descriptions
     chapters = { [chapter] }		-- Event chapters/content
     yearStart = [integer]			-- Start year
     yearEnd = [integer]				-- End year
@@ -112,12 +111,7 @@ function private.Core.Events.TransformEventToBook(event)
     table.insert(data, title)
 
     local chaptersLength = #event.chapters
-    if chaptersLength <= 0 then
-        for key, description in pairs(event.description) do
-            local chapter = CreateChapter(nil, {description})
-            table.insert(data, chapter)
-        end
-    else
+    if chaptersLength > 0 then
         for key, chapter in pairs(event.chapters) do
             local bookChapter = CreateChapter(chapter.header, chapter.pages)
             table.insert(data, bookChapter)
@@ -262,7 +256,7 @@ function private.Core.Events.GetEventsByTimeline(events, timelineId)
 end
 
 --[[
-    Search events by text in label or description
+    Search events by text in label
     @param events [table] List of events
     @param searchText [string] Text to search for
     @return [table] Events matching the search text
@@ -284,15 +278,6 @@ function private.Core.Events.SearchEvents(events, searchText)
             -- Search in label
             if string.find(string.lower(event.label), lowerSearchText) then
                 return true
-            end
-
-            -- Search in descriptions
-            if ValidationUtils.IsValidTable(event.description) then
-                for _, desc in pairs(event.description) do
-                    if string.find(string.lower(desc), lowerSearchText) then
-                        return true
-                    end
-                end
             end
 
             return false

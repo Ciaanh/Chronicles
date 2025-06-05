@@ -55,14 +55,6 @@ function private.Core.Factions.TransformFactionToBook(faction)
     )
     table.insert(data, title)
 
-    -- Add faction information
-    if ValidationUtils.IsValidTable(faction.description) then
-        for key, description in pairs(faction.description) do
-            local chapter = private.Core.Events.CreateChapter(nil, {description})
-            table.insert(data, chapter)
-        end
-    end
-
     return data
 end
 
@@ -117,7 +109,7 @@ function private.Core.Factions.GetFactionsByYearRange(factions, startYear, endYe
 end
 
 --[[
-    Search factions by name or description
+    Search factions by name
     @param factions [table] List of factions
     @param searchText [string] Text to search for
     @return [table] Factions matching the search text
@@ -139,24 +131,6 @@ function private.Core.Factions.SearchFactions(factions, searchText)
             -- Search in name
             if string.find(string.lower(faction.name), lowerSearchText) then
                 return true
-            end
-
-            -- Search in descriptions
-            if ValidationUtils.IsValidTable(faction.description) then
-                for _, desc in pairs(faction.description) do
-                    if string.find(string.lower(desc), lowerSearchText) then
-                        return true
-                    end
-                end
-            end
-
-            -- Search in territories
-            if ValidationUtils.IsValidTable(faction.territories) then
-                for _, territory in pairs(faction.territories) do
-                    if string.find(string.lower(territory), lowerSearchText) then
-                        return true
-                    end
-                end
             end
 
             return false

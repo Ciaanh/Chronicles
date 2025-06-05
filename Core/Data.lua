@@ -343,7 +343,6 @@ function Chronicles.Data:GetLibrariesNames()
     return private.Core.Data.DataRegistry.getLibrariesNames()
 end
 
-
 function Chronicles.Data:GetLibraryStatus(libraryName)
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
@@ -354,7 +353,6 @@ function Chronicles.Data:GetLibraryStatus(libraryName)
     -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.getLibraryStatus(libraryName)
 end
-
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
     -- Ensure StateManager is available
@@ -685,7 +683,12 @@ function Chronicles.Data.RP:RegisterBirth(age, name, addon)
     local event = {
         id = 0,
         label = "Birth of " .. name,
-        description = {"Birth of " .. name .. " \n\nImported from " .. addon},
+        chapters = {
+            {
+                header = "Birth of " .. name,
+                pages = {"Birth of " .. name .. "\n\nImported from " .. addon}
+            }
+        },
         yearStart = birth,
         yearEnd = birth,
         eventType = 5,

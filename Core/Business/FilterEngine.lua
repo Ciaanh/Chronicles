@@ -38,7 +38,7 @@ local FilterEngine = private.Core.Business.FilterEngine
         search = {
             enabled = [boolean],
             searchText = [string],
-            searchFields = { [string] }  -- Fields to search: "label", "description", etc.
+            searchFields = { [string] }  -- Fields to search: "label", etc.
         }
     }
 ]]
@@ -278,7 +278,7 @@ function FilterEngine.FilterBySearch(events, searchText, searchFields)
     end
 
     local lowerSearchText = string.lower(searchText)
-    searchFields = searchFields or {"label", "description"}
+    searchFields = searchFields or {"label"}
 
     return TableUtils.Filter(
         events,
@@ -292,12 +292,6 @@ function FilterEngine.FilterBySearch(events, searchText, searchFields)
                 if field == "label" and event.label then
                     if string.find(string.lower(event.label), lowerSearchText) then
                         return true
-                    end
-                elseif field == "description" and ValidationUtils.IsValidTable(event.description) then
-                    for _, desc in pairs(event.description) do
-                        if string.find(string.lower(desc), lowerSearchText) then
-                            return true
-                        end
                     end
                 elseif field == "author" and event.author then
                     if string.find(string.lower(event.author), lowerSearchText) then
@@ -348,7 +342,7 @@ function FilterEngine.CreateFilterConfig(options)
         search = {
             enabled = options.enableSearch or false,
             searchText = options.searchText or "",
-            searchFields = options.searchFields or {"label", "description"}
+            searchFields = options.searchFields or {"label"}
         }
     }
 end

@@ -28,12 +28,10 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
         filterByTimeline = [boolean]    -- Filter events by current timeline
     }
     characters = {
-        showRelationships = [boolean]   -- Show character relationships
         groupByFaction = [boolean]      -- Group characters by faction
         sortBy = [string]               -- Default sort method
     }
     factions = {
-        showRelationships = [boolean]   -- Show faction relationships
         groupByAlignment = [boolean]    -- Group factions by alignment
         sortBy = [string]               -- Default sort method
     }
@@ -68,12 +66,10 @@ local DEFAULT_SETTINGS = {
         filterByTimeline = true
     },
     characters = {
-        showRelationships = true,
         groupByFaction = false,
         sortBy = "name"
     },
     factions = {
-        showRelationships = true,
         groupByAlignment = false,
         sortBy = "name"
     },

@@ -11,13 +11,11 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     Character Data Structure:
     id = [integer]					-- Id of the character
     name = [string]				    -- Character name
-    description = { [string] }		-- Character descriptions/biography
     chapters = { [chapter] }		-- Character chapters/content
     yearStart = [integer]			-- Birth/first appearance year
     yearEnd = [integer]				-- Death/last appearance year
     timeline = [integer]			-- Timeline ID
     factions = { [faction] }		-- Associated factions
-    relationships = { [relationship] } -- Character relationships
     author = [string]				-- Author of the character entry
 ]]
 --[[
@@ -59,14 +57,6 @@ function private.Core.Characters.TransformCharacterToBook(character)
         }
     )
     table.insert(data, title)
-
-    -- Add biography/description content
-    if ValidationUtils.IsValidTable(character.description) then
-        for key, description in pairs(character.description) do
-            local chapter = private.Core.Events.CreateChapter(nil, {description})
-            table.insert(data, chapter)
-        end
-    end
 
     return data
 end
@@ -131,7 +121,7 @@ function private.Core.Characters.GetCharactersByYearRange(characters, startYear,
 end
 
 --[[
-    Search characters by name or description
+    Search characters by name
     @param characters [table] List of characters
     @param searchText [string] Text to search for
     @return [table] Characters matching the search text
@@ -153,15 +143,6 @@ function private.Core.Characters.SearchCharacters(characters, searchText)
             -- Search in name
             if string.find(string.lower(character.name), lowerSearchText) then
                 return true
-            end
-
-            -- Search in descriptions
-            if ValidationUtils.IsValidTable(character.description) then
-                for _, desc in pairs(character.description) do
-                    if string.find(string.lower(desc), lowerSearchText) then
-                        return true
-                    end
-                end
             end
 
             return false

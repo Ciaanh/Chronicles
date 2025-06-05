@@ -281,22 +281,10 @@ function SearchEngine.cleanFactionObject(faction, libraryName)
         return nil
     end
 
-    -- Convert string description to chapter structure if needed
-    local chapters = faction.chapters
-    if not chapters and faction.description and type(faction.description) == "string" then
-        chapters = {
-            {
-                header = faction.name,
-                pages = {faction.description}
-            }
-        }
-    end
-
     return {
         id = faction.id,
         name = faction.name,
-        description = faction.description,
-        chapters = chapters,
+        chapters = faction.chapters,
         timeline = faction.timeline,
         source = libraryName
     }
@@ -417,22 +405,10 @@ function SearchEngine.cleanCharacterObject(character, libraryName)
         return nil
     end
 
-    -- Convert string description to chapter structure if needed
-    local chapters = character.chapters
-    if not chapters and character.description and type(character.description) == "string" then
-        chapters = {
-            {
-                header = character.name,
-                pages = {character.description}
-            }
-        }
-    end
-
     return {
         id = character.id,
         name = character.name,
-        description = character.description,
-        chapters = chapters,
+        chapters = character.chapters,
         timeline = character.timeline,
         factions = character.factions or {},
         source = libraryName
