@@ -49,19 +49,19 @@ function SearchEngine.searchEvents(yearStart, yearEnd)
         private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events")
         return foundEvents
     end
-    for libraryName, eventsGroup in pairs(chronicles.Data.Events) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, eventsGroup in pairs(chronicles.Data.Events) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
         private.Core.Logger.trace(
             "SearchEngine",
-            "Checking library: " .. libraryName .. " (active: " .. tostring(isLibraryActive) .. ")"
+            "Checking collection: " .. collectionName .. " (active: " .. tostring(isCollectionActive) .. ")"
         )
 
-        if isLibraryActive and eventsGroup and eventsGroup.data then
+        if isCollectionActive and eventsGroup and eventsGroup.data then
             local pluginEvents = SearchEngine.searchEventsInDB(yearStart, yearEnd, eventsGroup.data)
 
             for _, event in pairs(pluginEvents) do
-                local cleanEvent = SearchEngine.cleanEventObject(event, libraryName)
+                local cleanEvent = SearchEngine.cleanEventObject(event, collectionName)
                 if cleanEvent then
                     table.insert(foundEvents, cleanEvent)
                 end
@@ -139,10 +139,10 @@ end
 --[[
     Clean and format an event object for consumption
     @param event [table] Raw event object
-    @param libraryName [string] Source library name
+    @param collectionName [string] Source collection name
     @return [table] Cleaned event object
 ]]
-function SearchEngine.cleanEventObject(event, libraryName)
+function SearchEngine.cleanEventObject(event, collectionName)
     if not event then
         return nil
     end
@@ -156,7 +156,7 @@ function SearchEngine.cleanEventObject(event, libraryName)
         eventType = event.eventType,
         factions = event.factions or {},
         characters = event.characters or {},
-        source = libraryName,
+        source = collectionName,
         order = event.order or 0,
         author = event.author,
         timeline = event.timeline
@@ -185,13 +185,13 @@ function SearchEngine.searchFactions(name)
         return foundFactions
     end
 
-    for libraryName, factionsGroup in pairs(chronicles.Data.Factions) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, factionsGroup in pairs(chronicles.Data.Factions) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
-        if isLibraryActive and factionsGroup and factionsGroup.data then
+        if isCollectionActive and factionsGroup and factionsGroup.data then
             for _, faction in pairs(factionsGroup.data) do
                 if SearchEngine.matchesFactionSearch(faction, searchTerm) then
-                    local cleanFaction = SearchEngine.cleanFactionObject(faction, libraryName)
+                    local cleanFaction = SearchEngine.cleanFactionObject(faction, collectionName)
                     if cleanFaction then
                         table.insert(foundFactions, cleanFaction)
                     end
@@ -231,8 +231,8 @@ function SearchEngine.matchesFactionSearch(faction, searchTerm)
 end
 
 --[[
-    Find factions by their IDs across libraries
-    @param ids [table] Table mapping library names to arrays of faction IDs
+    Find factions by their IDs across collections
+    @param ids [table] Table mapping collection names to arrays of faction IDs
     @return [table] Array of found factions
 ]]
 function SearchEngine.findFactions(ids)
@@ -245,17 +245,17 @@ function SearchEngine.findFactions(ids)
         return foundFactions
     end
 
-    for libraryName, factionIds in pairs(ids) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, factionIds in pairs(ids) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
-        if isLibraryActive then
-            local factionsGroup = chronicles.Data.Factions[libraryName]
+        if isCollectionActive then
+            local factionsGroup = chronicles.Data.Factions[collectionName]
 
             if factionsGroup and factionsGroup.data and #factionsGroup.data > 0 then
                 for _, faction in pairs(factionsGroup.data) do
                     for _, targetId in ipairs(factionIds) do
                         if faction.id == targetId then
-                            local cleanFaction = SearchEngine.cleanFactionObject(faction, libraryName)
+                            local cleanFaction = SearchEngine.cleanFactionObject(faction, collectionName)
                             if cleanFaction then
                                 table.insert(foundFactions, cleanFaction)
                             end
@@ -273,10 +273,10 @@ end
 --[[
     Clean and format a faction object for consumption
     @param faction [table] Raw faction object
-    @param libraryName [string] Source library name
+    @param collectionName [string] Source collection name
     @return [table] Cleaned faction object
 ]]
-function SearchEngine.cleanFactionObject(faction, libraryName)
+function SearchEngine.cleanFactionObject(faction, collectionName)
     if not faction then
         return nil
     end
@@ -286,7 +286,7 @@ function SearchEngine.cleanFactionObject(faction, libraryName)
         name = faction.name,
         chapters = faction.chapters,
         timeline = faction.timeline,
-        source = libraryName
+        source = collectionName
     }
 end
 
@@ -309,13 +309,13 @@ function SearchEngine.searchCharacters(name)
         return foundCharacters
     end
 
-    for libraryName, charactersGroup in pairs(chronicles.Data.Characters) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, charactersGroup in pairs(chronicles.Data.Characters) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
-        if isLibraryActive and charactersGroup and charactersGroup.data then
+        if isCollectionActive and charactersGroup and charactersGroup.data then
             for _, character in pairs(charactersGroup.data) do
                 if SearchEngine.matchesCharacterSearch(character, searchTerm) then
-                    local cleanCharacter = SearchEngine.cleanCharacterObject(character, libraryName)
+                    local cleanCharacter = SearchEngine.cleanCharacterObject(character, collectionName)
                     if cleanCharacter then
                         table.insert(foundCharacters, cleanCharacter)
                     end
@@ -355,8 +355,8 @@ function SearchEngine.matchesCharacterSearch(character, searchTerm)
 end
 
 --[[
-    Find characters by their IDs across libraries
-    @param ids [table] Table mapping library names to arrays of character IDs
+    Find characters by their IDs across collections
+    @param ids [table] Table mapping collection names to arrays of character IDs
     @return [table] Array of found characters
 ]]
 function SearchEngine.findCharacters(ids)
@@ -369,17 +369,17 @@ function SearchEngine.findCharacters(ids)
         return foundCharacters
     end
 
-    for libraryName, characterIds in pairs(ids) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, characterIds in pairs(ids) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
-        if isLibraryActive then
-            local charactersGroup = chronicles.Data.Characters[libraryName]
+        if isCollectionActive then
+            local charactersGroup = chronicles.Data.Characters[collectionName]
 
             if charactersGroup and charactersGroup.data and #charactersGroup.data > 0 then
                 for _, character in pairs(charactersGroup.data) do
                     for _, targetId in ipairs(characterIds) do
                         if character.id == targetId then
-                            local cleanCharacter = SearchEngine.cleanCharacterObject(character, libraryName)
+                            local cleanCharacter = SearchEngine.cleanCharacterObject(character, collectionName)
                             if cleanCharacter then
                                 table.insert(foundCharacters, cleanCharacter)
                             end
@@ -397,10 +397,10 @@ end
 --[[
     Clean and format a character object for consumption
     @param character [table] Raw character object
-    @param libraryName [string] Source library name
+    @param collectionName [string] Source collection name
     @return [table] Cleaned character object
 ]]
-function SearchEngine.cleanCharacterObject(character, libraryName)
+function SearchEngine.cleanCharacterObject(character, collectionName)
     if not character then
         return nil
     end
@@ -411,7 +411,7 @@ function SearchEngine.cleanCharacterObject(character, libraryName)
         chapters = character.chapters,
         timeline = character.timeline,
         factions = character.factions or {},
-        source = libraryName
+        source = collectionName
     }
 end
 
@@ -435,10 +435,10 @@ function SearchEngine.hasEvents(yearStart, yearEnd)
         return false
     end
 
-    for libraryName, eventsGroup in pairs(chronicles.Data.Events) do
-        local isLibraryActive = chronicles.Data:GetLibraryStatus(libraryName)
+    for collectionName, eventsGroup in pairs(chronicles.Data.Events) do
+        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
 
-        if isLibraryActive and eventsGroup and eventsGroup.data then
+        if isCollectionActive and eventsGroup and eventsGroup.data then
             if SearchEngine.hasEventsInDB(yearStart, yearEnd, eventsGroup.data) then
                 return true
             end

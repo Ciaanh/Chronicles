@@ -2,7 +2,7 @@ local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- Event types
--- Libraries
+-- Collections
 -- My journal
 SettingsMixin = {}
 
@@ -22,10 +22,10 @@ function SettingsMixin:OnLoad()
                     Load = self.LoadEventTypes
                 },
                 {
-                    text = Locale["Libraries"],
-                    TabName = "Libraries",
-                    TabFrame = self.TabUI.Libraries,
-                    Load = self.LoadLibraries
+                    text = Locale["Collections"],
+                    TabName = "Collections",
+                    TabFrame = self.TabUI.Collections,
+                    Load = self.LoadCollections
                 }
             }
         },
@@ -69,7 +69,7 @@ function SettingsMixin:OnLoad()
         self.OnSettingsEventTypeChecked,
         self
     )
-    private.Core.registerCallback(private.constants.events.SettingsLibraryChecked, self.OnSettingsLibraryChecked, self)
+    private.Core.registerCallback(private.constants.events.SettingsCollectionChecked, self.OnSettingsCollectionChecked, self)
 
     -- Use state-based subscription for tab selection
     -- This provides a single source of truth for the active tab
@@ -127,8 +127,8 @@ function SettingsMixin:InitializeLocalizedText()
             if overview.EventTypesInfo then
                 overview.EventTypesInfo:SetText(Locale["SettingsHomeOverviewEventTypesInfo"])
             end
-            if overview.LibrariesInfo then
-                overview.LibrariesInfo:SetText(Locale["SettingsHomeOverviewLibrariesInfo"])
+            if overview.CollectionsInfo then
+                overview.CollectionsInfo:SetText(Locale["SettingsHomeOverviewCollectionsInfo"])
             end
             if overview.MyJournalInfo then
                 overview.MyJournalInfo:SetText(Locale["SettingsHomeOverviewMyJournalInfo"])
@@ -178,14 +178,14 @@ function SettingsMixin:InitializeLocalizedText()
         end
     end
 
-    -- Initialize Libraries tab
-    if self.TabUI and self.TabUI.Libraries then
-        local libraries = self.TabUI.Libraries
-        if libraries.Title then
-            libraries.Title:SetText(Locale["Event Libraries"])
+    -- Initialize Collections tab
+    if self.TabUI and self.TabUI.Collections then
+        local collections = self.TabUI.Collections
+        if collections.Title then
+            collections.Title:SetText(Locale["Event Collections"])
         end
-        if libraries.Description then
-            libraries.Description:SetText(Locale["LibrariesDescription"])
+        if collections.Description then
+            collections.Description:SetText(Locale["CollectionsDescription"])
         end
     end
 
@@ -364,29 +364,29 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
 end
 
-function SettingsMixin:OnSettingsLibraryChecked(eventData)
+function SettingsMixin:OnSettingsCollectionChecked(eventData)
     -- Validate event data
-    if not eventData or not eventData.libraryName then
-        private.Core.Logger.warn("Settings", "OnSettingsLibraryChecked called with invalid eventData")
+    if not eventData or not eventData.collectionName then
+        private.Core.Logger.warn("Settings", "OnSettingsCollectionChecked called with invalid eventData")
         return
     end
 
-    -- Extract the library name and checked status from the event data
-    local libraryName = eventData.libraryName
-    local isActive = eventData.isActive -- Update StateManager for library status
-    local path = "libraries." .. libraryName
-    private.Core.StateManager.setState(path, isActive, "Library setting changed")
+    -- Extract the collection name and checked status from the event data
+    local collectionName = eventData.collectionName
+    local isActive = eventData.isActive -- Update StateManager for collection status
+    local path = "collections." .. collectionName
+    private.Core.StateManager.setState(path, isActive, "Collection setting changed")
 
     private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods()
 
-    -- Invalidate caches when library status changes
+    -- Invalidate caches when collection status changes
     private.Core.Cache.invalidate("periodsFillingBySteps")
     private.Core.Cache.invalidate("searchCache")
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
 
-    private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsLibraryChecked")
+    private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsCollectionChecked")
 end
 
 function SettingsMixin:LoadSettingsHome(frame)
@@ -501,7 +501,7 @@ function SettingsMixin:LoadEventTypes(frame)
     scrollFrame:Show()
 end
 
-function SettingsMixin:LoadLibraries(frame)
+function SettingsMixin:LoadCollections(frame)
     local scrollFrame = frame.ScrollFrame
     if not scrollFrame then
         return
@@ -527,10 +527,10 @@ function SettingsMixin:LoadLibraries(frame)
     end
     content.checkboxes = {}
 
-    local libraries = private.Core.Cache.getLibrariesNames()
-    for _, library in ipairs(libraries) do
-        local libraryName = library.name
-        local text = Locale[libraryName] or libraryName
+    local collections = private.Core.Cache.getCollectionsNames()
+    for _, collection in ipairs(collections) do
+        local collectionName = collection.name
+        local text = Locale[collectionName] or collectionName
         local checkboxContainer = CreateFrame("Frame", nil, content)
         checkboxContainer:SetSize(400, 28)
 
@@ -538,21 +538,21 @@ function SettingsMixin:LoadLibraries(frame)
         newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
-        newCheckbox.libraryName = libraryName
+        newCheckbox.collectionName = collectionName
 
-        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetLibraryStatus(libraryName))
+        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetCollectionStatus(collectionName))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
                 local eventData = {
-                    libraryName = self.libraryName,
+                    collectionName = self.collectionName,
                     isActive = self:GetChecked()
                 }
 
                 private.Core.triggerEvent(
-                    private.constants.events.SettingsLibraryChecked,
+                    private.constants.events.SettingsCollectionChecked,
                     eventData,
-                    "Settings:LibraryCheckbox"
+                    "Settings:CollectionCheckbox"
                 )
             end
         )
@@ -605,7 +605,7 @@ function SettingsMixin:LoadMyJournal(frame)
             end
             chronicles.db.global.options.myjournal = isChecked
             private.Core.StateManager.setState(
-                "libraries." .. private.constants.configurationName.myjournal,
+                "collections." .. private.constants.configurationName.myjournal,
                 isChecked,
                 "MyJournal setting changed"
             )

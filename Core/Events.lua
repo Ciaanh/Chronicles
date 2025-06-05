@@ -132,7 +132,7 @@ function private.Core.Events.FilterEvents(events)
     for eventIndex in pairs(events) do
         local event = events[eventIndex]
 
-        local eventGroupStatus = private.Chronicles.Data:GetLibraryStatus(event.source)
+        local eventGroupStatus = private.Chronicles.Data:GetCollectionStatus(event.source)
         local eventTypeStatus = private.Chronicles.Data:GetEventTypeStatus(event.eventType)
 
         if eventGroupStatus and eventTypeStatus then

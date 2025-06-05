@@ -12,8 +12,8 @@ function EventBookMixin:OnLoad()
 			"ui.selectedEvent",
 			function(newEventSelection)
 				if newEventSelection and newEventSelection.eventId then
-					-- Fetch the full event object using both ID and library name
-					self:OnEventSelected(newEventSelection.eventId, newEventSelection.libraryName)
+					-- Fetch the full event object using both ID and collection name
+					self:OnEventSelected(newEventSelection.eventId, newEventSelection.collectionName)
 				else
 					self:OnUIRefresh()
 				end
@@ -40,29 +40,29 @@ function EventBookMixin:OnPagingButtonLeave()
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
 
-function EventBookMixin:GetEventById(eventId, libraryName)
-	-- FIRST: If library name is provided, try direct lookup in that specific library
-	if libraryName and Chronicles and Chronicles.Data and Chronicles.Data.Events then
-		local libraryData = Chronicles.Data.Events[libraryName]
-		if libraryData and libraryData.data and libraryData.data[eventId] then
-			return libraryData.data[eventId]
+function EventBookMixin:GetEventById(eventId, collectionName)
+	-- FIRST: If collection name is provided, try direct lookup in that specific collection
+	if collectionName and Chronicles and Chronicles.Data and Chronicles.Data.Events then
+		local collectionData = Chronicles.Data.Events[collectionName]
+		if collectionData and collectionData.data and collectionData.data[eventId] then
+			return collectionData.data[eventId]
 		end
 	end
 	-- SECOND: Try direct access to OriginsEventsDB (fastest fallback method)
 	if OriginsEventsDB and OriginsEventsDB[eventId] then
 		local eventData = OriginsEventsDB[eventId]
 		return eventData
-	end	-- THIRD: Try Chronicles.Data API (comprehensive search across all libraries)
+	end	-- THIRD: Try Chronicles.Data API (comprehensive search across all collections)
 	if Chronicles and Chronicles.Data then
-		-- Check active libraries
-		local libraries = Chronicles.Data:GetLibrariesNames()
-		local originsStatus = Chronicles.Data:GetLibraryStatus("Origins")
+		-- Check active collections
+		local collections = Chronicles.Data:GetCollectionsNames()
+		local originsStatus = Chronicles.Data:GetCollectionStatus("Origins")
 
 		-- Try accessing through registered databases
 		if Chronicles.Data.Events then
-			for libraryName, libraryData in pairs(Chronicles.Data.Events) do
-				if libraryData and libraryData.data then
-					local event = libraryData.data[eventId]
+			for collectionName, collectionData in pairs(Chronicles.Data.Events) do
+				if collectionData and collectionData.data then
+					local event = collectionData.data[eventId]
 					if event then
 						return event
 					end
@@ -82,8 +82,8 @@ function EventBookMixin:GetEventById(eventId, libraryName)
 	return nil
 end
 
-function EventBookMixin:OnEventSelected(eventId, libraryName)
-	local data = self:GetEventById(eventId, libraryName)
+function EventBookMixin:OnEventSelected(eventId, collectionName)
+	local data = self:GetEventById(eventId, collectionName)
 	if data then
 		local content = private.Core.Events.TransformEventToBook(data)
 		local dataProvider = CreateDataProvider(content)

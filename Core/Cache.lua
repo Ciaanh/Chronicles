@@ -16,14 +16,14 @@ local Cache = {
         periodsFillingBySteps = nil,
         minEventYear = nil,
         maxEventYear = nil,
-        librariesNames = nil,
+        collectionsNames = nil,
         searchCache = {} -- Cache for search results with yearStart_yearEnd keys
     },
     _dirty = {
         periodsFillingBySteps = true,
         minEventYear = true,
         maxEventYear = true,
-        librariesNames = true,
+        collectionsNames = true,
         searchCache = true
     }
 }
@@ -51,7 +51,7 @@ function private.Core.Cache.invalidate(cacheType)
             periodsFillingBySteps = nil,
             minEventYear = nil,
             maxEventYear = nil,
-            librariesNames = nil,
+            collectionsNames = nil,
             searchCache = {}
         }
         private.Core.Logger.trace("Cache", "Invalidated all caches")
@@ -135,15 +135,15 @@ function private.Core.Cache.getMaxEventYear()
     return result
 end
 
--- Get cached libraries names
-function private.Core.Cache.getLibrariesNames()
-    local cached = private.Core.Cache.get("librariesNames")
+-- Get cached collections names
+function private.Core.Cache.getCollectionsNames()
+    local cached = private.Core.Cache.get("collectionsNames")
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Rebuilding libraries names cache")
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetLibrariesNames()
-    private.Core.Cache.set("librariesNames", result)
+    private.Core.Logger.trace("Cache", "Rebuilding collections names cache")
+    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetCollectionsNames()
+    private.Core.Cache.set("collectionsNames", result)
     return result
 end
 
@@ -226,8 +226,8 @@ function private.Core.Cache.warmAllCaches()
     if Cache._dirty.maxEventYear then
         private.Core.Cache.getMaxEventYear()
     end
-    if Cache._dirty.librariesNames then
-        private.Core.Cache.getLibrariesNames()
+    if Cache._dirty.collectionsNames then
+        private.Core.Cache.getCollectionsNames()
     end
 
     private.Core.Cache.preWarmSearchCache()

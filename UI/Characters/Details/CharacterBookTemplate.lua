@@ -13,13 +13,13 @@ function CharacterDetailPageMixin:OnLoad()
 				if newCharacterSelection then
 					local characterData = nil
 					
-					-- Handle both new format {characterId, libraryName} and legacy format (just ID)
-					if type(newCharacterSelection) == "table" and newCharacterSelection.characterId and newCharacterSelection.libraryName then
-						-- New format with library-specific lookup
+					-- Handle both new format {characterId, collectionName} and legacy format (just ID)
+					if type(newCharacterSelection) == "table" and newCharacterSelection.characterId and newCharacterSelection.collectionName then
+						-- New format with collection-specific lookup
 						local characterId = newCharacterSelection.characterId
-						local libraryName = newCharacterSelection.libraryName
-						private.Core.Logger.debug("CharacterBook", "Character selection received - ID: " .. characterId .. ", Library: " .. libraryName)
-						characterData = self:GetCharacterById(characterId, libraryName)
+						local collectionName = newCharacterSelection.collectionName
+						private.Core.Logger.debug("CharacterBook", "Character selection received - ID: " .. characterId .. ", Collection: " .. collectionName)
+						characterData = self:GetCharacterById(characterId, collectionName)
 					else
 						-- Legacy format or fallback - treat as just character ID
 						local characterId = type(newCharacterSelection) == "table" and newCharacterSelection.characterId or newCharacterSelection
@@ -47,30 +47,30 @@ function CharacterDetailPageMixin:OnLoad()
 	self.SinglePageBookCornerFlipbook.Anim:Pause()
 end
 
-function CharacterDetailPageMixin:GetCharacterById(characterId, libraryName)
+function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
 	-- Use the Chronicles Data API to find the character by ID
 	if Chronicles and Chronicles.Data then
 		local characters = Chronicles.Data:SearchCharacters()
 		if characters then
-			-- If library name is provided, try direct lookup first for performance
-			if libraryName then
-				private.Core.Logger.debug("CharacterBook", "Attempting direct library lookup for character ID: " .. characterId .. " in library: " .. libraryName)
+			-- If collection name is provided, try direct lookup first for performance
+			if collectionName then
+				private.Core.Logger.debug("CharacterBook", "Attempting direct collection lookup for character ID: " .. characterId .. " in collection: " .. collectionName)
 				
 				for _, character in pairs(characters) do
-					if character.id == characterId and character.source == libraryName then
-						private.Core.Logger.debug("CharacterBook", "Found character via direct library lookup")
+					if character.id == characterId and character.source == collectionName then
+						private.Core.Logger.debug("CharacterBook", "Found character via direct collection lookup")
 						return character
 					end
 				end
 				
-				private.Core.Logger.warn("CharacterBook", "Character not found in specified library, falling back to general search")
+				private.Core.Logger.warn("CharacterBook", "Character not found in specified collection, falling back to general search")
 			end
 			
 			-- Fallback: search through all characters (maintains backward compatibility)
 			for _, character in pairs(characters) do
 				if character.id == characterId then
-					if libraryName then
-						private.Core.Logger.debug("CharacterBook", "Found character via fallback search (different library than expected)")
+					if collectionName then
+						private.Core.Logger.debug("CharacterBook", "Found character via fallback search (different collection than expected)")
 					end
 					return character
 				end
@@ -78,8 +78,8 @@ function CharacterDetailPageMixin:GetCharacterById(characterId, libraryName)
 		end
 	end
 	
-	if libraryName then
-		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId .. ", Library: " .. libraryName)
+	if collectionName then
+		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId .. ", Collection: " .. collectionName)
 	else
 		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId)
 	end

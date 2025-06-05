@@ -23,7 +23,7 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     }
     events = {
         showEventTypes = { [number] }   -- Enabled event type IDs
-        showLibraries = { [string] }    -- Enabled library names
+        showCollections = { [string] }    -- Enabled collection names
         sortBy = [string]               -- Default sort method
         filterByTimeline = [boolean]    -- Filter events by current timeline
     }
@@ -61,7 +61,7 @@ local DEFAULT_SETTINGS = {
     },
     events = {
         showEventTypes = {},
-        showLibraries = {},
+        showCollections = {},
         sortBy = "year",
         filterByTimeline = true
     },

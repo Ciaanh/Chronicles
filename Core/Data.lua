@@ -71,8 +71,8 @@ function Chronicles.Data:GetPeriodsFillingBySteps()
         mod10 = {}
         --mod1 = {}
     }
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        if Chronicles.Data:GetLibraryStatus(libraryName) then
+    for collectionName, eventsGroup in pairs(Chronicles.Data.Events) do
+        if Chronicles.Data:GetCollectionStatus(collectionName) then
             if eventsGroup and eventsGroup.data then
                 for _, event in pairs(eventsGroup.data) do
                     if (event ~= nil) then
@@ -156,8 +156,8 @@ end
 function Chronicles.Data:MinEventYear()
     local MinEventYear = 0
 
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = self:GetLibraryStatus(libraryName)
+    for collectionName, eventsGroup in pairs(Chronicles.Data.Events) do
+        local isActive = self:GetCollectionStatus(collectionName)
         if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
@@ -174,8 +174,8 @@ end
 function Chronicles.Data:MaxEventYear()
     local MaxEventYear = 0
 
-    for libraryName, eventsGroup in pairs(Chronicles.Data.Events) do
-        local isActive = self:GetLibraryStatus(libraryName)
+    for collectionName, eventsGroup in pairs(Chronicles.Data.Events) do
+        local isActive = self:GetCollectionStatus(collectionName)
         if (isActive) then
             for eventIndex, event in pairs(eventsGroup.data) do
                 local isEventTypeActive = self:GetEventTypeStatus(event.eventType)
@@ -223,14 +223,14 @@ function Chronicles.Data:IsInRange(event, yearStart, yearEnd)
     return private.Core.Data.SearchEngine.isEventInRange(event, yearStart, yearEnd)
 end
 
-function Chronicles.Data:CleanEventObject(event, libraryName)
+function Chronicles.Data:CleanEventObject(event, collectionName)
     -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
         private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean event object")
         return nil
     end
     -- Delegate to SearchEngine
-    return private.Core.Data.SearchEngine.cleanEventObject(event, libraryName)
+    return private.Core.Data.SearchEngine.cleanEventObject(event, collectionName)
 end
 
 -- Search factions ----------------------------------------------------------------------
@@ -255,14 +255,14 @@ function Chronicles.Data:FindFactions(ids)
     return private.Core.Data.SearchEngine.findFactions(ids)
 end
 
-function Chronicles.Data:CleanFactionObject(faction, libraryName)
+function Chronicles.Data:CleanFactionObject(faction, collectionName)
     -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
         private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean faction object")
         return nil
     end
     -- Delegate to SearchEngine
-    return private.Core.Data.SearchEngine.cleanFactionObject(faction, libraryName)
+    return private.Core.Data.SearchEngine.cleanFactionObject(faction, collectionName)
 end
 
 -- Search characters --------------------------------------------------------------------
@@ -287,14 +287,14 @@ function Chronicles.Data:FindCharacters(ids)
     return private.Core.Data.SearchEngine.findCharacters(ids)
 end
 
-function Chronicles.Data:CleanCharacterObject(character, libraryName)
+function Chronicles.Data:CleanCharacterObject(character, collectionName)
     -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
         private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean character object")
         return nil
     end
     -- Delegate to SearchEngine
-    return private.Core.Data.SearchEngine.cleanCharacterObject(character, libraryName)
+    return private.Core.Data.SearchEngine.cleanCharacterObject(character, collectionName)
 end
 
 -----------------------------------------------------------------------------------------
@@ -303,55 +303,55 @@ end
 -----------------------------------------------------------------------------------------
 -- External DB tools --------------------------------------------------------------------
 -----------------------------------------------------------------------------------------
-function Chronicles.Data:RegisterEventDB(libraryName, db)
+function Chronicles.Data:RegisterEventDB(collectionName, db)
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. libraryName)
+        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
     -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.registerEventDB(libraryName, db)
+    return private.Core.Data.DataRegistry.registerEventDB(collectionName, db)
 end
 
-function Chronicles.Data:RegisterCharacterDB(libraryName, db)
+function Chronicles.Data:RegisterCharacterDB(collectionName, db)
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. libraryName)
+        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
     -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.registerCharacterDB(libraryName, db)
+    return private.Core.Data.DataRegistry.registerCharacterDB(collectionName, db)
 end
 
-function Chronicles.Data:RegisterFactionDB(libraryName, db)
+function Chronicles.Data:RegisterFactionDB(collectionName, db)
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. libraryName)
+        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
     -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.registerFactionDB(libraryName, db)
+    return private.Core.Data.DataRegistry.registerFactionDB(collectionName, db)
 end
 
-function Chronicles.Data:GetLibrariesNames()
+function Chronicles.Data:GetCollectionsNames()
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get libraries names")
+        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get collections names")
         return {}
     end
     -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.getLibrariesNames()
+    return private.Core.Data.DataRegistry.getCollectionsNames()
 end
 
-function Chronicles.Data:GetLibraryStatus(libraryName)
+function Chronicles.Data:GetCollectionStatus(collectionName)
     -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get library status")
+        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get collection status")
         return false
     end
 
     -- Delegate to DataRegistry
-    return private.Core.Data.DataRegistry.getLibraryStatus(libraryName)
+    return private.Core.Data.DataRegistry.getCollectionStatus(collectionName)
 end
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)

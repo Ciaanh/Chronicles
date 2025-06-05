@@ -235,7 +235,7 @@
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="LibrariesInfo" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="CollectionsInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
@@ -245,7 +245,7 @@
                                         <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.LibrariesInfo" x="0" y="-5"/>
+                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.CollectionsInfo" x="0" y="-5"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
@@ -421,8 +421,8 @@
                         </Scripts>
                     </Frame>
 
-                    <!-- Event Libraries Configuration Tab -->
-                    <Frame parentKey="Libraries" frameLevel="100" hidden="true">
+                    <!-- Event Collections Configuration Tab -->
+                    <Frame parentKey="Collections" frameLevel="100" hidden="true">
                         <Anchors>
                             <Anchor point="TOPLEFT" x="15" y="-15"/>
                             <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>

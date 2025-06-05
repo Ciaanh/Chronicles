@@ -1,12 +1,12 @@
 --[[
     Chronicles DataRegistry Module
     
-    Handles database registration and library status management functionality.
+    Handles database registration and collection status management functionality.
     
     RESPONSIBILITIES:
     - Database registration (Events, Factions, Characters)
-    - Library status management (Get/Set library status)
-    - Library enumeration and state management
+    - Collection status management (Get/Set collection status)
+    - Collection enumeration and state management
     - Cross-database status synchronization
 --]]
 local FOLDER_NAME, private = ...
@@ -26,176 +26,176 @@ local DataRegistry = private.Core.Data.DataRegistry
 -----------------------------------------------------------------------------------------
 
 --[[
-    Register an Events database for a library
-    @param libraryName [string] Name of the library/plugin
+    Register an Events database for a collection
+    @param collectionName [string] Name of the collection/plugin
     @param db [table] Events database to register
     @return [boolean] Success status
 ]]
-function DataRegistry.registerEventDB(libraryName, db) -- Ensure Chronicles.Data is initialized
+function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. libraryName
+            "Chronicles.Data not initialized when trying to register " .. collectionName
         )
         return false
     end
 
-    if chronicles.Data.Events[libraryName] ~= nil then
-        private.Core.Logger.error("DataRegistry", libraryName .. " is already registered by another plugin in Events.")
+    if chronicles.Data.Events[collectionName] ~= nil then
+        private.Core.Logger.error("DataRegistry", collectionName .. " is already registered by another plugin in Events.")
         return false
     end
     if db == nil then
         private.Core.Logger.warn(
             "DataRegistry",
-            "Library '" .. libraryName .. "' is trying to register a nil events database."
+            "Collection '" .. collectionName .. "' is trying to register a nil events database."
         )
     end -- Use StateManager path for status management
-    local dbTypePath = "libraries." .. libraryName
+    local dbTypePath = "collections." .. collectionName
     local isActive = private.Core.StateManager.getState(dbTypePath)
 
     -- Only set default value if no saved state exists
-    -- If the library status is already set (either from saved state or previous registration), don't overwrite it
+    -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
-        -- Check if StateManager has loaded saved state - if so, respect the absence of this library
+        -- Check if StateManager has loaded saved state - if so, respect the absence of this collection
         -- (it might have been disabled and removed from saved state)
         if private.Core.StateManager.isStateLoaded() then
-            -- StateManager has loaded, so absence means this library is new or was removed
-            -- For new libraries after initial setup, default to true
+            -- StateManager has loaded, so absence means this collection is new or was removed
+            -- For new collections after initial setup, default to true
             isActive = true
         else
             -- StateManager hasn't loaded yet, default to true for first-time initialization
             isActive = true
         end
-        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
+        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
-    chronicles.Data.Events[libraryName] = {
+    chronicles.Data.Events[collectionName] = {
         data = db or {}, -- Ensure data is never nil
-        name = libraryName
+        name = collectionName
     }
 
     -- Invalidate caches since we registered new event data
     private.Core.Cache.invalidate("periodsFillingBySteps")
     private.Core.Cache.invalidate("minEventYear")
     private.Core.Cache.invalidate("maxEventYear")
-    private.Core.Cache.invalidate("librariesNames")
+    private.Core.Cache.invalidate("collectionsNames")
     private.Core.Cache.invalidate("searchCache")
 
     return true
 end
 
 --[[
-    Register a Factions database for a library
-    @param libraryName [string] Name of the library/plugin
+    Register a Factions database for a collection
+    @param collectionName [string] Name of the collection/plugin
     @param db [table] Factions database to register
     @return [boolean] Success status
 ]]
-function DataRegistry.registerFactionDB(libraryName, db)
+function DataRegistry.registerFactionDB(collectionName, db)
     -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. libraryName
+            "Chronicles.Data not initialized when trying to register " .. collectionName
         )
         return false
     end
-    if chronicles.Data.Factions[libraryName] ~= nil then
+    if chronicles.Data.Factions[collectionName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
-            libraryName .. " is already registered by another plugin in Factions."
+            collectionName .. " is already registered by another plugin in Factions."
         )
         return false
     end
     -- Use StateManager path for status management
-    local dbTypePath = "libraries." .. libraryName
+    local dbTypePath = "collections." .. collectionName
     local isActive = private.Core.StateManager.getState(dbTypePath)
 
     -- Only set default value if no saved state exists
-    -- If the library status is already set (either from saved state or previous registration), don't overwrite it
+    -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
         if private.Core.StateManager.isStateLoaded() then
-            isActive = true -- New library after initial setup
+            isActive = true -- New collection after initial setup
         else
             isActive = true -- First-time initialization
         end
-        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
+        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
-    chronicles.Data.Factions[libraryName] = {
+    chronicles.Data.Factions[collectionName] = {
         data = db,
-        name = libraryName
+        name = collectionName
     }
 
     return true
 end
 
 --[[
-    Register a Characters database for a library
-    @param libraryName [string] Name of the library/plugin
+    Register a Characters database for a collection
+    @param collectionName [string] Name of the collection/plugin
     @param db [table] Characters database to register
     @return [boolean] Success status
 ]]
-function DataRegistry.registerCharacterDB(libraryName, db)
+function DataRegistry.registerCharacterDB(collectionName, db)
     -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. libraryName
+            "Chronicles.Data not initialized when trying to register " .. collectionName
         )
         return false
     end
-    if chronicles.Data.Characters[libraryName] ~= nil then
+    if chronicles.Data.Characters[collectionName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
-            libraryName .. " is already registered by another plugin in Characters."
+            collectionName .. " is already registered by another plugin in Characters."
         )
         return false
     end -- Use StateManager path for status management
-    local dbTypePath = "libraries." .. libraryName
+    local dbTypePath = "collections." .. collectionName
     local isActive = private.Core.StateManager.getState(dbTypePath)
 
     -- Only set default value if no saved state exists
-    -- If the library status is already set (either from saved state or previous registration), don't overwrite it
+    -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
         if private.Core.StateManager.isStateLoaded() then
-            isActive = true -- New library after initial setup
+            isActive = true -- New collection after initial setup
         else
             isActive = true -- First-time initialization
         end
-        private.Core.StateManager.setState(dbTypePath, isActive, "Library status initialization: " .. libraryName)
+        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
-    chronicles.Data.Characters[libraryName] = {
+    chronicles.Data.Characters[collectionName] = {
         data = db,
-        name = libraryName
+        name = collectionName
     }
 
     return true
 end
 
 -----------------------------------------------------------------------------------------
--- Library Status Management -----------------------------------------------------------
+-- Collection Status Management -----------------------------------------------------------
 -----------------------------------------------------------------------------------------
 
 --[[
-    Get the status of a library (whether it's active/enabled)
-    @param libraryName [string] Name of the library
-    @return [boolean] Library status (true if active)
+    Get the status of a collection (whether it's active/enabled)
+    @param collectionName [string] Name of the collection
+    @return [boolean] Collection status (true if active)
 ]]
-function DataRegistry.getLibraryStatus(libraryName) -- Ensure Chronicles.Data is initialized
+function DataRegistry.getCollectionStatus(collectionName) -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to get library status for " .. libraryName
+            "Chronicles.Data not initialized when trying to get collection status for " .. collectionName
         )
         return false
     end
 
-    local dbTypePath = "libraries." .. libraryName
+    local dbTypePath = "collections." .. collectionName
     local isActive = private.Core.StateManager.getState(dbTypePath)
 
     if isActive ~= nil and isActive then
@@ -206,7 +206,7 @@ function DataRegistry.getLibraryStatus(libraryName) -- Ensure Chronicles.Data is
 end
 
 -----------------------------------------------------------------------------------------
--- Library Enumeration and Utilities ---------------------------------------------------
+-- Collection Enumeration and Utilities ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 
 --[[
@@ -225,26 +225,26 @@ local function existInTable(value, lookUpTable)
 end
 
 --[[
-    Get a list of all registered libraries with their status
-    @return [table] Array of library information objects
+    Get a list of all registered collections with their status
+    @return [table] Array of collection information objects
 ]]
-function DataRegistry.getLibrariesNames()
+function DataRegistry.getCollectionsNames()
     -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("DataRegistry", "Chronicles.Data not initialized when trying to get libraries names")
+        private.Core.Logger.error("DataRegistry", "Chronicles.Data not initialized when trying to get collections names")
         return {}
     end
 
-    local dataGroups = {} -- Process Events libraries using StateManager paths
-    for eventLibraryName, group in pairs(chronicles.Data.Events) do
-        if (eventLibraryName ~= "myjournal") then
-            local dbTypePath = "libraries." .. eventLibraryName
+    local dataGroups = {} -- Process Events collections using StateManager paths
+    for eventCollectionName, group in pairs(chronicles.Data.Events) do
+        if (eventCollectionName ~= "myjournal") then
+            local dbTypePath = "collections." .. eventCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
                 -- Only set default if StateManager hasn't loaded saved state yet
                 if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New library after initial setup
+                    isActive = true -- New collection after initial setup
                 else
                     isActive = true -- First-time initialization
                 end
@@ -254,20 +254,20 @@ function DataRegistry.getLibrariesNames()
                 isActive = isActive
             }
 
-            if not existInTable(eventLibraryName, dataGroups) then
+            if not existInTable(eventCollectionName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end
     end
-    -- Process Factions libraries using StateManager paths
-    for factionLibraryName, group in pairs(chronicles.Data.Factions) do
-        if (factionLibraryName ~= "myjournal") then
-            local dbTypePath = "libraries." .. factionLibraryName
+    -- Process Factions collections using StateManager paths
+    for factionCollectionName, group in pairs(chronicles.Data.Factions) do
+        if (factionCollectionName ~= "myjournal") then
+            local dbTypePath = "collections." .. factionCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
                 -- Only set default if StateManager hasn't loaded saved state yet
                 if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New library after initial setup
+                    isActive = true -- New collection after initial setup
                 else
                     isActive = true -- First-time initialization
                 end
@@ -277,20 +277,20 @@ function DataRegistry.getLibrariesNames()
                 isActive = isActive
             }
 
-            if not existInTable(factionLibraryName, dataGroups) then
+            if not existInTable(factionCollectionName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end
     end
-    -- Process Characters libraries using StateManager paths
-    for characterLibraryName, group in pairs(chronicles.Data.Characters) do
-        if (characterLibraryName ~= "myjournal") then
-            local dbTypePath = "libraries." .. characterLibraryName
+    -- Process Characters collections using StateManager paths
+    for characterCollectionName, group in pairs(chronicles.Data.Characters) do
+        if (characterCollectionName ~= "myjournal") then
+            local dbTypePath = "collections." .. characterCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
                 -- Only set default if StateManager hasn't loaded saved state yet
                 if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New library after initial setup
+                    isActive = true -- New collection after initial setup
                 else
                     isActive = true -- First-time initialization
                 end
@@ -300,7 +300,7 @@ function DataRegistry.getLibrariesNames()
                 isActive = isActive
             }
 
-            if not existInTable(characterLibraryName, dataGroups) then
+            if not existInTable(characterCollectionName, dataGroups) then
                 table.insert(dataGroups, groupProjection)
             end
         end

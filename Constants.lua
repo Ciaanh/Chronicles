@@ -55,7 +55,7 @@ constants.config = {
 	eventFilter = {
 		pageSize = 7
 	},
-	librariesFilter = {
+	collectionsFilter = {
 		pageSize = 7
 	},
 	myJournal = {
@@ -93,7 +93,7 @@ constants.events = {
 	MainFrameUICloseFrame = "MainFrameUI.CloseFrame",
 	SettingsTabSelected = "Settings.TAB_SELECTED",
 	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
-	SettingsLibraryChecked = "Settings.LIBRARY_CHECKED",
+	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED",
 	-- New event management events
 	EventManagerError = "EventManager.ERROR",
 	EventValidationFailed = "EventManager.VALIDATION_FAILED",

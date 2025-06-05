@@ -13,13 +13,13 @@ function FactionDetailPageMixin:OnLoad()
 				if newFactionSelection then
 					local factionData = nil
 					
-					-- Handle both new format {factionId, libraryName} and legacy format (just ID)
-					if type(newFactionSelection) == "table" and newFactionSelection.factionId and newFactionSelection.libraryName then
-						-- New format with library-specific lookup
+					-- Handle both new format {factionId, collectionName} and legacy format (just ID)
+					if type(newFactionSelection) == "table" and newFactionSelection.factionId and newFactionSelection.collectionName then
+						-- New format with collection-specific lookup
 						local factionId = newFactionSelection.factionId
-						local libraryName = newFactionSelection.libraryName
-						private.Core.Logger.debug("FactionBook", "Faction selection received - ID: " .. factionId .. ", Library: " .. libraryName)
-						factionData = self:GetFactionById(factionId, libraryName)
+						local collectionName = newFactionSelection.collectionName
+						private.Core.Logger.debug("FactionBook", "Faction selection received - ID: " .. factionId .. ", Collection: " .. collectionName)
+						factionData = self:GetFactionById(factionId, collectionName)
 					else
 						-- Legacy format or fallback - treat as just faction ID
 						local factionId = type(newFactionSelection) == "table" and newFactionSelection.factionId or newFactionSelection
@@ -56,30 +56,30 @@ function FactionDetailPageMixin:OnPagingButtonLeave()
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
 
-function FactionDetailPageMixin:GetFactionById(factionId, libraryName)
+function FactionDetailPageMixin:GetFactionById(factionId, collectionName)
 	-- Use the Chronicles Data API to find the faction by ID
 	if Chronicles and Chronicles.Data then
 		local factions = Chronicles.Data:SearchFactions()
 		if factions then
-			-- If library name is provided, try direct lookup first for performance
-			if libraryName then
-				private.Core.Logger.debug("FactionBook", "Attempting direct library lookup for faction ID: " .. factionId .. " in library: " .. libraryName)
+			-- If collection name is provided, try direct lookup first for performance
+			if collectionName then
+				private.Core.Logger.debug("FactionBook", "Attempting direct collection lookup for faction ID: " .. factionId .. " in collection: " .. collectionName)
 				
 				for _, faction in pairs(factions) do
-					if faction.id == factionId and faction.source == libraryName then
-						private.Core.Logger.debug("FactionBook", "Found faction via direct library lookup")
+					if faction.id == factionId and faction.source == collectionName then
+						private.Core.Logger.debug("FactionBook", "Found faction via direct collection lookup")
 						return faction
 					end
 				end
 				
-				private.Core.Logger.warn("FactionBook", "Faction not found in specified library, falling back to general search")
+				private.Core.Logger.warn("FactionBook", "Faction not found in specified collection, falling back to general search")
 			end
 			
 			-- Fallback: search through all factions (maintains backward compatibility)
 			for _, faction in pairs(factions) do
 				if faction.id == factionId then
-					if libraryName then
-						private.Core.Logger.debug("FactionBook", "Found faction via fallback search (different library than expected)")
+					if collectionName then
+						private.Core.Logger.debug("FactionBook", "Found faction via fallback search (different collection than expected)")
 					end
 					return faction
 				end
@@ -87,8 +87,8 @@ function FactionDetailPageMixin:GetFactionById(factionId, libraryName)
 		end
 	end
 	
-	if libraryName then
-		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId .. ", Library: " .. libraryName)
+	if collectionName then
+		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId .. ", Collection: " .. collectionName)
 	else
 		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId)
 	end

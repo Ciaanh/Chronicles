@@ -44,7 +44,7 @@ local StateManager = {
         },
         settings = {
             eventTypes = {},
-            libraries = {},
+            collections = {},
             debugMode = false
         },
         data = {
@@ -330,7 +330,7 @@ function private.Core.StateManager.loadState()
         if Chronicles.db.global.dataState then
             StateManager.state.data = deepCopy(Chronicles.db.global.dataState)
         end
-    end -- Mark as loaded to prevent library registrations from overriding saved state
+    end -- Mark as loaded to prevent collection registrations from overriding saved state
     StateManager.isLoaded = true
 
     -- Trigger notifications for loaded state values that UI components need to react to

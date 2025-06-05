@@ -19,9 +19,9 @@ local FilterEngine = private.Core.Business.FilterEngine
             enabled = [boolean],
             allowedTypes = { [number] }  -- Array of event type IDs
         },
-        libraries = {
+        collections = {
             enabled = [boolean],
-            allowedLibraries = { [string] }  -- Array of library names
+            allowedCollections = { [string] }  -- Array of collection names
         },
         timelines = {
             enabled = [boolean],
@@ -70,9 +70,9 @@ function FilterEngine.ApplyFilters(events, filters)
         filteredEvents = FilterEngine.FilterByEventTypes(filteredEvents, filters.eventTypes.allowedTypes)
     end
 
-    -- Apply library filter
-    if filters.libraries and filters.libraries.enabled then
-        filteredEvents = FilterEngine.FilterByLibraries(filteredEvents, filters.libraries.allowedLibraries)
+    -- Apply collection filter
+    if filters.collections and filters.collections.enabled then
+        filteredEvents = FilterEngine.FilterByCollections(filteredEvents, filters.collections.allowedCollections)
     end
 
     -- Apply timeline filter
@@ -154,17 +154,17 @@ function FilterEngine.FilterByEventTypes(events, allowedTypes)
 end
 
 --[[
-    Filter events by library sources
+    Filter events by collection sources
     @param events [table] List of events
-    @param allowedLibraries [table] Array of allowed library names
+    @param allowedCollections [table] Array of allowed collection names
     @return [table] Filtered events
 ]]
-function FilterEngine.FilterByLibraries(events, allowedLibraries)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedLibraries) then
+function FilterEngine.FilterByCollections(events, allowedCollections)
+    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedCollections) then
         return events
     end
 
-    local allowedLibrarySet = TableUtils.Set(allowedLibraries)
+    local allowedCollectionSet = TableUtils.Set(allowedCollections)
 
     return TableUtils.Filter(
         events,
@@ -173,7 +173,7 @@ function FilterEngine.FilterByLibraries(events, allowedLibraries)
                 return false
             end
 
-            return allowedLibrarySet[event.source] == true
+            return allowedCollectionSet[event.source] == true
         end
     )
 end
@@ -323,9 +323,9 @@ function FilterEngine.CreateFilterConfig(options)
             enabled = options.enableEventTypes or false,
             allowedTypes = options.allowedEventTypes or {}
         },
-        libraries = {
-            enabled = options.enableLibraries or false,
-            allowedLibraries = options.allowedLibraries or {}
+        collections = {
+            enabled = options.enableCollections or false,
+            allowedCollections = options.allowedCollections or {}
         },
         timelines = {
             enabled = options.enableTimelines or false,

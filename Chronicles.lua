@@ -23,7 +23,7 @@ local defaults = {
         },
         settingsState = {
             eventTypes = {},
-            libraries = {},
+            collections = {},
             debugMode = false
         },
         dataState = {
@@ -75,7 +75,7 @@ function Chronicles:OnInitialize()
         end
     )
 
-    -- Initialize state manager BEFORE loading data to ensure saved state is available during library registration
+    -- Initialize state manager BEFORE loading data to ensure saved state is available during collection registration
     if private.Core.StateManager then
         private.Core.StateManager.init()
     end
