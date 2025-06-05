@@ -1,5 +1,40 @@
 local FOLDER_NAME, private = ...
 
+--[[
+=================================================================================
+Module: StringUtils
+Purpose: String manipulation and text processing utilities
+Dependencies: WoW UI API for text measurement
+Author: Chronicles Team
+=================================================================================
+
+This module provides string utilities including:
+- Text trimming and cleaning
+- HTML content detection and removal
+- Text width measurement and wrapping
+- Tooltip text adjustment for UI display
+
+Key Features:
+- Smart text wrapping based on UI frame width
+- HTML tag removal for plain text display
+- Text length adjustment with ellipsis
+- Tooltip integration for truncated text
+
+Usage Example:
+    local trimmed = StringUtils.Trim("  text  ")
+    local lines = StringUtils.SplitTextToFitWidth(text, 300)
+    local clean = StringUtils.CleanHTML(htmlContent)
+
+Global Exports (Backwards Compatibility):
+This module intentionally exports functions to global namespace for backwards
+compatibility with existing code and external integrations. This pattern allows
+both modern module-style access and legacy global function calls.
+
+Dependencies:
+- WoW UI API for CreateFrame and FontString measurement
+=================================================================================
+]]
+
 private.Core.Utils = private.Core.Utils or {}
 private.Core.Utils.StringUtils = {}
 
@@ -121,9 +156,19 @@ function StringUtils.AdjustTextLength(text, size, frame)
             function()
             end
         )
-    end
-    return adjustedText
+    end    return adjustedText
 end
+
+-- -------------------------
+-- Global Exports (Backwards Compatibility)
+-- -------------------------
+-- The following global exports are intentionally maintained for backwards compatibility
+-- with existing code and external integrations. This allows both modern module-style
+-- access (StringUtils.Trim) and legacy global function calls (_G.Trim).
+-- 
+-- Usage patterns supported:
+-- Modern: private.Core.Utils.StringUtils.Trim(text)
+-- Legacy: Trim(text) or _G.Trim(text)
 
 -- Export utility functions globally for backwards compatibility
 _G.Trim = StringUtils.Trim

@@ -1,9 +1,66 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
+--[[
+=================================================================================
+Module: MainFrameUI
+Purpose: Main user interface controller and tab system management
+Dependencies: AceLocale-3.0, StateManager, WoW UI API
+Author: Chronicles Team
+=================================================================================
+
+This module manages the main Chronicles interface including:
+- Main frame show/hide functionality
+- Tab system coordination
+- UI state management integration
+- Sound feedback for user interactions
+
+Key UI Event Flow Patterns:
+
+1. Main Frame Lifecycle:
+   User Action → UI Panel Toggle → State Update → Sound Feedback
+   
+2. Tab Navigation Flow:
+   Tab Click → Tab Validation → Content Switch → State Persistence → Event Trigger
+   
+3. State Integration Pattern:
+   UI Change → StateManager.setState() → State Subscribers Notified → UI Updates
+   
+4. Sound Integration:
+   UI Actions → Appropriate Sound Playback → Enhanced User Experience
+
+Event Integration Patterns:
+- MainFrameUI manages top-level UI state
+- TabUI coordinates between different content areas
+- State changes trigger automatic UI synchronization
+- Events propagate to child components (Events, Characters, Factions)
+
+UI Architecture:
+- MainFrameUIMixin: Top-level frame management
+- TabUIMixin: Tab system and navigation
+- Child mixins: Content-specific UI logic
+
+Dependencies:
+- AceLocale-3.0: UI text localization
+- StateManager: Centralized state persistence
+- WoW UI API: Frame management and sound system
+=================================================================================
+]]
+
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI = {}
+
+--[[
+    Toggle the main Chronicles interface window
+    
+    Handles showing/hiding the main UI panel with proper WoW UI integration.
+    Uses WoW's ShowUIPanel/HideUIPanel for proper panel management and
+    integration with the game's UI system.
+    
+    @example
+        Chronicles.UI.DisplayWindow() -- Toggles window visibility
+]]
 function Chronicles.UI.DisplayWindow()
 	local alreadyShowing = MainFrameUI:IsShown()
 
@@ -14,14 +71,31 @@ function Chronicles.UI.DisplayWindow()
 	end
 end
 
------------------------------------------------------------------------------------------
--- Main UI Fonctions --------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Main UI Functions
+-- -------------------------
 MainFrameUIMixin = {}
 
+--[[
+    Initialize the main frame UI component
+    
+    Called automatically when the frame is created. Sets up initial state
+    and prepares the frame for display.
+]]
 function MainFrameUIMixin:OnLoad()
 end
 
+--[[
+    Handle main frame becoming visible
+    
+    Triggers when the main Chronicles window is shown to the user. Updates
+    tabs, manages application state, and provides audio feedback.
+    
+    Event Flow:
+    1. Update tab system to reflect current state
+    2. Set global UI state to indicate frame is open
+    3. Play appropriate UI sound for user feedback
+]]
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs()
 	-- Update state instead of triggering event - provides single source of truth
@@ -31,6 +105,16 @@ function MainFrameUIMixin:OnShow()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
 
+--[[
+    Handle main frame becoming hidden
+    
+    Triggers when the main Chronicles window is closed. Updates application
+    state and provides audio feedback.
+    
+    Event Flow:
+    1. Play appropriate UI sound for user feedback
+    2. Update global UI state to indicate frame is closed
+]]
 function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW)
 	-- Update state instead of triggering event - provides single source of truth
@@ -39,9 +123,9 @@ function MainFrameUIMixin:OnHide()
 	end
 end
 
------------------------------------------------------------------------------------------
--- Tab UI Fonctions ---------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Tab UI Functions
+-- -------------------------
 
 TabUIMixin = {}
 

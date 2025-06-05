@@ -1,11 +1,55 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
+--[[
+=================================================================================
+Module: StateManager
+Purpose: Centralized application state management with persistence
+Dependencies: AceDB-3.0 (via Chronicles.db), TableUtils patterns
+Author: Chronicles Team
+=================================================================================
+
+This module provides comprehensive state management for Chronicles:
+- Centralized state storage with nested path access
+- State change notifications and subscriptions
+- Automatic persistence via AceDB-3.0 integration
+- State history tracking for debugging
+- Safe state access with validation
+
+Key Features:
+- Dot-notation path access (e.g., "ui.selectedEvent")
+- Subscribe/unsubscribe pattern for state changes
+- Automatic saving to persistent storage
+- State change history with debugging support
+- Safe getters with default values
+
+State Structure:
+- ui.* - User interface state (selected items, frame states)
+- timeline.* - Timeline view state (periods, navigation)
+- settings.* - User preferences and configuration
+- data.* - Data caching and refresh tracking
+
+Usage Example:
+    StateManager.setState("ui.selectedEvent", eventId, "User selection")
+    local eventId = StateManager.getState("ui.selectedEvent")
+    StateManager.subscribe("ui.selectedEvent", callback, "ModuleName")
+
+Event Integration:
+- Automatically triggers events.StateChanged when state updates
+- Integrates with Timeline and UI modules for state synchronization
+- Supports undo/redo through state history
+
+Dependencies:
+- Chronicles.db for persistence (AceDB-3.0)
+- Internal deep copy utility to avoid TableUtils dependency
+=================================================================================
+]]
+
 private.Core.StateManager = {}
 
------------------------------------------------------------------------------------------
--- Local Utilities ---------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Local Utilities
+-- -------------------------
 
 -- Local deep copy function (to avoid dependency on TableUtils)
 local function deepCopy(original)
@@ -22,9 +66,9 @@ local function deepCopy(original)
     return copy
 end
 
------------------------------------------------------------------------------------------
--- State Management ---------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- State Management
+-- -------------------------
 
 local StateManager = {
     state = {
@@ -58,9 +102,9 @@ local StateManager = {
     isLoaded = false -- Track if saved state has been loaded
 }
 
------------------------------------------------------------------------------------------
--- State History & Undo/Redo ----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- State History & Undo/Redo
+-- -------------------------
 
 local function saveStateSnapshot(description)
     local snapshot = {
@@ -77,9 +121,9 @@ local function saveStateSnapshot(description)
     end
 end
 
------------------------------------------------------------------------------------------
--- State Utilities ---------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- State Utilities
+-- -------------------------
 
 function private.Core.StateManager.getState(path)
     if not path then
@@ -188,9 +232,9 @@ function private.Core.StateManager.unsubscribe(path, owner)
     end
 end
 
------------------------------------------------------------------------------------------
--- Event-Driven State Updates ----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Event-Driven State Updates
+-- -------------------------
 
 local function setupEventListeners() -- Use centralized event constants to avoid string duplication errors
     local events = private.constants.events
@@ -297,9 +341,9 @@ local function setupEventListeners() -- Use centralized event constants to avoid
     )
 end
 
------------------------------------------------------------------------------------------
--- State Persistence -------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- State Persistence
+-- -------------------------
 
 function private.Core.StateManager.saveState()
     if Chronicles and Chronicles.db then
@@ -343,41 +387,34 @@ function private.Core.StateManager.loadState()
     if StateManager.state.ui.selectedEvent then
         private.Core.Logger.trace("StateManager", "Triggering selectedEvent notification after state load")
         private.Core.StateManager.notifyStateChange("ui.selectedEvent", StateManager.state.ui.selectedEvent)
-    end
-
-    if StateManager.state.ui.selectedCharacter then
+    end    if StateManager.state.ui.selectedCharacter then
         private.Core.Logger.trace("StateManager", "Triggering selectedCharacter notification after state load")
         private.Core.StateManager.notifyStateChange(
             "ui.selectedCharacter",
-            StateManager.state.ui.selectedCharacter,
-            nil
+            StateManager.state.ui.selectedCharacter
         )
-    end
-
-    if StateManager.state.ui.selectedFaction then
+    end    if StateManager.state.ui.selectedFaction then
         private.Core.Logger.trace("StateManager", "Triggering selectedFaction notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedFaction", StateManager.state.ui.selectedFaction, nil)
+        private.Core.StateManager.notifyStateChange("ui.selectedFaction", StateManager.state.ui.selectedFaction)
     end
 
     -- Also schedule a delayed notification to catch any UI components that subscribe after initial load
     C_Timer.After(
         0.5,
-        function()
-            if StateManager.state.ui.selectedPeriod then
+        function()            if StateManager.state.ui.selectedPeriod then
                 private.Core.Logger.trace("StateManager", "Triggering delayed selectedPeriod notification")
                 private.Core.StateManager.notifyStateChange(
                     "ui.selectedPeriod",
-                    StateManager.state.ui.selectedPeriod,
-                    nil
+                    StateManager.state.ui.selectedPeriod
                 )
             end
         end
     )
 end
 
------------------------------------------------------------------------------------------
--- State Debugging ----------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- State Debugging
+-- -------------------------
 
 function private.Core.StateManager.dumpState(path)
     local state = private.Core.StateManager.getState(path)
@@ -416,9 +453,9 @@ function private.Core.StateManager.getHistory(count)
     return history
 end
 
------------------------------------------------------------------------------------------
--- Initialization -----------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Initialization
+-- -------------------------
 
 function private.Core.StateManager.init()
     -- Set up event listeners first

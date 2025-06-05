@@ -36,9 +36,9 @@ local defaults = {
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
 
------------------------------------------------------------------------------------------
--- Init ---------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Init
+-- -------------------------
 local Chronicles = private.Chronicles
 Chronicles.descName = Locale["Chronicles"]
 Chronicles.description = Locale["Description"]
@@ -108,5 +108,4 @@ function Chronicles:RegisterPluginDB(pluginName, db)
     private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
 end
 
------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------

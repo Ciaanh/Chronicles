@@ -3,9 +3,9 @@ local Chronicles = private.Chronicles
 
 private.Core.EventManager = {}
 
------------------------------------------------------------------------------------------
--- Global Utility Functions ------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Global Utility Functions
+-- -------------------------
 
 -- Helper function to safely trigger events with fallback to EventRegistry
 function private.Core.triggerEvent(eventName, eventData, source)
@@ -26,9 +26,9 @@ function private.Core.registerCallback(eventName, callback, owner)
     end
 end
 
------------------------------------------------------------------------------------------
--- Event Validation & Schema -----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Event Validation & Schema
+-- -------------------------
 
 local eventSchemas = {
     [private.constants.events.AddonStartup] = {
@@ -128,9 +128,9 @@ local eventSchemas = {
     }
 }
 
------------------------------------------------------------------------------------------
--- Event Validator ----------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Event Validator
+-- -------------------------
 
 private.Core.EventManager.Validator = {
     validate = function(self, eventName, data)
@@ -150,9 +150,9 @@ private.Core.EventManager.Validator = {
     end
 }
 
------------------------------------------------------------------------------------------
--- Safe Event Triggering ---------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Safe Event Triggering
+-- -------------------------
 
 private.Core.EventManager.safeTrigger = function(eventName, data, source)
     source = source or debug.getinfo(2, "S").source
@@ -194,9 +194,9 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     end
 end
 
------------------------------------------------------------------------------------------
--- Enhanced Event Registry Wrapper -----------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Enhanced Event Registry Wrapper
+-- -------------------------
 
 private.Core.EventManager.safeRegisterCallback = function(eventName, callback, owner)
     private.Core.Logger.trace(
@@ -216,9 +216,9 @@ private.Core.EventManager.safeRegisterCallback = function(eventName, callback, o
     EventRegistry:RegisterCallback(eventName, wrappedCallback, owner)
 end
 
------------------------------------------------------------------------------------------
--- Plugin Event System -----------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Plugin Event System
+-- -------------------------
 
 private.Core.EventManager.PluginEvents = {
     registeredEvents = {},

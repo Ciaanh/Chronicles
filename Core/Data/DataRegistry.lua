@@ -21,9 +21,9 @@ end
 private.Core.Data.DataRegistry = {}
 local DataRegistry = private.Core.Data.DataRegistry
 
------------------------------------------------------------------------------------------
--- Database Registration Operations ----------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Database Registration Operations
+-- -------------------------
 
 --[[
     Register an Events database for a collection
@@ -176,9 +176,9 @@ function DataRegistry.registerCharacterDB(collectionName, db)
     return true
 end
 
------------------------------------------------------------------------------------------
--- Collection Status Management -----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Collection Status Management
+-- -------------------------
 
 --[[
     Get the status of a collection (whether it's active/enabled)
@@ -205,9 +205,9 @@ function DataRegistry.getCollectionStatus(collectionName) -- Ensure Chronicles.D
     return false
 end
 
------------------------------------------------------------------------------------------
--- Collection Enumeration and Utilities ---------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Collection Enumeration and Utilities
+-- -------------------------
 
 --[[
     Helper function to check if a value exists in a lookup table
@@ -309,9 +309,9 @@ function DataRegistry.getCollectionsNames()
     return dataGroups
 end
 
------------------------------------------------------------------------------------------
--- Module Export ------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Module Export
+-- -------------------------
 
 -- Expose the DataRegistry module for use by other components
 return DataRegistry

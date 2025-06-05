@@ -11,9 +11,9 @@ private.Core.Utils.HelperUtils = {}
 
 local HelperUtils = private.Core.Utils.HelperUtils
 
------------------------------------------------------------------------------------------
--- Chronicles Access Helpers -----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Chronicles Access Helpers
+-- -------------------------
 
 --[[
     Safely access the Chronicles object
@@ -23,9 +23,9 @@ function HelperUtils.getChronicles()
     return private.Chronicles
 end
 
------------------------------------------------------------------------------------------
--- Module Initialization ---------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Module Initialization
+-- -------------------------
 
 function HelperUtils.init()
     private.Core.Logger.trace("HelperUtils", "HelperUtils module initialized")

@@ -1,10 +1,45 @@
 local FOLDER_NAME, private = ...
 
+--[[
+=================================================================================
+Module: Logger
+Purpose: Centralized logging system for Chronicles addon
+Dependencies: None (core module)
+Author: Chronicles Team
+=================================================================================
+
+This module provides a comprehensive logging system with:
+- Multiple log levels (TRACE, WARN, ERROR)
+- Color-coded console output
+- Log history with configurable retention
+- Safe function execution with automatic error logging
+- Module-specific logging context
+
+Key Features:
+- Level-based filtering (configurable minimum log level)
+- Automatic message formatting with color codes
+- Log history storage for debugging
+- Safe function wrapper with error handling
+
+Usage Example:
+    private.Core.Logger.trace("ModuleName", "Debug information")
+    private.Core.Logger.warn("ModuleName", "Warning message")
+    private.Core.Logger.error("ModuleName", "Error occurred")
+
+Configuration:
+- Default level: WARN (only warnings and errors shown)
+- Max history: 500 entries
+- Can be enabled/disabled globally
+
+Dependencies: None - this is a core module loaded early
+=================================================================================
+]]
+
 private.Core.Logger = {}
 
------------------------------------------------------------------------------------------
--- Logger Constants and Configuration --------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Logger Constants and Configuration
+-- -------------------------
 
 -- Log levels
 private.Core.Logger.LOG_LEVELS = {
@@ -32,9 +67,9 @@ local config = {
 -- Log history storage
 local logHistory = {}
 
------------------------------------------------------------------------------------------
--- Core Logging Functions --------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Core Logging Functions
+-- -------------------------
 
 local function shouldLog(level)
     return config.enabled and private.Core.Logger.LOG_LEVELS[level] >= private.Core.Logger.LOG_LEVELS[config.logLevel]
@@ -91,9 +126,9 @@ function private.Core.Logger.error(module, message)
     --error(message) -- Use error to throw an error in Lua
 end
 
------------------------------------------------------------------------------------------
--- Simple Configuration Functions ------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Simple Configuration Functions
+-- -------------------------
 
 function private.Core.Logger.setEnabled(enabled)
     config.enabled = enabled
@@ -159,9 +194,9 @@ function private.Core.Logger.getLogLevel()
     return config.logLevel
 end
 
------------------------------------------------------------------------------------------
--- Log History Management ---------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Log History Management
+-- -------------------------
 
 function private.Core.Logger.getLogHistory(count, level, module)
     count = count or 50
@@ -220,9 +255,9 @@ function private.Core.Logger.clearLogHistory()
     private.Core.Logger.trace("Logger", "Log history cleared")
 end
 
------------------------------------------------------------------------------------------
--- Stack Traces and Error Handling -----------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Stack Traces and Error Handling
+-- -------------------------
 
 function private.Core.Logger.getStackTrace(skipLevels)
     skipLevels = (skipLevels or 0) + 2 -- Skip this function and the caller

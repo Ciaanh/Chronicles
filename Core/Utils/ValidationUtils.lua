@@ -1,5 +1,41 @@
 local FOLDER_NAME, private = ...
 
+--[[
+=================================================================================
+Module: ValidationUtils
+Purpose: Data validation and type checking utilities for Chronicles
+Dependencies: None (core utility module)
+Author: Chronicles Team
+=================================================================================
+
+This module provides comprehensive data validation for Chronicles addon:
+- Type checking and validation functions
+- Chronicles-specific data structure validation
+- Safe data access patterns
+- Input sanitization and bounds checking
+
+Key Features:
+- Null/empty value detection
+- Type-specific validation (numbers, strings, tables)
+- Chronicles entity validation (events, characters, factions)
+- Year and date validation for timeline system
+- Safe validation with no external dependencies
+
+Validation Categories:
+- Basic Types: IsValidNumber, IsValidString, IsValidTable
+- Chronicles Entities: IsValidEvent, IsValidCharacter, IsValidFaction
+- Timeline Data: IsValidYear, date range validation
+- Special Cases: NaN detection, empty collection handling
+
+Usage Patterns:
+- Guard clauses: if not ValidationUtils.IsValidEvent(event) then return end
+- Safe access: local duration = ValidationUtils.IsValidEvent(event) and event.duration or 0
+- Data sanitization: ValidationUtils.IsValidString(input) and input or defaultValue
+
+Dependencies: None - this is a foundational utility module
+=================================================================================
+]]
+
 private.Core.Utils = private.Core.Utils or {}
 private.Core.Utils.ValidationUtils = {}
 

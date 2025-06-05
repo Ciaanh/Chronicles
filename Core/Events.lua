@@ -1,6 +1,55 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
+--[[
+=================================================================================
+Module: Events
+Purpose: Event data processing and transformation for Chronicles timeline
+Dependencies: StringUtils, TableUtils, ValidationUtils, AceLocale-3.0
+Author: Chronicles Team
+=================================================================================
+
+This module handles complex event data processing and transformation:
+- Event object creation and validation
+- Chapter and page content processing
+- HTML content detection and sanitization
+- Template-based content rendering
+- Event list generation and filtering
+
+Key Features:
+- Smart HTML vs text content detection
+- Chapter-based content organization
+- Template key mapping for UI rendering
+- Author attribution and metadata handling
+- Event list generation with filtering support
+
+Event Data Structure:
+- id: Unique event identifier
+- label: Display name/title
+- chapters: Array of content chapters
+- yearStart/yearEnd: Time range
+- eventType: Category classification
+- characters/factions: Associated entities
+- author: Content attribution
+
+Usage Example:
+    local eventsList = Events.GetEventsList()
+    local processedEvent = Events.ProcessEventData(rawEventData)
+    local chapters = Events.CreateChaptersFromContent(content)
+
+Event Flow Patterns:
+1. Raw event data → Processing → Template mapping → UI rendering
+2. User selection → Event lookup → Chapter processing → Content display
+3. Filter application → Event list generation → UI update
+
+Dependencies:
+- StringUtils: HTML processing and text manipulation
+- TableUtils: Deep copying and table operations
+- ValidationUtils: Data validation and safety checks
+- AceLocale-3.0: Localization support
+=================================================================================
+]]
+
 private.Core.Events = {}
 
 -- Import utilities
@@ -27,10 +76,21 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     pages = { [string] }			-- Content of the chapter, either text or HTML
 ]]
 --[[
-    Transform the title and pages into a chapter
-    @param title [string] Title of the chapter
-    @param pages { [string] } Content of the chapter
-    @return [table] Chapter object
+    Transform title and pages into a structured chapter object for UI rendering
+    
+    This function processes raw chapter content and creates a structured object
+    with proper template keys for the UI rendering system. It handles both
+    text and HTML content, applying appropriate template mappings.
+    
+    @param title string|nil - Title of the chapter (optional)
+    @param pages table - Array of content strings (text or HTML)
+    @return table - Chapter object with header and elements array
+    @example
+        local chapter = CreateChapter("The Fall of Lordaeron", {
+            "Prince Arthas returned from Northrend...",
+            "<h2>The Culling of Stratholme</h2><p>Desperate times...</p>"
+        })
+        -- Returns: { header = {...}, elements = { {...}, {...} } }
 ]]
 local function CreateChapter(title, pages)
     local chapter = {elements = {}}

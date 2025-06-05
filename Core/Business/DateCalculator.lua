@@ -1,5 +1,41 @@
 local FOLDER_NAME, private = ...
 
+--[[
+=================================================================================
+Module: DateCalculator
+Purpose: Business logic for date and time calculations in Chronicles timeline
+Dependencies: ValidationUtils (accessed globally)
+Author: Chronicles Team
+=================================================================================
+
+This module provides comprehensive date and timeline calculation functionality:
+- Event duration calculations
+- Year-based event filtering and validation
+- Timeline period calculations
+- Date range operations for historical events
+
+Key Features:
+- Event active year checking for timeline display
+- Duration calculations for event spans
+- Timeline period boundary calculations
+- Year validation and normalization
+
+Usage Example:
+    local duration = DateCalculator.GetEventDuration(eventData)
+    local isActive = DateCalculator.IsEventActiveInYear(eventData, -10000)
+    local periods = DateCalculator.CalculateTimelinePeriods(startYear, endYear)
+
+Event Integration:
+- Used by Timeline module for period calculations
+- Integrates with FilterEngine for year-based filtering
+- Supports both positive and negative years (BC/AD system)
+
+Dependencies:
+- ValidationUtils (global access pattern)
+- Constants for timeline configuration
+=================================================================================
+]]
+
 private.Core.Business = private.Core.Business or {}
 private.Core.Business.DateCalculator = {}
 

@@ -7,9 +7,9 @@ local Chronicles = private.Chronicles
 -- Responsible for all caching operations throughout the Chronicles addon
 private.Core.Cache = {}
 
------------------------------------------------------------------------------------------
--- Cache Structure & Configuration -----------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Cache Structure & Configuration
+-- -------------------------
 
 local Cache = {
     _data = {
@@ -28,9 +28,9 @@ local Cache = {
     }
 }
 
------------------------------------------------------------------------------------------
--- Core Cache Management Functions -----------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Core Cache Management Functions
+-- -------------------------
 
 -- Invalidate specific cache type or all caches
 function private.Core.Cache.invalidate(cacheType)
@@ -95,9 +95,9 @@ function private.Core.Cache.set(cacheType, value, cacheKey)
     private.Core.Logger.trace("Cache", "Cached " .. cacheType .. (cacheKey and (" key: " .. cacheKey) or ""))
 end
 
------------------------------------------------------------------------------------------
--- High-Level Cache Interface Functions ------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- High-Level Cache Interface Functions
+-- -------------------------
 
 -- Get cached periods with automatic rebuilding
 function private.Core.Cache.getPeriodsFillingBySteps()
@@ -170,9 +170,9 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
     return result
 end
 
------------------------------------------------------------------------------------------
--- Cache Management Utilities ----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Cache Management Utilities
+-- -------------------------
 
 -- Pre-warm commonly used search caches for better performance
 function private.Core.Cache.preWarmSearchCache()
@@ -246,9 +246,9 @@ function private.Core.Cache.rebuildAll()
     private.Core.Cache.warmAllCaches()
 end
 
------------------------------------------------------------------------------------------
--- Initialization & Cleanup ------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Initialization & Cleanup
+-- -------------------------
 
 -- Initialize cache system
 function private.Core.Cache.init()
@@ -274,9 +274,9 @@ function private.Core.Cache.cleanup()
     private.Core.Cache.clearAll()
 end
 
------------------------------------------------------------------------------------------
--- Export Cache Interface ---------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Export Cache Interface
+-- -------------------------
 
 -- Export the main cache interface
 Chronicles.Cache = private.Core.Cache

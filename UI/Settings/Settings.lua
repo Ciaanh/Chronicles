@@ -1,11 +1,80 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
+--[[
+=================================================================================
+Module: Settings UI
+Purpose: User preferences and configuration interface management
+Dependencies: AceLocale-3.0, StateManager, Core.Settings
+Author: Chronicles Team
+=================================================================================
+
+This module manages the complex Settings interface with dynamic tab generation:
+- Hierarchical settings categories and subcategories
+- Dynamic UI generation based on configuration
+- Real-time settings validation and application
+- Collection and event type management
+- Personal journal configuration
+
+Complex UI Event Flow Patterns:
+
+1. Settings Interface Initialization:
+   OnLoad → Category Configuration → Dynamic Button Creation → Tab Setup
+   
+2. Category Navigation Flow:
+   Button Click → Category Validation → Tab Switch → Content Loading → State Update
+   
+3. Setting Change Pattern:
+   User Input → Validation → State Update → UI Refresh → Event Trigger → Persistence
+   
+4. Collection Management Flow:
+   Collection Toggle → Status Validation → Data Registry Update → UI Refresh → Filter Update
+
+UI Architecture Patterns:
+- ConfiguredCategories: Hierarchical menu structure
+- Dynamic button generation for categories and subcategories
+- Tab-based content switching with lazy loading
+- Event-driven state synchronization
+
+Key Settings Categories:
+- Event Types: Toggle event categories (war, death, birth, etc.)
+- Collections: Enable/disable data collections (expansions, custom content)
+- My Journal: Personal content and RP integration settings
+- Logs: Debug and diagnostic information
+
+Event Integration:
+- Settings changes trigger events.SettingsEventTypeChecked
+- Collection toggles trigger events.SettingsCollectionChecked
+- State changes propagate to FilterEngine and Data modules
+
+Dependencies:
+- AceLocale-3.0: UI text localization
+- StateManager: Settings persistence
+- Core.Settings: Configuration data management
+=================================================================================
+]]
+
 -- Event types
 -- Collections
 -- My journal
 SettingsMixin = {}
 
+--[[
+    Initialize the Settings interface with dynamic category generation
+    
+    This complex initialization function sets up the hierarchical settings structure:
+    1. Configures category hierarchy with nested submenus
+    2. Generates dynamic UI buttons for each category
+    3. Sets up tab system integration
+    4. Initializes event handling for settings changes
+    
+    UI Generation Flow:
+    ConfiguredCategories → GetVisibleCategories → AddCategory → Button Creation
+    
+    @example
+        -- Called automatically when Settings frame loads
+        -- Creates buttons for: Settings (EventTypes, Collections), My Journal, Logs
+]]
 function SettingsMixin:OnLoad()
     self.prefix = "Entry"
     self.ConfiguredCategories = {

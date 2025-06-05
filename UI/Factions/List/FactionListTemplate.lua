@@ -2,9 +2,9 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
------------------------------------------------------------------------------------------
--- Templates ----------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Templates
+-- -------------------------
 
 FactionListItemMixin = {}
 function FactionListItemMixin:Init(factionData)
@@ -28,9 +28,9 @@ function FactionListItemMixin:OnClick()
 	end
 end
 
------------------------------------------------------------------------------------------
--- FactionList --------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- FactionList
+-- -------------------------
 FactionListMixin = {}
 function FactionListMixin:OnLoad()
 	self.PagedFactionList:SetElementTemplateData(private.constants.templates)

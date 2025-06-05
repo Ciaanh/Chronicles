@@ -2,9 +2,9 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
------------------------------------------------------------------------------------------
--- Templates ----------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Templates
+-- -------------------------
 
 CharacterListItemMixin = {}
 function CharacterListItemMixin:Init(characterData)
@@ -32,9 +32,9 @@ function CharacterListItemMixin:OnClick()
 	end
 end
 
------------------------------------------------------------------------------------------
--- CharacterList ------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- CharacterList
+-- -------------------------
 CharacterListMixin = {}
 function CharacterListMixin:OnLoad()
 	-- Set element template data first

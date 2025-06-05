@@ -10,9 +10,9 @@ local function getTimelineBusiness()
     return private.Core.Data.TimelineBusiness
 end
 
------------------------------------------------------------------------------------------
--- Timeline -----------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Timeline
+-- -------------------------
 local Timeline = {}
 -- KEEP: Core timeline data that's not in state
 Timeline.MaxStepIndex = #private.constants.config.stepValues
@@ -247,9 +247,9 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
     private.Core.Timeline.DisplayTimelineWindow()
 end
 
------------------------------------------------------------------------------------------
--- Initialization -----------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Initialization
+-- -------------------------
 
 function private.Core.Timeline.Init()
     private.Core.Logger.trace("Timeline", "Initializing Timeline module")

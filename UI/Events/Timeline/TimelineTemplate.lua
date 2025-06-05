@@ -1,9 +1,9 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
------------------------------------------------------------------------------------------
--- Timeline -----------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Timeline
+-- -------------------------
 TimelineMixin = {}
 
 -- arrow CovenantSanctum-Renown-Arrow-Depressed
@@ -130,9 +130,9 @@ function TimelineMixin:UpdateZoomLevelIndicator(stepValue)
     self.ZoomLevelIndicator.Text:SetText(displayText)
 end
 
------------------------------------------------------------------------------------------
--- TimelineLabel ------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- TimelineLabel
+-- -------------------------
 TimelineLabelMixin = {}
 function TimelineLabelMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelineLabel .. tostring(self.index)
@@ -149,9 +149,9 @@ function TimelineLabelMixin:OnDisplayTimelineLabel(data)
     end
 end
 
------------------------------------------------------------------------------------------
--- TimelinePeriod -----------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- TimelinePeriod
+-- -------------------------
 TimelinePeriodMixin = {}
 function TimelinePeriodMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(self.index)

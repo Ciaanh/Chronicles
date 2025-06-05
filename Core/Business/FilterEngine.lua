@@ -1,5 +1,54 @@
 local FOLDER_NAME, private = ...
 
+--[[
+=================================================================================
+Module: FilterEngine
+Purpose: Advanced filtering system for Chronicles events and content
+Dependencies: ValidationUtils (global), DateCalculator
+Author: Chronicles Team
+=================================================================================
+
+This module provides comprehensive filtering capabilities for Chronicles data:
+- Multi-criteria event filtering (year, type, collection, etc.)
+- Performance-optimized filter chains
+- Complex boolean logic support
+- Timeline-aware filtering
+- Full-text search integration
+
+Key Features:
+- Year range filtering with BC/AD support
+- Event type and collection filtering
+- Character and faction association filtering
+- Timeline-specific filtering
+- Full-text search across event content
+- Combinatorial filter logic (AND/OR operations)
+
+Filter System Architecture:
+1. Filter Configuration → Individual Filter Functions → Combined Results
+2. Performance optimization through early termination
+3. Lazy evaluation for expensive operations
+4. Caching for repeated filter operations
+
+Complex Business Logic Patterns:
+
+Filter Execution Flow:
+1. Input Validation → Configuration Parsing → Filter Chain Setup
+2. Year Range Check → Type Validation → Collection Membership
+3. Character/Faction Association → Search Text Matching
+4. Result Aggregation → Performance Metrics
+
+Event Filtering Pipeline:
+- Stage 1: Quick filters (year range, basic validation)
+- Stage 2: Membership tests (collections, types)
+- Stage 3: Association filters (characters, factions)  
+- Stage 4: Content search (expensive, done last)
+
+Dependencies:
+- ValidationUtils: Data validation and safety checks
+- DateCalculator: Year range and timeline calculations
+=================================================================================
+]]
+
 private.Core.Business = private.Core.Business or {}
 private.Core.Business.FilterEngine = {}
 
@@ -43,10 +92,28 @@ local FilterEngine = private.Core.Business.FilterEngine
     }
 ]]
 --[[
-    Apply filters to a list of events
-    @param events [table] List of events to filter
-    @param filters [table] Filter configuration
-    @return [table] Filtered events
+    Apply comprehensive filters to event list with performance optimization
+    
+    This is the main entry point for the filtering system. It processes events
+    through multiple filter stages in order of performance efficiency (fastest
+    filters first to eliminate events early).
+    
+    Filter Processing Order:
+    1. Basic validation and year range (fastest)
+    2. Event type and collection membership (fast)
+    3. Character and faction associations (moderate)
+    4. Full-text search (slowest, done last)
+    
+    @param events table - Array of event objects to filter
+    @param filters table - Filter configuration object (see structure above)
+    @return table - Filtered array of events that match all enabled criteria
+    @throws error - If events list is invalid or filters malformed
+    @example
+        local filteredEvents = FilterEngine.ApplyFilters(allEvents, {
+            yearRange = { enabled = true, startYear = -10000, endYear = 0 },
+            eventTypes = { enabled = true, allowedTypes = {1, 2, 3} },
+            search = { enabled = true, searchText = "Arthas" }
+        })
 ]]
 function FilterEngine.ApplyFilters(events, filters)
     if not ValidationUtils.IsValidTable(events) then

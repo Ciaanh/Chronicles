@@ -38,9 +38,9 @@ end
 private.Core.Data.TimelineBusiness = {}
 local TimelineBusiness = private.Core.Data.TimelineBusiness
 
------------------------------------------------------------------------------------------
--- Timeline Configuration Logic ---------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Timeline Configuration Logic
+-- -------------------------
 
 --[[
     Calculate timeline configuration based on data boundaries
@@ -158,9 +158,9 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
     return timelineConfig
 end
 
------------------------------------------------------------------------------------------
--- Event Counting and Analysis ----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Event Counting and Analysis
+-- -------------------------
 
 --[[
     Get date profile index for current step value
@@ -320,9 +320,9 @@ function TimelineBusiness.countEventsInPeriod(block)
     return eventCount
 end
 
------------------------------------------------------------------------------------------
--- Timeline Period Generation -----------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Timeline Period Generation
+-- -------------------------
 
 --[[
     Generate timeline periods based on configuration
@@ -529,9 +529,9 @@ function TimelineBusiness.consolidateTimelinePeriods(timelineBlocks)
     return displayableTimeFrames
 end
 
------------------------------------------------------------------------------------------
--- Timeline Pagination Logic ------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Timeline Pagination Logic
+-- -------------------------
 
 --[[
     Calculate pagination parameters for timeline display
@@ -668,9 +668,9 @@ function TimelineBusiness.getStepValueIndex(stepValue)
     return index[stepValue]
 end
 
------------------------------------------------------------------------------------------
--- Main Timeline Business Logic Interface -----------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
+-- Main Timeline Business Logic Interface
+-- -------------------------
 
 --[[
     Compute complete timeline periods for current state
