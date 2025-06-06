@@ -18,14 +18,21 @@ function CharacterListItemMixin:OnClick()
 		-- Pass character ID and collection name for unique identification
 		local characterId = self.Character and self.Character.id or nil
 		local collectionName = self.Character and self.Character.source or nil
-		
+
 		if characterId and collectionName then
 			local characterSelection = {
 				characterId = characterId,
 				collectionName = collectionName
 			}
-			private.Core.StateManager.setState("ui.selectedCharacter", characterSelection, "Character selected from list: " .. characterId .. " (" .. collectionName .. ")")
-			private.Core.Logger.debug("CharacterList", "Character selected - ID: " .. characterId .. ", Collection: " .. collectionName)
+			private.Core.StateManager.setState(
+				"ui.selectedCharacter",
+				characterSelection,
+				"Character selected from list: " .. characterId .. " (" .. collectionName .. ")"
+			)
+			private.Core.Logger.trace(
+				"CharacterList",
+				"Character selected - ID: " .. characterId .. ", Collection: " .. collectionName
+			)
 		else
 			private.Core.Logger.warn("CharacterList", "Character selection failed - missing ID or source")
 		end

@@ -36,7 +36,7 @@ function Chronicles.Data:Load()
 end
 
 function Chronicles.Data:RefreshPeriods()
-    private.Core.Cache.invalidate("periodsFillingBySteps")
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
 end
 
 -- -------------------------
@@ -51,10 +51,10 @@ function Chronicles.Data:AddRPEvent(event)
     table.insert(RPEventsDB, event.id, self:CleanEventObject(event, "RP"))
 
     -- Invalidate caches since we added new event data
-    private.Core.Cache.invalidate("periodsFillingBySteps")
-    private.Core.Cache.invalidate("minEventYear")
-    private.Core.Cache.invalidate("maxEventYear")
-    private.Core.Cache.invalidate("searchCache")
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 end
 
 -- function to retrieve the list of dates for all eventsGroup
@@ -107,9 +107,7 @@ function Chronicles.Data:DefinePeriodsForEvent(period, eventId)
     if period ~= nil then
         local items = Set(period)
         if items[eventId] ~= nil then
-            --print("-- found event do nothing")
         else
-            --print("-- event not found insert")
             table.insert(period, eventId)
         end
 
@@ -118,7 +116,6 @@ function Chronicles.Data:DefinePeriodsForEvent(period, eventId)
         local data = {}
         table.insert(data, eventId)
 
-        --print("-- create new data")
         return data
     end
 end
@@ -353,11 +350,22 @@ function Chronicles.Data:GetEventTypeStatus(eventTypeId)
     if not private.Core.StateManager then
         private.Core.Logger.error("Data", "StateManager not available when trying to get event type status")
         return true -- Default to active
+    end -- Check if StateManager has finished loading saved state
+
+    local status = private.Core.StateManager.getState("eventTypes." .. eventTypeId)
+
+    -- If status is nil after state is loaded, it means this is a new event type
+    -- Set default to true for new event types only
+    if status == nil then
+        private.Core.StateManager.setState(
+            "eventTypes." .. eventTypeId,
+            true,
+            "Default status for new event type " .. tostring(eventTypeId)
+        )
+        return true
     end
 
-    -- Delegate to StateManager
-    local status = private.Core.StateManager.getState("eventTypes." .. eventTypeId)
-    return status ~= nil and status or true
+    return status
 end
 
 -- -------------------------
@@ -426,13 +434,11 @@ function Chronicles.Data:SetMyJournalEvents(event)
             currentData,
             "Added MyJournal event: " .. (event.label or event.id)
         )
-    end
-
-    -- Invalidate caches since we added new event data
-    private.Core.Cache.invalidate("periodsFillingBySteps")
-    private.Core.Cache.invalidate("minEventYear")
-    private.Core.Cache.invalidate("maxEventYear")
-    private.Core.Cache.invalidate("searchCache")
+    end -- Invalidate caches since we added new event data
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 end
 
 function Chronicles.Data:RemoveMyJournalEvent(eventId)
@@ -465,13 +471,11 @@ function Chronicles.Data:RemoveMyJournalEvent(eventId)
             "data.userContent.events",
             currentData,
             "Removed MyJournal event: " .. eventId
-        )
-
-        -- Invalidate caches
-        private.Core.Cache.invalidate("periodsFillingBySteps")
-        private.Core.Cache.invalidate("minEventYear")
-        private.Core.Cache.invalidate("maxEventYear")
-        private.Core.Cache.invalidate("searchCache")
+        ) -- Invalidate caches
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
     end
 end
 

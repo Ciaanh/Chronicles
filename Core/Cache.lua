@@ -1,11 +1,56 @@
 local FOLDER_NAME, private = ...
 
+--[[
+    Chronicles Cache Module
+    
+    Centralized caching system for performance optimization and data management.
+    Provides intelligent caching, cache invalidation, and performance monitoring.
+    
+    DEPENDENCIES:
+    - Core.Logger: For debug and performance logging
+    - Core.Utils.HelperUtils: For safe Chronicles object access
+    - Constants: For configuration values and timeline ranges
+    - Timer API: For delayed cache warming and cleanup operations
+    
+    RESPONSIBILITIES:
+    - Event search result caching with intelligent invalidation
+    - Timeline data caching (periods, min/max years, collections)
+    - Cache warming strategies for performance optimization
+    - Memory management and cache cleanup operations
+    - Performance monitoring and cache hit/miss statistics
+    
+    CACHING STRATEGIES:
+    - Lazy loading: Cache data on first access
+    - Pre-warming: Common queries cached proactively
+    - Smart invalidation: Only invalidate affected cache entries
+    - Memory bounds: Automatic cleanup when limits exceeded
+    
+    CACHE TYPES:
+    - Filtered Events: Search results by year range with compound keys
+    - Timeline Metadata: Min/max years, periods, collection status
+    - Performance Data: Cache statistics and hit ratios
+    
+    PERFORMANCE FEATURES:
+    - Sub-second cache lookups for timeline navigation
+    - Background cache warming during low-activity periods
+    - Automatic cache rebuilding on data changes
+    - Memory-efficient storage with configurable limits
+--]]
 -- Get Chronicles reference
 local Chronicles = private.Chronicles
 
--- Centralized Cache Management System
--- Responsible for all caching operations throughout the Chronicles addon
 private.Core.Cache = {}
+
+-- -------------------------
+-- Cache Key Constants
+-- -------------------------
+local CACHE_KEYS = {
+    PERIODS_FILLING = "periodsFillingBySteps",
+    MIN_EVENT_YEAR = "minEventYear",
+    MAX_EVENT_YEAR = "maxEventYear",
+    COLLECTIONS_NAMES = "collectionsNames",
+    FILTERED_EVENTS = "filteredEventResults" -- Cache for filtered event search results with yearStart_yearEnd keys
+}
 
 -- -------------------------
 -- Cache Structure & Configuration
@@ -13,18 +58,18 @@ private.Core.Cache = {}
 
 local Cache = {
     _data = {
-        periodsFillingBySteps = nil,
-        minEventYear = nil,
-        maxEventYear = nil,
-        collectionsNames = nil,
-        searchCache = {} -- Cache for search results with yearStart_yearEnd keys
+        [CACHE_KEYS.PERIODS_FILLING] = nil,
+        [CACHE_KEYS.MIN_EVENT_YEAR] = nil,
+        [CACHE_KEYS.MAX_EVENT_YEAR] = nil,
+        [CACHE_KEYS.COLLECTIONS_NAMES] = nil,
+        [CACHE_KEYS.FILTERED_EVENTS] = {} -- Cache for filtered event results with yearStart_yearEnd keys
     },
     _dirty = {
-        periodsFillingBySteps = true,
-        minEventYear = true,
-        maxEventYear = true,
-        collectionsNames = true,
-        searchCache = true
+        [CACHE_KEYS.PERIODS_FILLING] = true,
+        [CACHE_KEYS.MIN_EVENT_YEAR] = true,
+        [CACHE_KEYS.MAX_EVENT_YEAR] = true,
+        [CACHE_KEYS.COLLECTIONS_NAMES] = true,
+        [CACHE_KEYS.FILTERED_EVENTS] = true
     }
 }
 
@@ -36,8 +81,8 @@ local Cache = {
 function private.Core.Cache.invalidate(cacheType)
     if cacheType then
         Cache._dirty[cacheType] = true
-        if cacheType == "searchCache" then
-            Cache._data.searchCache = {}
+        if cacheType == CACHE_KEYS.FILTERED_EVENTS then
+            Cache._data[CACHE_KEYS.FILTERED_EVENTS] = {}
         else
             Cache._data[cacheType] = nil
         end
@@ -48,11 +93,11 @@ function private.Core.Cache.invalidate(cacheType)
             Cache._dirty[key] = true
         end
         Cache._data = {
-            periodsFillingBySteps = nil,
-            minEventYear = nil,
-            maxEventYear = nil,
-            collectionsNames = nil,
-            searchCache = {}
+            [CACHE_KEYS.PERIODS_FILLING] = nil,
+            [CACHE_KEYS.MIN_EVENT_YEAR] = nil,
+            [CACHE_KEYS.MAX_EVENT_YEAR] = nil,
+            [CACHE_KEYS.COLLECTIONS_NAMES] = nil,
+            [CACHE_KEYS.FILTERED_EVENTS] = {}
         }
         private.Core.Logger.trace("Cache", "Invalidated all caches")
     end
@@ -60,8 +105,8 @@ end
 
 -- Check if cache entry is valid
 function private.Core.Cache.isValid(cacheType, cacheKey)
-    if cacheType == "searchCache" then
-        return not Cache._dirty.searchCache and Cache._data.searchCache[cacheKey] ~= nil
+    if cacheType == CACHE_KEYS.FILTERED_EVENTS then
+        return not Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] and Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] ~= nil
     else
         return not Cache._dirty[cacheType] and Cache._data[cacheType] ~= nil
     end
@@ -72,8 +117,8 @@ function private.Core.Cache.get(cacheType, cacheKey)
     local isValid = private.Core.Cache.isValid(cacheType, cacheKey)
 
     if isValid then
-        if cacheType == "searchCache" then
-            return Cache._data.searchCache[cacheKey]
+        if cacheType == CACHE_KEYS.FILTERED_EVENTS then
+            return Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey]
         else
             return Cache._data[cacheType]
         end
@@ -84,9 +129,9 @@ end
 
 -- Set cached value
 function private.Core.Cache.set(cacheType, value, cacheKey)
-    if cacheType == "searchCache" then
-        Cache._data.searchCache[cacheKey] = value
-        Cache._dirty.searchCache = false
+    if cacheType == CACHE_KEYS.FILTERED_EVENTS then
+        Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] = value
+        Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] = false
     else
         Cache._data[cacheType] = value
         Cache._dirty[cacheType] = false
@@ -101,49 +146,49 @@ end
 
 -- Get cached periods with automatic rebuilding
 function private.Core.Cache.getPeriodsFillingBySteps()
-    local cached = private.Core.Cache.get("periodsFillingBySteps")
+    local cached = private.Core.Cache.get(CACHE_KEYS.PERIODS_FILLING)
     if cached then
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding periods cache")
     local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetPeriodsFillingBySteps()
-    private.Core.Cache.set("periodsFillingBySteps", result)
+    private.Core.Cache.set(CACHE_KEYS.PERIODS_FILLING, result)
     return result
 end
 
 -- Get cached min event year
 function private.Core.Cache.getMinEventYear()
-    local cached = private.Core.Cache.get("minEventYear")
+    local cached = private.Core.Cache.get(CACHE_KEYS.MIN_EVENT_YEAR)
     if cached then
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding min event year cache")
     local result = private.Core.Utils.HelperUtils.getChronicles().Data:MinEventYear()
-    private.Core.Cache.set("minEventYear", result)
+    private.Core.Cache.set(CACHE_KEYS.MIN_EVENT_YEAR, result)
     return result
 end
 
 -- Get cached max event year
 function private.Core.Cache.getMaxEventYear()
-    local cached = private.Core.Cache.get("maxEventYear")
+    local cached = private.Core.Cache.get(CACHE_KEYS.MAX_EVENT_YEAR)
     if cached then
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding max event year cache")
     local result = private.Core.Utils.HelperUtils.getChronicles().Data:MaxEventYear()
-    private.Core.Cache.set("maxEventYear", result)
+    private.Core.Cache.set(CACHE_KEYS.MAX_EVENT_YEAR, result)
     return result
 end
 
 -- Get cached collections names
 function private.Core.Cache.getCollectionsNames()
-    local cached = private.Core.Cache.get("collectionsNames")
+    local cached = private.Core.Cache.get(CACHE_KEYS.COLLECTIONS_NAMES)
     if cached then
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding collections names cache")
     local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetCollectionsNames()
-    private.Core.Cache.set("collectionsNames", result)
+    private.Core.Cache.set(CACHE_KEYS.COLLECTIONS_NAMES, result)
     return result
 end
 
@@ -160,13 +205,13 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
     end
 
     local cacheKey = yearStart .. "_" .. yearEnd
-    local cached = private.Core.Cache.get("searchCache", cacheKey)
+    local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_EVENTS, cacheKey)
     if cached then
         return cached
     end
     private.Core.Logger.trace("Cache", "Caching search results for " .. cacheKey)
     local result = private.Core.Utils.HelperUtils.getChronicles().Data:SearchEvents(yearStart, yearEnd)
-    private.Core.Cache.set("searchCache", result, cacheKey)
+    private.Core.Cache.set(CACHE_KEYS.FILTERED_EVENTS, result, cacheKey)
     return result
 end
 
@@ -176,7 +221,7 @@ end
 
 -- Pre-warm commonly used search caches for better performance
 function private.Core.Cache.preWarmSearchCache()
-    if not Cache._dirty.searchCache then
+    if not Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] then
         return -- Cache is already warm
     end
 
@@ -216,17 +261,16 @@ end
 -- Warm all caches during low-activity periods
 function private.Core.Cache.warmAllCaches()
     private.Core.Logger.trace("Cache", "Warming all caches")
-
-    if Cache._dirty.periodsFillingBySteps then
+    if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
         private.Core.Cache.getPeriodsFillingBySteps()
     end
-    if Cache._dirty.minEventYear then
+    if Cache._dirty[CACHE_KEYS.MIN_EVENT_YEAR] then
         private.Core.Cache.getMinEventYear()
     end
-    if Cache._dirty.maxEventYear then
+    if Cache._dirty[CACHE_KEYS.MAX_EVENT_YEAR] then
         private.Core.Cache.getMaxEventYear()
     end
-    if Cache._dirty.collectionsNames then
+    if Cache._dirty[CACHE_KEYS.COLLECTIONS_NAMES] then
         private.Core.Cache.getCollectionsNames()
     end
 
@@ -280,3 +324,6 @@ end
 
 -- Export the main cache interface
 Chronicles.Cache = private.Core.Cache
+
+-- Export cache keys for use by other modules
+private.Core.Cache.KEYS = CACHE_KEYS

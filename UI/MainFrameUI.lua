@@ -46,7 +46,6 @@ Dependencies:
 - WoW UI API: Frame management and sound system
 =================================================================================
 ]]
-
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 Chronicles.UI = {}
@@ -97,10 +96,10 @@ end
     3. Play appropriate UI sound for user feedback
 ]]
 function MainFrameUIMixin:OnShow()
-	self.TabUI:UpdateTabs()
-	-- Update state instead of triggering event - provides single source of truth
+	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
+		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
+		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
 	end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
@@ -116,10 +115,10 @@ end
     2. Update global UI state to indicate frame is closed
 ]]
 function MainFrameUIMixin:OnHide()
-	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW)
-	-- Update state instead of triggering event - provides single source of truth
+	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
-		private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
+		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
+		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed")
 	end
 end
 
@@ -169,12 +168,8 @@ end
 function TabUIMixin:SetTab(tabID)
 	TabSystemOwnerMixin.SetTab(self, tabID)
 	-- Use safe event triggering with fallback
-	private.Core.triggerEvent(
-		private.constants.events.TabUITabSet,
-		{frame = self, tabID = tabID},
-		"MainFrameUI:SetTab"
-	)
-	
+	private.Core.triggerEvent(private.constants.events.TabUITabSet, {frame = self, tabID = tabID}, "MainFrameUI:SetTab")
+
 	return true -- Don't show the tab as selected yet.
 end
 

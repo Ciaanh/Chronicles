@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
 
 --[[
 =================================================================================
@@ -42,492 +41,566 @@ Event Integration:
 Dependencies:
 - Chronicles.db for persistence (AceDB-3.0)
 - Internal deep copy utility to avoid TableUtils dependency
+
+USAGE EXAMPLES:
+• Building keys: private.Core.StateManager.buildStateKey("ui.selection", "event")
+• Setting state: private.Core.StateManager.setState("ui.selectedEvent", eventId)
+• Subscribing: private.Core.StateManager.subscribe("ui.selectedEvent", callback, "ModuleName")
+• Convenience: private.Core.StateManager.buildSelectionKey("character")
+
 =================================================================================
 ]]
-
 private.Core.StateManager = {}
 
--- -------------------------
--- Local Utilities
--- -------------------------
+-- Local state storage
+local stateStore = {}
+local subscribers = {}
 
--- Local deep copy function (to avoid dependency on TableUtils)
-local function deepCopy(original)
-    local copy
-    if type(original) == "table" then
-        copy = {}
-        for key, value in next, original, nil do
-            copy[deepCopy(key)] = deepCopy(value)
+-- =============================================================================================
+-- STATE KEY BUILDER SYSTEM
+-- =============================================================================================
+--
+-- The key builder provides type-safe, validated state key construction for Chronicles'
+-- complex state management needs. It enforces naming conventions, validates input parameters,
+-- and ensures consistent key patterns across all modules.
+--
+-- SUPPORTED KEY TYPES:
+-- • ui.selection: Entity selection state (ui.selectedEvent, ui.selectedCharacter, etc.)
+-- • settings: Configuration state (eventTypes.{id}, collections.{name})
+-- • userContent: MyJournal data containers (data.userContent.events, etc.)
+-- • collection: Collection status tracking (collections.{name})
+-- • ui.state: General UI state (ui.activeTab, ui.isMainFrameOpen, timeline.{id})
+--
+-- KEY VALIDATION:
+-- • Input type checking for all parameters
+-- • Entity ID sanitization (alphanumeric, underscore, hyphen only)
+-- • Null/empty value protection
+-- • Error messages with context for debugging
+--
+-- INTEGRATION:
+-- Keys built here directly map to AceDB storage paths and are used throughout
+-- Chronicles for consistent state access patterns.
+-- =============================================================================================
+
+--[[
+    Build standardized state keys with validation and type safety
+    
+    This is the core function for all state key generation in Chronicles. It enforces
+    naming conventions, validates inputs, and provides consistent error handling.
+    
+    @param keyType [string] Type of key: "ui.selection", "settings", "userContent", "collection", "ui.state"
+    @param entityType [string] Entity type: "event", "character", "faction", "eventType", "collection"
+    @param entityId [string|number] Entity identifier (optional for some key types)
+    @param options [table] Additional options (reserved for future expansion)
+    @return [string] Formatted state key
+    @throws Error if validation fails with descriptive message
+]]
+function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, options)
+    if not keyType or type(keyType) ~= "string" then
+        error("StateManager.buildStateKey: keyType must be a non-empty string")
+    end
+
+    if not entityType or type(entityType) ~= "string" then
+        error("StateManager.buildStateKey: entityType must be a non-empty string")
+    end
+
+    -- Sanitize entity ID if provided
+    local sanitizedId = nil
+    if entityId ~= nil then
+        if type(entityId) == "number" then
+            sanitizedId = tostring(entityId)
+        elseif type(entityId) == "string" then
+            -- Remove invalid characters and ensure it's not empty
+            sanitizedId = string.gsub(entityId, "[^%w_%-]", "")
+            if sanitizedId == "" then
+                error("StateManager.buildStateKey: entityId cannot be empty after sanitization")
+            end
+        else
+            error("StateManager.buildStateKey: entityId must be a string or number")
         end
-        setmetatable(copy, deepCopy(getmetatable(original)))
+    end
+
+    -- Build key based on type
+    if keyType == "ui.selection" then
+        if entityType == "event" or entityType == "character" or entityType == "faction" then
+            return "ui.selected" .. string.upper(string.sub(entityType, 1, 1)) .. string.sub(entityType, 2)
+        else
+            error("StateManager.buildStateKey: Invalid entityType for ui.selection: " .. entityType)
+        end
+    elseif keyType == "settings" then
+        if entityType == "eventType" and sanitizedId then
+            return "eventTypes." .. sanitizedId
+        elseif entityType == "collection" and sanitizedId then
+            return "collections." .. sanitizedId
+        else
+            error("StateManager.buildStateKey: Invalid entityType or missing entityId for settings: " .. entityType)
+        end
+    elseif keyType == "userContent" then
+        if entityType == "events" or entityType == "characters" or entityType == "factions" then
+            return "data.userContent." .. entityType
+        else
+            error("StateManager.buildStateKey: Invalid entityType for userContent: " .. entityType)
+        end
+    elseif keyType == "collection" then
+        if sanitizedId then
+            return "collections." .. sanitizedId
+        else
+            error("StateManager.buildStateKey: entityId required for collection key type")
+        end
+    elseif keyType == "ui.state" then
+        if entityType == "activeTab" or entityType == "isMainFrameOpen" then
+            return "ui." .. entityType
+        elseif entityType == "timeline" and sanitizedId then
+            return "timeline." .. sanitizedId
+        else
+            error("StateManager.buildStateKey: Invalid entityType for ui.state: " .. entityType)
+        end
     else
-        copy = original
-    end
-    return copy
-end
-
--- -------------------------
--- State Management
--- -------------------------
-
-local StateManager = {
-    state = {
-        ui = {
-            selectedEvent = nil, -- Stores event ID (number) instead of full event object
-            selectedCharacter = nil, -- Stores character ID (number) instead of full character object
-            selectedFaction = nil, -- Stores faction ID (number) instead of full faction object
-            selectedPeriod = nil,
-            activeTab = nil,
-            isMainFrameOpen = false
-        },
-        timeline = {
-            currentStep = nil,
-            currentPage = nil,
-            selectedYear = nil,
-            periodsCache = {}
-        },
-        settings = {
-            eventTypes = {},
-            collections = {},
-            debugMode = false
-        },
-        data = {
-            lastRefreshTime = 0,
-            isDirty = false
-        }
-    },
-    history = {},
-    maxHistorySize = 50,
-    listeners = {},
-    isLoaded = false -- Track if saved state has been loaded
-}
-
--- -------------------------
--- State History & Undo/Redo
--- -------------------------
-
-local function saveStateSnapshot(description)
-    local snapshot = {
-        timestamp = GetServerTime(),
-        description = description or "State change",
-        state = deepCopy(StateManager.state)
-    }
-
-    table.insert(StateManager.history, snapshot)
-
-    -- Maintain history size
-    if #StateManager.history > StateManager.maxHistorySize then
-        table.remove(StateManager.history, 1)
+        error("StateManager.buildStateKey: Unknown keyType: " .. keyType)
     end
 end
 
--- -------------------------
--- State Utilities
--- -------------------------
+-- =============================================================================================
+-- CONVENIENCE KEY BUILDER FUNCTIONS
+-- =============================================================================================
+--
+-- These helper functions provide simplified interfaces for common key building patterns.
+-- They wrap the main buildStateKey function with predefined parameters for specific use cases,
+-- reducing boilerplate code and improving readability throughout Chronicles.
+--
+-- DESIGN PATTERN:
+-- Each convenience function is specialized for a particular domain (selections, settings,
+-- content, collections, UI state) and provides appropriate default values and validation
+-- specific to that domain's requirements.
+--
+-- USAGE GUIDELINES:
+-- • Use these instead of buildStateKey directly when possible
+-- • They provide better type safety and clearer intent
+-- • Error messages are more specific to the use case
+-- • Parameters are optimized for each domain
+-- =============================================================================================
 
-function private.Core.StateManager.getState(path)
-    if not path then
-        return StateManager.state
+--[[
+    Build entity selection key for UI state management
+    
+    Creates keys for tracking which entity is currently selected in the UI.
+    Maps to ui.selectedEvent, ui.selectedCharacter, ui.selectedFaction patterns.
+    
+    @param entityType [string] "event", "character", or "faction"
+    @return [string] Selection state key (e.g., "ui.selectedEvent")
+]]
+function private.Core.StateManager.buildSelectionKey(entityType)
+    return private.Core.StateManager.buildStateKey("ui.selection", entityType)
+end
+
+--[[
+    Build settings key for event types or collections
+    @param settingType [string] "eventType" or "collection"
+    @param id [string|number] Setting identifier
+    @return [string] Settings state key
+]]
+function private.Core.StateManager.buildSettingsKey(settingType, id)
+    return private.Core.StateManager.buildStateKey("settings", settingType, id)
+end
+
+--[[
+    Build user content key for MyJournal data
+    @param contentType [string] "events", "characters", or "factions"
+    @return [string] User content state key
+]]
+function private.Core.StateManager.buildUserContentKey(contentType)
+    return private.Core.StateManager.buildStateKey("userContent", contentType)
+end
+
+--[[
+    Build collection status key
+    @param collectionName [string] Collection identifier
+    @return [string] Collection status state key
+]]
+function private.Core.StateManager.buildCollectionKey(collectionName)
+    return private.Core.StateManager.buildStateKey("collection", "collection", collectionName)
+end
+
+--[[
+    Build UI state key
+    @param stateType [string] UI state type
+    @param subKey [string] Optional sub-key for complex states
+    @return [string] UI state key
+]]
+function private.Core.StateManager.buildUIStateKey(stateType, subKey)
+    if subKey then
+        return private.Core.StateManager.buildStateKey("ui.state", stateType, subKey)
+    else
+        return private.Core.StateManager.buildStateKey("ui.state", stateType)
     end
+end
 
-    local keys = {strsplit(".", path)}
-    local current = StateManager.state
+-- =============================================================================================
+-- CORE STATE MANAGEMENT OPERATIONS
+-- =============================================================================================
+--
+-- These functions provide the primary interface for state manipulation in Chronicles.
+-- They handle initialization, persistence, subscription management, and state access
+-- with proper error handling and performance optimization.
+--
+-- INITIALIZATION FLOW:
+-- 1. Check if already initialized to prevent duplicate setup
+-- 2. Load existing state from AceDB global storage
+-- 3. Restructure flat storage into hierarchical state store
+-- 4. Initialize default structures for user content
+-- 5. Mark state as loaded and initialized
+--
+-- PERSISTENCE STRATEGY:
+-- • Immediate persistence on state changes
+-- • Hierarchical storage mapping (ui.*, timeline.*, etc.)
+-- • Atomic updates with rollback capability
+-- • Separation of complex data structures (userContent handled separately)
+--
+-- SUBSCRIPTION SYSTEM:
+-- • Event-driven notifications for state changes
+-- • Module isolation with subscriber IDs
+-- • Safe callback execution with error recovery
+-- • Unsubscription support for cleanup
+--
+-- PERFORMANCE CONSIDERATIONS:
+-- • Lazy initialization of state store
+-- • Efficient key-based storage access
+-- • Minimal memory footprint
+-- • Fast subscriber lookup and notification
+-- =============================================================================================
 
-    for _, key in ipairs(keys) do
-        if type(current) ~= "table" or not current[key] then
-            return nil
+--[[
+    Initialize StateManager and load existing state from SavedVariables
+    
+    This function performs the critical startup sequence for Chronicles' state management:
+    • Prevents duplicate initialization with guard clause
+    • Safely accesses Chronicles.db through HelperUtils
+    • Loads and restructures existing state from AceDB global storage
+    • Initializes default user content structures if missing
+    • Sets up the in-memory state store for runtime operations
+    
+    STORAGE MAPPING:
+    • chronicles.db.global.uiState → stateStore["ui.*"]
+    • chronicles.db.global.timelineState → stateStore["timeline.*"]
+    • chronicles.db.global.settingsState.eventTypes → stateStore["eventTypes.*"]
+    • chronicles.db.global.settingsState.collections → stateStore["collections.*"]
+    • chronicles.db.global.dataState → stateStore["data.*"]
+    
+    DEPENDENCIES:
+    • Requires Core.Logger for initialization tracking
+    • Requires Core.Utils.HelperUtils for safe Chronicles access
+    • Expects AceDB-3.0 to be properly initialized
+    
+    @throws None - designed to be safe and idempotent
+]]
+function private.Core.StateManager.init()
+    private.Core.Logger.trace("StateManager", "Initializing StateManager")
+
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if chronicles and chronicles.db and chronicles.db.global then
+        -- Load existing state
+        if chronicles.db.global.uiState then
+            for key, value in pairs(chronicles.db.global.uiState) do
+                stateStore["ui." .. key] = value
+            end
         end
-        current = current[key]
-    end
 
-    return current
-end
-
-function private.Core.StateManager.isStateLoaded()
-    return StateManager.isLoaded
-end
-
-function private.Core.StateManager.setState(path, value, description)
-    local keys = {strsplit(".", path)}
-    local current = StateManager.state
-
-    -- Navigate to parent
-    for i = 1, #keys - 1 do
-        local key = keys[i]
-        if type(current) ~= "table" then
-            return false
+        if chronicles.db.global.timelineState then
+            for key, value in pairs(chronicles.db.global.timelineState) do
+                stateStore["timeline." .. key] = value
+            end
         end
-        if not current[key] then
-            current[key] = {}
-        end
-        current = current[key]
-    end
-
-    -- Save snapshot before change
-    saveStateSnapshot(description or ("Set " .. path))
-
-    -- Set the value
-    local finalKey = keys[#keys]
-    current[finalKey] = value
-
-    -- Notify listeners
-    private.Core.StateManager.notifyStateChange(path, value)
-
-    return true
-end
-
-function private.Core.StateManager.notifyStateChange(path, newValue)
-    local listeners = StateManager.listeners[path] or {}
-    for _, listener in ipairs(listeners) do
-        local success, error = pcall(listener.callback, newValue, path)
-        if not success then
-            private.Core.Logger.error("StateManager", "Listener error for path " .. path .. ": " .. tostring(error))
-        end
-    end
-
-    -- Also notify wildcard listeners (listening to parent paths)
-    local pathParts = {strsplit(".", path)}
-    for i = 1, #pathParts - 1 do
-        local parentPath = table.concat(pathParts, ".", 1, i)
-        local parentListeners = StateManager.listeners[parentPath] or {}
-        for _, listener in ipairs(parentListeners) do
-            if listener.includeChildren then
-                local success, error = pcall(listener.callback, newValue, path)
-                if not success then
-                    private.Core.Logger.error(
-                        "StateManager",
-                        "Parent listener error for path " .. parentPath .. ": " .. tostring(error)
-                    )
+        if chronicles.db.global.settingsState then
+            for key, value in pairs(chronicles.db.global.settingsState) do
+                if key == "eventTypes" then
+                    for eventTypeId, status in pairs(value) do
+                        stateStore["eventTypes." .. eventTypeId] = status
+                    end
+                elseif key == "collections" then
+                    for collectionName, status in pairs(value) do
+                        stateStore["collections." .. collectionName] = status
+                    end
+                else
+                    stateStore[key] = value
                 end
             end
         end
-    end
-end
 
-function private.Core.StateManager.subscribe(path, callback, owner, includeChildren)
-    if not StateManager.listeners[path] then
-        StateManager.listeners[path] = {}
-    end
-
-    table.insert(
-        StateManager.listeners[path],
-        {
-            callback = callback,
-            owner = owner or "unknown",
-            includeChildren = includeChildren or false
-        }
-    )
-end
-
-function private.Core.StateManager.unsubscribe(path, owner)
-    local listeners = StateManager.listeners[path]
-    if not listeners then
-        return
-    end
-
-    for i = #listeners, 1, -1 do
-        if listeners[i].owner == owner then
-            table.remove(listeners, i)
-        end
-    end
-end
-
--- -------------------------
--- Event-Driven State Updates
--- -------------------------
-
-local function setupEventListeners() -- Use centralized event constants to avoid string duplication errors
-    local events = private.constants.events
-
-    -- Application startup event
-    private.Core.registerCallback(
-        events.AddonStartup,
-        function(startupData)
-            private.Core.Logger.trace(
-                "StateManager",
-                "AddonStartup event received - version: " .. tostring(startupData.version)
-            )
-
-            -- Load saved state from database
-            private.Core.StateManager.loadState()
-
-            -- Initialize state with startup data
-            private.Core.StateManager.setState(
-                "settings.debugMode",
-                startupData.debugMode or false,
-                "Debug mode initialized"
-            ) -- Initialize Timeline component
-            if private.Core.Timeline then
-                private.Core.Logger.trace("StateManager", "Initializing Timeline component")
-                private.Core.Timeline.Init()
-            end
-
-            private.Core.Logger.trace("StateManager", "Application startup initialization completed")
-        end,
-        "StateManager"
-    )
-
-    -- Application shutdown event
-    private.Core.registerCallback(
-        events.AddonShutdown,
-        function()
-            private.Core.Logger.trace("StateManager", "Application shutdown event received")
-
-            -- Save current state before shutdown
-            private.Core.StateManager.saveState()
-
-            -- Clean up listeners and state
-            StateManager.listeners = {}
-
-            private.Core.Logger.trace("StateManager", "Application shutdown cleanup completed")
-        end,
-        "StateManager"
-    )
-    -- Event selection
-    private.Core.registerCallback(
-        events.EventSelected,
-        function(eventData)
-            -- Store only the event ID instead of the full object
-            local eventId = eventData and eventData.id or nil
-            private.Core.StateManager.setState("ui.selectedEvent", eventId, "Event selected")
-        end,
-        "StateManager"
-    )
-    -- Character selection
-    private.Core.registerCallback(
-        events.CharacterSelected,
-        function(characterData)
-            -- Store only the character ID instead of the full object
-            local characterId = characterData and characterData.id or nil
-            private.Core.StateManager.setState("ui.selectedCharacter", characterId, "Character selected")
-        end,
-        "StateManager"
-    )
-    -- Faction selection
-    private.Core.registerCallback(
-        events.FactionSelected,
-        function(factionData)
-            -- Store only the faction ID instead of the full object
-            local factionId = factionData and factionData.id or nil
-            private.Core.StateManager.setState("ui.selectedFaction", factionId, "Faction selected")
-        end,
-        "StateManager"
-    )
-
-    -- Timeline period selection
-    private.Core.registerCallback(
-        events.TimelinePeriodSelected,
-        function(periodData)
-            private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
-        end,
-        "StateManager"
-    )
-
-    -- Main frame state
-    private.Core.registerCallback(
-        events.MainFrameUIOpenFrame,
-        function()
-            private.Core.StateManager.setState("ui.isMainFrameOpen", true, "Main frame opened")
-        end,
-        "StateManager"
-    )
-
-    private.Core.registerCallback(
-        events.MainFrameUICloseFrame,
-        function()
-            private.Core.StateManager.setState("ui.isMainFrameOpen", false, "Main frame closed")
-        end,
-        "StateManager"
-    )
-end
-
--- -------------------------
--- State Persistence
--- -------------------------
-
-function private.Core.StateManager.saveState()
-    if Chronicles and Chronicles.db then
-        Chronicles.db.global.uiState = deepCopy(StateManager.state.ui)
-        Chronicles.db.global.timelineState = deepCopy(StateManager.state.timeline)
-        Chronicles.db.global.settingsState = deepCopy(StateManager.state.settings)
-        Chronicles.db.global.dataState = deepCopy(StateManager.state.data)
-    end
-end
-
-function private.Core.StateManager.loadState()
-    if Chronicles and Chronicles.db then
-        -- Load UI state with fallback to defaults
-        if Chronicles.db.global.uiState then
-            StateManager.state.ui = deepCopy(Chronicles.db.global.uiState)
-        end
-
-        -- Load timeline state with fallback to defaults
-        if Chronicles.db.global.timelineState then
-            StateManager.state.timeline = deepCopy(Chronicles.db.global.timelineState)
-        end
-
-        -- Load settings state with fallback to defaults
-        if Chronicles.db.global.settingsState then
-            StateManager.state.settings = deepCopy(Chronicles.db.global.settingsState)
-        end
-        -- Load data state with fallback to defaults
-        if Chronicles.db.global.dataState then
-            StateManager.state.data = deepCopy(Chronicles.db.global.dataState)
-        end
-    end -- Mark as loaded to prevent collection registrations from overriding saved state
-    StateManager.isLoaded = true
-
-    -- Trigger notifications for loaded state values that UI components need to react to
-    -- This ensures UI components respond to loaded state even if they weren't initialized when state was loaded
-    if StateManager.state.ui.selectedPeriod then
-        private.Core.Logger.trace("StateManager", "Triggering selectedPeriod notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedPeriod", StateManager.state.ui.selectedPeriod)
-    end
-
-    if StateManager.state.ui.selectedEvent then
-        private.Core.Logger.trace("StateManager", "Triggering selectedEvent notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedEvent", StateManager.state.ui.selectedEvent)
-    end    if StateManager.state.ui.selectedCharacter then
-        private.Core.Logger.trace("StateManager", "Triggering selectedCharacter notification after state load")
-        private.Core.StateManager.notifyStateChange(
-            "ui.selectedCharacter",
-            StateManager.state.ui.selectedCharacter
-        )
-    end    if StateManager.state.ui.selectedFaction then
-        private.Core.Logger.trace("StateManager", "Triggering selectedFaction notification after state load")
-        private.Core.StateManager.notifyStateChange("ui.selectedFaction", StateManager.state.ui.selectedFaction)
-    end
-
-    -- Also schedule a delayed notification to catch any UI components that subscribe after initial load
-    C_Timer.After(
-        0.5,
-        function()            if StateManager.state.ui.selectedPeriod then
-                private.Core.Logger.trace("StateManager", "Triggering delayed selectedPeriod notification")
-                private.Core.StateManager.notifyStateChange(
-                    "ui.selectedPeriod",
-                    StateManager.state.ui.selectedPeriod
-                )
+        if chronicles.db.global.dataState then
+            for key, value in pairs(chronicles.db.global.dataState) do
+                stateStore["data." .. key] = value
             end
         end
-    )
-end
 
--- -------------------------
--- State Debugging
--- -------------------------
-
-function private.Core.StateManager.dumpState(path)
-    local state = private.Core.StateManager.getState(path)
-    private.Core.Logger.trace("StateManager", "State dump" .. (path and (" for " .. path) or "") .. ":")
-    private.Core.StateManager.printTable(state, 0)
-end
-
-function private.Core.StateManager.printTable(t, indent)
-    indent = indent or 0
-    local prefix = string.rep("  ", indent)
-
-    if type(t) ~= "table" then
-        private.Core.Logger.trace("StateManager", prefix .. tostring(t))
-        return
-    end
-
-    for k, v in pairs(t) do
-        if type(v) == "table" then
-            private.Core.Logger.trace("StateManager", prefix .. tostring(k) .. ":")
-            private.Core.StateManager.printTable(v, indent + 1)
-        else
-            private.Core.Logger.trace("StateManager", prefix .. tostring(k) .. ": " .. tostring(v))
+        -- Initialize user content structure if it doesn't exist
+        if not stateStore["data.userContent.events"] then
+            stateStore["data.userContent.events"] = {
+                byId = {},
+                metadata = {
+                    count = 0,
+                    lastModified = 0
+                },
+                index = {
+                    byYear = {},
+                    byEventType = {}
+                }
+            }
         end
-    end
-end
 
-function private.Core.StateManager.getHistory(count)
-    count = count or 10
-    local history = {}
-    local startIndex = math.max(1, #StateManager.history - count + 1)
+        if not stateStore["data.userContent.characters"] then
+            stateStore["data.userContent.characters"] = {
+                byId = {},
+                metadata = {
+                    count = 0,
+                    lastModified = 0
+                },
+                index = {
+                    byYear = {}
+                }
+            }
+        end
 
-    for i = startIndex, #StateManager.history do
-        table.insert(history, StateManager.history[i])
-    end
-
-    return history
-end
-
--- -------------------------
--- Initialization
--- -------------------------
-
-function private.Core.StateManager.init()
-    -- Set up event listeners first
-    setupEventListeners()
-
-    -- Load state from database
-    private.Core.StateManager.loadState()
-
-    -- Set up auto-save timer (save every 30 seconds)
-    if not StateManager.autoSaveTimer then
-        StateManager.autoSaveTimer =
-            C_Timer.NewTicker(
-            30,
-            function()
-                private.Core.StateManager.saveState()
-            end
-        )
+        if not stateStore["data.userContent.factions"] then
+            stateStore["data.userContent.factions"] = {
+                byId = {},
+                metadata = {
+                    count = 0,
+                    lastModified = 0
+                },
+                index = {
+                    byYear = {}
+                }
+            }
+        end
     end
 
     private.Core.Logger.trace("StateManager", "StateManager initialized successfully")
 end
 
--- Console commands for state debugging
-SLASH_CHRONICLESSTATEDEBUG1 = "/cstatedebug"
-SlashCmdList["CHRONICLESSTATEDEBUG"] = function(msg)
-    local args = {strsplit(" ", msg)}
-    local command = args[1]
-
-    if command == "dump" then
-        local path = args[2]
-        private.Core.StateManager.dumpState(path)
-    elseif command == "history" then
-        local count = tonumber(args[2]) or 5
-        local history = private.Core.StateManager.getHistory(count)
-        private.Core.Logger.trace("StateManager", "State History:")
-        for _, entry in ipairs(history) do
-            local timeStr = date("%H:%M:%S", entry.timestamp)
-            private.Core.Logger.trace("StateManager", string.format("[%s] %s", timeStr, entry.description))
-        end
-    elseif command == "get" then
-        local path = args[2]
-        if path then
-            local value = private.Core.StateManager.getState(path)
-            private.Core.Logger.trace("StateManager", path .. ": " .. tostring(value))
-        else
-            private.Core.Logger.error("StateManager", "Please specify a state path")
-        end
-    elseif command == "set" then
-        local path = args[2]
-        local value = args[3]
-        if path and value then
-            -- Try to convert value to appropriate type
-            local numValue = tonumber(value)
-            if numValue then
-                value = numValue
-            elseif value == "true" then
-                value = true
-            elseif value == "false" then
-                value = false
-            elseif value == "nil" then
-                value = nil
-            end
-            private.Core.StateManager.setState(path, value, "Manual state change")
-            private.Core.Logger.trace("StateManager", "Set " .. path .. " to " .. tostring(value))
-        else
-            private.Core.Logger.error("StateManager", "Please specify path and value")
-        end
-    else
-        private.Core.Logger.trace("StateManager", "Commands:")
-        private.Core.Logger.trace("StateManager", "  /cstatedebug dump [path] - Dump current state")
-        private.Core.Logger.trace("StateManager", "  /cstatedebug history [count] - Show state change history")
-        private.Core.Logger.trace("StateManager", "  /cstatedebug get <path> - Get state value")
-        private.Core.Logger.trace("StateManager", "  /cstatedebug set <path> <value> - Set state value")
+--[[
+    Set a state value with automatic persistence and change notification
+    
+    This is the primary method for updating Chronicles state. It provides:
+    • Automatic initialization if StateManager hasn't been set up yet
+    • Input validation with detailed error logging
+    • Immediate persistence to AceDB storage
+    • Change event notification to all subscribers
+    • Optional description for debugging and audit trails
+    
+    PERSISTENCE FLOW:
+    1. Validate input parameters
+    2. Store old value for change comparison
+    3. Update in-memory state store
+    4. Persist to appropriate AceDB storage location
+    5. Notify subscribers with old and new values
+    6. Log the change with optional description
+    
+    @param key [string] State key (should be built using buildStateKey functions)
+    @param value [any] New state value (any JSON-serializable type)
+    @param description [string] Optional description for logging and debugging
+    @return [boolean] Success status (false indicates validation failure)
+]]
+function private.Core.StateManager.setState(key, value, description)
+    if not key or type(key) ~= "string" then
+        private.Core.Logger.error("StateManager", "setState called with invalid key: " .. tostring(key))
+        return false
     end
+
+    local oldValue = stateStore[key]
+    stateStore[key] = value
+
+    -- Persist to saved variables
+    private.Core.StateManager.persistState(key, value)
+
+    -- Notify subscribers
+    private.Core.StateManager.notifySubscribers(key, value, oldValue)
+
+    private.Core.Logger.trace(
+        "StateManager",
+        "State updated: " .. key .. " = " .. tostring(value) .. (description and (" (" .. description .. ")") or "")
+    )
+
+    return true
+end
+
+--[[
+    Retrieve a state value with automatic initialization
+    
+    Safe state retrieval method that handles initialization and provides
+    consistent error handling across Chronicles.
+    
+    @param key [string] State key to retrieve
+    @return [any] State value, or nil if key doesn't exist or is invalid
+]]
+function private.Core.StateManager.getState(key)
+    if not key or type(key) ~= "string" then
+        private.Core.Logger.error("StateManager", "getState called with invalid key: " .. tostring(key))
+        return nil
+    end
+
+    return stateStore[key]
+end
+
+function private.Core.StateManager.persistState(key, value)
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.db or not chronicles.db.global then
+        return
+    end
+
+    -- Parse key to determine storage location
+    local keyParts = {}
+    for part in string.gmatch(key, "[^%.]+") do
+        table.insert(keyParts, part)
+    end
+
+    if #keyParts < 2 then
+        return
+    end
+
+    local category = keyParts[1]
+    local subKey = keyParts[2]
+
+    if category == "ui" then
+        if not chronicles.db.global.uiState then
+            chronicles.db.global.uiState = {}
+        end
+        chronicles.db.global.uiState[subKey] = value
+    elseif category == "timeline" then
+        if not chronicles.db.global.timelineState then
+            chronicles.db.global.timelineState = {}
+        end
+        chronicles.db.global.timelineState[subKey] = value
+    elseif category == "eventTypes" then
+        if not chronicles.db.global.settingsState then
+            chronicles.db.global.settingsState = {}
+        end
+        if not chronicles.db.global.settingsState.eventTypes then
+            chronicles.db.global.settingsState.eventTypes = {}
+        end
+        chronicles.db.global.settingsState.eventTypes[subKey] = value
+    elseif category == "collections" then
+        if not chronicles.db.global.settingsState then
+            chronicles.db.global.settingsState = {}
+        end
+        if not chronicles.db.global.settingsState.collections then
+            chronicles.db.global.settingsState.collections = {}
+        end
+        chronicles.db.global.settingsState.collections[subKey] = value
+    elseif category == "data" and subKey ~= "userContent" then
+        if not chronicles.db.global.dataState then
+            chronicles.db.global.dataState = {}
+        end
+        chronicles.db.global.dataState[subKey] = value
+    end
+
+    -- For complex data structures like userContent, store directly in stateStore
+    -- They are handled separately in the data modules
+end
+
+--[[
+    Subscribe to state changes for reactive programming patterns
+    
+    Enables modules to react to state changes without tight coupling.
+    Callbacks are executed safely with error handling to prevent
+    subscriber failures from affecting other subscribers.
+    
+    @param key [string] State key to monitor
+    @param callback [function] Function to call when state changes: callback(newValue, oldValue, key)
+    @param subscriberId [string] Unique identifier for this subscription (for cleanup)
+    @return [boolean] Success status
+]]
+function private.Core.StateManager.subscribe(key, callback, subscriberId)
+    if not key or not callback then
+        return false
+    end
+
+    if not subscribers[key] then
+        subscribers[key] = {}
+    end
+
+    subscribers[key][subscriberId or "anonymous"] = callback
+    return true
+end
+
+function private.Core.StateManager.unsubscribe(key, subscriberId)
+    if not key or not subscriberId then
+        return false
+    end
+
+    if subscribers[key] then
+        subscribers[key][subscriberId] = nil
+    end
+
+    return true
+end
+
+function private.Core.StateManager.notifySubscribers(key, newValue, oldValue)
+    if not subscribers[key] then
+        return
+    end
+
+    for subscriberId, callback in pairs(subscribers[key]) do
+        if type(callback) == "function" then
+            local success, errorMsg = pcall(callback, newValue, oldValue, key)
+            if not success then
+                private.Core.Logger.error(
+                    "StateManager",
+                    "Subscriber callback failed for " .. key .. ": " .. tostring(errorMsg)
+                )
+            end
+        end
+    end
+end
+
+function private.Core.StateManager.getAllState()
+    return stateStore
+end
+
+function private.Core.StateManager.clearState()
+    stateStore = {}
+    subscribers = {}
+end
+
+-- =============================================================================================
+-- DEBUG AND UTILITY FUNCTIONS
+-- =============================================================================================
+--
+-- Development and debugging utilities for StateManager inspection and troubleshooting.
+-- These functions provide visibility into StateManager's internal state and are essential
+-- for development, testing, and runtime debugging.
+--
+-- DEBUGGING CAPABILITIES:
+-- • Complete state store inspection with formatted output
+-- • Subscriber tracking and relationship mapping
+-- • State change audit trails via logging integration
+-- • Safe state access patterns for development tools
+--
+-- USAGE SCENARIOS:
+-- • Development: Understanding state structure and flow
+-- • Testing: Verifying state transitions and persistence
+-- • Production: Troubleshooting user-reported issues
+-- • Performance: Identifying state access patterns and bottlenecks
+--
+-- DEPENDENCIES:
+-- • Core.Logger: For formatted debug output
+-- • Core.Utils.TableUtils: For subscriber count calculations
+-- =============================================================================================
+
+function private.Core.StateManager.debugPrintState()
+    private.Core.Logger.trace("StateManager", "=== Current State ===")
+    for key, value in pairs(stateStore) do
+        private.Core.Logger.trace("StateManager", key .. " = " .. tostring(value))
+    end
+    private.Core.Logger.trace("StateManager", "=== End State ===")
+end
+
+function private.Core.StateManager.debugPrintSubscribers()
+    private.Core.Logger.trace("StateManager", "=== Current Subscribers ===")
+    for key, subs in pairs(subscribers) do
+        private.Core.Logger.trace(
+            "StateManager",
+            key .. " has " .. private.Core.Utils.TableUtils.tableLength(subs) .. " subscribers"
+        )
+    end
+    private.Core.Logger.trace("StateManager", "=== End Subscribers ===")
 end

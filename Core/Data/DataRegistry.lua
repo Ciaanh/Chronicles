@@ -42,7 +42,10 @@ function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.D
     end
 
     if chronicles.Data.Events[collectionName] ~= nil then
-        private.Core.Logger.error("DataRegistry", collectionName .. " is already registered by another plugin in Events.")
+        private.Core.Logger.error(
+            "DataRegistry",
+            collectionName .. " is already registered by another plugin in Events."
+        )
         return false
     end
     if db == nil then
@@ -57,30 +60,19 @@ function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.D
     -- Only set default value if no saved state exists
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
-        -- Check if StateManager has loaded saved state - if so, respect the absence of this collection
-        -- (it might have been disabled and removed from saved state)
-        if private.Core.StateManager.isStateLoaded() then
-            -- StateManager has loaded, so absence means this collection is new or was removed
-            -- For new collections after initial setup, default to true
-            isActive = true
-        else
-            -- StateManager hasn't loaded yet, default to true for first-time initialization
-            isActive = true
-        end
+        isActive = true
         private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
     chronicles.Data.Events[collectionName] = {
         data = db or {}, -- Ensure data is never nil
         name = collectionName
-    }
-
-    -- Invalidate caches since we registered new event data
-    private.Core.Cache.invalidate("periodsFillingBySteps")
-    private.Core.Cache.invalidate("minEventYear")
-    private.Core.Cache.invalidate("maxEventYear")
-    private.Core.Cache.invalidate("collectionsNames")
-    private.Core.Cache.invalidate("searchCache")
+    } -- Invalidate caches since we registered new event data
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.COLLECTIONS_NAMES)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 
     return true
 end
@@ -115,11 +107,7 @@ function DataRegistry.registerFactionDB(collectionName, db)
     -- Only set default value if no saved state exists
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
-        if private.Core.StateManager.isStateLoaded() then
-            isActive = true -- New collection after initial setup
-        else
-            isActive = true -- First-time initialization
-        end
+        isActive = true -- New collection after initial setup
         private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
@@ -160,11 +148,7 @@ function DataRegistry.registerCharacterDB(collectionName, db)
     -- Only set default value if no saved state exists
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
-        if private.Core.StateManager.isStateLoaded() then
-            isActive = true -- New collection after initial setup
-        else
-            isActive = true -- First-time initialization
-        end
+        isActive = true
         private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
     end
 
@@ -232,7 +216,10 @@ function DataRegistry.getCollectionsNames()
     -- Ensure Chronicles.Data is initialized
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("DataRegistry", "Chronicles.Data not initialized when trying to get collections names")
+        private.Core.Logger.error(
+            "DataRegistry",
+            "Chronicles.Data not initialized when trying to get collections names"
+        )
         return {}
     end
 
@@ -242,12 +229,7 @@ function DataRegistry.getCollectionsNames()
             local dbTypePath = "collections." .. eventCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                -- Only set default if StateManager hasn't loaded saved state yet
-                if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New collection after initial setup
-                else
-                    isActive = true -- First-time initialization
-                end
+                isActive = true -- New collection after initial setup
             end
             local groupProjection = {
                 name = group.name,
@@ -265,12 +247,7 @@ function DataRegistry.getCollectionsNames()
             local dbTypePath = "collections." .. factionCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                -- Only set default if StateManager hasn't loaded saved state yet
-                if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New collection after initial setup
-                else
-                    isActive = true -- First-time initialization
-                end
+                isActive = true -- New collection after initial setup
             end
             local groupProjection = {
                 name = group.name,
@@ -288,12 +265,7 @@ function DataRegistry.getCollectionsNames()
             local dbTypePath = "collections." .. characterCollectionName
             local isActive = private.Core.StateManager.getState(dbTypePath)
             if isActive == nil then
-                -- Only set default if StateManager hasn't loaded saved state yet
-                if private.Core.StateManager.isStateLoaded() then
-                    isActive = true -- New collection after initial setup
-                else
-                    isActive = true -- First-time initialization
-                end
+                isActive = true
             end
             local groupProjection = {
                 name = group.name,

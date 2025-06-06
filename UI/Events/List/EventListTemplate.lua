@@ -32,6 +32,9 @@ end
 function EventListItemMixin:OnClick()
 	-- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
+		-- Use the centralized state key builder for entity selection
+		local selectionKey = private.Core.StateManager.buildSelectionKey("event")
+
 		-- Pass both event ID and collection name for unique identification
 		local eventSelection = nil
 		if self.Event and self.Event.id then
@@ -40,7 +43,7 @@ function EventListItemMixin:OnClick()
 				collectionName = self.Event.source or "Origins" -- Default to Origins if source not available
 			}
 		end
-		private.Core.StateManager.setState("ui.selectedEvent", eventSelection, "Event selected from list")
+		private.Core.StateManager.setState(selectionKey, eventSelection, "Event selected from list")
 	end
 end
 

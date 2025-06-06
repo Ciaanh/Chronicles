@@ -94,7 +94,6 @@ function SearchEngine.searchEventsInDB(yearStart, yearEnd, db)
     for _, event in pairs(db) do
         if event then
             local isEventTypeActive = chronicles.Data:GetEventTypeStatus(event.eventType)
-
             if isEventTypeActive and SearchEngine.isEventInRange(event, yearStart, yearEnd) then
                 table.insert(foundEvents, event)
             end

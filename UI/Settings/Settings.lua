@@ -53,7 +53,6 @@ Dependencies:
 - Core.Settings: Configuration data management
 =================================================================================
 ]]
-
 -- Event types
 -- Collections
 -- My journal
@@ -138,7 +137,11 @@ function SettingsMixin:OnLoad()
         self.OnSettingsEventTypeChecked,
         self
     )
-    private.Core.registerCallback(private.constants.events.SettingsCollectionChecked, self.OnSettingsCollectionChecked, self)
+    private.Core.registerCallback(
+        private.constants.events.SettingsCollectionChecked,
+        self.OnSettingsCollectionChecked,
+        self
+    )
 
     -- Use state-based subscription for tab selection
     -- This provides a single source of truth for the active tab
@@ -420,12 +423,14 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
 
     -- Extract the event type ID and checked status from the event data
     local eventTypeId = eventData.eventTypeId
-    local isActive = eventData.isActive -- Update StateManager for event type status
-    local path = "eventTypes." .. tostring(eventTypeId)
-    private.Core.StateManager.setState(path, isActive, "Event type setting changed")
+    local isActive = eventData.isActive -- Use the centralized state key builder for event type settings
+    local settingsKey = private.Core.StateManager.buildSettingsKey("eventType", eventTypeId)
 
-    --private.Core.Utils.HelperUtils.getChronicles().Data:SetEventTypeStatus(eventTypeId, isActive)
-    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods()
+    private.Core.StateManager.setState(settingsKey, isActive, "Event type setting changed")
+
+    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods() -- Invalidate caches when event type status changes
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -438,19 +443,17 @@ function SettingsMixin:OnSettingsCollectionChecked(eventData)
     if not eventData or not eventData.collectionName then
         private.Core.Logger.warn("Settings", "OnSettingsCollectionChecked called with invalid eventData")
         return
-    end
-
-    -- Extract the collection name and checked status from the event data
+    end -- Extract the collection name and checked status from the event data
     local collectionName = eventData.collectionName
-    local isActive = eventData.isActive -- Update StateManager for collection status
-    local path = "collections." .. collectionName
-    private.Core.StateManager.setState(path, isActive, "Collection setting changed")
+    local isActive = eventData.isActive
 
-    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods()
+    -- Use the centralized state key builder for collection settings
+    local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
+    private.Core.StateManager.setState(collectionKey, isActive, "Collection setting changed")
 
-    -- Invalidate caches when collection status changes
-    private.Core.Cache.invalidate("periodsFillingBySteps")
-    private.Core.Cache.invalidate("searchCache")
+    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods() -- Invalidate caches when collection status changes
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
+    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -507,7 +510,11 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
-        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(eventTypeId))
+
+        -- Debug: Check what status is being retrieved and set
+        local currentStatus = private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(eventTypeId)
+
+        newCheckbox:SetChecked(currentStatus)
 
         -- Add hover effect to container
         checkboxContainer:SetScript(
@@ -673,11 +680,11 @@ function SettingsMixin:LoadMyJournal(frame)
                 chronicles.db.global.options = chronicles.db.global.options or {}
             end
             chronicles.db.global.options.myjournal = isChecked
-            private.Core.StateManager.setState(
-                "collections." .. private.constants.configurationName.myjournal,
-                isChecked,
-                "MyJournal setting changed"
-            )
+
+            -- Use the centralized state key builder for MyJournal collection
+            local myJournalKey =
+                private.Core.StateManager.buildCollectionKey(private.constants.configurationName.myjournal)
+            private.Core.StateManager.setState(myJournalKey, isChecked, "MyJournal setting changed")
 
             -- Update UI
             if MyJournalViewShow then
@@ -864,9 +871,7 @@ function SettingsMixin:RefreshLogDisplay(frame)
                 timestamp = time()
             }
         }
-    end
-
-    -- Get current log level filter from dropdown
+    end -- Get current log level filter from dropdown
     local currentLogLevel = private.Core.Logger.getLogLevel and private.Core.Logger.getLogLevel() or "WARN"
     local logLevels = {TRACE = 1, WARN = 2, ERROR = 3}
     local minLevel = logLevels[currentLogLevel] or 3
@@ -953,7 +958,7 @@ function SettingsMixin:CreateLogEntryFrame(parent, logEntry)
     levelText:SetPoint("LEFT", entryFrame, "LEFT", 5, 0)
     levelText:SetWidth(50)
     levelText:SetJustifyH("LEFT")
-    levelText:SetText(logEntry.level or "INFO")
+    levelText:SetText(logEntry.level or "TRACE")
 
     -- Color level text based on log level
     local colors = {
@@ -988,7 +993,7 @@ function SettingsMixin:CreateLogEntryFrame(parent, logEntry)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetText("Log Entry Details", 1, 1, 1)
             GameTooltip:AddLine("Timestamp: " .. date("%Y-%m-%d %H:%M:%S", logEntry.timestamp or time()), 0.8, 0.8, 0.8)
-            GameTooltip:AddLine("Level: " .. (logEntry.level or "INFO"), color[1], color[2], color[3])
+            GameTooltip:AddLine("Level: " .. (logEntry.level or "TRACE"), color[1], color[2], color[3])
             GameTooltip:AddLine("Module: " .. (logEntry.module or "Unknown"), 0.8, 0.8, 1.0)
             GameTooltip:AddLine("Message: " .. (logEntry.message or ""), 0.9, 0.9, 0.9, true)
             GameTooltip:Show()

@@ -4,7 +4,7 @@ local Chronicles = private.Chronicles
 CharacterDetailPageMixin = {}
 
 function CharacterDetailPageMixin:OnLoad()
-	self.PagedCharacterDetails:SetElementTemplateData(private.constants.templates)	-- Use state-based subscription for character selection
+	self.PagedCharacterDetails:SetElementTemplateData(private.constants.templates) -- Use state-based subscription for character selection
 	-- This provides a single source of truth for the selected character
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
@@ -12,23 +12,30 @@ function CharacterDetailPageMixin:OnLoad()
 			function(newCharacterSelection, oldCharacterSelection)
 				if newCharacterSelection then
 					local characterData = nil
-					
+
 					-- Handle both new format {characterId, collectionName} and legacy format (just ID)
-					if type(newCharacterSelection) == "table" and newCharacterSelection.characterId and newCharacterSelection.collectionName then
+					if
+						type(newCharacterSelection) == "table" and newCharacterSelection.characterId and
+							newCharacterSelection.collectionName
+					 then
 						-- New format with collection-specific lookup
 						local characterId = newCharacterSelection.characterId
 						local collectionName = newCharacterSelection.collectionName
-						private.Core.Logger.debug("CharacterBook", "Character selection received - ID: " .. characterId .. ", Collection: " .. collectionName)
+						private.Core.Logger.trace(
+							"CharacterBook",
+							"Character selection received - ID: " .. characterId .. ", Collection: " .. collectionName
+						)
 						characterData = self:GetCharacterById(characterId, collectionName)
 					else
 						-- Legacy format or fallback - treat as just character ID
-						local characterId = type(newCharacterSelection) == "table" and newCharacterSelection.characterId or newCharacterSelection
+						local characterId =
+							type(newCharacterSelection) == "table" and newCharacterSelection.characterId or newCharacterSelection
 						if characterId then
-							private.Core.Logger.debug("CharacterBook", "Character selection received (legacy format) - ID: " .. characterId)
+							private.Core.Logger.trace("CharacterBook", "Character selection received (legacy format) - ID: " .. characterId)
 							characterData = self:GetCharacterById(characterId)
 						end
 					end
-					
+
 					if characterData then
 						self:OnCharacterSelected(characterData)
 					else
@@ -54,32 +61,44 @@ function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
 		if characters then
 			-- If collection name is provided, try direct lookup first for performance
 			if collectionName then
-				private.Core.Logger.debug("CharacterBook", "Attempting direct collection lookup for character ID: " .. characterId .. " in collection: " .. collectionName)
-				
+				private.Core.Logger.trace(
+					"CharacterBook",
+					"Attempting direct collection lookup for character ID: " .. characterId .. " in collection: " .. collectionName
+				)
+
 				for _, character in pairs(characters) do
 					if character.id == characterId and character.source == collectionName then
-						private.Core.Logger.debug("CharacterBook", "Found character via direct collection lookup")
+						private.Core.Logger.trace("CharacterBook", "Found character via direct collection lookup")
 						return character
 					end
 				end
-				
-				private.Core.Logger.warn("CharacterBook", "Character not found in specified collection, falling back to general search")
+
+				private.Core.Logger.warn(
+					"CharacterBook",
+					"Character not found in specified collection, falling back to general search"
+				)
 			end
-			
+
 			-- Fallback: search through all characters (maintains backward compatibility)
 			for _, character in pairs(characters) do
 				if character.id == characterId then
 					if collectionName then
-						private.Core.Logger.debug("CharacterBook", "Found character via fallback search (different collection than expected)")
+						private.Core.Logger.trace(
+							"CharacterBook",
+							"Found character via fallback search (different collection than expected)"
+						)
 					end
 					return character
 				end
 			end
 		end
 	end
-	
+
 	if collectionName then
-		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId .. ", Collection: " .. collectionName)
+		private.Core.Logger.error(
+			"CharacterBook",
+			"Character not found - ID: " .. characterId .. ", Collection: " .. collectionName
+		)
 	else
 		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId)
 	end

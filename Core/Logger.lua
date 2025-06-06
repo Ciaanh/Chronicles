@@ -34,7 +34,6 @@ Configuration:
 Dependencies: None - this is a core module loaded early
 =================================================================================
 ]]
-
 private.Core.Logger = {}
 
 -- -------------------------
@@ -53,7 +52,6 @@ private.Core.Logger.LOG_COLORS = {
     TRACE = "|cFF00FFFF", -- Cyan
     WARN = "|cFFFFFF00", -- Yellow
     ERROR = "|cFFFF0000", -- Red
-    INFO = "|cFF00FF00", -- Green
     RESET = "|r"
 }
 
@@ -136,7 +134,7 @@ function private.Core.Logger.setEnabled(enabled)
     local message =
         string.format(
         "%s[Chronicles Logger]%s Debug logging %s",
-        private.Core.Logger.LOG_COLORS.INFO,
+        private.Core.Logger.LOG_COLORS.TRACE,
         private.Core.Logger.LOG_COLORS.RESET,
         status
     )
@@ -165,7 +163,7 @@ function private.Core.Logger.setLogLevel(level)
         local message =
             string.format(
             "%s[Chronicles Logger]%s Log level set to %s",
-            private.Core.Logger.LOG_COLORS.INFO,
+            private.Core.Logger.LOG_COLORS.TRACE,
             private.Core.Logger.LOG_COLORS.RESET,
             level
         )
@@ -235,7 +233,7 @@ function private.Core.Logger.printLogHistory(count, level, module)
     local headerMessage =
         string.format(
         "%s[Chronicles Logger]%s Log History%s:",
-        private.Core.Logger.LOG_COLORS.INFO,
+        private.Core.Logger.LOG_COLORS.TRACE,
         private.Core.Logger.LOG_COLORS.RESET,
         filterDesc
     )

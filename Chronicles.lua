@@ -6,11 +6,10 @@ local defaults = {
             minimap = {hide = false},
             myjournal = true
         },
-        -- StateManager state defaults
         uiState = {
-            selectedEvent = nil, -- Stores event ID (number)
-            selectedCharacter = nil, -- Stores character ID (number)
-            selectedFaction = nil, -- Stores faction ID (number)
+            selectedEvent = nil,
+            selectedCharacter = nil,
+            selectedFaction = nil,
             selectedPeriod = nil,
             activeTab = nil,
             isMainFrameOpen = false
@@ -18,8 +17,7 @@ local defaults = {
         timelineState = {
             currentStep = nil,
             currentPage = nil,
-            selectedYear = nil,
-            periodsCache = {}
+            selectedYear = nil
         },
         settingsState = {
             eventTypes = {},

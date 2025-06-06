@@ -18,12 +18,23 @@ function FactionListItemMixin:OnClick()
 		-- Store both faction ID and collection name for unique identification
 		local factionId = self.Faction and self.Faction.id or nil
 		local collectionName = self.Faction and self.Faction.source or nil
-		
+
 		if factionId and collectionName then
-			private.Core.Logger.debug("FactionList", "Faction selected - ID: " .. factionId .. ", Collection: " .. collectionName)
-			private.Core.StateManager.setState("ui.selectedFaction", {factionId = factionId, collectionName = collectionName}, "Faction selected from list")
+			private.Core.Logger.trace(
+				"FactionList",
+				"Faction selected - ID: " .. factionId .. ", Collection: " .. collectionName
+			)
+			private.Core.StateManager.setState(
+				"ui.selectedFaction",
+				{factionId = factionId, collectionName = collectionName},
+				"Faction selected from list"
+			)
 		else
-			private.Core.Logger.warn("FactionList", "Faction selection missing required data - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName))
+			private.Core.Logger.warn(
+				"FactionList",
+				"Faction selection missing required data - ID: " ..
+					tostring(factionId) .. ", Collection: " .. tostring(collectionName)
+			)
 		end
 	end
 end
