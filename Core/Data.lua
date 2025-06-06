@@ -705,9 +705,15 @@ function Chronicles.Data.RP:GetName()
 end
 
 function Chronicles.Data.RP:TRP_GetCharacteristics()
+    if not _G["TRP3_API"] or not TRP3_API.profile then
+        return nil
+    end
     local profileID = TRP3_API.profile.getPlayerCurrentProfileID()
     local profile = TRP3_API.profile.getProfileByID(profileID)
-    return profile.player.characteristics
+    if profile and profile.player and profile.player.characteristics then
+        return profile.player.characteristics
+    end
+    return nil
 end
 
 function Chronicles.Data.RP:TRP_GetFirstName()
