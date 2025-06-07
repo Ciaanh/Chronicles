@@ -1,7 +1,4 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
-local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-
 -- -------------------------
 -- Templates
 -- -------------------------
@@ -55,7 +52,7 @@ end
 
 function FactionListMixin:LoadFactions()
 	-- Get all factions using the data search function
-	local factions = Chronicles.Data:SearchFactions()
+	local factions = private.Chronicles.Data:SearchFactions()
 	if not factions then
 		private.Core.Logger.warn("FactionList", "No faction data available")
 		return

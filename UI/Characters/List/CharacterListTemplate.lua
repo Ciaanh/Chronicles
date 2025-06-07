@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- -------------------------
@@ -56,7 +55,7 @@ end
 
 function CharacterListMixin:LoadCharacters()
 	-- Get all characters using the data search function
-	local characters = Chronicles.Data:SearchCharacters()
+	local characters = private.Chronicles.Data:SearchCharacters()
 	if not characters then
 		private.Core.Logger.warn("CharacterList", "No character data available")
 		return

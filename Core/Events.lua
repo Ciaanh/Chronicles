@@ -1,4 +1,5 @@
 local FOLDER_NAME, private = ...
+local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 --[[
@@ -49,7 +50,6 @@ Dependencies:
 - AceLocale-3.0: Localization support
 =================================================================================
 ]]
-
 private.Core.Events = {}
 
 -- Import utilities
@@ -95,7 +95,7 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
 local function CreateChapter(title, pages)
     local chapter = {elements = {}}
 
-    if (title ~= nil) then
+    if (title ~= nil and title ~= "") then
         chapter.header = {
             templateKey = private.constants.templateKeys.HEADER,
             text = title
@@ -178,6 +178,22 @@ function private.Core.Events.TransformEventToBook(event)
         end
     end
 
+    -- Print all properties from data (each chapter/table in the book)
+    -- for i, chapter in ipairs(data) do
+    --     print("Chapter " .. i .. ":")
+    --     for key, value in pairs(chapter) do
+    --         if type(value) == "table" then
+    --             print("  " .. tostring(key) .. " = {")
+    --             for k, v in pairs(value) do
+    --                 print("    " .. tostring(k) .. " = " .. tostring(v))
+    --             end
+    --             print("  }")
+    --         else
+    --             print("  " .. tostring(key) .. " = " .. tostring(value))
+    --         end
+    --     end
+    -- end
+
     return data
 end
 
@@ -192,8 +208,8 @@ function private.Core.Events.FilterEvents(events)
     for eventIndex in pairs(events) do
         local event = events[eventIndex]
 
-        local eventGroupStatus = private.Chronicles.Data:GetCollectionStatus(event.source)
-        local eventTypeStatus = private.Chronicles.Data:GetEventTypeStatus(event.eventType)
+        local eventGroupStatus = Chronicles.Data:GetCollectionStatus(event.source)
+        local eventTypeStatus = Chronicles.Data:GetEventTypeStatus(event.eventType)
 
         if eventGroupStatus and eventTypeStatus then
             table.insert(foundEvents, event)

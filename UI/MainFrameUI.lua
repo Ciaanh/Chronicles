@@ -1,5 +1,4 @@
 local FOLDER_NAME, private = ...
-local Chronicles = private.Chronicles
 
 --[[
 =================================================================================
@@ -48,7 +47,7 @@ Dependencies:
 ]]
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-Chronicles.UI = {}
+private.Chronicles.UI = {}
 
 --[[
     Toggle the main Chronicles interface window
@@ -60,7 +59,7 @@ Chronicles.UI = {}
     @example
         Chronicles.UI.DisplayWindow() -- Toggles window visibility
 ]]
-function Chronicles.UI.DisplayWindow()
+function private.Chronicles.UI.DisplayWindow()
 	local alreadyShowing = MainFrameUI:IsShown()
 
 	if alreadyShowing then

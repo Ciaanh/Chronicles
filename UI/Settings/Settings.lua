@@ -1,4 +1,5 @@
 local FOLDER_NAME, private = ...
+local Chronicles = private.Chronicles
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 --[[
@@ -428,7 +429,7 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
 
     private.Core.StateManager.setState(settingsKey, isActive, "Event type setting changed")
 
-    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods() -- Invalidate caches when event type status changes
+    Chronicles.Data:RefreshPeriods() -- Invalidate caches when event type status changes
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 
@@ -451,7 +452,7 @@ function SettingsMixin:OnSettingsCollectionChecked(eventData)
     local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
     private.Core.StateManager.setState(collectionKey, isActive, "Collection setting changed")
 
-    private.Core.Utils.HelperUtils.getChronicles().Data:RefreshPeriods() -- Invalidate caches when collection status changes
+    Chronicles.Data:RefreshPeriods() -- Invalidate caches when collection status changes
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
 
@@ -512,7 +513,7 @@ function SettingsMixin:LoadEventTypes(frame)
         newCheckbox.eventTypeName = eventTypeName
 
         -- Debug: Check what status is being retrieved and set
-        local currentStatus = private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(eventTypeId)
+        local currentStatus = Chronicles.Data:GetEventTypeStatus(eventTypeId)
 
         newCheckbox:SetChecked(currentStatus)
 
@@ -616,7 +617,7 @@ function SettingsMixin:LoadCollections(frame)
         newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.collectionName = collectionName
 
-        newCheckbox:SetChecked(private.Core.Utils.HelperUtils.getChronicles().Data:GetCollectionStatus(collectionName))
+        newCheckbox:SetChecked(Chronicles.Data:GetCollectionStatus(collectionName))
         newCheckbox:SetScript(
             "OnClick",
             function(self)
@@ -655,7 +656,7 @@ function SettingsMixin:LoadMyJournal(frame)
     local isActive = frame.SettingsContainer.IsActive
 
     -- Check if the setting exists in the database
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = Chronicles
     if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
         chronicles.db = chronicles.db or {}
         chronicles.db.global = chronicles.db.global or {}
@@ -672,7 +673,7 @@ function SettingsMixin:LoadMyJournal(frame)
         "OnClick",
         function(self)
             local isChecked = self:GetChecked()
-            local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+            local chronicles = Chronicles
 
             if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
                 chronicles.db = chronicles.db or {}

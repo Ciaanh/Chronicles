@@ -1,4 +1,5 @@
 local FOLDER_NAME, private = ...
+
 local Chronicles = private.Chronicles
 
 FactionDetailPageMixin = {}

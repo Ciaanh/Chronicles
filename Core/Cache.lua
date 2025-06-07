@@ -1,5 +1,8 @@
 local FOLDER_NAME, private = ...
 
+-- Get Chronicles reference
+local Chronicles = private.Chronicles
+
 --[[
     Chronicles Cache Module
     
@@ -36,9 +39,6 @@ local FOLDER_NAME, private = ...
     - Automatic cache rebuilding on data changes
     - Memory-efficient storage with configurable limits
 --]]
--- Get Chronicles reference
-local Chronicles = private.Chronicles
-
 private.Core.Cache = {}
 
 -- -------------------------
@@ -51,6 +51,9 @@ local CACHE_KEYS = {
     COLLECTIONS_NAMES = "collectionsNames",
     FILTERED_EVENTS = "filteredEventResults" -- Cache for filtered event search results with yearStart_yearEnd keys
 }
+
+-- Export cache keys for use by other modules immediately
+private.Core.Cache.KEYS = CACHE_KEYS
 
 -- -------------------------
 -- Cache Structure & Configuration
@@ -151,7 +154,7 @@ function private.Core.Cache.getPeriodsFillingBySteps()
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding periods cache")
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetPeriodsFillingBySteps()
+    local result = Chronicles.Data:GetPeriodsFillingBySteps()
     private.Core.Cache.set(CACHE_KEYS.PERIODS_FILLING, result)
     return result
 end
@@ -163,7 +166,7 @@ function private.Core.Cache.getMinEventYear()
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding min event year cache")
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:MinEventYear()
+    local result = Chronicles.Data:MinEventYear()
     private.Core.Cache.set(CACHE_KEYS.MIN_EVENT_YEAR, result)
     return result
 end
@@ -175,7 +178,7 @@ function private.Core.Cache.getMaxEventYear()
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding max event year cache")
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:MaxEventYear()
+    local result = Chronicles.Data:MaxEventYear()
     private.Core.Cache.set(CACHE_KEYS.MAX_EVENT_YEAR, result)
     return result
 end
@@ -187,7 +190,7 @@ function private.Core.Cache.getCollectionsNames()
         return cached
     end
     private.Core.Logger.trace("Cache", "Rebuilding collections names cache")
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:GetCollectionsNames()
+    local result = Chronicles.Data:GetCollectionsNames()
     private.Core.Cache.set(CACHE_KEYS.COLLECTIONS_NAMES, result)
     return result
 end
@@ -210,7 +213,7 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
         return cached
     end
     private.Core.Logger.trace("Cache", "Caching search results for " .. cacheKey)
-    local result = private.Core.Utils.HelperUtils.getChronicles().Data:SearchEvents(yearStart, yearEnd)
+    local result = Chronicles.Data:SearchEvents(yearStart, yearEnd)
     private.Core.Cache.set(CACHE_KEYS.FILTERED_EVENTS, result, cacheKey)
     return result
 end
@@ -324,6 +327,3 @@ end
 
 -- Export the main cache interface
 Chronicles.Cache = private.Core.Cache
-
--- Export cache keys for use by other modules
-private.Core.Cache.KEYS = CACHE_KEYS

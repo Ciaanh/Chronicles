@@ -32,7 +32,7 @@ local DataRegistry = private.Core.Data.DataRegistry
     @return [boolean] Success status
 ]]
 function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.Data is initialized
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = private.Chronicles
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
@@ -85,7 +85,7 @@ end
 ]]
 function DataRegistry.registerFactionDB(collectionName, db)
     -- Ensure Chronicles.Data is initialized
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = private.Chronicles
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
@@ -127,7 +127,7 @@ end
 ]]
 function DataRegistry.registerCharacterDB(collectionName, db)
     -- Ensure Chronicles.Data is initialized
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = private.Chronicles
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
@@ -170,7 +170,7 @@ end
     @return [boolean] Collection status (true if active)
 ]]
 function DataRegistry.getCollectionStatus(collectionName) -- Ensure Chronicles.Data is initialized
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = private.Chronicles
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
@@ -214,7 +214,7 @@ end
 ]]
 function DataRegistry.getCollectionsNames()
     -- Ensure Chronicles.Data is initialized
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    local chronicles = private.Chronicles
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",

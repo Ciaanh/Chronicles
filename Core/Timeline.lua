@@ -3,8 +3,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Timeline = {}
 
-local Chronicles = private.Chronicles
-
 -- Create convenience accessor for TimelineBusiness (accessed lazily)
 local function getTimelineBusiness()
     return private.Core.Data.TimelineBusiness

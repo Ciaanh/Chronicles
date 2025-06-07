@@ -1,4 +1,5 @@
 local FOLDER_NAME, private = ...
+
 local Chronicles = private.Chronicles
 
 CharacterDetailPageMixin = {}
@@ -55,6 +56,8 @@ function CharacterDetailPageMixin:OnLoad()
 end
 
 function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
+	local Chronicles = private.Chronicles
+
 	-- Use the Chronicles Data API to find the character by ID
 	if Chronicles and Chronicles.Data then
 		local characters = Chronicles.Data:SearchCharacters()
