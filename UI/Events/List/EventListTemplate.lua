@@ -59,11 +59,13 @@ EventListMixin = {}
 function EventListMixin:OnLoad()
 	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
+
 	-- Use state-based subscription for period selection
 	-- This aligns with the architectural direction of using state for UI updates
 	if private.Core.StateManager then
+		local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
 		private.Core.StateManager.subscribe(
-			"ui.selectedPeriod",
+			selectedPeriodKey,
 			function(newPeriod, oldPeriod)
 				if newPeriod then
 					private.Core.Logger.trace("EventListMixin", "Received selectedPeriod state change notification")
@@ -74,7 +76,14 @@ function EventListMixin:OnLoad()
 			end,
 			"EventListMixin"
 		)
+
+		private.Core.Logger.trace(
+			"EventListMixin",
+			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
+		)
 	end
+
+	-- Set up template data for the paged list
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 

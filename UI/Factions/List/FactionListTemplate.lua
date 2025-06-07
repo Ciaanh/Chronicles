@@ -15,11 +15,10 @@ function FactionListItemMixin:OnClick()
 		-- Store both faction ID and collection name for unique identification
 		local factionId = self.Faction and self.Faction.id or nil
 		local collectionName = self.Faction and self.Faction.source or nil
-
 		if factionId and collectionName then
 			private.Core.Logger.trace(
 				"FactionList",
-				"Faction selected - ID: " .. factionId .. ", Collection: " .. collectionName
+				"Faction selected - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
 			)
 			private.Core.StateManager.setState(
 				"ui.selectedFaction",

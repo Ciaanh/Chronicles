@@ -69,7 +69,7 @@ local subscribers = {}
 -- • settings: Configuration state (eventTypes.{id}, collections.{name})
 -- • userContent: MyJournal data containers (data.userContent.events, etc.)
 -- • collection: Collection status tracking (collections.{name})
--- • ui.state: General UI state (ui.activeTab, ui.isMainFrameOpen, timeline.{id})
+-- • ui.state: General UI state (ui.activeTab, ui.isMainFrameOpen, ui.selectedPeriod, timeline.{id})
 --
 -- KEY VALIDATION:
 -- • Input type checking for all parameters
@@ -148,7 +148,7 @@ function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, 
             error("StateManager.buildStateKey: entityId required for collection key type")
         end
     elseif keyType == "ui.state" then
-        if entityType == "activeTab" or entityType == "isMainFrameOpen" then
+        if entityType == "activeTab" or entityType == "isMainFrameOpen" or entityType == "selectedPeriod" then
             return "ui." .. entityType
         elseif entityType == "timeline" and sanitizedId then
             return "timeline." .. sanitizedId

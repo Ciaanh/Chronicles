@@ -163,7 +163,8 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
     self.data = periodData
 
     -- Highlight logic
-    local selectedPeriod = private.Core.StateManager.getState("ui.selectedPeriod")
+    local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+    local selectedPeriod = private.Core.StateManager.getState(selectedPeriodKey)
     local isSelected =
         selectedPeriod and periodData and selectedPeriod.lower == periodData.lowerBound and
         selectedPeriod.upper == periodData.upperBound
@@ -230,7 +231,8 @@ function TimelinePeriodMixin:OnClick()
 
     -- Update state instead of triggering event - provides single source of truth
     if private.Core.StateManager then
-        private.Core.StateManager.setState("ui.selectedPeriod", periodData, "Timeline period selected")
+        local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+        private.Core.StateManager.setState(selectedPeriodKey, periodData, "Timeline period selected")
     end
 
     self:ResetAllPeriodTextures()

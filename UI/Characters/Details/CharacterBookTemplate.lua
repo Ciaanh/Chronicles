@@ -8,8 +8,9 @@ function CharacterDetailPageMixin:OnLoad()
 	self.PagedCharacterDetails:SetElementTemplateData(private.constants.templates) -- Use state-based subscription for character selection
 	-- This provides a single source of truth for the selected character
 	if private.Core.StateManager then
+		local selectedCharacterKey = private.Core.StateManager.buildSelectionKey("character")
 		private.Core.StateManager.subscribe(
-			"ui.selectedCharacter",
+			selectedCharacterKey,
 			function(newCharacterSelection, oldCharacterSelection)
 				if newCharacterSelection then
 					local characterData = nil
@@ -24,16 +25,31 @@ function CharacterDetailPageMixin:OnLoad()
 						local collectionName = newCharacterSelection.collectionName
 						private.Core.Logger.trace(
 							"CharacterBook",
-							"Character selection received - ID: " .. characterId .. ", Collection: " .. collectionName
+							"Character selection received - ID: " .. tostring(characterId) .. ", Collection: " .. tostring(collectionName)
 						)
 						characterData = self:GetCharacterById(characterId, collectionName)
 					else
 						-- Legacy format or fallback - treat as just character ID
-						local characterId =
-							type(newCharacterSelection) == "table" and newCharacterSelection.characterId or newCharacterSelection
+						local characterId = nil
+						if type(newCharacterSelection) == "table" then
+							-- Table format but missing collectionName - extract characterId if available
+							characterId = newCharacterSelection.characterId
+						else
+							-- Primitive value - use directly as character ID
+							characterId = newCharacterSelection
+						end
+
 						if characterId then
-							private.Core.Logger.trace("CharacterBook", "Character selection received (legacy format) - ID: " .. characterId)
+							private.Core.Logger.trace(
+								"CharacterBook",
+								"Character selection received (legacy format) - ID: " .. tostring(characterId)
+							)
 							characterData = self:GetCharacterById(characterId)
+						else
+							private.Core.Logger.warn(
+								"CharacterBook",
+								"Invalid character selection format - neither new format nor valid legacy format"
+							)
 						end
 					end
 
@@ -44,6 +60,11 @@ function CharacterDetailPageMixin:OnLoad()
 					end
 				end
 			end
+		)
+
+		private.Core.Logger.trace(
+			"CharacterDetailPageMixin",
+			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
 		)
 	end
 
@@ -66,7 +87,8 @@ function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
 			if collectionName then
 				private.Core.Logger.trace(
 					"CharacterBook",
-					"Attempting direct collection lookup for character ID: " .. characterId .. " in collection: " .. collectionName
+					"Attempting direct collection lookup for character ID: " ..
+						tostring(characterId) .. " in collection: " .. tostring(collectionName)
 				)
 
 				for _, character in pairs(characters) do
@@ -100,10 +122,10 @@ function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
 	if collectionName then
 		private.Core.Logger.error(
 			"CharacterBook",
-			"Character not found - ID: " .. characterId .. ", Collection: " .. collectionName
+			"Character not found - ID: " .. tostring(characterId) .. ", Collection: " .. tostring(collectionName)
 		)
 	else
-		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. characterId)
+		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. tostring(characterId))
 	end
 	return nil
 end

@@ -9,7 +9,7 @@ function FactionDetailPageMixin:OnLoad()
 	-- This provides a single source of truth for the selected faction
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
-			"ui.selectedFaction",
+			private.Core.StateManager.buildSelectionKey("faction"),
 			function(newFactionSelection, oldFactionSelection)
 				if newFactionSelection then
 					local factionData = nil
@@ -21,7 +21,7 @@ function FactionDetailPageMixin:OnLoad()
 						local collectionName = newFactionSelection.collectionName
 						private.Core.Logger.trace(
 							"FactionBook",
-							"Faction selection received - ID: " .. factionId .. ", Collection: " .. collectionName
+							"Faction selection received - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
 						)
 						factionData = self:GetFactionById(factionId, collectionName)
 					else
@@ -40,6 +40,11 @@ function FactionDetailPageMixin:OnLoad()
 					end
 				end
 			end
+		)
+
+		private.Core.Logger.trace(
+			"FactionBook",
+			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
 		)
 	end
 
@@ -69,7 +74,8 @@ function FactionDetailPageMixin:GetFactionById(factionId, collectionName)
 			if collectionName then
 				private.Core.Logger.trace(
 					"FactionBook",
-					"Attempting direct collection lookup for faction ID: " .. factionId .. " in collection: " .. collectionName
+					"Attempting direct collection lookup for faction ID: " ..
+						tostring(factionId) .. " in collection: " .. tostring(collectionName)
 				)
 
 				for _, faction in pairs(factions) do
@@ -97,7 +103,7 @@ function FactionDetailPageMixin:GetFactionById(factionId, collectionName)
 	if collectionName then
 		private.Core.Logger.error(
 			"FactionBook",
-			"Faction not found - ID: " .. factionId .. ", Collection: " .. collectionName
+			"Faction not found - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
 		)
 	else
 		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId)

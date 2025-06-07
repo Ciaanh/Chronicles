@@ -147,14 +147,20 @@ function SettingsMixin:OnLoad()
     -- Use state-based subscription for tab selection
     -- This provides a single source of truth for the active tab
     if private.Core.StateManager then
+        local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
         private.Core.StateManager.subscribe(
-            "ui.activeTab",
+            activeTabKey,
             function(newTab, oldTab)
                 if newTab then
                     self:OnSettingsTabSelected(newTab)
                 end
             end,
             "SettingsMixin"
+        )
+
+        private.Core.Logger.trace(
+            "SettingsMixin",
+            "OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
         )
     end
 
@@ -1081,11 +1087,10 @@ end
 
 function CategoryButtonMixin:OnClick()
     -- Handle tab selection if this category has a TabName
-    if self.category and self.category.TabName then
-        -- Update state instead of calling method directly - provides single source of truth
+    if self.category and self.category.TabName then -- Update state instead of calling method directly - provides single source of truth
         if private.Core.StateManager then
             private.Core.StateManager.setState(
-                "ui.activeTab",
+                private.Core.StateManager.buildUIStateKey("activeTab"),
                 self.category.TabName,
                 "Settings tab selected from category button"
             )

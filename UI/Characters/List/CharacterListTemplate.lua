@@ -26,11 +26,11 @@ function CharacterListItemMixin:OnClick()
 			private.Core.StateManager.setState(
 				"ui.selectedCharacter",
 				characterSelection,
-				"Character selected from list: " .. characterId .. " (" .. collectionName .. ")"
+				"Character selected from list: " .. tostring(characterId) .. " (" .. tostring(collectionName) .. ")"
 			)
 			private.Core.Logger.trace(
 				"CharacterList",
-				"Character selected - ID: " .. characterId .. ", Collection: " .. collectionName
+				"Character selected - ID: " .. tostring(characterId) .. ", Collection: " .. tostring(collectionName)
 			)
 		else
 			private.Core.Logger.warn("CharacterList", "Character selection failed - missing ID or source")
