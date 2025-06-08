@@ -1,30 +1,20 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-    <!-- Core Infrastructure -->
-    <Script file="Logger.lua"/>
-    <Script file="Cache.lua"/>
-    <Script file="EventManager.lua"/>
-    <Script file="StateManager.lua"/>
-    <!-- Utility Modules (loaded first for dependencies) -->
-    <Script file="Utils/HelperUtils.lua"/>
-    <Script file="Utils/StringUtils.lua"/>
-    <Script file="Utils/TableUtils.lua"/>
-    <Script file="Utils/MathUtils.lua"/>
-    <Script file="Utils/ValidationUtils.lua"/>
+
+    <!-- Core Infrastructure (loaded first) -->
+    <Include file="Infrastructure\_Includes.xml"/>
+
+    <!-- Utility Modules -->
+    <Include file="Utils\_Includes.xml"/>
 
     <!-- Data Layer -->
     <Include file="Data\_Includes.xml"/>
     <Script file="Data.lua"/>
 
-    <!-- Business Logic Modules -->
-    <Script file="Business/DateCalculator.lua"/>
-    <Script file="Business/FilterEngine.lua"/>
+    <!-- Business Logic -->
+    <Include file="Business\_Includes.xml"/>
 
     <!-- Domain Modules -->
-    <Script file="Characters.lua"/>
-    <Script file="Events.lua"/>
-    <Script file="Timeline.lua"/>
-    <Script file="Factions.lua"/>
-    <Script file="Settings.lua"/>
+    <Include file="Domain\_Includes.xml"/>
 </Ui>

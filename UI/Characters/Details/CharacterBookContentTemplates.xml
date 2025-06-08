@@ -4,7 +4,7 @@
     <Script file="CharacterBookContentTemplates.lua"/>
 
 
-    <Frame name="CharacterTitleTemplate" mixin="CharacterBookTitleMixin" virtual="true">
+    <Frame name="CharacterTitleTemplate" mixin="CharacterTitleMixin" virtual="true">
         <Size x="$parent.viewWidth" y="510"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
