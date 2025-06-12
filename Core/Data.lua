@@ -27,8 +27,8 @@ function Chronicles.Data:Load()
     self:RegisterEventDB("myjournal", Chronicles.Data:GetMyJournalEvents())
     self:RegisterFactionDB("myjournal", Chronicles.Data:GetMyJournalFactions())
     self:RegisterCharacterDB("myjournal", Chronicles.Data:GetMyJournalCharacters())
-    if (Chronicles.Custom ~= nil and Chronicles.Custom.DB ~= nil) then
-        Chronicles.Custom.DB:Init()
+    if (Chronicles.DB ~= nil) then
+        Chronicles.DB:Init()
     end
 
     -- Initialize the cache system
@@ -350,15 +350,23 @@ function Chronicles.Data:GetEventTypeStatus(eventTypeId)
     if not private.Core.StateManager then
         private.Core.Logger.error("Data", "StateManager not available when trying to get event type status")
         return true -- Default to active
-    end -- Check if StateManager has finished loading saved state
+    end
 
-    local status = private.Core.StateManager.getState("eventTypes." .. eventTypeId)
+    -- Validate eventTypeId before using it
+    if not eventTypeId then
+        private.Core.Logger.warn("Data", "GetEventTypeStatus called with nil eventTypeId")
+        return true -- Default to active
+    end
+
+    -- Use the proper key builder instead of direct concatenation
+    local eventTypeKey = private.Core.StateManager.buildSettingsKey("eventType", eventTypeId)
+    local status = private.Core.StateManager.getState(eventTypeKey)
 
     -- If status is nil after state is loaded, it means this is a new event type
     -- Set default to true for new event types only
     if status == nil then
         private.Core.StateManager.setState(
-            "eventTypes." .. eventTypeId,
+            eventTypeKey,
             true,
             "Default status for new event type " .. tostring(eventTypeId)
         )
@@ -376,7 +384,8 @@ function Chronicles.Data:GetMyJournalEvents()
         private.Core.Logger.error("Data", "StateManager not available when trying to get MyJournal events")
         return {}
     end -- Delegate to StateManager
-    local newData = private.Core.StateManager.getState("data.userContent.events.byId")
+    local userContentDataKey = private.Core.StateManager.buildUserContentDataKey("events", "byId")
+    local newData = private.Core.StateManager.getState(userContentDataKey)
     if newData and next(newData) then
         local result = {}
         for id, event in pairs(newData) do
@@ -395,7 +404,8 @@ function Chronicles.Data:SetMyJournalEvents(event)
     end -- Set source and ensure ID is assigned
     event.source = "myjournal"
     if (event.id == nil) then
-        local newData = private.Core.StateManager.getState("data.userContent.events.byId")
+        local userContentDataKey = private.Core.StateManager.buildUserContentDataKey("events", "byId")
+        local newData = private.Core.StateManager.getState(userContentDataKey)
         local currentEvents = {}
         if newData and next(newData) then
             for id, evt in pairs(newData) do
@@ -406,7 +416,8 @@ function Chronicles.Data:SetMyJournalEvents(event)
     end
 
     -- Add through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.events")
+    local userContentKey = private.Core.StateManager.buildUserContentKey("events")
+    local currentData = private.Core.StateManager.getState(userContentKey)
     if currentData and currentData.byId and event and event.id then
         currentData.byId[event.id] = event
         currentData.metadata.count = currentData.metadata.count + 1
@@ -430,7 +441,7 @@ function Chronicles.Data:SetMyJournalEvents(event)
         end
 
         private.Core.StateManager.setState(
-            "data.userContent.events",
+            userContentKey,
             currentData,
             "Added MyJournal event: " .. (event.label or event.id)
         )
@@ -443,7 +454,8 @@ end
 
 function Chronicles.Data:RemoveMyJournalEvent(eventId)
     -- Remove through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.events")
+    local userContentKey = private.Core.StateManager.buildUserContentKey("events")
+    local currentData = private.Core.StateManager.getState(userContentKey)
     if currentData and currentData.byId and eventId then
         currentData.byId[eventId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
@@ -468,7 +480,7 @@ function Chronicles.Data:RemoveMyJournalEvent(eventId)
             end
         end
         private.Core.StateManager.setState(
-            "data.userContent.events",
+            userContentKey,
             currentData,
             "Removed MyJournal event: " .. eventId
         ) -- Invalidate caches
@@ -481,7 +493,7 @@ end
 
 function Chronicles.Data:GetMyJournalFactions()
     -- Use StateManager directly for clean implementation
-    local newData = private.Core.StateManager.getState("data.userContent.factions.byId")
+    local newData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("factions", "byId"))
     if newData and next(newData) then
         local result = {}
         for id, faction in pairs(newData) do
@@ -498,10 +510,8 @@ function Chronicles.Data:SetMyJournalFactions(faction)
     if (faction.id == nil) then
         local currentFactions = Chronicles.Data:GetMyJournalFactions()
         faction.id = Chronicles.Data:AvailableDbId(currentFactions)
-    end
-
-    -- Add through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.factions")
+    end    -- Add through StateManager
+    local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("factions"))
     if currentData and currentData.byId and faction and faction.id then
         currentData.byId[faction.id] = faction
         currentData.metadata.count = currentData.metadata.count + 1
@@ -514,10 +524,8 @@ function Chronicles.Data:SetMyJournalFactions(faction)
         end
         if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], faction.id) then
             table.insert(currentData.index.byYear[startYear], faction.id)
-        end
-
-        private.Core.StateManager.setState(
-            "data.userContent.factions",
+        end        private.Core.StateManager.setState(
+            private.Core.StateManager.buildUserContentKey("factions"),
             currentData,
             "Added MyJournal faction: " .. (faction.label or faction.id)
         )
@@ -526,7 +534,7 @@ end
 
 function Chronicles.Data:RemoveMyJournalFaction(factionId)
     -- Remove through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.factions")
+    local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("factions"))
     if currentData and currentData.byId and factionId then
         currentData.byId[factionId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
@@ -540,10 +548,8 @@ function Chronicles.Data:RemoveMyJournalFaction(factionId)
                     break
                 end
             end
-        end
-
-        private.Core.StateManager.setState(
-            "data.userContent.factions",
+        end        private.Core.StateManager.setState(
+            private.Core.StateManager.buildUserContentKey("factions"),
             currentData,
             "Removed MyJournal faction: " .. factionId
         )
@@ -552,7 +558,7 @@ end
 
 function Chronicles.Data:GetMyJournalCharacters()
     -- Use StateManager directly for clean implementation
-    local newData = private.Core.StateManager.getState("data.userContent.characters.byId")
+    local newData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("characters", "byId"))
     if newData and next(newData) then
         local result = {}
         for id, character in pairs(newData) do
@@ -569,10 +575,8 @@ function Chronicles.Data:SetMyJournalCharacters(character)
     if (character.id == nil) then
         local currentCharacters = Chronicles.Data:GetMyJournalCharacters()
         character.id = Chronicles.Data:AvailableDbId(currentCharacters)
-    end
-
-    -- Add through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.characters")
+    end    -- Add through StateManager
+    local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("characters"))
     if currentData and currentData.byId and character and character.id then
         currentData.byId[character.id] = character
         currentData.metadata.count = currentData.metadata.count + 1
@@ -585,19 +589,21 @@ function Chronicles.Data:SetMyJournalCharacters(character)
         end
         if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], character.id) then
             table.insert(currentData.index.byYear[startYear], character.id)
-        end
-
-        private.Core.StateManager.setState(
-            "data.userContent.characters",
+        end        private.Core.StateManager.setState(
+            private.Core.StateManager.buildUserContentKey("characters"),
             currentData,
             "Added MyJournal character: " .. (character.label or character.id)
         )
+
+        -- Invalidate character caches
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.ALL_CHARACTERS)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_CHARACTERS)
     end
 end
 
 function Chronicles.Data:RemoveMyJournalCharacter(characterId)
     -- Remove through StateManager
-    local currentData = private.Core.StateManager.getState("data.userContent.characters")
+    local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("characters"))
     if currentData and currentData.byId and characterId then
         currentData.byId[characterId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
@@ -611,13 +617,15 @@ function Chronicles.Data:RemoveMyJournalCharacter(characterId)
                     break
                 end
             end
-        end
-
-        private.Core.StateManager.setState(
-            "data.userContent.characters",
+        end        private.Core.StateManager.setState(
+            private.Core.StateManager.buildUserContentKey("characters"),
             currentData,
             "Removed MyJournal character: " .. characterId
         )
+
+        -- Invalidate character caches
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.ALL_CHARACTERS)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_CHARACTERS)
     end
 end
 

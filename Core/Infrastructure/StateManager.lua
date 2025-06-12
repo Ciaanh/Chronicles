@@ -200,6 +200,12 @@ end
     @return [string] Settings state key
 ]]
 function private.Core.StateManager.buildSettingsKey(settingType, id)
+    if not settingType or type(settingType) ~= "string" or settingType == "" then
+        error("StateManager.buildSettingsKey: settingType must be a non-empty string, got: " .. tostring(settingType))
+    end
+    if not id then
+        error("StateManager.buildSettingsKey: id cannot be nil")
+    end
     return private.Core.StateManager.buildStateKey("settings", settingType, id)
 end
 
@@ -209,7 +215,24 @@ end
     @return [string] User content state key
 ]]
 function private.Core.StateManager.buildUserContentKey(contentType)
+    if not contentType or type(contentType) ~= "string" or contentType == "" then
+        error("StateManager.buildUserContentKey: contentType must be a non-empty string, got: " .. tostring(contentType))
+    end
     return private.Core.StateManager.buildStateKey("userContent", contentType)
+end
+
+--[[
+    Build user content data key with subpath
+    @param contentType [string] "events", "characters", or "factions"
+    @param subPath [string] Optional subpath like "byId", "metadata", "index"
+    @return [string] Full user content data key
+]]
+function private.Core.StateManager.buildUserContentDataKey(contentType, subPath)
+    local baseKey = private.Core.StateManager.buildUserContentKey(contentType)
+    if subPath and type(subPath) == "string" and subPath ~= "" then
+        return baseKey .. "." .. subPath
+    end
+    return baseKey
 end
 
 --[[
@@ -218,6 +241,12 @@ end
     @return [string] Collection status state key
 ]]
 function private.Core.StateManager.buildCollectionKey(collectionName)
+    if not collectionName or type(collectionName) ~= "string" or collectionName == "" then
+        error(
+            "StateManager.buildCollectionKey: collectionName must be a non-empty string, got: " ..
+                tostring(collectionName)
+        )
+    end
     return private.Core.StateManager.buildStateKey("collection", "collection", collectionName)
 end
 
@@ -228,11 +257,26 @@ end
     @return [string] UI state key
 ]]
 function private.Core.StateManager.buildUIStateKey(stateType, subKey)
+    if not stateType or type(stateType) ~= "string" or stateType == "" then
+        error("StateManager.buildUIStateKey: stateType must be a non-empty string, got: " .. tostring(stateType))
+    end
     if subKey then
         return private.Core.StateManager.buildStateKey("ui.state", stateType, subKey)
     else
         return private.Core.StateManager.buildStateKey("ui.state", stateType)
     end
+end
+
+--[[
+    Build timeline state key
+    @param timelineKey [string] Timeline state key like "currentStep", "currentPage", "selectedYear"
+    @return [string] Timeline state key
+]]
+function private.Core.StateManager.buildTimelineKey(timelineKey)
+    if not timelineKey or type(timelineKey) ~= "string" or timelineKey == "" then
+        error("StateManager.buildTimelineKey: timelineKey must be a non-empty string, got: " .. tostring(timelineKey))
+    end
+    return "timeline." .. timelineKey
 end
 
 -- =============================================================================================
@@ -401,8 +445,21 @@ end
     @return [boolean] Success status (false indicates validation failure)
 ]]
 function private.Core.StateManager.setState(key, value, description)
-    if not key or type(key) ~= "string" then
-        private.Core.Logger.error("StateManager", "setState called with invalid key: " .. tostring(key))
+    if not key then
+        private.Core.Logger.error("StateManager", "setState called with nil key")
+        return false
+    end
+
+    if type(key) ~= "string" then
+        private.Core.Logger.error(
+            "StateManager",
+            "setState called with invalid key type: " .. type(key) .. ", value: " .. tostring(key)
+        )
+        return false
+    end
+
+    if key == "" then
+        private.Core.Logger.error("StateManager", "setState called with empty string key")
         return false
     end
 
@@ -433,8 +490,21 @@ end
     @return [any] State value, or nil if key doesn't exist or is invalid
 ]]
 function private.Core.StateManager.getState(key)
-    if not key or type(key) ~= "string" then
-        private.Core.Logger.error("StateManager", "getState called with invalid key: " .. tostring(key))
+    if not key then
+        private.Core.Logger.error("StateManager", "getState called with nil key")
+        return nil
+    end
+
+    if type(key) ~= "string" then
+        private.Core.Logger.error(
+            "StateManager",
+            "getState called with invalid key type: " .. type(key) .. ", value: " .. tostring(key)
+        )
+        return nil
+    end
+
+    if key == "" then
+        private.Core.Logger.error("StateManager", "getState called with empty string key")
         return nil
     end
 

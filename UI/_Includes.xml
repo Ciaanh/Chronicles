@@ -4,14 +4,17 @@
 	<Include file="Fonts.xml" />
 
 	<Include file="Templates\BookPages.xml" />
+	<Include file="Templates\SharedBookTemplate.xml" />
+	<Include file="Templates\SharedBookTemplate.lua" />
+	<Include file="Templates\SharedBookImplementations.lua" />
 
 	<Include file="Events\Timeline\TimelineTemplate.xml" />
 	<Include file="Events\List\EventListTemplate.xml" />
 	<Include file="Events\List\EventListPagingControls.xml" />
 	<Include file="Events\Details\EventBookContentTemplates.xml" />
-	
+
 	<Include file="Characters\Details\CharacterBookContentTemplates.xml" />
-	<Include file="Characters\List\CharacterListTemplate.xml" />
+	<Include file="Characters\List\VerticalCharacterListTemplate.xml" />
 
 	<Include file="Factions\Details\FactionBookContentTemplates.xml" />
 	<Include file="Factions\List\FactionListTemplate.xml" />

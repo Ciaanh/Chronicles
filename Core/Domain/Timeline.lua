@@ -18,36 +18,48 @@ Timeline.Periods = {}
 
 -- Helper functions to access state values
 local function getCurrentStepValue()
-    local value = private.Core.StateManager.getState("timeline.currentStep")
+    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
     private.Core.Logger.trace("Timeline", "Retrieved current step value: " .. tostring(value))
     return value
 end
 
 local function getCurrentPage()
-    local value = private.Core.StateManager.getState("timeline.currentPage")
+    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentPage"))
     private.Core.Logger.trace("Timeline", "Retrieved current page: " .. tostring(value))
     return value
 end
 
 local function getSelectedYear()
-    local value = private.Core.StateManager.getState("timeline.selectedYear")
+    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("selectedYear"))
     private.Core.Logger.trace("Timeline", "Retrieved selected year: " .. tostring(value))
     return value
 end
 
 local function setCurrentStepValue(value, description)
     private.Core.Logger.trace("Timeline", "Setting timeline step to: " .. tostring(value))
-    private.Core.StateManager.setState("timeline.currentStep", value, description or "Timeline step changed")
+    private.Core.StateManager.setState(
+        private.Core.StateManager.buildTimelineKey("currentStep"),
+        value,
+        description or "Timeline step changed"
+    )
 end
 
 local function setCurrentPage(value, description)
     private.Core.Logger.trace("Timeline", "Setting timeline page to: " .. tostring(value))
-    private.Core.StateManager.setState("timeline.currentPage", value, description or "Timeline page changed")
+    private.Core.StateManager.setState(
+        private.Core.StateManager.buildTimelineKey("currentPage"),
+        value,
+        description or "Timeline page changed"
+    )
 end
 
 local function setSelectedYear(value, description)
     private.Core.Logger.trace("Timeline", "Setting selected year to: " .. tostring(value))
-    private.Core.StateManager.setState("timeline.selectedYear", value, description or "Timeline year changed")
+    private.Core.StateManager.setState(
+        private.Core.StateManager.buildTimelineKey("selectedYear"),
+        value,
+        description or "Timeline year changed"
+    )
 end
 
 -- Delegate to business logic module
@@ -85,7 +97,9 @@ end
 function private.Core.Timeline.ChangePage(value)
     local currentPage = getCurrentPage() or 1
     local newPage = currentPage + value
+
     setCurrentPage(newPage, "Timeline page changed via navigation")
+
     private.Core.Timeline.DisplayTimelineWindow()
 end
 
@@ -124,32 +138,6 @@ local function UpdateNavigationButtons(paginationData)
     )
 end
 
--- Helper function to generate label text based on period data and position
-local function GenerateLabelText(labelData, isLastLabel, firstIndex, labelIndex)
-    if not labelData then
-        return ""
-    end
-
-    -- For the last label (boundary label), always show upper bound
-    if isLastLabel then
-        return tostring(labelData.upperBound)
-    end
-
-    -- For regular labels, determine text based on period type
-    if labelData.upperBound == private.constants.config.futur then
-        -- Future period: get previous period's upper bound
-        local prevPeriodIndex = firstIndex + labelIndex - 2
-        local prevPeriodData = Timeline.Periods[prevPeriodIndex]
-        return prevPeriodData and tostring(prevPeriodData.upperBound) or ""
-    elseif labelData.lowerBound == private.constants.config.mythos then
-        -- Mythos period: use localized text
-        return Locale["Mythos"]
-    else
-        -- Standard period: use lower bound
-        return tostring(labelData.lowerBound)
-    end
-end
-
 -- Distribute timeline label data via events
 local function DistributeTimelineLabels(paginationData)
     local firstIndex = paginationData.firstIndex
@@ -164,14 +152,27 @@ local function DistributeTimelineLabels(paginationData)
 
         local labelText = ""
 
-        if labelData then
-            labelText = GenerateLabelText(labelData, isLastLabel, firstIndex, labelIndex)
+        if labelData and not isLastLabel then
+            if labelData.upper == private.constants.config.futur then
+                -- Future period: get previous period's upper bound
+                local prevPeriodIndex = firstIndex + labelIndex - 2
+                local prevPeriodData = Timeline.Periods[prevPeriodIndex]
+                labelText = prevPeriodData and tostring(prevPeriodData.upper) or ""
+            elseif labelData.lower == private.constants.config.mythos then
+                -- Mythos period: use localized text
+                labelText = Locale["Mythos"]
+            else
+                -- Standard period: use lower bound
+                labelText = tostring(labelData.lower)
+            end
         elseif isLastLabel then
             -- Special case: no data for last label, check if previous period is future
             local prevPeriodIndex = firstIndex + labelIndex - 2
             local prevPeriodData = Timeline.Periods[prevPeriodIndex]
-            if prevPeriodData and prevPeriodData.upperBound == private.constants.config.futur then
+            if prevPeriodData and prevPeriodData.upper == private.constants.config.futur then
                 labelText = Locale["Futur"]
+            elseif prevPeriodData then
+                labelText = tostring(prevPeriodData.upper)
             end
         end
 
@@ -192,13 +193,10 @@ local function DistributeTimelinePeriods(paginationData)
     end
 end
 
--- Main function to display the timeline window - now orchestrates the separated responsibilities
 function private.Core.Timeline.DisplayTimelineWindow()
-    -- Calculate pagination parameters
     local paginationData = CalculateTimelinePagination()
 
-    -- Update the current page state
-    setCurrentPage(paginationData.currentPage, "Timeline page updated during display")
+    -- setCurrentPage(paginationData.currentPage, "Timeline page updated during display")
 
     -- Update UI state
     UpdateNavigationButtons(paginationData)
@@ -213,8 +211,6 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
     local currentStepValue = getCurrentStepValue()
     local curentStepIndex = GetStepValueIndex(currentStepValue)
     local nextStepValue = private.constants.config.stepValues[1]
-
-    -- handle selected year
 
     if direction == 1 then
         if (curentStepIndex == Timeline.MaxStepIndex) then
@@ -235,14 +231,56 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
         "Changing timeline step from " .. tostring(currentStepValue) .. " to " .. tostring(nextStepValue)
     )
 
-    -- Update state instead of triggering event - provides single source of truth
     setCurrentStepValue(nextStepValue, "Timeline step changed via zoom")
 
     private.Core.Timeline.ComputeTimelinePeriods()
-    local selectedYear = getSelectedYear()
-    local newPage = GetYearPageIndex(selectedYear)
-    setCurrentPage(newPage, "Timeline page updated after step change")
+    private.Core.Timeline.MaintainSelectedYear()
+
     private.Core.Timeline.DisplayTimelineWindow()
+end
+
+function private.Core.Timeline.MaintainSelectedYear()
+    local selectedYear = getSelectedYear()
+
+    if not selectedYear then
+        selectedYear = private.constants.config.currentYear
+    end
+
+    local newPage = GetYearPageIndex(selectedYear)
+
+    if not newPage then
+        return
+    end
+
+    setCurrentPage(newPage, "Timeline page updated after step change")
+
+    local selectedPeriod = nil
+
+    for i, period in ipairs(Timeline.Periods) do
+        local containsYear = false
+
+        if period.lower == private.constants.config.mythos then
+            containsYear = (selectedYear < private.constants.config.historyStartYear)
+        elseif period.upper == private.constants.config.futur then
+            containsYear = (selectedYear > private.constants.config.currentYear)
+        else
+            containsYear = (selectedYear >= period.lower and selectedYear <= period.upper)
+        end
+
+        if containsYear then
+            selectedPeriod = period
+            break
+        end
+    end
+
+    if selectedPeriod then
+        local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+        private.Core.StateManager.setState(
+            selectedPeriodKey,
+            selectedPeriod,
+            "Timeline period selected after step change"
+        )
+    end
 end
 
 -- -------------------------
@@ -264,11 +302,29 @@ function private.Core.Timeline.Init()
         setCurrentPage(1, "Timeline page initialized to default")
     end
 
-    -- Ensure timeline periods are computed during initialization
-    private.Core.Timeline.ComputeTimelinePeriods()
+    -- Register state change listener before computing periods
+    private.Core.StateManager.addListener(
+        private.Core.StateManager.buildTimelineKey("currentPage"),
+        onCurrentPageChanged
+    )
 
-    -- Explicitly trigger TimelineInit event to ensure UI components update
+    -- Compute timeline periods once and display
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.DisplayTimelineWindow()
+
     SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
 
     private.Core.Logger.trace("Timeline", "Timeline module initialization complete")
+end
+
+local function onCurrentPageChanged(newPage, oldPage, description)
+    private.Core.Logger.trace(
+        "Timeline",
+        "Page changed from " .. tostring(oldPage) .. " to " .. tostring(newPage) .. " - " .. (description or "")
+    )
+
+    -- Only trigger display update if page actually changed and we're not in initialization
+    if newPage ~= oldPage and oldPage ~= nil then
+        private.Core.Timeline.DisplayTimelineWindow()
+    end
 end

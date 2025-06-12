@@ -36,7 +36,16 @@ function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.D
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. collectionName
+            "Chronicles.Data not initialized when trying to register " .. tostring(collectionName or "nil")
+        )
+        return false
+    end
+
+    -- Validate collectionName before using it
+    if not collectionName or type(collectionName) ~= "string" or collectionName == "" then
+        private.Core.Logger.error(
+            "DataRegistry",
+            "Invalid collectionName provided to registerEventDB: " .. tostring(collectionName)
         )
         return false
     end
@@ -54,14 +63,18 @@ function DataRegistry.registerEventDB(collectionName, db) -- Ensure Chronicles.D
             "Collection '" .. collectionName .. "' is trying to register a nil events database."
         )
     end -- Use StateManager path for status management
-    local dbTypePath = "collections." .. collectionName
-    local isActive = private.Core.StateManager.getState(dbTypePath)
+    local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
+    local isActive = private.Core.StateManager.getState(collectionKey)
 
     -- Only set default value if no saved state exists
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
         isActive = true
-        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
+        private.Core.StateManager.setState(
+            collectionKey,
+            isActive,
+            "Collection status initialization: " .. collectionName
+        )
     end
 
     chronicles.Data.Events[collectionName] = {
@@ -89,10 +102,20 @@ function DataRegistry.registerFactionDB(collectionName, db)
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. collectionName
+            "Chronicles.Data not initialized when trying to register " .. tostring(collectionName or "nil")
         )
         return false
     end
+
+    -- Validate collectionName before using it
+    if not collectionName or type(collectionName) ~= "string" or collectionName == "" then
+        private.Core.Logger.error(
+            "DataRegistry",
+            "Invalid collectionName provided to registerFactionDB: " .. tostring(collectionName)
+        )
+        return false
+    end
+
     if chronicles.Data.Factions[collectionName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
@@ -101,14 +124,16 @@ function DataRegistry.registerFactionDB(collectionName, db)
         return false
     end
     -- Use StateManager path for status management
-    local dbTypePath = "collections." .. collectionName
-    local isActive = private.Core.StateManager.getState(dbTypePath)
-
-    -- Only set default value if no saved state exists
+    local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
+    local isActive = private.Core.StateManager.getState(collectionKey)
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
         isActive = true -- New collection after initial setup
-        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
+        private.Core.StateManager.setState(
+            collectionKey,
+            isActive,
+            "Collection status initialization: " .. collectionName
+        )
     end
 
     chronicles.Data.Factions[collectionName] = {
@@ -131,10 +156,20 @@ function DataRegistry.registerCharacterDB(collectionName, db)
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to register " .. collectionName
+            "Chronicles.Data not initialized when trying to register " .. tostring(collectionName or "nil")
         )
         return false
     end
+
+    -- Validate collectionName before using it
+    if not collectionName or type(collectionName) ~= "string" or collectionName == "" then
+        private.Core.Logger.error(
+            "DataRegistry",
+            "Invalid collectionName provided to registerCharacterDB: " .. tostring(collectionName)
+        )
+        return false
+    end
+
     if chronicles.Data.Characters[collectionName] ~= nil then
         private.Core.Logger.error(
             "DataRegistry",
@@ -142,14 +177,18 @@ function DataRegistry.registerCharacterDB(collectionName, db)
         )
         return false
     end -- Use StateManager path for status management
-    local dbTypePath = "collections." .. collectionName
-    local isActive = private.Core.StateManager.getState(dbTypePath)
+    local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
+    local isActive = private.Core.StateManager.getState(collectionKey)
 
     -- Only set default value if no saved state exists
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
     if (isActive == nil) then
         isActive = true
-        private.Core.StateManager.setState(dbTypePath, isActive, "Collection status initialization: " .. collectionName)
+        private.Core.StateManager.setState(
+            collectionKey,
+            isActive,
+            "Collection status initialization: " .. collectionName
+        )
     end
 
     chronicles.Data.Characters[collectionName] = {
@@ -174,13 +213,23 @@ function DataRegistry.getCollectionStatus(collectionName) -- Ensure Chronicles.D
     if not chronicles or not chronicles.Data then
         private.Core.Logger.error(
             "DataRegistry",
-            "Chronicles.Data not initialized when trying to get collection status for " .. collectionName
+            "Chronicles.Data not initialized when trying to get collection status for " ..
+                tostring(collectionName or "nil")
         )
         return false
     end
 
-    local dbTypePath = "collections." .. collectionName
-    local isActive = private.Core.StateManager.getState(dbTypePath)
+    -- Validate collectionName before using it
+    if not collectionName or type(collectionName) ~= "string" or collectionName == "" then
+        private.Core.Logger.warn(
+            "DataRegistry",
+            "Invalid collectionName provided to getCollectionStatus: " .. tostring(collectionName)
+        )
+        return false
+    end
+
+    local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
+    local isActive = private.Core.StateManager.getState(collectionKey)
 
     if isActive ~= nil and isActive then
         return true
@@ -222,58 +271,65 @@ function DataRegistry.getCollectionsNames()
         )
         return {}
     end
-
     local dataGroups = {} -- Process Events collections using StateManager paths
     for eventCollectionName, group in pairs(chronicles.Data.Events) do
         if (eventCollectionName ~= "myjournal") then
-            local dbTypePath = "collections." .. eventCollectionName
-            local isActive = private.Core.StateManager.getState(dbTypePath)
-            if isActive == nil then
-                isActive = true -- New collection after initial setup
-            end
-            local groupProjection = {
-                name = group.name,
-                isActive = isActive
-            }
+            -- Validate collection name before building key
+            if eventCollectionName and type(eventCollectionName) == "string" and eventCollectionName ~= "" then
+                local collectionKey = private.Core.StateManager.buildCollectionKey(eventCollectionName)
+                local isActive = private.Core.StateManager.getState(collectionKey)
+                if isActive == nil then
+                    isActive = true -- New collection after initial setup
+                end
+                local groupProjection = {
+                    name = group.name,
+                    isActive = isActive
+                }
 
-            if not existInTable(eventCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
+                if not existInTable(eventCollectionName, dataGroups) then
+                    table.insert(dataGroups, groupProjection)
+                end
             end
         end
     end
     -- Process Factions collections using StateManager paths
     for factionCollectionName, group in pairs(chronicles.Data.Factions) do
         if (factionCollectionName ~= "myjournal") then
-            local dbTypePath = "collections." .. factionCollectionName
-            local isActive = private.Core.StateManager.getState(dbTypePath)
-            if isActive == nil then
-                isActive = true -- New collection after initial setup
-            end
-            local groupProjection = {
-                name = group.name,
-                isActive = isActive
-            }
-
-            if not existInTable(factionCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
+            -- Validate collection name before building key
+            if factionCollectionName and type(factionCollectionName) == "string" and factionCollectionName ~= "" then
+                local collectionKey = private.Core.StateManager.buildCollectionKey(factionCollectionName)
+                local isActive = private.Core.StateManager.getState(collectionKey)
+                if isActive == nil then
+                    isActive = true -- New collection after initial setup
+                end
+                local groupProjection = {
+                    name = group.name,
+                    isActive = isActive
+                }
+                if not existInTable(factionCollectionName, dataGroups) then
+                    table.insert(dataGroups, groupProjection)
+                end
             end
         end
     end
     -- Process Characters collections using StateManager paths
     for characterCollectionName, group in pairs(chronicles.Data.Characters) do
         if (characterCollectionName ~= "myjournal") then
-            local dbTypePath = "collections." .. characterCollectionName
-            local isActive = private.Core.StateManager.getState(dbTypePath)
-            if isActive == nil then
-                isActive = true
-            end
-            local groupProjection = {
-                name = group.name,
-                isActive = isActive
-            }
+            -- Validate collection name before building key
+            if characterCollectionName and type(characterCollectionName) == "string" and characterCollectionName ~= "" then
+                local collectionKey = private.Core.StateManager.buildCollectionKey(characterCollectionName)
+                local isActive = private.Core.StateManager.getState(collectionKey)
+                if isActive == nil then
+                    isActive = true
+                end
+                local groupProjection = {
+                    name = group.name,
+                    isActive = isActive
+                }
 
-            if not existInTable(characterCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
+                if not existInTable(characterCollectionName, dataGroups) then
+                    table.insert(dataGroups, groupProjection)
+                end
             end
         end
     end

@@ -78,7 +78,9 @@ function Chronicles:OnInitialize()
         private.Core.StateManager.init()
     end
 
-    Chronicles.Data:Load() -- Register AddonStartup event handler to check saved state after all systems are initialized
+    Chronicles.Data:Load()
+
+    -- Register AddonStartup event handler to check saved state after all systems are initialized
     private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
 
     -- Delay the startup event to ensure all event listeners are registered
@@ -90,9 +92,6 @@ function Chronicles:OnInitialize()
             }
             private.Core.Logger.trace("Chronicles", "Triggering AddonStartup event")
             private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
-
-            -- Explicitly trigger TimelineInit event after startup
-            private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
         end
     )
 end
@@ -112,6 +111,9 @@ function Chronicles:OnAddonStartup(eventData)
         return
     end
 
+    -- Explicitly trigger TimelineInit event after startup
+    private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
+
     -- Check for existing selectedPeriod and trigger state update if found
     local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
     local existingPeriod = private.Core.StateManager.getState(selectedPeriodKey)
@@ -125,12 +127,10 @@ function Chronicles:OnAddonStartup(eventData)
         private.Core.StateManager.setState(selectedPeriodKey, existingPeriod, "AddonStartup state restoration")
     else
         private.Core.Logger.trace("Chronicles", "No existing selectedPeriod found in saved state")
-    end
-
-    -- Check for existing selectedEvent and trigger state update if found
+    end -- Check for existing selectedEvent and trigger state update if found
     local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
     local existingEventSelection = private.Core.StateManager.getState(eventSelectionKey)
-    if existingEventSelection then
+    if existingEventSelection and type(existingEventSelection) == "table" then
         private.Core.Logger.trace(
             "Chronicles",
             "Found existing selectedEvent in saved state - restoring: " ..
@@ -140,17 +140,15 @@ function Chronicles:OnAddonStartup(eventData)
         private.Core.StateManager.setState(eventSelectionKey, existingEventSelection, "AddonStartup state restoration")
     else
         private.Core.Logger.trace("Chronicles", "No existing selectedEvent found in saved state")
-    end
-
-    -- Check for existing selectedCharacter and trigger state update if found
+    end -- Check for existing selectedCharacter and trigger state update if found
     local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
     local existingCharacterSelection = private.Core.StateManager.getState(characterSelectionKey)
-    if existingCharacterSelection then
+    if existingCharacterSelection and type(existingCharacterSelection) == "table" then
         private.Core.Logger.trace(
             "Chronicles",
             "Found existing selectedCharacter in saved state - restoring: " ..
-                tostring(existingCharacterSelection.characterId or existingCharacterSelection) ..
-                    " from " .. tostring(existingCharacterSelection.collectionName or "unknown")
+                tostring(existingCharacterSelection.characterId) ..
+                    " from " .. tostring(existingCharacterSelection.collectionName)
         )
         -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(
@@ -160,16 +158,15 @@ function Chronicles:OnAddonStartup(eventData)
         )
     else
         private.Core.Logger.trace("Chronicles", "No existing selectedCharacter found in saved state")
-    end
-    -- Check for existing selectedFaction and trigger state update if found
+    end -- Check for existing selectedFaction and trigger state update if found
     local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
     local existingFactionSelection = private.Core.StateManager.getState(factionSelectionKey)
-    if existingFactionSelection then
+    if existingFactionSelection and type(existingFactionSelection) == "table" then
         private.Core.Logger.trace(
             "Chronicles",
             "Found existing selectedFaction in saved state - restoring: " ..
-                tostring(existingFactionSelection.factionId or existingFactionSelection) ..
-                    " from " .. tostring(existingFactionSelection.collectionName or "unknown")
+                tostring(existingFactionSelection.factionId) ..
+                    " from " .. tostring(existingFactionSelection.collectionName)
         )
         -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(

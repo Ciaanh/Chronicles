@@ -19,9 +19,8 @@ function FactionListItemMixin:OnClick()
 			private.Core.Logger.trace(
 				"FactionList",
 				"Faction selected - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
-			)
-			private.Core.StateManager.setState(
-				"ui.selectedFaction",
+			)			private.Core.StateManager.setState(
+				private.Core.StateManager.buildSelectionKey("faction"),
 				{factionId = factionId, collectionName = collectionName},
 				"Faction selected from list"
 			)

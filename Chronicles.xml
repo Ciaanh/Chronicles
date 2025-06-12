@@ -4,13 +4,14 @@
 
     <Include file="Libs\_Includes.xml"/>
     <Include file="Locales\Locales.xml"/>
-    <Include file="Custom\Locales\Locales.xml"/>
+    <Include file="DB\Locales\Locales.xml"/>
+    
     <Script file="Constants.lua"/>
     <Script file="Chronicles.lua"/>
 
     <Include file="Core\_Includes.xml"/>
 
-    <Include file="Custom\DB\ChroniclesDB.xml"/>
+    <Include file="DB\ChroniclesDB.xml"/>
 
     <Include file="UI\_Includes.xml"/>
 </Ui>

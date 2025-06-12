@@ -62,9 +62,9 @@
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="CharacterList" inherits="CharacterListTemplate">
+                    <Frame parentKey="VerticalCharacterList" inherits="VerticalCharacterListTemplate">
                         <Anchors>
-                            <Anchor point="TOP" />
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="-20" y="0" />
                         </Anchors>
                     </Frame>
                 </Frames>

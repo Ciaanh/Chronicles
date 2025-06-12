@@ -410,6 +410,7 @@ function SearchEngine.cleanCharacterObject(character, collectionName)
         chapters = character.chapters,
         timeline = character.timeline,
         factions = character.factions or {},
+        author = character.author,
         source = collectionName
     }
 end

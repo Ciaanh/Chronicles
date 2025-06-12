@@ -167,15 +167,16 @@ end
     @param date [number] The date to get index for
     @return [number] Date index for current step
 ]]
-function TimelineBusiness.getDateCurrentStepIndex(date)
+function TimelineBusiness.getDateCurrentStepIndex(date) -- Use global Chronicles.Data instead of local chronicles.Data for method calls
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
+
+    if not chronicles or not chronicles.Data or not chronicles.Data.ComputeEventDateProfile then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when getting date index")
         return 0
     end
-
     local dateProfile = chronicles.Data:ComputeEventDateProfile(date)
-    local currentStepValue = private.Core.StateManager.getState("timeline.currentStep")
+    local currentStepValue =
+        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
 
     if (currentStepValue == 1000) then
         return dateProfile.mod1000 or 0
@@ -211,8 +212,8 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
     if eventDates == nil then
         return {}
     end
-
-    local currentStepValue = private.Core.StateManager.getState("timeline.currentStep")
+    local currentStepValue =
+        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
 
     if (currentStepValue == 1000) then
         return eventDates.mod1000 or {}
@@ -235,7 +236,7 @@ end
 
 --[[
     Count events within a timeline period block
-    @param block [table] Timeline period block with lowerBound and upperBound
+    @param block [table] Timeline period block with lower and upper
     @return [number] Number of events in the period
 ]]
 function TimelineBusiness.countEventsInPeriod(block)
@@ -258,12 +259,12 @@ function TimelineBusiness.countEventsInPeriod(block)
     end
 
     local eventCount = 0
-    local originalLowerBound = block.lowerBound
-    local originalUpperBound = block.upperBound
+    local originalLower = block.lower
+    local originalUpper = block.upper
 
     -- Handle special periods differently
-    local isMytosPeriod = (originalLowerBound == config.mythos)
-    local isFuturePeriod = (originalUpperBound == config.futur)
+    local isMytosPeriod = (originalLower == config.mythos)
+    local isFuturePeriod = (originalUpper == config.futur)
     if isMytosPeriod then
         -- For mythos period: manually search for events before historyStartYear
         local mythosYearEnd = config.historyStartYear - 1
@@ -280,8 +281,8 @@ function TimelineBusiness.countEventsInPeriod(block)
         end
     else
         -- Regular period processing
-        local lowerBound = originalLowerBound
-        local upperBound = originalUpperBound -- Clamp bounds to valid date range for date index calculation only
+        local lowerBound = originalLower
+        local upperBound = originalUpper
         if (lowerBound < config.historyStartYear) then
             lowerBound = config.historyStartYear
         end
@@ -331,7 +332,7 @@ end
 ]]
 function TimelineBusiness.generateTimelinePeriods(stepValue)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
+    if not chronicles or not chronicles.Data or not chronicles.Data.MinEventYear or not chronicles.Data.MaxEventYear then
         private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when generating periods")
         -- Return default empty periods instead of empty table
         -- This ensures timeline UI has something to display
@@ -374,10 +375,9 @@ function TimelineBusiness.generateTimelinePeriods(stepValue)
                 maxValue = timelineConfig.minYear + (blockIndex * stepValue)
             end
         end
-
         local period = {
-            lowerBound = minValue,
-            upperBound = maxValue,
+            lower = minValue,
+            upper = maxValue,
             text = nil,
             hasEvents = nil
         }
@@ -385,19 +385,19 @@ function TimelineBusiness.generateTimelinePeriods(stepValue)
         -- Handle special period types
         if (maxValue > private.constants.config.currentYear) then
             if (minValue > private.constants.config.currentYear) then
-                period.lowerBound = private.constants.config.currentYear + 1
-                period.upperBound = private.constants.config.futur
+                period.lower = private.constants.config.currentYear + 1
+                period.upper = private.constants.config.futur
                 period.text = nil -- Let the UI layer handle localization
             else
-                period.upperBound = private.constants.config.currentYear
+                period.upper = private.constants.config.currentYear
             end
         elseif (maxValue < private.constants.config.historyStartYear) then
             if (minValue < private.constants.config.historyStartYear) then
-                period.lowerBound = private.constants.config.mythos
-                period.upperBound = private.constants.config.historyStartYear - 1
+                period.lower = private.constants.config.mythos
+                period.upper = private.constants.config.historyStartYear - 1
                 period.text = nil -- Let the UI layer handle localization
             else
-                period.upperBound = private.constants.config.historyStartYear
+                period.upper = private.constants.config.historyStartYear
             end
         end
 
@@ -450,10 +450,9 @@ function TimelineBusiness.generateDefaultPeriods(stepValue)
                 maxValue = timelineConfig.minYear + (blockIndex * stepValue)
             end
         end
-
         local period = {
-            lowerBound = minValue,
-            upperBound = maxValue,
+            lower = minValue,
+            upper = maxValue,
             text = nil,
             hasEvents = false,
             nbEvents = 0
@@ -462,19 +461,19 @@ function TimelineBusiness.generateDefaultPeriods(stepValue)
         -- Handle special period types
         if (maxValue > private.constants.config.currentYear) then
             if (minValue > private.constants.config.currentYear) then
-                period.lowerBound = private.constants.config.currentYear + 1
-                period.upperBound = private.constants.config.futur
+                period.lower = private.constants.config.currentYear + 1
+                period.upper = private.constants.config.futur
                 period.text = nil -- Let the UI layer handle localization
             else
-                period.upperBound = private.constants.config.currentYear
+                period.upper = private.constants.config.currentYear
             end
         elseif (maxValue < private.constants.config.historyStartYear) then
             if (minValue < private.constants.config.historyStartYear) then
-                period.lowerBound = private.constants.config.mythos
-                period.upperBound = private.constants.config.historyStartYear - 1
+                period.lower = private.constants.config.mythos
+                period.upper = private.constants.config.historyStartYear - 1
                 period.text = nil -- Let the UI layer handle localization
             else
-                period.upperBound = private.constants.config.historyStartYear
+                period.upper = private.constants.config.historyStartYear
             end
         end
 
@@ -500,8 +499,8 @@ function TimelineBusiness.consolidateTimelinePeriods(timelineBlocks)
                 table.insert(
                     displayableTimeFrames,
                     {
-                        lowerBound = value.lowerBound,
-                        upperBound = value.upperBound,
+                        lower = value.lower,
+                        upper = value.upper,
                         text = value.text,
                         hasEvents = value.hasEvents,
                         nbEvents = value.nbEvents
@@ -510,14 +509,14 @@ function TimelineBusiness.consolidateTimelinePeriods(timelineBlocks)
             end
 
             if (value.hasEvents == false and nextValue.hasEvents == false) then
-                nextValue.lowerBound = value.lowerBound
+                nextValue.lower = value.lower
             end
         else
             table.insert(
                 displayableTimeFrames,
                 {
-                    lowerBound = value.lowerBound,
-                    upperBound = value.upperBound,
+                    lower = value.lower,
+                    upper = value.upper,
                     text = value.text,
                     hasEvents = value.hasEvents,
                     nbEvents = value.nbEvents
@@ -556,26 +555,31 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
 
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #periods
-    local maxPageValue = math.ceil(numberOfCells / pageSize)
-
-    -- Validate and normalize page index
+    local maxPageValue = math.ceil(numberOfCells / pageSize) -- Validate and normalize page index
     if (currentPage == nil) then
         currentPage = maxPageValue
         private.Core.StateManager.setState(
-            "timeline.currentPage",
+            private.Core.StateManager.buildTimelineKey("currentPage"),
             currentPage,
             "Timeline page initialized to last page"
         )
     end
-
     if (currentPage < 1) then
         currentPage = 1
-        private.Core.StateManager.setState("timeline.currentPage", currentPage, "Timeline page clamped to minimum")
+        private.Core.StateManager.setState(
+            private.Core.StateManager.buildTimelineKey("currentPage"),
+            currentPage,
+            "Timeline page clamped to minimum"
+        )
     end
 
     if (currentPage > maxPageValue) then
         currentPage = maxPageValue
-        private.Core.StateManager.setState("timeline.currentPage", currentPage, "Timeline page clamped to maximum")
+        private.Core.StateManager.setState(
+            private.Core.StateManager.buildTimelineKey("currentPage"),
+            currentPage,
+            "Timeline page clamped to maximum"
+        )
     end
 
     -- Calculate page bounds
@@ -617,42 +621,86 @@ function TimelineBusiness.getYearPageIndex(year, periods)
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #periods
 
+    -- If no year specified, use current page's middle year
     if (selectedYear == nil) then
-        local currentPage = private.Core.StateManager.getState("timeline.currentPage") or 1
+        local currentPage =
+            private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentPage")) or 1
         local firstIndex = 1 + ((currentPage - 1) * pageSize)
-        local lastIndex = currentPage * pageSize
+        local lastIndex = math.min(currentPage * pageSize, numberOfCells)
 
         if (firstIndex <= 1) then
             firstIndex = 1
         end
         if (lastIndex > numberOfCells) then
-            firstIndex = numberOfCells - (pageSize)
-            lastIndex = numberOfCells - 1
+            firstIndex = math.max(1, numberOfCells - pageSize + 1)
+            lastIndex = numberOfCells
         end
-
+        
         local firstIndexBounds = periods[firstIndex]
         local lastIndexBounds = periods[lastIndex]
 
         if (firstIndexBounds ~= nil and lastIndexBounds ~= nil) then
-            local lowerBoundYear = firstIndexBounds.lowerBound
-            local upperBoundYear = lastIndexBounds.upperBound
-            selectedYear = (lowerBoundYear + upperBoundYear) / 2
+            local lowerBoundYear = firstIndexBounds.lower
+            local upperBoundYear = lastIndexBounds.upper
+            selectedYear = math.floor((lowerBoundYear + upperBoundYear) / 2)
         else
             selectedYear = 0
         end
     end
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
-        return 1
+
+    -- Find the period that contains the selected year
+    local periodIndex = nil
+    for i, period in ipairs(periods) do
+        -- Check if year falls within this period's bounds
+        if selectedYear >= period.lower and selectedYear <= period.upper then
+            periodIndex = i
+            break
+        end
+        -- Special handling for mythos period (negative values)
+        if period.lower == private.constants.config.mythos and selectedYear < private.constants.config.historyStartYear then
+            periodIndex = i
+            break
+        end
+        -- Special handling for future period
+        if period.upper == private.constants.config.futur and selectedYear > private.constants.config.currentYear then
+            periodIndex = i
+            break
+        end
     end
 
-    local minYear = chronicles.Data:MinEventYear()
-    local length = math.abs(minYear - selectedYear)
-    local currentStepValue = private.Core.StateManager.getState("timeline.currentStep")
-    local yearIndex = math.floor(length / currentStepValue)
-    local result = yearIndex - (yearIndex % pageSize)
+    -- If no period found, find the closest one
+    if periodIndex == nil then
+        local closestDistance = math.huge
+        for i, period in ipairs(periods) do
+            local distance
+            if selectedYear < period.lower then
+                distance = period.lower - selectedYear
+            elseif selectedYear > period.upper then
+                distance = selectedYear - period.upper
+            else
+                distance = 0
+            end
+            
+            if distance < closestDistance then
+                closestDistance = distance
+                periodIndex = i
+            end
+        end
+    end
 
-    return result
+    -- If still no period found, default to first period
+    if periodIndex == nil then
+        periodIndex = 1
+    end
+
+    -- Calculate which page contains this period
+    local pageIndex = math.ceil(periodIndex / pageSize)
+    
+    -- Ensure page index is within valid bounds
+    local maxPage = math.ceil(numberOfCells / pageSize)
+    pageIndex = math.max(1, math.min(pageIndex, maxPage))
+
+    return pageIndex
 end
 
 --[[
@@ -677,14 +725,18 @@ end
     @return [table] Array of displayable timeline periods
 ]]
 function TimelineBusiness.computeTimelinePeriods()
-    local stepValue = private.Core.StateManager.getState("timeline.currentStep")
+    local stepValue = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
     if (stepValue == nil) then
         stepValue = private.constants.config.stepValues[1]
         private.Core.Logger.trace(
             "TimelineBusiness",
             "Initializing timeline step to default value: " .. tostring(stepValue)
         )
-        private.Core.StateManager.setState("timeline.currentStep", stepValue, "Timeline step initialized")
+        private.Core.StateManager.setState(
+            private.Core.StateManager.buildTimelineKey("currentStep"),
+            stepValue,
+            "Timeline step initialized"
+        )
     end
 
     private.Core.Logger.trace("TimelineBusiness", "Computing timeline periods with step value: " .. tostring(stepValue))

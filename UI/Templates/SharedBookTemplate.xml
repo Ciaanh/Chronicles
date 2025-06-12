@@ -1,0 +1,150 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+	<Script file="SharedBookTemplate.lua"/>
+
+	<!-- =============================================================================================
+	SHARED BOOK TEMPLATE
+	=============================================================================================
+	
+	Universal book component that can be used for Events, Characters, and Factions.
+	Provides common functionality including:
+	- Paged content display with templates
+	- Book corner animations
+	- Paging controls with hover effects
+	- State management integration
+	- Period filtering
+	- Empty state handling
+	
+	USAGE:
+	Inherit from this template and specify the appropriate mixin in your concrete implementations:
+	- EventBookTemplate: inherits="SharedBookTemplate" mixin="EventBookMixin"
+	- CharacterBookTemplate: inherits="SharedBookTemplate" mixin="CharacterBookMixin"  
+	- FactionBookTemplate: inherits="SharedBookTemplate" mixin="FactionBookMixin"
+	
+	CUSTOMIZATION:
+	- Modify background textures by overriding BookBGLeft/BookBGRight
+	- Adjust page dimensions via viewWidth KeyValue
+	- Customize paging controls through PagingControls KeyValues
+	- Change animation timing in SinglePageBookCornerFlipbook
+	============================================================================================= -->
+
+	<Frame name="SharedBookTemplate" mixin="SharedBookMixin" virtual="true">
+		<Size x="1200" y="650"/>
+		
+		<!-- Book Background Layers -->
+		<Layers>
+			<Layer level="BACKGROUND" textureSubLevel="1">
+				<!-- Left page background -->
+				<Texture parentKey="BookBGLeft" atlas="spellbook-background-evergreen-left" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM"/>
+					</Anchors>
+				</Texture>
+				
+				<!-- Right page background -->
+				<Texture parentKey="BookBGRight" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOP"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			
+			<Layer level="BACKGROUND" textureSubLevel="2">
+				<!-- Animated book corner when paging -->
+				<Texture parentKey="SinglePageBookCornerFlipbook" atlas="spellbook-corner-flipbook-evergreen" useAtlasSize="false">
+					<Size x="75" y="77"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-15" y="6"/>
+					</Anchors>
+					<Animations>
+						<AnimationGroup parentKey="Anim" looping="NONE">
+							<FlipBook flipBookRows="2" flipBookColumns="4" flipBookFrames="8" duration="0.25" smoothing="NONE" />
+						</AnimationGroup>
+					</Animations>
+				</Texture>
+			</Layer>
+			
+			<!-- Debug background - uncomment for layout debugging -->
+			<!-- <Layer level="BACKGROUND" textureSubLevel="1000">
+				<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
+					<Color r="255.0" g="0.0" b="0.0"/>
+				</Texture>
+			</Layer> -->
+		</Layers>
+		
+		<!-- Content Frames -->
+		<Frames>
+			<!-- Main paged content display -->
+			<Frame parentKey="PagedDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+				<KeyValues>
+					<KeyValue key="viewsPerPage" value="2" type="number"/>
+					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
+					<KeyValue key="xPadding" value="15" type="number"/>
+					<KeyValue key="columnsPerRow" value="1" type="number"/>
+					<KeyValue key="autoExpandElements" value="true" type="boolean"/>
+					<KeyValue key="viewWidth" value="500" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="50" y="-50"/>
+					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
+				</Anchors>
+				
+				<Frames>
+					<!-- Left page view -->
+					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+						<Anchors>
+							<Anchor point="TOPLEFT" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM" x="-50" />
+						</Anchors>
+						<!-- Debug background for left page -->
+						<!-- <Layers>
+							<Layer level="BACKGROUND" textureSubLevel="1000">
+								<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
+									<Color r="0.0" g="0.0" b="255.0"/>
+								</Texture>
+							</Layer>
+						</Layers> -->
+					</Frame>
+					
+					<!-- Right page view -->
+					<Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+						<Anchors>
+							<Anchor point="TOPRIGHT" />
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM" x="50" />
+						</Anchors>
+						<!-- Debug background for right page -->
+						<!-- <Layers>
+							<Layer level="BACKGROUND" textureSubLevel="1000">
+								<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
+									<Color r="0.0" g="255.0" b="0.0"/>
+								</Texture>
+							</Layer>
+						</Layers> -->
+					</Frame>
+
+					<!-- Paging controls with customizable styling -->
+					<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
+						</Anchors>
+						<KeyValues>
+							<KeyValue key="fontName" value="SystemFont_Med3" type="string" />
+							<KeyValue key="fontColor" value="SPELLBOOK_FONT_COLOR" type="global" />
+							<KeyValue key="spacing" value="8" type="number"/>
+							<KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+							<KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+						</KeyValues>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		
+		<!-- Event Scripts -->
+		<Scripts>
+			<OnLoad method="OnLoad" />
+		</Scripts>
+	</Frame>
+</Ui>

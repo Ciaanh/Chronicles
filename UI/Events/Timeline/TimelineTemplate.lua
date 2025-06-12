@@ -57,9 +57,8 @@ function TimelineMixin:OnLoad()
 
     -- Use state-based subscription for timeline step changes
     -- This provides a single source of truth for the current timeline step
-    if private.Core.StateManager then
-        private.Core.StateManager.subscribe(
-            "timeline.currentStep",
+    if private.Core.StateManager then        private.Core.StateManager.subscribe(
+            private.Core.StateManager.buildTimelineKey("currentStep"),
             function(newStep, oldStep)
                 -- Timeline step changed - update zoom level indicator
                 self:UpdateZoomLevelIndicator(newStep)
@@ -74,7 +73,7 @@ function TimelineMixin:OnLoad()
 
     -- Initialize zoom level indicator
     self:UpdateZoomLevelIndicator(
-        private.Core.StateManager.getState("timeline.currentStep") or private.constants.config.stepValues[1]
+        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep")) or private.constants.config.stepValues[1]
     )
 end
 
@@ -162,12 +161,12 @@ end
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
     self.data = periodData
 
-    -- Highlight logic
+    -- Highlight logic    
     local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
     local selectedPeriod = private.Core.StateManager.getState(selectedPeriodKey)
     local isSelected =
-        selectedPeriod and periodData and selectedPeriod.lower == periodData.lowerBound and
-        selectedPeriod.upper == periodData.upperBound
+        selectedPeriod and periodData and selectedPeriod.lower == periodData.lower and
+        selectedPeriod.upper == periodData.upper
 
     if (periodData ~= nil and periodData.hasEvents) then
         self.Text:SetText(periodData.nbEvents)
@@ -222,8 +221,8 @@ function TimelinePeriodMixin:OnClick()
     -- Create a period data structure for state storage
     -- Only store essential data, not calculated values
     local periodData = {
-        lower = self.data.lowerBound,
-        upper = self.data.upperBound,
+        lower = self.data.lower,
+        upper = self.data.upper,
         text = self.data.text,
         nbEvents = self.data.nbEvents,
         hasEvents = self.data.hasEvents

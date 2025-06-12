@@ -5,7 +5,6 @@
     for events, characters, factions, and related objects used throughout the
     Chronicles addon.
 --]]
-
 local private = ...
 
 -- Create the Types module if it doesn't exist
@@ -35,7 +34,6 @@ private.Core.Data.Types = {}
         author = [string]               -- Author of the event entry
     }
 --]]
-
 --[[
     Character Data Structure:
     {
@@ -49,7 +47,6 @@ private.Core.Data.Types = {}
         author = [string]                   -- Author of the character entry
     }
 --]]
-
 --[[
     Faction Data Structure:
     {
@@ -62,7 +59,6 @@ private.Core.Data.Types = {}
         author = [string]           -- Author of the faction entry
     }
 --]]
-
 --[[
     Chapter Data Structure:
     {
@@ -70,9 +66,6 @@ private.Core.Data.Types = {}
         pages = { [string] }        -- Content of the chapter (array of strings, text or HTML)
     }
 --]]
-
-
-
 --[[
     Timeline Period Data Structure:
     {
@@ -82,7 +75,6 @@ private.Core.Data.Types = {}
         description = [string]      -- Period description (optional)
     }
 --]]
-
 -- -------------------------
 -- VALIDATION FUNCTIONS
 -- -------------------------
@@ -280,8 +272,6 @@ function Types.IsValidChapter(chapter)
     return true, nil
 end
 
-
-
 --[[
     Check if a timeline period object has valid structure
     @param period [table] Timeline period object to validate
@@ -329,7 +319,7 @@ function Types.IsValidYear(year)
     if type(year) ~= "number" then
         return false
     end
-    
+
     -- Reasonable year range for Warcraft universe (adjust as needed)
     -- Negative years for "before" events, positive for "after"
     return year >= -50000 and year <= 50000
