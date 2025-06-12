@@ -68,36 +68,22 @@ function EventListMixin:OnLoad()
 			selectedPeriodKey,
 			function(newPeriod, oldPeriod)
 				if newPeriod then
-					private.Core.Logger.trace("EventListMixin", "Received selectedPeriod state change notification")
 					self:UpdateFromSelectedPeriod(newPeriod)
-				else
-					private.Core.Logger.trace("EventListMixin", "Received selectedPeriod state change with nil period")
 				end
 			end,
 			"EventListMixin"
 		)
-
-		private.Core.Logger.trace(
-			"EventListMixin",
-			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
-		)
 	end
 
-	-- Set up template data for the paged list
 	self.PagedEventList:SetElementTemplateData(private.constants.templates)
 end
 
 function EventListMixin:OnUIRefresh()
-	private.Core.Logger.trace("EventListMixin", "OnUIRefresh triggered - clearing event list data")
-
 	local data = {}
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
 
-	private.Core.Logger.trace("EventListMixin", "Setting empty data provider to PagedEventList")
 	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
-
-	private.Core.Logger.trace("EventListMixin", "OnUIRefresh completed - event list cleared")
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
@@ -105,12 +91,6 @@ function EventListMixin:OnTimelinePeriodSelected(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period)
-	private.Core.Logger.trace(
-		"EventListMixin",
-		"UpdateFromSelectedPeriod called with period: " ..
-			tostring(period and period.lower) .. "-" .. tostring(period and period.upper)
-	)
-
 	local eventList = private.Core.Cache.getSearchEvents(period.lower, period.upper)
 	private.Core.Timeline.SetYear(math.floor((period.lower + period.upper) / 2))
 

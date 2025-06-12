@@ -102,7 +102,6 @@ constants.events = {
 
 -- Event system configuration
 constants.eventSystem = {
-	debugMode = false,
 	enableValidation = true,
 	enableErrorLogging = true,
 	maxEventHistory = 100,

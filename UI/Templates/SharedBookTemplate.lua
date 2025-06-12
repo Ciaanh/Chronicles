@@ -27,45 +27,33 @@ SharedBookMixin = {}
 -- =============================================================================================
 
 function SharedBookMixin:OnLoad()
-	-- Set up paged content display
 	self.PagedDetails:SetElementTemplateData(private.constants.templates)
-
-	-- Register for UI refresh events that don't have state equivalents
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
 
-	-- Initialize state subscriptions based on book type
 	self:InitializeStateSubscriptions()
 
-	-- Set up paging controls with hover animations
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
 	local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
 	self.PagedDetails.PagingControls:SetButtonHoverCallbacks(onPagingButtonEnter, onPagingButtonLeave)
 
-	-- Initialize book corner animation
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 	self.SinglePageBookCornerFlipbook.Anim:Pause()
 
-	-- Track currently displayed item
 	self.currentlyDisplayedItem = nil
-
-	private.Core.Logger.trace(self:GetMixinName(), "OnLoad completed - initialized shared book template")
 end
 
 function SharedBookMixin:InitializeStateSubscriptions()
 	if not private.Core.StateManager then
-		private.Core.Logger.warn(self:GetMixinName(), "StateManager not available for state subscriptions")
 		return
 	end
 
 	local bookType = self:GetBookType()
 	local selectionKey = private.Core.StateManager.buildSelectionKey(bookType)
 
-	-- Subscribe to item selection changes
 	private.Core.StateManager.subscribe(
 		selectionKey,
 		function(newSelection)
 			if newSelection and newSelection.id then
-				-- Support both new format {id, collectionName} and legacy formats
 				local itemId = newSelection.id or newSelection.eventId or newSelection.characterId or newSelection.factionId
 				local collectionName = newSelection.collectionName
 
@@ -81,7 +69,6 @@ function SharedBookMixin:InitializeStateSubscriptions()
 		self:GetMixinName()
 	)
 
-	-- Subscribe to period selection changes for filtering
 	local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
 	private.Core.StateManager.subscribe(
 		selectedPeriodKey,
@@ -92,8 +79,6 @@ function SharedBookMixin:InitializeStateSubscriptions()
 		end,
 		self:GetMixinName()
 	)
-
-	private.Core.Logger.trace(self:GetMixinName(), "State subscriptions initialized for", bookType, "book")
 end
 
 -- =============================================================================================
@@ -101,12 +86,10 @@ end
 -- =============================================================================================
 
 function SharedBookMixin:OnPagingButtonEnter()
-	-- Play book corner animation on paging button hover
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 end
 
 function SharedBookMixin:OnPagingButtonLeave()
-	-- Reverse book corner animation when hover ends
 	local reverse = true
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
@@ -116,7 +99,6 @@ end
 -- =============================================================================================
 
 function SharedBookMixin:GetItemById(itemId, collectionName)
-	local bookType = self:GetBookType()
 	local dataSource = self:GetDataSource()
 
 	if collectionName and Chronicles and Chronicles.Data and Chronicles.Data[dataSource] then
@@ -129,16 +111,6 @@ function SharedBookMixin:GetItemById(itemId, collectionName)
 			end
 		end
 	end
-
-	private.Core.Logger.warn(
-		self:GetMixinName(),
-		"No",
-		bookType,
-		"found with ID:",
-		itemId,
-		"in collection:",
-		collectionName
-	)
 	return nil
 end
 
@@ -146,49 +118,32 @@ function SharedBookMixin:OnItemSelected(itemId, collectionName)
 	local data = self:GetItemById(itemId, collectionName)
 
 	if data then
-		-- Transform data to book format using type-specific transformer
 		local content = self:TransformItemToBook(data)
 		local dataProvider = CreateDataProvider(content)
 		local retainScrollPosition = false
 
-		-- Display the content in the paged view
 		self.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
 
-		-- Track currently displayed item for period filtering
 		self.currentlyDisplayedItem = {
 			id = itemId,
 			collectionName = collectionName,
 			bookType = self:GetBookType()
 		}
-
-		private.Core.Logger.trace(
-			self:GetMixinName(),
-			"Item selected and displayed:",
-			itemId,
-			"from collection:",
-			collectionName
-		)
 	else
-		-- Show empty book if item not found
 		local emptyData = self:GetEmptyBook()
 		local dataProvider = CreateDataProvider(emptyData)
 		self.PagedDetails:SetDataProvider(dataProvider, false)
 		self.currentlyDisplayedItem = nil
-
-		private.Core.Logger.warn(self:GetMixinName(), "Failed to load item, showing empty book:", itemId)
 	end
 end
 
 function SharedBookMixin:OnUIRefresh()
-	-- Clear the book view and show empty state
 	local data = self:GetEmptyBook()
 	local dataProvider = CreateDataProvider(data)
 	local retainScrollPosition = false
 
 	self.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
 	self.currentlyDisplayedItem = nil
-
-	private.Core.Logger.trace(self:GetMixinName(), "UI refreshed - book view cleared")
 end
 
 -- =============================================================================================
@@ -196,12 +151,7 @@ end
 -- =============================================================================================
 
 function SharedBookMixin:OnPeriodSelectionChanged(newPeriod)
-	-- Check if we have a currently displayed item
 	if not self.currentlyDisplayedItem then
-		private.Core.Logger.trace(
-			self:GetMixinName(),
-			"Period selection changed but no item is currently displayed - no action needed"
-		)
 		return
 	end
 
@@ -209,34 +159,12 @@ function SharedBookMixin:OnPeriodSelectionChanged(newPeriod)
 	local currentItem = self.currentlyDisplayedItem
 	local itemInNewPeriod = self:IsItemInPeriod(currentItem, newPeriod)
 
-	if itemInNewPeriod then
-		private.Core.Logger.trace(
-			self:GetMixinName(),
-			"Period selection changed but current item (ID:",
-			tostring(currentItem.id),
-			") is within new period (",
-			tostring(newPeriod.lower),
-			"-",
-			tostring(newPeriod.upper),
-			") - keeping item displayed"
-		)
-	else
-		private.Core.Logger.trace(
-			self:GetMixinName(),
-			"Period selection changed and current item (ID:",
-			tostring(currentItem.id),
-			") is NOT within new period (",
-			tostring(newPeriod.lower),
-			"-",
-			tostring(newPeriod.upper),
-			") - resetting book view"
-		)
+	if not itemInNewPeriod then
 		self:OnUIRefresh()
 	end
 end
 
 function SharedBookMixin:IsItemInPeriod(itemSelection, period)
-	-- Validate inputs
 	if not itemSelection or not itemSelection.id or not itemSelection.collectionName then
 		return false
 	end
@@ -245,13 +173,11 @@ function SharedBookMixin:IsItemInPeriod(itemSelection, period)
 		return false
 	end
 
-	-- Get the full item data to check its date range
 	local itemData = self:GetItemById(itemSelection.id, itemSelection.collectionName)
 	if not itemData then
 		return false
 	end
 
-	-- Use type-specific date range checking
 	return self:CheckItemDateRange(itemData, period)
 end
 
@@ -263,7 +189,6 @@ end
 -- specific method names for events, characters, and factions.
 -- =============================================================================================
 
--- Legacy compatibility for EventBookMixin
 function SharedBookMixin:GetEventById(eventId, collectionName)
 	if self:GetBookType() == "event" then
 		return self:GetItemById(eventId, collectionName)
@@ -280,7 +205,6 @@ function SharedBookMixin:OnEventSelected(eventId, collectionName)
 	end
 end
 
--- Legacy compatibility for CharacterBookMixin
 function SharedBookMixin:GetCharacterById(characterId, collectionName)
 	if self:GetBookType() == "character" then
 		return self:GetItemById(characterId, collectionName)
@@ -297,7 +221,6 @@ function SharedBookMixin:OnCharacterSelected(characterId, collectionName)
 	end
 end
 
--- Legacy compatibility for FactionBookMixin
 function SharedBookMixin:GetFactionById(factionId, collectionName)
 	if self:GetBookType() == "faction" then
 		return self:GetItemById(factionId, collectionName)

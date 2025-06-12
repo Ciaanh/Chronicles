@@ -6,7 +6,6 @@ private.Core.EventManager = {}
 -- Global Utility Functions
 -- -------------------------
 
--- Helper function to safely trigger events with fallback to EventRegistry
 function private.Core.triggerEvent(eventName, eventData, source)
     if private.Core.EventManager and private.Core.EventManager.safeTrigger then
         return private.Core.EventManager.safeTrigger(eventName, eventData, source)
@@ -16,7 +15,6 @@ function private.Core.triggerEvent(eventName, eventData, source)
     end
 end
 
--- Helper function to safely register callbacks with fallback to EventRegistry
 function private.Core.registerCallback(eventName, callback, owner)
     if private.Core.EventManager and private.Core.EventManager.safeRegisterCallback then
         private.Core.EventManager.safeRegisterCallback(eventName, callback, owner)
@@ -135,7 +133,6 @@ private.Core.EventManager.Validator = {
     validate = function(self, eventName, data)
         local schema = eventSchemas[eventName]
         if not schema then
-            -- No schema defined, allow event (backward compatibility)
             return true, nil
         end
 
@@ -156,39 +153,20 @@ private.Core.EventManager.Validator = {
 private.Core.EventManager.safeTrigger = function(eventName, data, source)
     source = source or debug.getinfo(2, "S").source
 
-    private.Core.Logger.trace("EventManager", "Attempting to trigger event: " .. eventName)
-
-    -- Validate event data
     local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
-        private.Core.Logger.error(
-            "EventManager",
-            "Event validation failed for " .. eventName .. ": " .. tostring(error)
-        )
-        private.Core.Logger.error("EventManager", "Event validation failed for " .. eventName .. ": " .. error)
         return false
     end
 
-    -- Try to trigger event safely
     local success, errorMsg =
         pcall(
         function()
-            private.Core.Logger.trace("EventManager", "Triggering event via EventRegistry: " .. eventName)
             EventRegistry:TriggerEvent(eventName, data)
         end
     )
     if success then
-        private.Core.Logger.trace("EventManager", "Event triggered successfully: " .. eventName)
         return true
     else
-        private.Core.Logger.error(
-            "EventManager",
-            "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
-        )
-        private.Core.Logger.error(
-            "EventManager",
-            "Event trigger failed for " .. eventName .. ": " .. tostring(errorMsg)
-        )
         return false
     end
 end
@@ -198,18 +176,9 @@ end
 -- -------------------------
 
 private.Core.EventManager.safeRegisterCallback = function(eventName, callback, owner)
-    private.Core.Logger.trace(
-        "EventManager",
-        "Registering callback for event: " .. eventName .. " (owner: " .. tostring(owner) .. ")"
-    )
-
     local wrappedCallback = function(...)
-        private.Core.Logger.trace("EventManager", "Callback triggered for event: " .. eventName)
         local success, errorMsg = pcall(callback, ...)
-        if not success then
-            private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
-            private.Core.Logger.error("EventManager", "Callback failed for " .. eventName .. ": " .. tostring(errorMsg))
-        end
+        -- Silently ignore callback failures to prevent cascade errors
     end
 
     EventRegistry:RegisterCallback(eventName, wrappedCallback, owner)
@@ -224,7 +193,6 @@ private.Core.EventManager.PluginEvents = {
     registerPluginEvent = function(self, pluginName, eventName, schema)
         local fullEventName = "Plugin." .. pluginName .. "." .. eventName
         if self.registeredEvents[fullEventName] then
-            private.Core.Logger.warn("EventManager", "Plugin event already registered: " .. fullEventName)
             return false
         end
 
@@ -232,18 +200,17 @@ private.Core.EventManager.PluginEvents = {
             pluginName = pluginName,
             eventName = eventName,
             schema = schema
-        } -- Add schema to validator if provided
+        }
+
         if schema then
             private.Core.EventManager.Validator:addSchema(fullEventName, schema)
         end
 
-        private.Core.Logger.trace("EventManager", "Plugin event registered: " .. fullEventName)
         return true
     end,
     triggerPluginEvent = function(self, pluginName, eventName, data, source)
         local fullEventName = "Plugin." .. pluginName .. "." .. eventName
         if not self.registeredEvents[fullEventName] then
-            private.Core.Logger.warn("EventManager", "Unknown plugin event: " .. fullEventName)
             return false
         end
 

@@ -28,7 +28,7 @@ end
 -- -------------------------
 
 function HelperUtils.init()
-    private.Core.Logger.trace("HelperUtils", "HelperUtils module initialized")
+    -- HelperUtils module initialized
 end
 
 -- Auto-initialize when module is loaded

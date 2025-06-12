@@ -73,24 +73,17 @@ function Chronicles:OnInitialize()
         end
     )
 
-    -- Initialize state manager BEFORE loading data to ensure saved state is available during collection registration
     if private.Core.StateManager then
         private.Core.StateManager.init()
     end
 
     Chronicles.Data:Load()
 
-    -- Register AddonStartup event handler to check saved state after all systems are initialized
     private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
-
-    -- Delay the startup event to ensure all event listeners are registered
     C_Timer.After(
         0.2,
         function()
-            local startupData = {
-                debugMode = private.constants.eventSystem.debugMode or false
-            }
-            private.Core.Logger.trace("Chronicles", "Triggering AddonStartup event")
+            local startupData = {}
             private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
         end
     )
@@ -104,95 +97,48 @@ end
     all core systems are fully initialized before checking saved state.
 ]]
 function Chronicles:OnAddonStartup(eventData)
-    private.Core.Logger.trace("Chronicles", "OnAddonStartup - checking for existing saved state")
-
     if not private.Core.StateManager then
-        private.Core.Logger.error("Chronicles", "StateManager not available during AddonStartup")
         return
     end
 
-    -- Explicitly trigger TimelineInit event after startup
     private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
-
-    -- Check for existing selectedPeriod and trigger state update if found
     local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
     local existingPeriod = private.Core.StateManager.getState(selectedPeriodKey)
     if existingPeriod then
-        private.Core.Logger.trace(
-            "Chronicles",
-            "Found existing selectedPeriod in saved state - restoring: " ..
-                tostring(existingPeriod.lower) .. "-" .. tostring(existingPeriod.upper)
-        )
-        -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(selectedPeriodKey, existingPeriod, "AddonStartup state restoration")
-    else
-        private.Core.Logger.trace("Chronicles", "No existing selectedPeriod found in saved state")
-    end -- Check for existing selectedEvent and trigger state update if found
+    end
+
     local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
     local existingEventSelection = private.Core.StateManager.getState(eventSelectionKey)
     if existingEventSelection and type(existingEventSelection) == "table" then
-        private.Core.Logger.trace(
-            "Chronicles",
-            "Found existing selectedEvent in saved state - restoring: " ..
-                tostring(existingEventSelection.eventId) .. " from " .. tostring(existingEventSelection.collectionName)
-        )
-        -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(eventSelectionKey, existingEventSelection, "AddonStartup state restoration")
-    else
-        private.Core.Logger.trace("Chronicles", "No existing selectedEvent found in saved state")
-    end -- Check for existing selectedCharacter and trigger state update if found
+    end
+
     local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
     local existingCharacterSelection = private.Core.StateManager.getState(characterSelectionKey)
     if existingCharacterSelection and type(existingCharacterSelection) == "table" then
-        private.Core.Logger.trace(
-            "Chronicles",
-            "Found existing selectedCharacter in saved state - restoring: " ..
-                tostring(existingCharacterSelection.characterId) ..
-                    " from " .. tostring(existingCharacterSelection.collectionName)
-        )
-        -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(
             characterSelectionKey,
             existingCharacterSelection,
             "AddonStartup state restoration"
         )
-    else
-        private.Core.Logger.trace("Chronicles", "No existing selectedCharacter found in saved state")
-    end -- Check for existing selectedFaction and trigger state update if found
+    end
+
     local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
     local existingFactionSelection = private.Core.StateManager.getState(factionSelectionKey)
     if existingFactionSelection and type(existingFactionSelection) == "table" then
-        private.Core.Logger.trace(
-            "Chronicles",
-            "Found existing selectedFaction in saved state - restoring: " ..
-                tostring(existingFactionSelection.factionId) ..
-                    " from " .. tostring(existingFactionSelection.collectionName)
-        )
-        -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(
             factionSelectionKey,
             existingFactionSelection,
             "AddonStartup state restoration"
         )
-    else
-        private.Core.Logger.trace("Chronicles", "No existing selectedFaction found in saved state")
     end
 
-    -- Check for existing activeTab and trigger state update if found
     local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
     local existingActiveTab = private.Core.StateManager.getState(activeTabKey)
     if existingActiveTab then
-        private.Core.Logger.trace(
-            "Chronicles",
-            "Found existing activeTab in saved state - restoring: " .. tostring(existingActiveTab)
-        )
-        -- Re-trigger state update to notify all subscribed UI components
         private.Core.StateManager.setState(activeTabKey, existingActiveTab, "AddonStartup state restoration")
-    else
-        private.Core.Logger.trace("Chronicles", "No existing activeTab found in saved state")
     end
-
-    private.Core.Logger.trace("Chronicles", "OnAddonStartup state restoration completed")
 end
 
 function Chronicles:OnDisable()

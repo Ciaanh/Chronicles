@@ -23,10 +23,6 @@ function CharacterDetailPageMixin:OnLoad()
 						-- New format with collection-specific lookup
 						local characterId = newCharacterSelection.characterId
 						local collectionName = newCharacterSelection.collectionName
-						private.Core.Logger.trace(
-							"CharacterBook",
-							"Character selection received - ID: " .. tostring(characterId) .. ", Collection: " .. tostring(collectionName)
-						)
 						characterData = self:GetCharacterById(characterId, collectionName)
 					else
 						-- Legacy format or fallback - treat as just character ID
@@ -40,31 +36,15 @@ function CharacterDetailPageMixin:OnLoad()
 						end
 
 						if characterId then
-							private.Core.Logger.trace(
-								"CharacterBook",
-								"Character selection received (legacy format) - ID: " .. tostring(characterId)
-							)
 							characterData = self:GetCharacterById(characterId)
-						else
-							private.Core.Logger.warn(
-								"CharacterBook",
-								"Invalid character selection format - neither new format nor valid legacy format"
-							)
 						end
 					end
 
 					if characterData then
 						self:OnCharacterSelected(characterData)
-					else
-						private.Core.Logger.warn("CharacterBook", "Could not find character data for selection")
 					end
 				end
 			end
-		)
-
-		private.Core.Logger.trace(
-			"CharacterDetailPageMixin",
-			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
 		)
 	end
 
@@ -79,54 +59,19 @@ end
 function CharacterDetailPageMixin:GetCharacterById(characterId, collectionName)
 	local Chronicles = private.Chronicles
 
-	-- Use the Chronicles Data API to find the character by ID
 	if Chronicles and Chronicles.Data then
 		local characters = Chronicles.Data:SearchCharacters()
 		if characters then
-			-- If collection name is provided, try direct lookup first for performance
 			if collectionName then
-				private.Core.Logger.trace(
-					"CharacterBook",
-					"Attempting direct collection lookup for character ID: " ..
-						tostring(characterId) .. " in collection: " .. tostring(collectionName)
-				)
-
 				for _, character in pairs(characters) do
 					if character.id == characterId and character.source == collectionName then
-						private.Core.Logger.trace("CharacterBook", "Found character via direct collection lookup")
 						return character
 					end
-				end
-
-				private.Core.Logger.warn(
-					"CharacterBook",
-					"Character not found in specified collection, falling back to general search"
-				)
-			end
-
-			-- Fallback: search through all characters (maintains backward compatibility)
-			for _, character in pairs(characters) do
-				if character.id == characterId then
-					if collectionName then
-						private.Core.Logger.trace(
-							"CharacterBook",
-							"Found character via fallback search (different collection than expected)"
-						)
-					end
-					return character
 				end
 			end
 		end
 	end
 
-	if collectionName then
-		private.Core.Logger.error(
-			"CharacterBook",
-			"Character not found - ID: " .. tostring(characterId) .. ", Collection: " .. tostring(collectionName)
-		)
-	else
-		private.Core.Logger.error("CharacterBook", "Character not found - ID: " .. tostring(characterId))
-	end
 	return nil
 end
 

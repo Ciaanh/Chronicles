@@ -35,11 +35,6 @@ function EventBookMixin:OnLoad()
 			end,
 			"EventBookMixin"
 		)
-
-		private.Core.Logger.trace(
-			"EventBookMixin",
-			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
-		)
 	end
 
 	local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
@@ -74,8 +69,6 @@ function EventBookMixin:GetEventById(eventId, collectionName)
 		end
 	end
 
-	private.Core.Logger.warn("EventBookMixin", "No event found with ID:", eventId, "in collection:", collectionName)
-
 	return nil
 end
 
@@ -103,40 +96,18 @@ function EventBookMixin:OnUIRefresh()
 	local retainScrollPosition = false
 
 	self.PagedEventDetails:SetDataProvider(dataProvider, retainScrollPosition)
-	-- Clear tracking when UI is refreshed (book view is empty)
 	self.currentlyDisplayedEvent = nil
 end
 
 function EventBookMixin:OnPeriodSelectionChanged(newPeriod)
-	-- Check if we have a currently displayed event
 	if not self.currentlyDisplayedEvent then
-		private.Core.Logger.trace(
-			"EventBookMixin",
-			"Period selection changed but no event is currently displayed - no action needed"
-		)
 		return
 	end
 
-	-- Check if the current event falls within the new period
 	local currentEvent = self.currentlyDisplayedEvent
 	local eventInNewPeriod = self:IsEventInPeriod(currentEvent, newPeriod)
 
-	if eventInNewPeriod then
-		private.Core.Logger.trace(
-			"EventBookMixin",
-			"Period selection changed but current event (ID: " ..
-				tostring(currentEvent.eventId) ..
-					") is within new period (" ..
-						tostring(newPeriod.lower) .. "-" .. tostring(newPeriod.upper) .. ") - keeping event displayed"
-		)
-	else
-		private.Core.Logger.trace(
-			"EventBookMixin",
-			"Period selection changed and current event (ID: " ..
-				tostring(currentEvent.eventId) ..
-					") is NOT within new period (" ..
-						tostring(newPeriod.lower) .. "-" .. tostring(newPeriod.upper) .. ") - resetting event book view"
-		)
+	if not eventInNewPeriod then
 		self:OnUIRefresh()
 	end
 end
@@ -150,13 +121,10 @@ function EventBookMixin:IsEventInPeriod(eventSelection, period)
 		return false
 	end
 
-	-- Get the full event data to check its date range
 	local eventData = self:GetEventById(eventSelection.eventId, eventSelection.collectionName)
 	if not eventData or not eventData.yearStart or not eventData.yearEnd then
 		return false
 	end
 
-	-- Check if the event's date range overlaps with the period
-	-- Event is in period if: event.yearStart <= period.upper AND event.yearEnd >= period.lower
 	return eventData.yearStart <= period.upper and eventData.yearEnd >= period.lower
 end

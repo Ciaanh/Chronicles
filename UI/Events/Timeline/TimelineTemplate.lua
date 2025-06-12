@@ -57,15 +57,11 @@ function TimelineMixin:OnLoad()
 
     -- Use state-based subscription for timeline step changes
     -- This provides a single source of truth for the current timeline step
-    if private.Core.StateManager then        private.Core.StateManager.subscribe(
+    if private.Core.StateManager then
+        private.Core.StateManager.subscribe(
             private.Core.StateManager.buildTimelineKey("currentStep"),
             function(newStep, oldStep)
-                -- Timeline step changed - update zoom level indicator
                 self:UpdateZoomLevelIndicator(newStep)
-                private.Core.Logger.trace(
-                    "TimelineMixin",
-                    "Timeline step changed from " .. tostring(oldStep) .. " to " .. tostring(newStep)
-                )
             end,
             "TimelineMixin"
         )
@@ -73,7 +69,8 @@ function TimelineMixin:OnLoad()
 
     -- Initialize zoom level indicator
     self:UpdateZoomLevelIndicator(
-        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep")) or private.constants.config.stepValues[1]
+        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep")) or
+            private.constants.config.stepValues[1]
     )
 end
 
@@ -135,7 +132,6 @@ end
 TimelineLabelMixin = {}
 function TimelineLabelMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelineLabel .. tostring(self.index)
-    -- Use safe event registration
     private.Core.registerCallback(eventName, self.OnDisplayTimelineLabel, self)
 end
 
@@ -154,14 +150,12 @@ end
 TimelinePeriodMixin = {}
 function TimelinePeriodMixin:OnLoad()
     local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(self.index)
-    -- Use safe event registration
     private.Core.registerCallback(eventName, self.OnDisplayTimelinePeriod, self)
 end
 
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
     self.data = periodData
 
-    -- Highlight logic    
     local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
     local selectedPeriod = private.Core.StateManager.getState(selectedPeriodKey)
     local isSelected =
@@ -170,7 +164,7 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
 
     if (periodData ~= nil and periodData.hasEvents) then
         self.Text:SetText(periodData.nbEvents)
-        local select = isSelected and "-selected" or "" -- gold for selected, white for unselected
+        local select = isSelected and "-selected" or ""
 
         if periodData.nbEvents < 10 then
             self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events" .. select)
@@ -184,7 +178,6 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
         self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
     end
 
-    -- Always reset background color to normal
     self.Background:SetVertexColor(1, 1, 1)
 end
 
@@ -213,8 +206,6 @@ function TimelinePeriodMixin:ResetAllPeriodTextures()
             period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
         end
     end
-
-    -- Highlight the period when hovered
 end
 
 function TimelinePeriodMixin:OnClick()

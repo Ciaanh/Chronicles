@@ -10,7 +10,6 @@ local Chronicles = private.Chronicles
     Provides intelligent caching, cache invalidation, and performance monitoring.
     
     DEPENDENCIES:
-    - Core.Logger: For debug and performance logging
     - Core.Utils.HelperUtils: For safe Chronicles object access
     - Constants: For configuration values and timeline ranges
     - Timer API: For delayed cache warming and cleanup operations
@@ -86,7 +85,6 @@ local Cache = {
 -- Core Cache Management Functions
 -- -------------------------
 
--- Invalidate specific cache type or all caches
 function private.Core.Cache.invalidate(cacheType)
     if cacheType then
         Cache._dirty[cacheType] = true
@@ -97,9 +95,7 @@ function private.Core.Cache.invalidate(cacheType)
         else
             Cache._data[cacheType] = nil
         end
-        private.Core.Logger.trace("Cache", "Invalidated cache: " .. cacheType)
     else
-        -- Invalidate all caches
         for key in pairs(Cache._dirty) do
             Cache._dirty[key] = true
         end
@@ -112,22 +108,20 @@ function private.Core.Cache.invalidate(cacheType)
             [CACHE_KEYS.ALL_CHARACTERS] = nil,
             [CACHE_KEYS.FILTERED_CHARACTERS] = {}
         }
-        private.Core.Logger.trace("Cache", "Invalidated all caches")
     end
 end
 
--- Check if cache entry is valid
 function private.Core.Cache.isValid(cacheType, cacheKey)
     if cacheType == CACHE_KEYS.FILTERED_EVENTS then
         return not Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] and Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] ~= nil
     elseif cacheType == CACHE_KEYS.FILTERED_CHARACTERS then
-        return not Cache._dirty[CACHE_KEYS.FILTERED_CHARACTERS] and Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey] ~= nil
+        return not Cache._dirty[CACHE_KEYS.FILTERED_CHARACTERS] and
+            Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey] ~= nil
     else
         return not Cache._dirty[cacheType] and Cache._data[cacheType] ~= nil
     end
 end
 
--- Get cached value with automatic validation
 function private.Core.Cache.get(cacheType, cacheKey)
     local isValid = private.Core.Cache.isValid(cacheType, cacheKey)
 
@@ -144,7 +138,6 @@ function private.Core.Cache.get(cacheType, cacheKey)
     end
 end
 
--- Set cached value
 function private.Core.Cache.set(cacheType, value, cacheKey)
     if cacheType == CACHE_KEYS.FILTERED_EVENTS then
         Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] = value
@@ -156,121 +149,97 @@ function private.Core.Cache.set(cacheType, value, cacheKey)
         Cache._data[cacheType] = value
         Cache._dirty[cacheType] = false
     end
-
-    private.Core.Logger.trace("Cache", "Cached " .. cacheType .. (cacheKey and (" key: " .. cacheKey) or ""))
 end
 
 -- -------------------------
 -- High-Level Cache Interface Functions
 -- -------------------------
 
--- Get cached periods with automatic rebuilding
 function private.Core.Cache.getPeriodsFillingBySteps()
     local cached = private.Core.Cache.get(CACHE_KEYS.PERIODS_FILLING)
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Rebuilding periods cache")
     local result = Chronicles.Data:GetPeriodsFillingBySteps()
     private.Core.Cache.set(CACHE_KEYS.PERIODS_FILLING, result)
     return result
 end
 
--- Get cached min event year
 function private.Core.Cache.getMinEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MIN_EVENT_YEAR)
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Rebuilding min event year cache")
     local result = Chronicles.Data:MinEventYear()
     private.Core.Cache.set(CACHE_KEYS.MIN_EVENT_YEAR, result)
     return result
 end
 
--- Get cached max event year
 function private.Core.Cache.getMaxEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MAX_EVENT_YEAR)
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Rebuilding max event year cache")
     local result = Chronicles.Data:MaxEventYear()
     private.Core.Cache.set(CACHE_KEYS.MAX_EVENT_YEAR, result)
     return result
 end
 
--- Get cached collections names
 function private.Core.Cache.getCollectionsNames()
     local cached = private.Core.Cache.get(CACHE_KEYS.COLLECTIONS_NAMES)
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Rebuilding collections names cache")
     local result = Chronicles.Data:GetCollectionsNames()
     private.Core.Cache.set(CACHE_KEYS.COLLECTIONS_NAMES, result)
     return result
 end
 
--- Get cached search results
 function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
-    -- Validate input parameters
     if not yearStart or not yearEnd then
-        private.Core.Logger.warn(
-            "Cache",
-            "getSearchEvents called with nil parameters: yearStart=" ..
-                tostring(yearStart) .. ", yearEnd=" .. tostring(yearEnd)
-        )
         return {}
     end
-
     local cacheKey = yearStart .. "_" .. yearEnd
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_EVENTS, cacheKey)
     if cached then
         return cached
     end
-    private.Core.Logger.trace("Cache", "Caching search results for " .. cacheKey)
+
     local result = Chronicles.Data:SearchEvents(yearStart, yearEnd)
     private.Core.Cache.set(CACHE_KEYS.FILTERED_EVENTS, result, cacheKey)
     return result
 end
 
--- Get cached all characters
 function private.Core.Cache.getAllCharacters()
     local cached = private.Core.Cache.get(CACHE_KEYS.ALL_CHARACTERS)
     if cached then
         return cached
-    end    private.Core.Logger.trace("Cache", "Rebuilding all characters cache")
-    -- Add safety check for Chronicles.Data availability
+    end
+
     if not Chronicles or not Chronicles.Data or not Chronicles.Data.SearchCharacters then
-        private.Core.Logger.error("Cache", "Chronicles.Data:SearchCharacters not available")
         return {}
     end
-    local result = Chronicles.Data:SearchCharacters() -- No filter = get all characters
+
+    local result = Chronicles.Data:SearchCharacters()
     private.Core.Cache.set(CACHE_KEYS.ALL_CHARACTERS, result)
     return result
 end
 
--- Get cached character search results
 function private.Core.Cache.getSearchCharacters(searchTerm)
-    -- Validate input parameters
     if not searchTerm or searchTerm == "" then
-        -- Return all characters if no search term provided
         return private.Core.Cache.getAllCharacters()
     end
 
-    -- Create cache key from search term - normalize to lowercase for consistent caching
     local cacheKey = string.lower(searchTerm)
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_CHARACTERS, cacheKey)
     if cached then
         return cached
     end
-      private.Core.Logger.trace("Cache", "Caching character search results for: " .. cacheKey)
-    -- Add safety check for Chronicles.Data availability
+
     if not Chronicles or not Chronicles.Data or not Chronicles.Data.SearchCharacters then
-        private.Core.Logger.error("Cache", "Chronicles.Data:SearchCharacters not available")
         return {}
     end
+
     local result = Chronicles.Data:SearchCharacters(searchTerm)
     private.Core.Cache.set(CACHE_KEYS.FILTERED_CHARACTERS, result, cacheKey)
     return result
@@ -305,29 +274,21 @@ function private.Core.Cache.preWarmSearchCache()
         return -- Cache is already warm
     end
 
-    private.Core.Logger.trace("Cache", "Pre-warming search cache with common ranges")
-
-    -- Safety check: ensure constants are available before accessing them
     if not private.constants or not private.constants.config then
-        private.Core.Logger.warn("Cache", "Constants not available yet, skipping cache pre-warming")
         return
     end
 
     local config = private.constants.config
 
-    -- Validate that required config values are not nil
     if not config.mythos or not config.historyStartYear or not config.currentYear or not config.futur then
-        private.Core.Logger.warn("Cache", "Config values incomplete, skipping cache pre-warming")
         return
     end
 
     -- Pre-cache some common search ranges that are likely to be used frequently
     local commonRanges = {
-        {config.mythos, config.historyStartYear - 1}, -- Mythos period
-        {config.currentYear + 1, config.futur}, -- Future period
-        {config.historyStartYear, config.currentYear}, -- Main history
-        {-10000, 0}, -- Common ancient period
-        {0, 50} -- Common modern period
+        {config.mythos, config.historyStartYear - 1},
+        {config.currentYear + 1, config.futur},
+        {config.historyStartYear, config.currentYear}
     }
 
     for _, range in ipairs(commonRanges) do
@@ -338,9 +299,7 @@ function private.Core.Cache.preWarmSearchCache()
     end
 end
 
--- Warm all caches during low-activity periods
 function private.Core.Cache.warmAllCaches()
-    private.Core.Logger.trace("Cache", "Warming all caches")
     if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
         private.Core.Cache.getPeriodsFillingBySteps()
     end
@@ -360,15 +319,11 @@ function private.Core.Cache.warmAllCaches()
     private.Core.Cache.preWarmSearchCache()
 end
 
--- Clear all caches to free memory
 function private.Core.Cache.clearAll()
-    private.Core.Logger.trace("Cache", "Clearing all caches")
     private.Core.Cache.invalidate()
 end
 
--- Force cache rebuild (useful for debugging or major data changes)
 function private.Core.Cache.rebuildAll()
-    private.Core.Logger.trace("Cache", "Force rebuilding all caches")
     private.Core.Cache.invalidate()
     private.Core.Cache.warmAllCaches()
 end
@@ -377,27 +332,18 @@ end
 -- Initialization & Cleanup
 -- -------------------------
 
--- Initialize cache system
 function private.Core.Cache.init()
-    private.Core.Logger.trace("Cache", "Initializing cache system")
-
-    -- Initialize all caches as dirty
     private.Core.Cache.invalidate()
 
-    -- Pre-warm after a short delay to avoid initialization conflicts
     C_Timer.After(
         1.0,
         function()
             private.Core.Cache.warmAllCaches()
         end
     )
-
-    private.Core.Logger.trace("Cache", "Cache system initialized")
 end
 
--- Cleanup cache system on shutdown
 function private.Core.Cache.cleanup()
-    private.Core.Logger.trace("Cache", "Cleaning up cache system")
     private.Core.Cache.clearAll()
 end
 
@@ -405,5 +351,4 @@ end
 -- Export Cache Interface
 -- -------------------------
 
--- Export the main cache interface
 Chronicles.Cache = private.Core.Cache

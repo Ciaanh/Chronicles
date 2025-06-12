@@ -12,14 +12,12 @@ This module provides comprehensive state management for Chronicles:
 - Centralized state storage with nested path access
 - State change notifications and subscriptions
 - Automatic persistence via AceDB-3.0 integration
-- State history tracking for debugging
 - Safe state access with validation
 
 Key Features:
 - Dot-notation path access (e.g., "ui.selectedEvent")
 - Subscribe/unsubscribe pattern for state changes
 - Automatic saving to persistent storage
-- State change history with debugging support
 - Safe getters with default values
 
 State Structure:
@@ -36,7 +34,6 @@ Usage Example:
 Event Integration:
 - Automatically triggers events.StateChanged when state updates
 - Integrates with Timeline and UI modules for state synchronization
-- Supports undo/redo through state history
 
 Dependencies:
 - Chronicles.db for persistence (AceDB-3.0)
@@ -104,13 +101,11 @@ function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, 
         error("StateManager.buildStateKey: entityType must be a non-empty string")
     end
 
-    -- Sanitize entity ID if provided
     local sanitizedId = nil
     if entityId ~= nil then
         if type(entityId) == "number" then
             sanitizedId = tostring(entityId)
         elseif type(entityId) == "string" then
-            -- Remove invalid characters and ensure it's not empty
             sanitizedId = string.gsub(entityId, "[^%w_%-]", "")
             if sanitizedId == "" then
                 error("StateManager.buildStateKey: entityId cannot be empty after sanitization")
@@ -120,7 +115,6 @@ function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, 
         end
     end
 
-    -- Build key based on type
     if keyType == "ui.selection" then
         if entityType == "event" or entityType == "character" or entityType == "faction" then
             return "ui.selected" .. string.upper(string.sub(entityType, 1, 1)) .. string.sub(entityType, 2)
@@ -216,7 +210,9 @@ end
 ]]
 function private.Core.StateManager.buildUserContentKey(contentType)
     if not contentType or type(contentType) ~= "string" or contentType == "" then
-        error("StateManager.buildUserContentKey: contentType must be a non-empty string, got: " .. tostring(contentType))
+        error(
+            "StateManager.buildUserContentKey: contentType must be a non-empty string, got: " .. tostring(contentType)
+        )
     end
     return private.Core.StateManager.buildStateKey("userContent", contentType)
 end
@@ -331,18 +327,14 @@ end
     • chronicles.db.global.dataState → stateStore["data.*"]
     
     DEPENDENCIES:
-    • Requires Core.Logger for initialization tracking
     • Requires Core.Utils.HelperUtils for safe Chronicles access
     • Expects AceDB-3.0 to be properly initialized
     
     @throws None - designed to be safe and idempotent
 ]]
 function private.Core.StateManager.init()
-    private.Core.Logger.trace("StateManager", "Initializing StateManager")
-
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if chronicles and chronicles.db and chronicles.db.global then
-        -- Load existing state
         if chronicles.db.global.uiState then
             for key, value in pairs(chronicles.db.global.uiState) do
                 stateStore["ui." .. key] = value
@@ -376,7 +368,6 @@ function private.Core.StateManager.init()
             end
         end
 
-        -- Initialize user content structure if it doesn't exist
         if not stateStore["data.userContent.events"] then
             stateStore["data.userContent.events"] = {
                 byId = {},
@@ -417,8 +408,6 @@ function private.Core.StateManager.init()
             }
         end
     end
-
-    private.Core.Logger.trace("StateManager", "StateManager initialized successfully")
 end
 
 --[[
@@ -446,36 +435,22 @@ end
 ]]
 function private.Core.StateManager.setState(key, value, description)
     if not key then
-        private.Core.Logger.error("StateManager", "setState called with nil key")
         return false
     end
 
     if type(key) ~= "string" then
-        private.Core.Logger.error(
-            "StateManager",
-            "setState called with invalid key type: " .. type(key) .. ", value: " .. tostring(key)
-        )
         return false
     end
 
     if key == "" then
-        private.Core.Logger.error("StateManager", "setState called with empty string key")
         return false
     end
 
     local oldValue = stateStore[key]
     stateStore[key] = value
 
-    -- Persist to saved variables
     private.Core.StateManager.persistState(key, value)
-
-    -- Notify subscribers
     private.Core.StateManager.notifySubscribers(key, value, oldValue)
-
-    private.Core.Logger.trace(
-        "StateManager",
-        "State updated: " .. key .. " = " .. tostring(value) .. (description and (" (" .. description .. ")") or "")
-    )
 
     return true
 end
@@ -491,20 +466,14 @@ end
 ]]
 function private.Core.StateManager.getState(key)
     if not key then
-        private.Core.Logger.error("StateManager", "getState called with nil key")
         return nil
     end
 
     if type(key) ~= "string" then
-        private.Core.Logger.error(
-            "StateManager",
-            "getState called with invalid key type: " .. type(key) .. ", value: " .. tostring(key)
-        )
         return nil
     end
 
     if key == "" then
-        private.Core.Logger.error("StateManager", "getState called with empty string key")
         return nil
     end
 
@@ -562,9 +531,6 @@ function private.Core.StateManager.persistState(key, value)
         end
         chronicles.db.global.dataState[subKey] = value
     end
-
-    -- For complex data structures like userContent, store directly in stateStore
-    -- They are handled separately in the data modules
 end
 
 --[[
@@ -608,16 +574,9 @@ function private.Core.StateManager.notifySubscribers(key, newValue, oldValue)
     if not subscribers[key] then
         return
     end
-
     for subscriberId, callback in pairs(subscribers[key]) do
         if type(callback) == "function" then
             local success, errorMsg = pcall(callback, newValue, oldValue, key)
-            if not success then
-                private.Core.Logger.error(
-                    "StateManager",
-                    "Subscriber callback failed for " .. key .. ": " .. tostring(errorMsg)
-                )
-            end
         end
     end
 end
@@ -629,48 +588,4 @@ end
 function private.Core.StateManager.clearState()
     stateStore = {}
     subscribers = {}
-end
-
--- =============================================================================================
--- DEBUG AND UTILITY FUNCTIONS
--- =============================================================================================
---
--- Development and debugging utilities for StateManager inspection and troubleshooting.
--- These functions provide visibility into StateManager's internal state and are essential
--- for development, testing, and runtime debugging.
---
--- DEBUGGING CAPABILITIES:
--- • Complete state store inspection with formatted output
--- • Subscriber tracking and relationship mapping
--- • State change audit trails via logging integration
--- • Safe state access patterns for development tools
---
--- USAGE SCENARIOS:
--- • Development: Understanding state structure and flow
--- • Testing: Verifying state transitions and persistence
--- • Production: Troubleshooting user-reported issues
--- • Performance: Identifying state access patterns and bottlenecks
---
--- DEPENDENCIES:
--- • Core.Logger: For formatted debug output
--- • Core.Utils.TableUtils: For subscriber count calculations
--- =============================================================================================
-
-function private.Core.StateManager.debugPrintState()
-    private.Core.Logger.trace("StateManager", "=== Current State ===")
-    for key, value in pairs(stateStore) do
-        private.Core.Logger.trace("StateManager", key .. " = " .. tostring(value))
-    end
-    private.Core.Logger.trace("StateManager", "=== End State ===")
-end
-
-function private.Core.StateManager.debugPrintSubscribers()
-    private.Core.Logger.trace("StateManager", "=== Current Subscribers ===")
-    for key, subs in pairs(subscribers) do
-        private.Core.Logger.trace(
-            "StateManager",
-            key .. " has " .. private.Core.Utils.TableUtils.tableLength(subs) .. " subscribers"
-        )
-    end
-    private.Core.Logger.trace("StateManager", "=== End Subscribers ===")
 end

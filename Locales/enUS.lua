@@ -102,8 +102,4 @@ if L then
     L["MyJournalCheckboxText"] = "Enable My Journal Features"
     L["SettingsContainerFeatureDescription"] =
         "When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content."
-
-    -- Logs UI strings
-    L["Logs"] = "Logs"
-    L["LogsDescription"] = "View and manage Chronicles debug logs and error messages."
 end

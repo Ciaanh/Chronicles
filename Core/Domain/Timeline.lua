@@ -12,31 +12,28 @@ end
 -- Timeline
 -- -------------------------
 local Timeline = {}
--- KEEP: Core timeline data that's not in state
 Timeline.MaxStepIndex = #private.constants.config.stepValues
 Timeline.Periods = {}
 
--- Helper functions to access state values
 local function getCurrentStepValue()
     local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
-    private.Core.Logger.trace("Timeline", "Retrieved current step value: " .. tostring(value))
+
     return value
 end
 
 local function getCurrentPage()
     local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentPage"))
-    private.Core.Logger.trace("Timeline", "Retrieved current page: " .. tostring(value))
+
     return value
 end
 
 local function getSelectedYear()
     local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("selectedYear"))
-    private.Core.Logger.trace("Timeline", "Retrieved selected year: " .. tostring(value))
+
     return value
 end
 
 local function setCurrentStepValue(value, description)
-    private.Core.Logger.trace("Timeline", "Setting timeline step to: " .. tostring(value))
     private.Core.StateManager.setState(
         private.Core.StateManager.buildTimelineKey("currentStep"),
         value,
@@ -45,7 +42,6 @@ local function setCurrentStepValue(value, description)
 end
 
 local function setCurrentPage(value, description)
-    private.Core.Logger.trace("Timeline", "Setting timeline page to: " .. tostring(value))
     private.Core.StateManager.setState(
         private.Core.StateManager.buildTimelineKey("currentPage"),
         value,
@@ -54,7 +50,6 @@ local function setCurrentPage(value, description)
 end
 
 local function setSelectedYear(value, description)
-    private.Core.Logger.trace("Timeline", "Setting selected year to: " .. tostring(value))
     private.Core.StateManager.setState(
         private.Core.StateManager.buildTimelineKey("selectedYear"),
         value,
@@ -62,34 +57,26 @@ local function setSelectedYear(value, description)
     )
 end
 
--- Delegate to business logic module
 local function GetDateCurrentStepIndex(date)
-    -- Phase 3 Debug: Log delegation
-    private.Core.Logger.trace("Timeline", "Delegating GetDateCurrentStepIndex to TimelineBusiness")
     return getTimelineBusiness().getDateCurrentStepIndex(date)
 end
 
--- Delegate to business logic module
 local function GetCurrentStepPeriodsFilling()
     return getTimelineBusiness().getCurrentStepPeriodsFilling()
 end
 
--- Delegate to business logic module
 local function CountEvents(block)
     return getTimelineBusiness().countEventsInPeriod(block)
 end
 
--- Delegate to business logic module
 local function GetTimelineConfig(minYear, maxYear, stepValue)
     return getTimelineBusiness().calculateTimelineConfig(minYear, maxYear, stepValue)
 end
 
--- Delegate to business logic module
 local function GetStepValueIndex(stepValue)
     return getTimelineBusiness().getStepValueIndex(stepValue)
 end
 
--- Delegate to business logic module
 local function GetYearPageIndex(year)
     return getTimelineBusiness().getYearPageIndex(year, Timeline.Periods)
 end
@@ -108,22 +95,19 @@ function private.Core.Timeline.SetYear(year)
 end
 
 function private.Core.Timeline.ComputeTimelinePeriods()
-    -- Delegate to business logic module and store result in Timeline.Periods
     Timeline.Periods = getTimelineBusiness().computeTimelinePeriods()
+
     return Timeline.Periods
 end
 
--- Helper function to safely trigger events
 local function SafeTriggerEvent(eventName, eventData, source)
     private.Core.triggerEvent(eventName, eventData, source)
 end
 
--- Calculate pagination parameters for the timeline window using business logic
 local function CalculateTimelinePagination()
     return getTimelineBusiness().calculateTimelinePagination(Timeline.Periods, getCurrentPage())
 end
 
--- Update navigation button visibility based on pagination state
 local function UpdateNavigationButtons(paginationData)
     SafeTriggerEvent(
         private.constants.events.TimelinePreviousButtonVisible,
@@ -138,7 +122,6 @@ local function UpdateNavigationButtons(paginationData)
     )
 end
 
--- Distribute timeline label data via events
 local function DistributeTimelineLabels(paginationData)
     local firstIndex = paginationData.firstIndex
     local pageSize = paginationData.pageSize
@@ -180,7 +163,6 @@ local function DistributeTimelineLabels(paginationData)
     end
 end
 
--- Distribute timeline period data via events
 local function DistributeTimelinePeriods(paginationData)
     local firstIndex = paginationData.firstIndex
     local pageSize = paginationData.pageSize
@@ -195,13 +177,8 @@ end
 
 function private.Core.Timeline.DisplayTimelineWindow()
     local paginationData = CalculateTimelinePagination()
-
-    -- setCurrentPage(paginationData.currentPage, "Timeline page updated during display")
-
-    -- Update UI state
     UpdateNavigationButtons(paginationData)
 
-    -- Distribute data to UI components
     DistributeTimelineLabels(paginationData)
     DistributeTimelinePeriods(paginationData)
 end
@@ -225,12 +202,6 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
 
         nextStepValue = private.constants.config.stepValues[curentStepIndex - 1]
     end
-
-    private.Core.Logger.trace(
-        "Timeline",
-        "Changing timeline step from " .. tostring(currentStepValue) .. " to " .. tostring(nextStepValue)
-    )
-
     setCurrentStepValue(nextStepValue, "Timeline step changed via zoom")
 
     private.Core.Timeline.ComputeTimelinePeriods()
@@ -288,9 +259,6 @@ end
 -- -------------------------
 
 function private.Core.Timeline.Init()
-    private.Core.Logger.trace("Timeline", "Initializing Timeline module")
-
-    -- Initialize default values if not already set
     local currentStep = getCurrentStepValue()
     if not currentStep then
         local defaultStep = private.constants.config.stepValues[1]
@@ -302,28 +270,18 @@ function private.Core.Timeline.Init()
         setCurrentPage(1, "Timeline page initialized to default")
     end
 
-    -- Register state change listener before computing periods
     private.Core.StateManager.addListener(
         private.Core.StateManager.buildTimelineKey("currentPage"),
         onCurrentPageChanged
     )
 
-    -- Compute timeline periods once and display
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
 
     SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
-
-    private.Core.Logger.trace("Timeline", "Timeline module initialization complete")
 end
 
 local function onCurrentPageChanged(newPage, oldPage, description)
-    private.Core.Logger.trace(
-        "Timeline",
-        "Page changed from " .. tostring(oldPage) .. " to " .. tostring(newPage) .. " - " .. (description or "")
-    )
-
-    -- Only trigger display update if page actually changed and we're not in initialization
     if newPage ~= oldPage and oldPage ~= nil then
         private.Core.Timeline.DisplayTimelineWindow()
     end

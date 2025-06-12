@@ -133,17 +133,13 @@ function Chronicles.Data:ComputeEventDateProfile(date)
 end
 
 function Chronicles.Data:HasEvents(yearStart, yearEnd)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to check for events")
         return false
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.hasEvents(yearStart, yearEnd)
 end
 
 function Chronicles.Data:HasEventsInDB(yearStart, yearEnd, db)
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.hasEventsInDB(yearStart, yearEnd, db)
 end
 
@@ -186,108 +182,84 @@ end
 -- Search events ------------------------------------------------------------------------
 
 function Chronicles.Data:SearchEvents(yearStart, yearEnd)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to search events")
         return {}
     end
 
-    -- If no parameters provided, search entire range
     if not yearStart or not yearEnd then
         if private.constants and private.constants.config then
             yearStart = private.constants.config.mythos
             yearEnd = private.constants.config.futur
         else
-            private.Core.Logger.warn("Data", "SearchEvents called without parameters and constants not available")
             return {}
         end
     end
 
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.searchEvents(yearStart, yearEnd)
 end
 
 function Chronicles.Data:SearchEventsInDB(yearStart, yearEnd, db)
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.searchEventsInDB(yearStart, yearEnd, db)
 end
 
 function Chronicles.Data:IsInRange(event, yearStart, yearEnd)
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.isEventInRange(event, yearStart, yearEnd)
 end
 
 function Chronicles.Data:CleanEventObject(event, collectionName)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean event object")
         return nil
+    --return event
     end
-    -- Delegate to SearchEngine
+
     return private.Core.Data.SearchEngine.cleanEventObject(event, collectionName)
 end
 
 -- Search factions ----------------------------------------------------------------------
 
 function Chronicles.Data:SearchFactions(name)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to search factions")
         return {}
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.searchFactions(name)
 end
 
 function Chronicles.Data:FindFactions(ids)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to find factions")
         return {}
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.findFactions(ids)
 end
 
 function Chronicles.Data:CleanFactionObject(faction, collectionName)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean faction object")
         return nil
+    --return faction
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.cleanFactionObject(faction, collectionName)
 end
 
 -- Search characters --------------------------------------------------------------------
 
 function Chronicles.Data:SearchCharacters(name)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to search characters")
         return {}
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.searchCharacters(name)
 end
 
 function Chronicles.Data:FindCharacters(ids)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to find characters")
         return {}
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.findCharacters(ids)
 end
 
 function Chronicles.Data:CleanCharacterObject(character, collectionName)
-    -- Ensure SearchEngine module is loaded
     if not private.Core.Data or not private.Core.Data.SearchEngine then
-        private.Core.Logger.error("Data", "SearchEngine module not loaded when trying to clean character object")
         return nil
+    --return character
     end
-    -- Delegate to SearchEngine
     return private.Core.Data.SearchEngine.cleanCharacterObject(character, collectionName)
 end
 
@@ -295,75 +267,52 @@ end
 -- External DB tools
 -- -------------------------
 function Chronicles.Data:RegisterEventDB(collectionName, db)
-    -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
-    -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.registerEventDB(collectionName, db)
 end
 
 function Chronicles.Data:RegisterCharacterDB(collectionName, db)
-    -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
-    -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.registerCharacterDB(collectionName, db)
 end
 
 function Chronicles.Data:RegisterFactionDB(collectionName, db)
-    -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to register " .. collectionName)
         return false
     end
-    -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.registerFactionDB(collectionName, db)
 end
 
 function Chronicles.Data:GetCollectionsNames()
-    -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get collections names")
         return {}
     end
-    -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.getCollectionsNames()
 end
 
 function Chronicles.Data:GetCollectionStatus(collectionName)
-    -- Ensure DataRegistry module is loaded
     if not private.Core.Data or not private.Core.Data.DataRegistry then
-        private.Core.Logger.error("Data", "DataRegistry module not loaded when trying to get collection status")
         return false
     end
-
-    -- Delegate to DataRegistry
     return private.Core.Data.DataRegistry.getCollectionStatus(collectionName)
 end
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
-    -- Ensure StateManager is available
     if not private.Core.StateManager then
-        private.Core.Logger.error("Data", "StateManager not available when trying to get event type status")
-        return true -- Default to active
+        return true
     end
 
-    -- Validate eventTypeId before using it
     if not eventTypeId then
-        private.Core.Logger.warn("Data", "GetEventTypeStatus called with nil eventTypeId")
-        return true -- Default to active
+        return true
     end
 
-    -- Use the proper key builder instead of direct concatenation
     local eventTypeKey = private.Core.StateManager.buildSettingsKey("eventType", eventTypeId)
     local status = private.Core.StateManager.getState(eventTypeKey)
 
-    -- If status is nil after state is loaded, it means this is a new event type
-    -- Set default to true for new event types only
     if status == nil then
         private.Core.StateManager.setState(
             eventTypeKey,
@@ -379,11 +328,10 @@ end
 -- -------------------------
 
 function Chronicles.Data:GetMyJournalEvents()
-    -- Ensure StateManager is available
     if not private.Core.StateManager then
-        private.Core.Logger.error("Data", "StateManager not available when trying to get MyJournal events")
         return {}
-    end -- Delegate to StateManager
+    end
+
     local userContentDataKey = private.Core.StateManager.buildUserContentDataKey("events", "byId")
     local newData = private.Core.StateManager.getState(userContentDataKey)
     if newData and next(newData) then
@@ -397,11 +345,10 @@ function Chronicles.Data:GetMyJournalEvents()
 end
 
 function Chronicles.Data:SetMyJournalEvents(event)
-    -- Ensure StateManager is available
     if not private.Core.StateManager then
-        private.Core.Logger.error("Data", "StateManager not available when trying to set MyJournal event")
         return
-    end -- Set source and ensure ID is assigned
+    end
+
     event.source = "myjournal"
     if (event.id == nil) then
         local userContentDataKey = private.Core.StateManager.buildUserContentDataKey("events", "byId")
@@ -415,9 +362,9 @@ function Chronicles.Data:SetMyJournalEvents(event)
         event.id = Chronicles.Data:AvailableDbId(currentEvents)
     end
 
-    -- Add through StateManager
     local userContentKey = private.Core.StateManager.buildUserContentKey("events")
     local currentData = private.Core.StateManager.getState(userContentKey)
+
     if currentData and currentData.byId and event and event.id then
         currentData.byId[event.id] = event
         currentData.metadata.count = currentData.metadata.count + 1
@@ -445,7 +392,8 @@ function Chronicles.Data:SetMyJournalEvents(event)
             currentData,
             "Added MyJournal event: " .. (event.label or event.id)
         )
-    end -- Invalidate caches since we added new event data
+    end
+
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
@@ -453,15 +401,14 @@ function Chronicles.Data:SetMyJournalEvents(event)
 end
 
 function Chronicles.Data:RemoveMyJournalEvent(eventId)
-    -- Remove through StateManager
     local userContentKey = private.Core.StateManager.buildUserContentKey("events")
     local currentData = private.Core.StateManager.getState(userContentKey)
+
     if currentData and currentData.byId and eventId then
         currentData.byId[eventId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
         currentData.metadata.lastModified = GetServerTime()
 
-        -- Remove from indexes
         for year, eventIds in pairs(currentData.index.byYear or {}) do
             for i, id in ipairs(eventIds) do
                 if id == eventId then
@@ -479,11 +426,8 @@ function Chronicles.Data:RemoveMyJournalEvent(eventId)
                 end
             end
         end
-        private.Core.StateManager.setState(
-            userContentKey,
-            currentData,
-            "Removed MyJournal event: " .. eventId
-        ) -- Invalidate caches
+
+        private.Core.StateManager.setState(userContentKey, currentData, "Removed MyJournal event: " .. eventId)
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
@@ -492,8 +436,8 @@ function Chronicles.Data:RemoveMyJournalEvent(eventId)
 end
 
 function Chronicles.Data:GetMyJournalFactions()
-    -- Use StateManager directly for clean implementation
-    local newData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("factions", "byId"))
+    local newData =
+        private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("factions", "byId"))
     if newData and next(newData) then
         local result = {}
         for id, faction in pairs(newData) do
@@ -505,12 +449,13 @@ function Chronicles.Data:GetMyJournalFactions()
 end
 
 function Chronicles.Data:SetMyJournalFactions(faction)
-    -- Set source and ensure ID is assigned
     faction.source = "myjournal"
+
     if (faction.id == nil) then
         local currentFactions = Chronicles.Data:GetMyJournalFactions()
         faction.id = Chronicles.Data:AvailableDbId(currentFactions)
-    end    -- Add through StateManager
+    end
+
     local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("factions"))
     if currentData and currentData.byId and faction and faction.id then
         currentData.byId[faction.id] = faction
@@ -524,7 +469,9 @@ function Chronicles.Data:SetMyJournalFactions(faction)
         end
         if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], faction.id) then
             table.insert(currentData.index.byYear[startYear], faction.id)
-        end        private.Core.StateManager.setState(
+        end
+
+        private.Core.StateManager.setState(
             private.Core.StateManager.buildUserContentKey("factions"),
             currentData,
             "Added MyJournal faction: " .. (faction.label or faction.id)
@@ -533,14 +480,12 @@ function Chronicles.Data:SetMyJournalFactions(faction)
 end
 
 function Chronicles.Data:RemoveMyJournalFaction(factionId)
-    -- Remove through StateManager
     local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("factions"))
     if currentData and currentData.byId and factionId then
         currentData.byId[factionId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
         currentData.metadata.lastModified = GetServerTime()
 
-        -- Remove from indexes
         for year, factionIds in pairs(currentData.index.byYear or {}) do
             for i, id in ipairs(factionIds) do
                 if id == factionId then
@@ -548,7 +493,9 @@ function Chronicles.Data:RemoveMyJournalFaction(factionId)
                     break
                 end
             end
-        end        private.Core.StateManager.setState(
+        end
+
+        private.Core.StateManager.setState(
             private.Core.StateManager.buildUserContentKey("factions"),
             currentData,
             "Removed MyJournal faction: " .. factionId
@@ -557,8 +504,8 @@ function Chronicles.Data:RemoveMyJournalFaction(factionId)
 end
 
 function Chronicles.Data:GetMyJournalCharacters()
-    -- Use StateManager directly for clean implementation
-    local newData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("characters", "byId"))
+    local newData =
+        private.Core.StateManager.getState(private.Core.StateManager.buildUserContentDataKey("characters", "byId"))
     if newData and next(newData) then
         local result = {}
         for id, character in pairs(newData) do
@@ -570,12 +517,12 @@ function Chronicles.Data:GetMyJournalCharacters()
 end
 
 function Chronicles.Data:SetMyJournalCharacters(character)
-    -- Set source and ensure ID is assigned
     character.source = "myjournal"
     if (character.id == nil) then
         local currentCharacters = Chronicles.Data:GetMyJournalCharacters()
         character.id = Chronicles.Data:AvailableDbId(currentCharacters)
-    end    -- Add through StateManager
+    end
+
     local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("characters"))
     if currentData and currentData.byId and character and character.id then
         currentData.byId[character.id] = character
@@ -589,27 +536,26 @@ function Chronicles.Data:SetMyJournalCharacters(character)
         end
         if not private.Core.Utils.TableUtils.containsValue(currentData.index.byYear[startYear], character.id) then
             table.insert(currentData.index.byYear[startYear], character.id)
-        end        private.Core.StateManager.setState(
+        end
+
+        private.Core.StateManager.setState(
             private.Core.StateManager.buildUserContentKey("characters"),
             currentData,
             "Added MyJournal character: " .. (character.label or character.id)
         )
 
-        -- Invalidate character caches
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.ALL_CHARACTERS)
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_CHARACTERS)
     end
 end
 
 function Chronicles.Data:RemoveMyJournalCharacter(characterId)
-    -- Remove through StateManager
     local currentData = private.Core.StateManager.getState(private.Core.StateManager.buildUserContentKey("characters"))
     if currentData and currentData.byId and characterId then
         currentData.byId[characterId] = nil
         currentData.metadata.count = math.max(0, currentData.metadata.count - 1)
         currentData.metadata.lastModified = GetServerTime()
 
-        -- Remove from indexes
         for year, characterIds in pairs(currentData.index.byYear or {}) do
             for i, id in ipairs(characterIds) do
                 if id == characterId then
@@ -617,13 +563,14 @@ function Chronicles.Data:RemoveMyJournalCharacter(characterId)
                     break
                 end
             end
-        end        private.Core.StateManager.setState(
+        end
+
+        private.Core.StateManager.setState(
             private.Core.StateManager.buildUserContentKey("characters"),
             currentData,
             "Removed MyJournal character: " .. characterId
         )
 
-        -- Invalidate character caches
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.ALL_CHARACTERS)
         private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_CHARACTERS)
     end

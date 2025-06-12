@@ -78,9 +78,7 @@ local DEFAULT_SETTINGS = {
         position = 0
     },
     advanced = {
-        debugMode = false,
-        cacheEnabled = true,
-        preloadData = false
+        cacheEnabled = true
     }
 }
 

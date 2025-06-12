@@ -28,34 +28,20 @@ local MIN_CHARACTER_SEARCH = 3
     @return [table] Array of found events
 ]]
 function SearchEngine.searchEvents(yearStart, yearEnd)
-    -- Validate input parameters
     if not yearStart or not yearEnd then
-        private.Core.Logger.warn("SearchEngine", "Invalid parameters: yearStart and yearEnd must not be nil")
         return {}
     end
 
-    private.Core.Logger.trace(
-        "SearchEngine",
-        "Searching events from " .. tostring(yearStart) .. " to " .. tostring(yearEnd)
-    )
-
     local foundEvents = {}
     if yearStart > yearEnd then
-        private.Core.Logger.warn("SearchEngine", "Invalid date range: start year is after end year")
         return foundEvents
     end
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events")
         return foundEvents
     end
     for collectionName, eventsGroup in pairs(chronicles.Data.Events) do
         local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
-
-        private.Core.Logger.trace(
-            "SearchEngine",
-            "Checking collection: " .. collectionName .. " (active: " .. tostring(isCollectionActive) .. ")"
-        )
 
         if isCollectionActive and eventsGroup and eventsGroup.data then
             local pluginEvents = SearchEngine.searchEventsInDB(yearStart, yearEnd, eventsGroup.data)
@@ -69,7 +55,6 @@ function SearchEngine.searchEvents(yearStart, yearEnd)
         end
     end
 
-    private.Core.Logger.trace("SearchEngine", "Found " .. #foundEvents .. " events in range")
     return foundEvents
 end
 
@@ -87,7 +72,6 @@ function SearchEngine.searchEventsInDB(yearStart, yearEnd, db)
     end
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching events in DB")
         return foundEvents
     end
 
@@ -174,13 +158,10 @@ end
     @return [table] Array of found factions
 ]]
 function SearchEngine.searchFactions(name)
-    private.Core.Logger.trace("SearchEngine", "Searching factions with name: " .. tostring(name or "all"))
-
     local foundFactions = {}
     local searchTerm = name and string.lower(name) or nil
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching factions")
         return foundFactions
     end
 
@@ -199,7 +180,6 @@ function SearchEngine.searchFactions(name)
         end
     end
 
-    private.Core.Logger.trace("SearchEngine", "Found " .. #foundFactions .. " factions")
     return foundFactions
 end
 
@@ -214,17 +194,14 @@ function SearchEngine.matchesFactionSearch(faction, searchTerm)
         return false
     end
 
-    -- If no search term, include all factions
     if not searchTerm then
         return true
     end
 
-    -- Require minimum characters for search
     if string.len(searchTerm) < MIN_CHARACTER_SEARCH then
-        return true -- Return all if search term too short
+        return true
     end
 
-    -- Check if faction name contains search term
     local factionName = string.lower(faction.name)
     return string.find(factionName, searchTerm) ~= nil
 end
@@ -235,12 +212,9 @@ end
     @return [table] Array of found factions
 ]]
 function SearchEngine.findFactions(ids)
-    private.Core.Logger.trace("SearchEngine", "Finding factions by IDs")
-
     local foundFactions = {}
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when finding factions")
         return foundFactions
     end
 
@@ -299,12 +273,10 @@ end
     @return [table] Array of found characters
 ]]
 function SearchEngine.searchCharacters(name)
-    private.Core.Logger.trace("SearchEngine", "Searching characters with name: " .. tostring(name or "all"))
     local foundCharacters = {}
     local searchTerm = name and string.lower(name) or nil
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when searching characters")
         return foundCharacters
     end
 
@@ -323,7 +295,6 @@ function SearchEngine.searchCharacters(name)
         end
     end
 
-    private.Core.Logger.trace("SearchEngine", "Found " .. #foundCharacters .. " characters")
     return foundCharacters
 end
 
@@ -338,17 +309,14 @@ function SearchEngine.matchesCharacterSearch(character, searchTerm)
         return false
     end
 
-    -- If no search term, include all characters
     if not searchTerm then
         return true
     end
 
-    -- Require minimum characters for search
     if string.len(searchTerm) < MIN_CHARACTER_SEARCH then
-        return true -- Return all if search term too short
+        return true
     end
 
-    -- Check if character name contains search term
     local characterName = string.lower(character.name)
     return string.find(characterName, searchTerm) ~= nil
 end
@@ -359,12 +327,9 @@ end
     @return [table] Array of found characters
 ]]
 function SearchEngine.findCharacters(ids)
-    private.Core.Logger.trace("SearchEngine", "Finding characters by IDs")
-
     local foundCharacters = {}
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when finding characters")
         return foundCharacters
     end
 
@@ -431,7 +396,6 @@ function SearchEngine.hasEvents(yearStart, yearEnd)
     end
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("SearchEngine", "Chronicles.Data not initialized when checking for events")
         return false
     end
 
@@ -478,7 +442,7 @@ end
 -- -------------------------
 
 function SearchEngine.init()
-    private.Core.Logger.trace("SearchEngine", "SearchEngine module initialized")
+    -- SearchEngine module initialized
 end
 
 -- Auto-initialize when module is loaded

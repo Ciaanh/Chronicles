@@ -14,11 +14,9 @@
     - Timeline configuration computation (overlapping, boundaries, etc.)
     - Period filtering and consolidation logic
     - Timeline pagination calculations
-    
-    DEPENDENCIES:
+      DEPENDENCIES:
     - Chronicles.Data (for event data access)
     - private.Core.StateManager (for timeline state)
-    - private.Core.Logger (for logging)
     - private.constants.config (for configuration values)
     
     USAGE:
@@ -52,10 +50,6 @@ local TimelineBusiness = private.Core.Data.TimelineBusiness
 function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error(
-            "TimelineBusiness",
-            "Chronicles.Data not initialized when calculating timeline config"
-        )
         return {
             isOverlapping = false,
             pastEvents = false,
@@ -68,9 +62,7 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
         }
     end
 
-    -- Safety check: ensure constants are available
     if not private.constants or not private.constants.config then
-        private.Core.Logger.warn("TimelineBusiness", "Constants not available when calculating timeline config")
         return {
             isOverlapping = false,
             pastEvents = false,
@@ -85,7 +77,6 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
 
     local config = private.constants.config
     if not config.historyStartYear or not config.currentYear then
-        private.Core.Logger.warn("TimelineBusiness", "Required config values are nil for timeline config")
         return {
             isOverlapping = false,
             pastEvents = false,
@@ -109,7 +100,6 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
         numberOfTimelineBlock = 0
     }
 
-    -- Define the boundaries of the timeline
     if (minYear < config.historyStartYear) then
         timelineConfig.minYear = config.historyStartYear
         timelineConfig.pastEvents = true
@@ -134,7 +124,6 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
         timelineConfig.after = math.ceil(afterLength / stepValue)
     end
 
-    -- Define the total number of timeline blocks
     if (timelineConfig.isOverlapping) then
         timelineConfig.numberOfTimelineBlock = timelineConfig.before + timelineConfig.after
     else
@@ -148,6 +137,7 @@ function TimelineBusiness.calculateTimelineConfig(minYear, maxYear, stepValue)
             timelineConfig.before = timelineConfig.before + 1
         end
     end
+
     if (timelineConfig.futurEvents == true) then
         timelineConfig.numberOfTimelineBlock = timelineConfig.numberOfTimelineBlock + 1
         if (timelineConfig.isOverlapping) then
@@ -167,11 +157,10 @@ end
     @param date [number] The date to get index for
     @return [number] Date index for current step
 ]]
-function TimelineBusiness.getDateCurrentStepIndex(date) -- Use global Chronicles.Data instead of local chronicles.Data for method calls
+function TimelineBusiness.getDateCurrentStepIndex(date)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
 
     if not chronicles or not chronicles.Data or not chronicles.Data.ComputeEventDateProfile then
-        private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when getting date index")
         return 0
     end
     local dateProfile = chronicles.Data:ComputeEventDateProfile(date)
@@ -191,9 +180,9 @@ function TimelineBusiness.getDateCurrentStepIndex(date) -- Use global Chronicles
     elseif (currentStepValue == 10) then
         return dateProfile.mod10 or 0
     elseif (currentStepValue == 1) then
-        return 0 -- Return default value for step 1 (not implemented)
+        return 0
     else
-        return 0 -- Return default value for unsupported step values
+        return 0
     end
 end
 
@@ -204,7 +193,6 @@ end
 function TimelineBusiness.getCurrentStepPeriodsFilling()
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when getting periods filling")
         return {}
     end
 
@@ -228,9 +216,9 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
     elseif (currentStepValue == 10) then
         return eventDates.mod10 or {}
     elseif (currentStepValue == 1) then
-        return {} -- Return empty table for step 1 (not implemented)
+        return {}
     else
-        return {} -- Return empty table for unsupported step values
+        return {}
     end
 end
 
@@ -242,19 +230,15 @@ end
 function TimelineBusiness.countEventsInPeriod(block)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data then
-        private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when counting events")
         return 0
     end
 
-    -- Safety check: ensure constants are available
     if not private.constants or not private.constants.config then
-        private.Core.Logger.warn("TimelineBusiness", "Constants not available when counting events, returning 0")
         return 0
     end
 
     local config = private.constants.config
     if not config.mythos or not config.futur or not config.historyStartYear or not config.currentYear then
-        private.Core.Logger.warn("TimelineBusiness", "Required config values are nil, returning 0")
         return 0
     end
 
@@ -262,7 +246,6 @@ function TimelineBusiness.countEventsInPeriod(block)
     local originalLower = block.lower
     local originalUpper = block.upper
 
-    -- Handle special periods differently
     local isMytosPeriod = (originalLower == config.mythos)
     local isFuturePeriod = (originalUpper == config.futur)
     if isMytosPeriod then
@@ -333,18 +316,13 @@ end
 function TimelineBusiness.generateTimelinePeriods(stepValue)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.Data or not chronicles.Data.MinEventYear or not chronicles.Data.MaxEventYear then
-        private.Core.Logger.error("TimelineBusiness", "Chronicles.Data not initialized when generating periods")
-        -- Return default empty periods instead of empty table
-        -- This ensures timeline UI has something to display
         return TimelineBusiness.generateDefaultPeriods(stepValue)
     end
 
     local minYear = chronicles.Data:MinEventYear()
     local maxYear = chronicles.Data:MaxEventYear()
 
-    -- If no events are loaded or found, use default range
     if not minYear or not maxYear or minYear > maxYear then
-        private.Core.Logger.warn("TimelineBusiness", "No valid event range found, using defaults")
         return TimelineBusiness.generateDefaultPeriods(stepValue)
     end
 
@@ -382,12 +360,11 @@ function TimelineBusiness.generateTimelinePeriods(stepValue)
             hasEvents = nil
         }
 
-        -- Handle special period types
         if (maxValue > private.constants.config.currentYear) then
             if (minValue > private.constants.config.currentYear) then
                 period.lower = private.constants.config.currentYear + 1
                 period.upper = private.constants.config.futur
-                period.text = nil -- Let the UI layer handle localization
+                period.text = nil
             else
                 period.upper = private.constants.config.currentYear
             end
@@ -395,7 +372,7 @@ function TimelineBusiness.generateTimelinePeriods(stepValue)
             if (minValue < private.constants.config.historyStartYear) then
                 period.lower = private.constants.config.mythos
                 period.upper = private.constants.config.historyStartYear - 1
-                period.text = nil -- Let the UI layer handle localization
+                period.text = nil
             else
                 period.upper = private.constants.config.historyStartYear
             end
@@ -418,9 +395,7 @@ end
     @return [table] Array of default timeline periods
 ]]
 function TimelineBusiness.generateDefaultPeriods(stepValue)
-    private.Core.Logger.trace("TimelineBusiness", "Generating default timeline periods")
-
-    local defaultMinYear = -10000 -- Example default minimum year
+    local defaultMinYear = -10000
     local defaultMaxYear = private.constants.config.currentYear
     local timelineConfig = TimelineBusiness.calculateTimelineConfig(defaultMinYear, defaultMaxYear, stepValue)
     local timelineBlocks = {}
@@ -463,7 +438,7 @@ function TimelineBusiness.generateDefaultPeriods(stepValue)
             if (minValue > private.constants.config.currentYear) then
                 period.lower = private.constants.config.currentYear + 1
                 period.upper = private.constants.config.futur
-                period.text = nil -- Let the UI layer handle localization
+                period.text = nil
             else
                 period.upper = private.constants.config.currentYear
             end
@@ -471,7 +446,7 @@ function TimelineBusiness.generateDefaultPeriods(stepValue)
             if (minValue < private.constants.config.historyStartYear) then
                 period.lower = private.constants.config.mythos
                 period.upper = private.constants.config.historyStartYear - 1
-                period.text = nil -- Let the UI layer handle localization
+                period.text = nil
             else
                 period.upper = private.constants.config.historyStartYear
             end
@@ -539,9 +514,7 @@ end
     @return [table] Pagination data with bounds and navigation info
 ]]
 function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
-    -- Safety check: ensure periods is not nil
     if periods == nil then
-        private.Core.Logger.error("TimelineBusiness", "periods parameter is nil in calculateTimelinePagination")
         return {
             currentPage = 1,
             maxPage = 1,
@@ -555,7 +528,7 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
 
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #periods
-    local maxPageValue = math.ceil(numberOfCells / pageSize) -- Validate and normalize page index
+    local maxPageValue = math.ceil(numberOfCells / pageSize)
     if (currentPage == nil) then
         currentPage = maxPageValue
         private.Core.StateManager.setState(
@@ -635,7 +608,7 @@ function TimelineBusiness.getYearPageIndex(year, periods)
             firstIndex = math.max(1, numberOfCells - pageSize + 1)
             lastIndex = numberOfCells
         end
-        
+
         local firstIndexBounds = periods[firstIndex]
         local lastIndexBounds = periods[lastIndex]
 
@@ -680,7 +653,7 @@ function TimelineBusiness.getYearPageIndex(year, periods)
             else
                 distance = 0
             end
-            
+
             if distance < closestDistance then
                 closestDistance = distance
                 periodIndex = i
@@ -695,7 +668,7 @@ function TimelineBusiness.getYearPageIndex(year, periods)
 
     -- Calculate which page contains this period
     local pageIndex = math.ceil(periodIndex / pageSize)
-    
+
     -- Ensure page index is within valid bounds
     local maxPage = math.ceil(numberOfCells / pageSize)
     pageIndex = math.max(1, math.min(pageIndex, maxPage))
@@ -728,10 +701,6 @@ function TimelineBusiness.computeTimelinePeriods()
     local stepValue = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
     if (stepValue == nil) then
         stepValue = private.constants.config.stepValues[1]
-        private.Core.Logger.trace(
-            "TimelineBusiness",
-            "Initializing timeline step to default value: " .. tostring(stepValue)
-        )
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("currentStep"),
             stepValue,
@@ -739,15 +708,11 @@ function TimelineBusiness.computeTimelinePeriods()
         )
     end
 
-    private.Core.Logger.trace("TimelineBusiness", "Computing timeline periods with step value: " .. tostring(stepValue))
-
     -- Generate raw timeline periods
     local rawPeriods = TimelineBusiness.generateTimelinePeriods(stepValue)
 
     -- Consolidate periods by merging adjacent empty ones
     local consolidatedPeriods = TimelineBusiness.consolidateTimelinePeriods(rawPeriods)
-
-    private.Core.Logger.trace("TimelineBusiness", "Generated " .. #consolidatedPeriods .. " timeline periods")
 
     return consolidatedPeriods
 end

@@ -5,8 +5,7 @@ local Chronicles = private.Chronicles
 FactionDetailPageMixin = {}
 
 function FactionDetailPageMixin:OnLoad()
-	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates) -- Use state-based subscription for faction selection
-	-- This provides a single source of truth for the selected faction
+	self.PagedFactionDetails:SetElementTemplateData(private.constants.templates)
 	if private.Core.StateManager then
 		private.Core.StateManager.subscribe(
 			private.Core.StateManager.buildSelectionKey("faction"),
@@ -14,37 +13,22 @@ function FactionDetailPageMixin:OnLoad()
 				if newFactionSelection then
 					local factionData = nil
 
-					-- Handle both new format {factionId, collectionName} and legacy format (just ID)
 					if type(newFactionSelection) == "table" and newFactionSelection.factionId and newFactionSelection.collectionName then
-						-- New format with collection-specific lookup
 						local factionId = newFactionSelection.factionId
 						local collectionName = newFactionSelection.collectionName
-						private.Core.Logger.trace(
-							"FactionBook",
-							"Faction selection received - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
-						)
 						factionData = self:GetFactionById(factionId, collectionName)
 					else
-						-- Legacy format or fallback - treat as just faction ID
 						local factionId = type(newFactionSelection) == "table" and newFactionSelection.factionId or newFactionSelection
 						if factionId then
-							private.Core.Logger.trace("FactionBook", "Faction selection received (legacy format) - ID: " .. factionId)
 							factionData = self:GetFactionById(factionId)
 						end
 					end
 
 					if factionData then
 						self:OnFactionSelected(factionData)
-					else
-						private.Core.Logger.warn("FactionBook", "Could not find faction data for selection")
 					end
 				end
 			end
-		)
-
-		private.Core.Logger.trace(
-			"FactionBook",
-			"OnLoad completed - subscribed to state changes, state restoration will happen during AddonStartup"
 		)
 	end
 
@@ -66,48 +50,25 @@ function FactionDetailPageMixin:OnPagingButtonLeave()
 end
 
 function FactionDetailPageMixin:GetFactionById(factionId, collectionName)
-	-- Use the Chronicles Data API to find the faction by ID
 	if Chronicles and Chronicles.Data then
 		local factions = Chronicles.Data:SearchFactions()
 		if factions then
-			-- If collection name is provided, try direct lookup first for performance
 			if collectionName then
-				private.Core.Logger.trace(
-					"FactionBook",
-					"Attempting direct collection lookup for faction ID: " ..
-						tostring(factionId) .. " in collection: " .. tostring(collectionName)
-				)
-
 				for _, faction in pairs(factions) do
 					if faction.id == factionId and faction.source == collectionName then
-						private.Core.Logger.trace("FactionBook", "Found faction via direct collection lookup")
 						return faction
 					end
 				end
-
-				private.Core.Logger.warn("FactionBook", "Faction not found in specified collection, falling back to general search")
 			end
 
-			-- Fallback: search through all factions (maintains backward compatibility)
 			for _, faction in pairs(factions) do
 				if faction.id == factionId then
-					if collectionName then
-						private.Core.Logger.trace("FactionBook", "Found faction via fallback search (different collection than expected)")
-					end
 					return faction
 				end
 			end
 		end
 	end
 
-	if collectionName then
-		private.Core.Logger.error(
-			"FactionBook",
-			"Faction not found - ID: " .. tostring(factionId) .. ", Collection: " .. tostring(collectionName)
-		)
-	else
-		private.Core.Logger.error("FactionBook", "Faction not found - ID: " .. factionId)
-	end
 	return nil
 end
 
