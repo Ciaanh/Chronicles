@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-    <Script file="TimelineTemplate.lua" />
 
+    <Script file="TimelineTemplate.lua" />
 
     <Frame name="TimelineLabelTemplate" mixin="TimelineLabelMixin" virtual="true">
         <Size x="130" y="25" />
@@ -32,7 +32,6 @@
     <Button name="TimelinePeriodTemplate" mixin="TimelinePeriodMixin" virtual="true">
         <Size x="130" y="75" />
         <Layers>
-
             <Layer level="BACKGROUND">
                 <Texture parentKey="Background" setAllPoints="true">
                     <Size x="130" y="75"/>
@@ -56,9 +55,7 @@
         </Scripts>
     </Button>
 
-
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
-        <Size x="1200" y="125" />
         <Frames>
 
             <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
@@ -67,23 +64,13 @@
                 </KeyValues>
                 <Size x="20" y="20" />
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="20" y="-5" />
+                    <Anchor point="BOTTOMRIGHT" x="-175" y="15" />
                 </Anchors>
             </Button>
-            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate">
-                <KeyValues>
-                    <KeyValue key="direction" value="1" type="number"/>
-                </KeyValues>
-                <Size x="20" y="20" />
-                <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomOut" x="5" y="0" />
-                </Anchors>
-            </Button>
-
             <Frame parentKey="ZoomLevelIndicator">
                 <Size x="120" y="25" />
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomIn" x="10" y="0" />
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomOut" x="5" y="0" />
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
@@ -105,13 +92,20 @@
                     </Layer>
                 </Layers>
             </Frame>
-
-
+            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate">
+                <KeyValues>
+                    <KeyValue key="direction" value="1" type="number"/>
+                </KeyValues>
+                <Size x="20" y="20" />
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomLevelIndicator" x="5" y="0" />
+                </Anchors>
+            </Button>
 
             <Button parentKey="Previous">
                 <Size x="50" y="50" />
                 <Anchors>
-                    <Anchor point="LEFT" x="10" y="10" />
+                    <Anchor point="LEFT" x="10" y="25" />
                 </Anchors>
                 <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
                     <Anchors>
@@ -134,11 +128,10 @@
                     </Anchors>
                 </HighlightTexture>
             </Button>
-
             <Button parentKey="Next">
                 <Size x="50" y="50" />
                 <Anchors>
-                    <Anchor point="RIGHT" x="-10" y="10" />
+                    <Anchor point="RIGHT" x="-10" y="25" />
                 </Anchors>
                 <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
                     <Anchors>
@@ -170,11 +163,10 @@
                 </Scripts>
             </Button>
 
-
-
             <Frame name="Label1" inherits="TimelineLabelTemplate">
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" x="15" y="10" />
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.Previous" x="0" y="-40" />
+                    <!-- <Anchor point="BOTTOMLEFT" x="15" y="10" /> -->
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="index" value="1" type="number" />
@@ -309,7 +301,6 @@
                     <KeyValue key="index" value="8" type="number" />
                 </KeyValues>
             </Button>
-
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />

@@ -3,48 +3,32 @@
     <Script file="MainFrameUI.lua"/>
 
     <Frame name="TabUITemplate" inherits="TabSystemOwnerTemplate" mixin="TabUIMixin" virtual="true">
-        <Size x="1200" y="805"/>
-        <!-- <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="0">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="255.0" g="0.0" b="0.0"/>
-                </Texture>
-            </Layer>
-        </Layers> -->
-        <Frames>
-            <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
-                <KeyValues>
-                    <KeyValue key="minTabWidth" value="100" type="number"/>
-                    <KeyValue key="maxTabWidth" value="150" type="number"/>
-                    <KeyValue key="tabSelectSound" value="SOUNDKIT.UI_CLASS_TALENT_TAB" type="global"/>
-                </KeyValues>
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" x="22" y="-30"/>
-                </Anchors>
-            </Frame>
 
+        <Frames>
             <Frame parentKey="Events" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="Book" inherits="EventBookTemplate">
-                        <Anchors>
-                            <Anchor point="BOTTOM" />
-                        </Anchors>
-                    </Frame>
-
                     <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                        <Size x="1200" y="175" />
                         <Anchors>
                             <Anchor point="TOP" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                    <Frame parentKey="Book" inherits="EventBookTemplate">
+                        <Size x="1200" y="650"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-170"/>
-                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="170"/>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                        <Size x="1480" y="650" />
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -56,15 +40,16 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="Book" inherits="CharacterBookTemplate">
+                    <Frame parentKey="VerticalCharacterList" inherits="VerticalCharacterListTemplate">
                         <Anchors>
-                            <Anchor point="BOTTOM" />
+                            <Anchor point="LEFT" x="0" y="-50" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="VerticalCharacterList" inherits="VerticalCharacterListTemplate">
+                    <Frame parentKey="Book" inherits="CharacterBookTemplate">
+                        <Size x="1200" y="650"/>
                         <Anchors>
-                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="-20" y="0" />
+                            <Anchor point="BOTTOM" />
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -76,23 +61,36 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="Book" inherits="FactionBookTemplate">
-                        <Anchors>
-                            <Anchor point="BOTTOM" />
-                        </Anchors>
-                    </Frame>
-
                     <Frame parentKey="FactionList" inherits="FactionListTemplate">
                         <Anchors>
                             <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="Book" inherits="FactionBookTemplate">
+                        <Size x="1200" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
                         </Anchors>
                     </Frame>
                 </Frames>
             </Frame>
 
             <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
+                <Size x="1200" y="650"/>
                 <Anchors>
-                    <Anchor point="BOTTOM"/>
+                    <Anchor point="BOTTOM" />
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
+                <KeyValues>
+                    <KeyValue key="minTabWidth" value="100" type="number"/>
+                    <KeyValue key="maxTabWidth" value="150" type="number"/>
+                    <KeyValue key="tabSelectSound" value="SOUNDKIT.UI_CLASS_TALENT_TAB" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="BOTTOM" x="0" y="-30"/>
                 </Anchors>
             </Frame>
         </Frames>
@@ -102,25 +100,32 @@
     </Frame>
 
     <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
-        <Size x="1200" y="805"/>
+        <!-- <Size x="1480" y="835"/> -->
+        <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="1000">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="0.0" b="0.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
         <Anchors>
-            <Anchor point="CENTER" y="25" />
+            <!-- <Anchor point="CENTER" y="50" /> -->
+            <Anchor point="TOPLEFT" />
+            <Anchor point="BOTTOMRIGHT" />
         </Anchors>
         <Frames>
-            <Button name="CloseButton" inherits="UIPanelCloseButton">
+            <Frame name="TabContainer" parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
+                <Size x="1480" y="825"/>
                 <Anchors>
-                    <Anchor point="CENTER" relativePoint="TOPRIGHT" x="0" y="-135"/>
-                </Anchors>
-            </Button>
-
-            <!-- <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/> -->
-
-            <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
-                <Anchors>
-                    <Anchor point="TOP" relativePoint="CENTER" x="0" y="425"/>
+                    <Anchor point="CENTER" y="50" />
                 </Anchors>
             </Frame>
 
+            <Button name="CloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="CENTER" relativePoint="TOPRIGHT" relativeTo="TabContainer" x="-140" y="-175"/>
+                </Anchors>
+            </Button>
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>

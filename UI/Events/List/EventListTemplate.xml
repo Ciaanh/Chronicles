@@ -27,7 +27,7 @@
     </Frame>
 
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
-        <Size x="178" y="110"/>
+        <Size x="150" y="110"/>
         <KeyValues>
             <KeyValue key="textureHeight" value="80" type="number"/>
         </KeyValues>
@@ -35,14 +35,14 @@
             <Layer level="BACKGROUND">
 
                 <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
-                    <Size x="62" y="64"/>
+                    <Size x="45" y="64"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
 
                 <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
-                    <Size x="116" y="64"/>
+                    <Size x="105" y="64"/>
                     <Anchors>
                         <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
@@ -51,12 +51,9 @@
             </Layer>
             <Layer level="ARTWORK">
                 <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
-                    <Size x="105" y="35"/>
-                    
+                    <Size x="100" y="35"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="0" />
-                        <!-- <Anchor point="TOPLEFT" x="65" y="-15" />
-                        <Anchor point="BOTTOMRIGHT" x="-5" y="15" /> -->
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -84,7 +81,7 @@
                 <Frames>
 
                     <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-                        <Size x="178" y="560"/>
+                        <Size x="150" y="560"/>
                         <KeyValues>
                             <KeyValue key="side" value="left" type="string"/>
                         </KeyValues>
@@ -94,19 +91,19 @@
                     </Frame>
 
                     <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-                        <Size x="178" y="550"/>
+                        <Size x="150" y="560"/>
                         <KeyValues>
                             <KeyValue key="side" value="right" type="string"/>
                         </KeyValues>
                         <Anchors>
-                            <Anchor point="RIGHT"  x="0" y="0" />
+                            <Anchor point="RIGHT" x="0" y="0" />
                         </Anchors>
                     </Frame>
 
                     <!-- TODO implement a new paging control for the event list -->
                     <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
                         <Anchors>
-                            <Anchor point="BOTTOMRIGHT" x="-10" y="10"/>
+                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
                         </Anchors>
                         <KeyValues>
                             <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
