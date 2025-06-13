@@ -24,7 +24,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" x="5" y="-15" />
                         <Anchor point="BOTTOMRIGHT" x="-5" y="15" />
@@ -155,7 +155,7 @@
                         </Anchors>
                         <KeyValues>
                             <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
-                            <KeyValue key="fontName" value="SystemFont_Med3" type="string" />
+                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
                             <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
                             <KeyValue key="spacing" value="8" type="number"/>
                             <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>

@@ -131,7 +131,7 @@
 							<Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
 						</Anchors>
 						<KeyValues>
-							<KeyValue key="fontName" value="SystemFont_Med3" type="string" />
+							<KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
 							<KeyValue key="fontColor" value="SPELLBOOK_FONT_COLOR" type="global" />
 							<KeyValue key="spacing" value="8" type="number"/>
 							<KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>

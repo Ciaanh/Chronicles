@@ -43,8 +43,8 @@
 
                     <Frame parentKey="EventList" inherits="EventListTemplate">
                         <Anchors>
-                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-150"/>
-                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="150"/>
+                            <Anchor point="TOPLEFT" relativeKey="$parent.Book" x="-170"/>
+                            <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Book" x="170"/>
                         </Anchors>
                     </Frame>
                 </Frames>

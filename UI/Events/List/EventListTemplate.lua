@@ -6,26 +6,43 @@ local FOLDER_NAME, private = ...
 
 EventListItemMixin = {}
 function EventListItemMixin:Init(eventData)
-	self.Text:SetText(eventData.text)
-	self.Event = eventData.event
-
+	local text = self.Text
 	local contentTexture = self.Content
 	local sideTexture = self.Side
 
+	text:SetText(eventData.text)
+	self.Event = eventData.event
+
 	if self:GetParent().side == "right" then
+		--sideTexture:SetSize(50, self.textureHeight)
 		contentTexture:SetTexCoord(1, 0, 0, 1)
 		sideTexture:SetTexCoord(1, 0, 0, 1)
 
+		contentTexture:ClearAllPoints()
+		contentTexture:SetPoint("LEFT", self, nil, 0, 0)
+
 		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("LEFT", self, "RIGHT", 0, 0)
-		sideTexture:SetSize(50, self.textureHeight)
+		sideTexture:SetPoint("RIGHT", self, nil, 0, 0)
+
+		text:ClearAllPoints()
+		text:SetPoint("LEFT", self, nil, 0, 0)
+		-- text:SetPoint("TOPLEFT", self, nil, 5, -15)
+		-- text:SetPoint("BOTTOMRIGHT", self, nil, -65, 15)
 	else
+		--sideTexture:SetSize(50, self.textureHeight)
 		contentTexture:SetTexCoord(0, 1, 0, 1)
 		sideTexture:SetTexCoord(0, 1, 0, 1)
 
+		contentTexture:ClearAllPoints()
+		contentTexture:SetPoint("RIGHT", self, nil, 0, 0)
+
 		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("RIGHT", self, "LEFT", 0, 0)
-		sideTexture:SetSize(50, self.textureHeight)
+		sideTexture:SetPoint("LEFT", self, nil, 0, 0)
+
+		text:ClearAllPoints()
+		text:SetPoint("RIGHT", self, nil, 0, 0)
+		-- text:SetPoint("TOPLEFT", self, nil, 65, -15)
+		-- text:SetPoint("BOTTOMRIGHT", self, nil, -5, 15)
 	end
 end
 

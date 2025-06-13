@@ -16,7 +16,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Huge" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="CENTER"/>
                     </Anchors>
@@ -27,7 +27,7 @@
     </Frame>
 
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
-        <Size y="110"/>
+        <Size x="178" y="110"/>
         <KeyValues>
             <KeyValue key="textureHeight" value="80" type="number"/>
         </KeyValues>
@@ -35,24 +35,28 @@
             <Layer level="BACKGROUND">
 
                 <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="62" y="64"/>
                     <Anchors>
-                        <Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+                        <Anchor point="LEFT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
 
                 <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size x="116" y="64"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" y="-15"/>
-                        <Anchor point="BOTTOMRIGHT" y="15"/>
+                        <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
 
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
+                    <Size x="105" y="35"/>
+                    
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="5" y="-15" />
-                        <Anchor point="BOTTOMRIGHT" x="-5" y="15" />
+                        <Anchor point="LEFT" x="0" y="0" />
+                        <!-- <Anchor point="TOPLEFT" x="65" y="-15" />
+                        <Anchor point="BOTTOMRIGHT" x="-5" y="15" /> -->
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -80,48 +84,33 @@
                 <Frames>
 
                     <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="178" y="560"/>
                         <KeyValues>
                             <KeyValue key="side" value="left" type="string"/>
                         </KeyValues>
                         <Anchors>
-                            <Anchor point="TOPLEFT" x="0" y="-40" />
-                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" x="160" y="40" />
+                            <Anchor point="LEFT" x="0" y="0" />
                         </Anchors>
-                        <!-- <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="1000">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="0.0" g="0.0" b="255.0"/>
-                                </Texture>
-                            </Layer>
-                        </Layers> -->
                     </Frame>
 
                     <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="178" y="550"/>
                         <KeyValues>
                             <KeyValue key="side" value="right" type="string"/>
                         </KeyValues>
                         <Anchors>
-                            <!-- <Anchor point="LEFT" relativePoint="RIGHT" x="10"/> -->
-                            <Anchor point="TOPRIGHT" x="0" y="-40" />
-                            <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-160" y="40" />
+                            <Anchor point="RIGHT"  x="0" y="0" />
                         </Anchors>
-                        <!-- <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="1000">
-                                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                                    <Color r="0.0" g="0.0" b="255.0"/>
-                                </Texture>
-                            </Layer>
-                        </Layers> -->
                     </Frame>
 
                     <!-- TODO implement a new paging control for the event list -->
                     <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
                         <Anchors>
-                            <Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
+                            <Anchor point="BOTTOMRIGHT" x="-10" y="10"/>
                         </Anchors>
                         <KeyValues>
                             <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
-                            <KeyValue key="fontName" value="SystemFont_Med3" type="string" />
+                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
                             <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
                             <KeyValue key="spacing" value="8" type="number"/>
                             <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>

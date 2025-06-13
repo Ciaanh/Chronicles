@@ -15,7 +15,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT" />
@@ -95,7 +95,7 @@
                         </Texture>
                     </Layer>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="Text" inherits="SystemFont_Med3" justifyH="CENTER">
+                        <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
                             <Anchors>
                                 <Anchor point="TOPLEFT" x="5" y="-3" />
                                 <Anchor point="BOTTOMRIGHT" x="-5" y="3" />

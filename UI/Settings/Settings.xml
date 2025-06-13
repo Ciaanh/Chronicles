@@ -194,7 +194,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
+                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -228,21 +228,21 @@
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="EventTypesInfo" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="EventTypesInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="CollectionsInfo" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="CollectionsInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="MyJournalInfo" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="MyJournalInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="20"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.CollectionsInfo" x="0" y="-5"/>
@@ -277,21 +277,21 @@
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="Tip1" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="Tip1" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="Tip2" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="Tip2" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip1" x="0" y="-3"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="Tip3" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="Tip3" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip2" x="0" y="-3"/>
@@ -326,14 +326,14 @@
                                             </Anchors>
                                             <Color r="1" g="0.82" b="0"/>
                                         </FontString>
-                                        <FontString parentKey="VersionInfo" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="VersionInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-8"/>
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="ConfigNote" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="ConfigNote" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="18"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.VersionInfo" x="0" y="-3"/>
@@ -372,7 +372,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
+                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -447,7 +447,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
+                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -510,7 +510,7 @@
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
                                     </Anchors>
                                 </Texture>
-                                <FontString parentKey="Description" inherits="SystemFont_Med3" justifyH="LEFT">
+                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                     <Size x="700" y="40"/>
                                     <Anchors>
                                         <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
@@ -545,7 +545,7 @@
                                 </Frames>
                                 <Layers>
                                     <Layer level="OVERLAY">
-                                        <FontString parentKey="FeatureDescription" inherits="SystemFont_Med3" justifyH="LEFT">
+                                        <FontString parentKey="FeatureDescription" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                                             <Size x="700" y="60"/>
                                             <Anchors>
                                                 <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.IsActive" x="0" y="-10"/>

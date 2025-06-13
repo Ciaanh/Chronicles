@@ -29,7 +29,7 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="RIGHT">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
                     <Anchors>
                         <Anchor point="TOPLEFT" y="-5"/>
                         <Anchor point="TOPRIGHT"/>
@@ -72,7 +72,7 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Med3" setAllPoints="true" justifyH="LEFT">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="LEFT">
                     <Anchors>
                         <Anchor point="TOPLEFT" y="-5"/>
                         <Anchor point="TOPRIGHT"/>
@@ -107,7 +107,7 @@
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
-                        <FontString inherits="SystemFont_Med3"/>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
                     </SimpleHTML>
                 </ScrollChild>
                 <Scripts>
