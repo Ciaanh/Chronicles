@@ -58,21 +58,11 @@ constants.config = {
 	collectionsFilter = {
 		pageSize = 7
 	},
-	myJournal = {
-		eventListPageSize = 9,
-		factionListPageSize = 9,
-		characterListPageSize = 9,
-		characterFactionsPageSize = 8,
-		eventFactionsPageSize = 8,
-		eventCharactersPageSize = 8
-	},
 	-- stepValues = {1000, 500, 250, 100, 50, 10, 1}
 	stepValues = {1000, 500, 100, 10}
 }
 
-constants.configurationName = {
-	myjournal = "myjournal"
-}
+constants.configurationName = {}
 
 constants.events = {
 	-- Application lifecycle events

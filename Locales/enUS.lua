@@ -70,7 +70,6 @@ if L then
     L["Settings"] = "Settings"
     L["Event types"] = "Event types"
     L["Collections"] = "Collections"
-    L["My Journal"] = "My Journal"
     L["Event Types"] = "Event Types"
     L["Event Collections"] = "Event Collections"
 
@@ -81,12 +80,10 @@ if L then
     L["SettingsHomeOverviewEventTypesInfo"] = "• Event Types: Configure which event categories appear in your timeline"
     L["SettingsHomeOverviewCollectionsInfo"] =
         "• Collections: Enable or disable content collections from different expansions"
-    L["MyJournalInfo"] = "• My Journal: Create and manage your own custom events and storylines"
 
     L["SettingsHomeQuickActionsSectionTitle"] = "Getting Started"
     L["SettingsHomeQuickActionsTip1"] = "1. Start with Event Types to customize which events you want to see"
     L["SettingsHomeQuickActionsTip2"] = "2. Use Collections to enable content from specific expansions or lore sources"
-    L["SettingsHomeQuickActionsTip1"] = "3. Enable My Journal to add your own custom events and characters"
 
     L["SettingsHomeVersionSectionTitle"] = "About Chronicles"
     L["SettingsHomeVersionVersionInfo"] = "A comprehensive timeline addon for World of Warcraft lore and events."
@@ -95,11 +92,6 @@ if L then
     -- Timeline zoom button text
     L["Zoom Out"] = "-"
     L["Zoom In"] = "+"
-
     L["EventTypesDescription"] = "Configure which types of events to display in the timeline and event lists."
     L["CollectionsDescription"] = "Enable or disable event collections to customize which content is available."
-    L["MyJournalDescription"] = "Enable personal journal features to create and manage your own custom content."
-    L["MyJournalCheckboxText"] = "Enable My Journal Features"
-    L["SettingsContainerFeatureDescription"] =
-        "When enabled, you can create custom events, characters, and storylines to complement the existing Chronicles content."
 end

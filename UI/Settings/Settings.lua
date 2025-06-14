@@ -15,7 +15,6 @@ This module manages the complex Settings interface with dynamic tab generation:
 - Dynamic UI generation based on configuration
 - Real-time settings validation and application
 - Collection and event type management
-- Personal journal configuration
 
 Complex UI Event Flow Patterns:
 
@@ -40,7 +39,6 @@ UI Architecture Patterns:
 Key Settings Categories:
 - Event Types: Toggle event categories (war, death, birth, etc.)
 - Collections: Enable/disable data collections (expansions, custom content)
-- My Journal: Personal content and RP integration settings
 - Logs: Debug and diagnostic information
 
 Event Integration:
@@ -56,7 +54,6 @@ Dependencies:
 ]]
 -- Event types
 -- Collections
--- My journal
 SettingsMixin = {}
 
 --[[
@@ -73,7 +70,7 @@ SettingsMixin = {}
     
     @example
         -- Called automatically when Settings frame loads
-        -- Creates buttons for: Settings (EventTypes, Collections), My Journal, Logs
+        -- Creates buttons for: Settings (EventTypes, Collections), Logs
 ]]
 function SettingsMixin:OnLoad()
     self.prefix = "Entry"
@@ -97,12 +94,6 @@ function SettingsMixin:OnLoad()
                     Load = self.LoadCollections
                 }
             }
-        },
-        {
-            text = Locale["My Journal"],
-            TabName = "MyJournal",
-            TabFrame = self.TabUI.MyJournal,
-            Load = self.LoadMyJournal
         }
     }
 
@@ -192,9 +183,6 @@ function SettingsMixin:InitializeLocalizedText()
             if overview.CollectionsInfo then
                 overview.CollectionsInfo:SetText(Locale["SettingsHomeOverviewCollectionsInfo"])
             end
-            if overview.MyJournalInfo then
-                overview.MyJournalInfo:SetText(Locale["SettingsHomeOverviewMyJournalInfo"])
-            end
         end
 
         if settingsHome.QuickActionsSection then
@@ -244,30 +232,6 @@ function SettingsMixin:InitializeLocalizedText()
         end
         if collections.Description then
             collections.Description:SetText(Locale["CollectionsDescription"])
-        end
-    end
-
-    if self.TabUI and self.TabUI.MyJournal then
-        local myJournal = self.TabUI.MyJournal
-        if myJournal.Title then
-            myJournal.Title:SetText(Locale["My Journal"])
-        end
-        if myJournal.Description then
-            myJournal.Description:SetText(Locale["MyJournalDescription"])
-        end
-
-        if myJournal.SettingsContainer and myJournal.SettingsContainer.IsActive then
-            local checkbox = myJournal.SettingsContainer.IsActive
-            if checkbox.Text then
-                checkbox.Text:SetText(Locale["MyJournalCheckboxText"])
-            end
-            if checkbox.SetText then
-                checkbox:SetText(Locale["MyJournalCheckboxText"])
-            end
-        end
-
-        if myJournal.SettingsContainer and myJournal.SettingsContainer.FeatureDescription then
-            myJournal.SettingsContainer.FeatureDescription:SetText(Locale["SettingsContainerFeatureDescription"])
         end
     end
 end
@@ -588,49 +552,6 @@ function SettingsMixin:LoadCollections(frame)
 
     local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
     content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
-end
-
-function SettingsMixin:LoadMyJournal(frame)
-    local isActive = frame.SettingsContainer.IsActive
-
-    local chronicles = Chronicles
-    if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
-        chronicles.db = chronicles.db or {}
-        chronicles.db.global = chronicles.db.global or {}
-        chronicles.db.global.options = chronicles.db.global.options or {}
-        chronicles.db.global.options.myjournal = false
-    end
-
-    isActive:SetChecked(chronicles.db.global.options.myjournal)
-
-    isActive.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
-    isActive.Text:SetTextColor(0.9, 0.9, 0.9)
-    isActive:SetScript(
-        "OnClick",
-        function(self)
-            local isChecked = self:GetChecked()
-            local chronicles = Chronicles
-
-            if not chronicles.db or not chronicles.db.global or not chronicles.db.global.options then
-                chronicles.db = chronicles.db or {}
-                chronicles.db.global = chronicles.db.global or {}
-                chronicles.db.global.options = chronicles.db.global.options or {}
-            end
-            chronicles.db.global.options.myjournal = isChecked
-
-            local myJournalKey =
-                private.Core.StateManager.buildCollectionKey(private.constants.configurationName.myjournal)
-            private.Core.StateManager.setState(myJournalKey, isChecked, "MyJournal setting changed")
-
-            if MyJournalViewShow then
-                if (isChecked) then
-                    MyJournalViewShow:Show()
-                else
-                    MyJournalViewShow:Hide()
-                end
-            end
-        end
-    )
 end
 
 CategoryButtonMixin = {}

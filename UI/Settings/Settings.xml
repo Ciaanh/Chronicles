@@ -242,13 +242,6 @@
                                             </Anchors>
                                             <Color r="0.9" g="0.9" b="0.9"/>
                                         </FontString>
-                                        <FontString parentKey="MyJournalInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.CollectionsInfo" x="0" y="-5"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
                                     </Layer>
                                 </Layers>
                             </Frame>
@@ -481,80 +474,6 @@
                                     <OnLoad method="OnLoad"/>
                                 </Scripts>
                             </ScrollFrame>
-                        </Frames>
-                    </Frame>
-
-                    <!-- My Journal Configuration Tab -->
-                    <Frame parentKey="MyJournal" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" x="15" y="-15"/>
-                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="-1">
-                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
-                                    <Color r="0.1" g="0.1" b="0.2"/>
-                                </Texture>
-                            </Layer>
-                            <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
-                                    <Size y="25"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="700" y="8"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
-                                    </Anchors>
-                                </Texture>
-                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                    <Size x="700" y="40"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                            </Layer>
-                        </Layers>
-                        <Frames>
-                            <Frame parentKey="SettingsContainer">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
-                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
-                                </Anchors>
-                                <Layers>
-                                    <Layer level="BACKGROUND" textureSubLevel="0">
-                                        <Texture parentKey="SettingsBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.3">
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="0" y="0"/>
-                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                                            </Anchors>
-                                        </Texture>
-                                    </Layer>
-                                </Layers>
-                                <Frames>
-                                    <CheckButton parentKey="IsActive" inherits="InterfaceOptionsCheckButtonTemplate" checked="false">
-                                        <Anchors>
-                                            <Anchor point="TOPLEFT" x="15" y="-15"/>
-                                        </Anchors>
-                                        <ButtonText/>
-                                    </CheckButton>
-                                </Frames>
-                                <Layers>
-                                    <Layer level="OVERLAY">
-                                        <FontString parentKey="FeatureDescription" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="60"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.IsActive" x="0" y="-10"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                    </Layer>
-                                </Layers>
-                            </Frame>
                         </Frames>
                     </Frame>
                 </Frames>

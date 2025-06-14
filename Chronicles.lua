@@ -3,8 +3,7 @@ private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceCo
 local defaults = {
     global = {
         options = {
-            minimap = {hide = false},
-            myjournal = true
+            minimap = {hide = false}
         },
         uiState = {
             selectedEvent = nil,

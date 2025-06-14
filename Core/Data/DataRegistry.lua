@@ -212,62 +212,56 @@ function DataRegistry.getCollectionsNames()
         return {}
     end
     local dataGroups = {}
+
     for eventCollectionName, group in pairs(chronicles.Data.Events) do
-        if (eventCollectionName ~= "myjournal") then
-            if eventCollectionName and type(eventCollectionName) == "string" and eventCollectionName ~= "" then
-                local collectionKey = private.Core.StateManager.buildCollectionKey(eventCollectionName)
-                local isActive = private.Core.StateManager.getState(collectionKey)
-                if isActive == nil then
-                    isActive = true
-                end
+        if eventCollectionName and type(eventCollectionName) == "string" and eventCollectionName ~= "" then
+            local collectionKey = private.Core.StateManager.buildCollectionKey(eventCollectionName)
+            local isActive = private.Core.StateManager.getState(collectionKey)
+            if isActive == nil then
+                isActive = true
+            end
 
-                local groupProjection = {
-                    name = group.name,
-                    isActive = isActive
-                }
+            local groupProjection = {
+                name = group.name,
+                isActive = isActive
+            }
 
-                if not existInTable(eventCollectionName, dataGroups) then
-                    table.insert(dataGroups, groupProjection)
-                end
+            if not existInTable(eventCollectionName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
             end
         end
     end
-
     for factionCollectionName, group in pairs(chronicles.Data.Factions) do
-        if (factionCollectionName ~= "myjournal") then
-            if factionCollectionName and type(factionCollectionName) == "string" and factionCollectionName ~= "" then
-                local collectionKey = private.Core.StateManager.buildCollectionKey(factionCollectionName)
-                local isActive = private.Core.StateManager.getState(collectionKey)
-                if isActive == nil then
-                    isActive = true
-                end
-                local groupProjection = {
-                    name = group.name,
-                    isActive = isActive
-                }
-                if not existInTable(factionCollectionName, dataGroups) then
-                    table.insert(dataGroups, groupProjection)
-                end
+        if factionCollectionName and type(factionCollectionName) == "string" and factionCollectionName ~= "" then
+            local collectionKey = private.Core.StateManager.buildCollectionKey(factionCollectionName)
+            local isActive = private.Core.StateManager.getState(collectionKey)
+            if isActive == nil then
+                isActive = true
+            end
+            local groupProjection = {
+                name = group.name,
+                isActive = isActive
+            }
+            if not existInTable(factionCollectionName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
             end
         end
     end
 
     for characterCollectionName, group in pairs(chronicles.Data.Characters) do
-        if (characterCollectionName ~= "myjournal") then
-            if characterCollectionName and type(characterCollectionName) == "string" and characterCollectionName ~= "" then
-                local collectionKey = private.Core.StateManager.buildCollectionKey(characterCollectionName)
-                local isActive = private.Core.StateManager.getState(collectionKey)
-                if isActive == nil then
-                    isActive = true
-                end
-                local groupProjection = {
-                    name = group.name,
-                    isActive = isActive
-                }
+        if characterCollectionName and type(characterCollectionName) == "string" and characterCollectionName ~= "" then
+            local collectionKey = private.Core.StateManager.buildCollectionKey(characterCollectionName)
+            local isActive = private.Core.StateManager.getState(collectionKey)
+            if isActive == nil then
+                isActive = true
+            end
+            local groupProjection = {
+                name = group.name,
+                isActive = isActive
+            }
 
-                if not existInTable(characterCollectionName, dataGroups) then
-                    table.insert(dataGroups, groupProjection)
-                end
+            if not existInTable(characterCollectionName, dataGroups) then
+                table.insert(dataGroups, groupProjection)
             end
         end
     end

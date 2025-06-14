@@ -64,7 +64,6 @@ local subscribers = {}
 -- SUPPORTED KEY TYPES:
 -- • ui.selection: Entity selection state (ui.selectedEvent, ui.selectedCharacter, etc.)
 -- • settings: Configuration state (eventTypes.{id}, collections.{name})
--- • userContent: MyJournal data containers (data.userContent.events, etc.)
 -- • collection: Collection status tracking (collections.{name})
 -- • ui.state: General UI state (ui.activeTab, ui.isMainFrameOpen, ui.selectedPeriod, timeline.{id})
 --
@@ -204,7 +203,7 @@ function private.Core.StateManager.buildSettingsKey(settingType, id)
 end
 
 --[[
-    Build user content key for MyJournal data
+    Build user content key for user data
     @param contentType [string] "events", "characters", or "factions"
     @return [string] User content state key
 ]]

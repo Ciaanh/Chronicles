@@ -5,7 +5,7 @@
 
     <!-- Vertical Character List Item Template (inspired by WoW's character frame title list) -->
     <Button name="VerticalCharacterListItemTemplate" mixin="VerticalCharacterListItemMixin" virtual="true">
-        <Size x="200" y="32"/>
+        <Size x="120" y="32"/>
         <KeyValues>
             <KeyValue key="textureHeight" value="32" type="number"/>
         </KeyValues>
@@ -97,7 +97,7 @@
 
     <!-- Vertical Character List Template -->
     <Frame name="VerticalCharacterListTemplate" mixin="VerticalCharacterListMixin" virtual="true">
-        <Size x="220" y="650"/>
+        <Size x="135" y="650"/>
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
         </KeyValues>
@@ -210,9 +210,10 @@
                         -- Refresh character list
                         self:GetParent():RefreshCharacterList()
                     </OnClick>
-                </Scripts>            </Button>
+                </Scripts>
+            </Button>
         </Frames>
-        
+
         <Layers>
             <Layer level="OVERLAY">
                 <!-- Character count label -->
@@ -224,7 +225,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        
+
         <Scripts>
             <OnLoad method="OnLoad" />
             <OnShow method="OnShow" />
