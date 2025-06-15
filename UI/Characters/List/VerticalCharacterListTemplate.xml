@@ -5,9 +5,9 @@
 
     <!-- Vertical Character List Item Template (inspired by WoW's character frame title list) -->
     <Button name="VerticalCharacterListItemTemplate" mixin="VerticalCharacterListItemMixin" virtual="true">
-        <Size x="120" y="32"/>
+        <Size x="130" y="24"/>
         <KeyValues>
-            <KeyValue key="textureHeight" value="32" type="number"/>
+            <KeyValue key="textureHeight" value="24" type="number"/>
         </KeyValues>
         <Layers>
             <Layer level="BACKGROUND">
@@ -21,44 +21,30 @@
                         <MinColor r="0.1" g="0.1" b="0.15" a="0.8"/>
                         <MaxColor r="0.05" g="0.05" b="0.1" a="0.6"/>
                     </Gradient>
-                </Texture>
-
-                <!-- Selection indicator -->
-                <Texture parentKey="SelectionHighlight" file="Interface\Buttons\WHITE8X8" hidden="true">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="0" y="0"/>
-                        <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                    </Anchors>
-                    <Color r="0.2" g="0.5" b="1.0" a="0.4"/>
-                </Texture>
-
-                <!-- Left border accent -->
-                <Texture parentKey="LeftBorder" file="Interface\Buttons\WHITE8X8">
-                    <Size x="3" y="28"/>
+                </Texture>                <!-- Status indicator -->
+                <Texture parentKey="StatusIndicator" file="Interface\Buttons\WHITE8X8">
+                    <Size x="3" y="20"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="0"/>
                     </Anchors>
                     <Color r="0.3" g="0.4" b="0.6" a="0.7"/>
                 </Texture>
             </Layer>
-
-            <Layer level="BORDER">
-                <!-- Character icon/indicator -->
+            <Layer level="BORDER">                <!-- Character icon/indicator -->
                 <Texture parentKey="CharacterIcon" atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="false">
                     <Size x="16" y="16"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="10" y="0"/>
+                        <Anchor point="LEFT" x="8" y="0"/>
                     </Anchors>
                     <Color r="0.7" g="0.8" b="0.9" a="0.8"/>
                 </Texture>
             </Layer>
 
-            <Layer level="ARTWORK">
-                <!-- Character name -->
-                <FontString parentKey="CharacterName" inherits="SystemFont_Small" justifyH="LEFT">
+            <Layer level="ARTWORK">                <!-- Character name -->
+                <FontString parentKey="CharacterName" inherits="SystemFont_Med1" justifyH="LEFT">
                     <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.CharacterIcon" relativePoint="RIGHT" x="6" y="2"/>
-                        <Anchor point="RIGHT" x="-8"/>
+                        <Anchor point="LEFT" x="30" y="0"/>
+                        <Anchor point="RIGHT" x="-8" y="0"/>
                     </Anchors>
                     <Color r="0.95" g="0.95" b="1.0"/>
                     <Shadow>
@@ -66,23 +52,22 @@
                         <Color r="0" g="0" b="0" a="0.8"/>
                     </Shadow>
                 </FontString>
-
-                <!-- Character status/info -->
-                <FontString parentKey="CharacterStatus" inherits="SystemFont_Tiny" justifyH="LEFT">
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.CharacterIcon" relativePoint="RIGHT" x="6" y="-8"/>
-                        <Anchor point="RIGHT" x="-8"/>
-                    </Anchors>
-                    <Color r="0.7" g="0.8" b="0.9" a="0.8"/>
-                </FontString>
             </Layer>
-
             <Layer level="OVERLAY">
+                <!-- Selection indicator -->
+                <Texture parentKey="SelectionHighlight" file="Interface\Buttons\WHITE8X8" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="2" y="-2"/>
+                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+                    </Anchors>
+                    <Color r="0.2" g="0.5" b="1.0" a="0.4"/>
+                </Texture>
+
                 <!-- Hover effect -->
                 <Texture parentKey="HoverHighlight" file="Interface\Buttons\WHITE8X8" hidden="true">
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="1" y="-1"/>
-                        <Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+                        <Anchor point="TOPLEFT" x="2" y="-2"/>
+                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
                     </Anchors>
                     <Color r="0.4" g="0.6" b="1.0" a="0.2"/>
                 </Texture>
@@ -97,7 +82,7 @@
 
     <!-- Vertical Character List Template -->
     <Frame name="VerticalCharacterListTemplate" mixin="VerticalCharacterListMixin" virtual="true">
-        <Size x="135" y="650"/>
+        <Size x="140" y="650"/>
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
         </KeyValues>
@@ -136,11 +121,9 @@
                         <Offset x="1" y="-1"/>
                         <Color r="0" g="0" b="0" a="0.8"/>
                     </Shadow>
-                </FontString>
-
-                <!-- Separator line -->
+                </FontString>                <!-- Separator line -->
                 <Texture parentKey="HeaderSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                    <Size x="180" y="8"/>
+                    <Size x="120" y="8"/>
                     <Anchors>
                         <Anchor point="TOP" relativeKey="$parent.HeaderText" relativePoint="BOTTOM" x="0" y="-8"/>
                     </Anchors>
@@ -148,70 +131,74 @@
                 </Texture>
             </Layer>
         </Layers>
-
         <Frames>
+            <!-- Search box for filtering characters -->
+            <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
+                <Size x="120" y="20"/>
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.HeaderSeparator" relativePoint="BOTTOM" x="0" y="-8"/>
+                </Anchors>
+                <FontString inherits="SystemFont_Small"/>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="SearchBG" file="Interface\Buttons\WHITE8X8">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="-8" y="2"/>
+                                <Anchor point="BOTTOMRIGHT" x="8" y="-2"/>
+                            </Anchors>
+                            <Color r="0.1" g="0.1" b="0.15" a="0.8"/>
+                        </Texture>
+                    </Layer>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="PlaceholderText" inherits="SystemFont_Small" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="LEFT" x="5" y="0"/>
+                            </Anchors>
+                            <Color r="0.5" g="0.5" b="0.5" a="0.8"/>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnTextChanged>
+                        if self:GetText() ~= "" then
+                            self.PlaceholderText:Hide()
+                        else
+                            self.PlaceholderText:Show()
+                        end
+                    </OnTextChanged>
+                    <OnEditFocusGained>
+                        self.PlaceholderText:Hide()
+                    </OnEditFocusGained>
+                    <OnEditFocusLost>
+                        if self:GetText() == "" then
+                            self.PlaceholderText:Show()
+                        end
+                    </OnEditFocusLost>
+                    <OnLoad>
+                        self.PlaceholderText:SetText("Search characters...")
+                        self.PlaceholderText:Show()
+                    </OnLoad>
+                </Scripts>
+            </EditBox>
+
             <!-- Scroll area for character list -->
             <ScrollFrame parentKey="CharacterScrollFrame" inherits="UIPanelScrollFrameTemplate">
+                <Size x="130" y="540"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.HeaderSeparator" relativePoint="BOTTOMLEFT" x="-80" y="-10"/>
-                    <Anchor point="BOTTOMRIGHT" x="-25" y="40"/>
+                    <Anchor point="TOP" relativeKey="$parent.SearchBox" relativePoint="BOTTOM" x="0" y="-10"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="scrollBarHideable" value="true" type="boolean"/>
                 </KeyValues>
                 <ScrollChild>
                     <Frame parentKey="Content">
-                        <Size x="180" y="1"/>
+                        <Size x="120" y="1"/>
                         <Frames>
                             <!-- Character list items will be dynamically created here -->
                         </Frames>
                     </Frame>
                 </ScrollChild>
             </ScrollFrame>
-
-            <!-- Navigation buttons -->
-            <Button parentKey="RefreshButton">
-                <Size x="24" y="24"/>
-                <Anchors>
-                    <Anchor point="BOTTOMRIGHT" x="-10" y="10"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="ButtonBG" atlas="charactercreate-customize-dropdownbox" useAtlasSize="false">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="-2" y="2"/>
-                                <Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
-                            </Anchors>
-                            <Color r="0.2" g="0.3" b="0.4" a="0.8"/>
-                        </Texture>
-                    </Layer>
-                </Layers>
-                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="false">
-                    <Size x="16" y="16"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                    <Color r="0.7" g="0.8" b="0.9"/>
-                </NormalTexture>
-                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="false">
-                    <Size x="16" y="16"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </PushedTexture>
-                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="false" alphaMode="ADD">
-                    <Size x="18" y="18"/>
-                    <Anchors>
-                        <Anchor point="CENTER"/>
-                    </Anchors>
-                </HighlightTexture>
-                <Scripts>
-                    <OnClick>
-                        -- Refresh character list
-                        self:GetParent():RefreshCharacterList()
-                    </OnClick>
-                </Scripts>
-            </Button>
         </Frames>
 
         <Layers>

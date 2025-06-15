@@ -2,6 +2,44 @@ local FOLDER_NAME, private = ...
 
 private.Core.EventManager = {}
 
+--[[
+Chronicles Event Management System
+
+ARCHITECTURE OVERVIEW:
+This addon has migrated from a pure event-driven architecture to a hybrid
+state-based + event-driven architecture for better maintainability and
+single source of truth patterns.
+
+CURRENT EVENT USAGE:
+✅ ACTIVELY TRIGGERED EVENTS (All with validation schemas):
+- AddonStartup, AddonShutdown: Application lifecycle
+- TimelineInit: Timeline initialization 
+- UIRefresh: UI component refresh requests
+- TabUITabSet: Tab selection in main UI
+- SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
+- TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
+- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display (with suffix validation)
+
+CURRENT EVENT USAGE:
+✅ ACTIVELY TRIGGERED EVENTS:
+- AddonStartup, AddonShutdown: Application lifecycle
+- TimelineInit: Timeline initialization
+- UIRefresh: UI component refresh requests
+- TabUITabSet: Tab selection in main UI
+- SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
+- TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
+- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display
+
+❌ LEGACY EVENTS (State-based now):
+- EventSelected, CharacterSelected, FactionSelected: Now handled via StateManager
+- TimelinePeriodSelected: Now handled via StateManager
+
+MIGRATION NOTES:
+- Selection events (Event/Character/Faction) moved to StateManager.setState()
+- UI components subscribe to state changes instead of listening for events
+- This provides single source of truth and better state synchronization
+- Legacy event schemas remain for potential future use or plugin compatibility
+--]]
 -- -------------------------
 -- Global Utility Functions
 -- -------------------------
@@ -47,78 +85,120 @@ local eventSchemas = {
             return true, nil
         end
     },
-    [private.constants.events.EventSelected] = {
-        description = "Fired when an event is selected in the timeline or list",
-        required = {"id", "label", "yearStart", "yearEnd"},
-        optional = {"chapters", "eventType", "factions", "characters", "source", "order"},
+    [private.constants.events.TimelineInit] = {
+        description = "Fired when the timeline is initialized",
+        optional = {"data"},
+        validate = function(data)
+            return true, nil
+        end
+    },
+    [private.constants.events.UIRefresh] = {
+        description = "Fired when UI components need to refresh their data",
+        optional = {"source", "data"},
+        validate = function(data)
+            return true, nil
+        end
+    },
+    [private.constants.events.TabUITabSet] = {
+        description = "Fired when a tab is selected in the main UI",
+        required = {"frame", "tabID"},
         validate = function(data)
             if not data then
-                return false, "Event data is nil"
+                return false, "Tab data is nil"
             end
-            if type(data.id) ~= "number" then
-                return false, "Event ID must be a number"
+            if not data.frame then
+                return false, "Tab frame is required"
             end
-            if type(data.label) ~= "string" then
-                return false, "Event label must be a string"
-            end
-            if type(data.yearStart) ~= "number" then
-                return false, "Event yearStart must be a number"
-            end
-            if type(data.yearEnd) ~= "number" then
-                return false, "Event yearEnd must be a number"
+            if type(data.tabID) ~= "number" then
+                return false, "Tab ID must be a number"
             end
             return true, nil
         end
     },
-    [private.constants.events.TimelinePeriodSelected] = {
-        description = "Fired when a timeline period is selected",
-        required = {"lower", "upper"},
+    [private.constants.events.SettingsEventTypeChecked] = {
+        description = "Fired when an event type setting is toggled",
+        required = {"eventTypeId", "isActive"},
         validate = function(data)
             if not data then
-                return false, "Period data is nil"
+                return false, "Event type data is nil"
             end
-            if type(data.lower) ~= "number" then
-                return false, "Period lower bound must be a number"
+            if type(data.eventTypeId) ~= "number" then
+                return false, "Event type ID must be a number"
             end
-            if type(data.upper) ~= "number" then
-                return false, "Period upper bound must be a number"
-            end
-            if data.lower > data.upper then
-                return false, "Period lower bound cannot be greater than upper bound"
+            if type(data.isActive) ~= "boolean" then
+                return false, "isActive must be a boolean"
             end
             return true, nil
         end
     },
-    [private.constants.events.CharacterSelected] = {
-        description = "Fired when a character is selected",
-        required = {"id", "name"},
-        optional = {"description", "factions", "events"},
+    [private.constants.events.SettingsCollectionChecked] = {
+        description = "Fired when a collection setting is toggled",
+        required = {"collectionName", "isActive"},
         validate = function(data)
             if not data then
-                return false, "Character data is nil"
+                return false, "Collection data is nil"
             end
-            if type(data.id) ~= "number" then
-                return false, "Character ID must be a number"
+            if type(data.collectionName) ~= "string" then
+                return false, "Collection name must be a string"
             end
-            if type(data.name) ~= "string" then
-                return false, "Character name must be a string"
+            if type(data.isActive) ~= "boolean" then
+                return false, "isActive must be a boolean"
             end
             return true, nil
         end
     },
-    [private.constants.events.FactionSelected] = {
-        description = "Fired when a faction is selected",
-        required = {"id", "name"},
-        optional = {"description", "characters", "events"},
+    [private.constants.events.TimelinePreviousButtonVisible] = {
+        description = "Fired when timeline previous button visibility changes",
+        required = {"visible"},
         validate = function(data)
             if not data then
-                return false, "Faction data is nil"
+                return false, "Visibility data is nil"
             end
-            if type(data.id) ~= "number" then
-                return false, "Faction ID must be a number"
+            if type(data.visible) ~= "boolean" then
+                return false, "visible must be a boolean"
             end
-            if type(data.name) ~= "string" then
-                return false, "Faction name must be a string"
+            return true, nil
+        end
+    },
+    [private.constants.events.TimelineNextButtonVisible] = {
+        description = "Fired when timeline next button visibility changes",
+        required = {"visible"},
+        validate = function(data)
+            if not data then
+                return false, "Visibility data is nil"
+            end
+            if type(data.visible) ~= "boolean" then
+                return false, "visible must be a boolean"
+            end
+            return true, nil
+        end
+    },
+    -- Dynamic Timeline Display Events (with index suffixes)
+    [private.constants.events.DisplayTimelineLabel] = {
+        description = "Fired when timeline labels need to be displayed (dynamic with index suffixes)",
+        validate = function(data)
+            -- Timeline labels can be strings (years) or empty
+            if data ~= nil and type(data) ~= "string" then
+                return false, "Timeline label must be a string or nil"
+            end
+            return true, nil
+        end
+    },
+    [private.constants.events.DisplayTimelinePeriod] = {
+        description = "Fired when timeline periods need to be displayed (dynamic with index suffixes)",
+        validate = function(data)
+            -- Period data can be nil (empty period) or a table with period information
+            if data ~= nil then
+                if type(data) ~= "table" then
+                    return false, "Timeline period data must be a table or nil"
+                end
+                -- If period data exists, it should have the expected structure
+                if data.lower and type(data.lower) ~= "number" then
+                    return false, "Period lower bound must be a number"
+                end
+                if data.upper and type(data.upper) ~= "number" then
+                    return false, "Period upper bound must be a number"
+                end
             end
             return true, nil
         end
@@ -132,6 +212,18 @@ local eventSchemas = {
 private.Core.EventManager.Validator = {
     validate = function(self, eventName, data)
         local schema = eventSchemas[eventName]
+
+        -- If no direct match, check for dynamic events with suffixes
+        if not schema then
+            -- Check for DisplayTimelineLabel events (e.g., "Timeline.DisplayLabel1")
+            if string.find(eventName, "^" .. private.constants.events.DisplayTimelineLabel .. "%d+$") then
+                -- Check for DisplayTimelinePeriod events (e.g., "Timeline.DisplayPeriod1")
+                schema = eventSchemas[private.constants.events.DisplayTimelineLabel]
+            elseif string.find(eventName, "^" .. private.constants.events.DisplayTimelinePeriod .. "%d+$") then
+                schema = eventSchemas[private.constants.events.DisplayTimelinePeriod]
+            end
+        end
+
         if not schema then
             return true, nil
         end

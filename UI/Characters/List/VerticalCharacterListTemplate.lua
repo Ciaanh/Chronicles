@@ -7,8 +7,8 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     DESIGN INSPIRATION:
     - Based on WoW's character selection frame title list layout
     - Vertical scrolling list as an alternative to horizontal character lists
-    - Compact character entries with name and status information
-    - Clean, minimal design that works as a standalone character selector
+    - Clean, minimal character entries displaying only character names
+    - Simple design that works as a standalone character selector
     
     FEATURES:
     - Vertical list of characters with scroll support
@@ -16,6 +16,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     - Hover effects and visual feedback
     - Responsive to character data changes
     - Works independently from character book
+    - Displays only character names for clean, uncluttered UI
     
     LAYOUT:
     - Fixed width (220px) designed as alternative to horizontal lists
@@ -39,23 +40,6 @@ function VerticalCharacterListItemMixin:Init(characterData)
         self.CharacterName:SetText(self.Character.name)
     else
         self.CharacterName:SetText("Unknown Character")
-    end
-
-    local statusText = ""
-    if self.Character.yearStart then
-        if self.Character.yearEnd then
-            statusText = tostring(self.Character.yearStart) .. " - " .. tostring(self.Character.yearEnd)
-        else
-            statusText = "From " .. tostring(self.Character.yearStart)
-        end
-    elseif self.Character.yearEnd then
-        statusText = "Died " .. tostring(self.Character.yearEnd)
-    else
-        statusText = "Timeline unknown"
-    end
-
-    if self.CharacterStatus then
-        self.CharacterStatus:SetText(statusText)
     end
 
     self:SetSelected(false)
@@ -84,10 +68,8 @@ function VerticalCharacterListItemMixin:OnClick()
     end
 
     self:SetSelected(true)
-
-    if self:GetParent() and self:GetParent():GetParent() and self:GetParent():GetParent().UpdateSelectionStates then
-        self:GetParent():GetParent():UpdateSelectionStates(self)
-    end
+    -- Use state-based approach only - consistent with event selection pattern
+    -- The CharacterBookTemplate subscribes to state changes instead of listening for events
 end
 
 function VerticalCharacterListItemMixin:OnEnter()
@@ -101,44 +83,14 @@ function VerticalCharacterListItemMixin:OnEnter()
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(self.Character.name or "Character", 1, 1, 1)
 
-        if self.Character.id then
-            GameTooltip:AddLine("ID: " .. tostring(self.Character.id), 0.7, 0.8, 0.9)
+        -- Add content information if available
+        if self.Character.chapters and #self.Character.chapters > 0 then
+            GameTooltip:AddLine("Available Content: " .. #self.Character.chapters .. " chapters", 0.6, 0.8, 0.6)
         end
 
-        local yearText = ""
-        if self.Character.yearStart then
-            if self.Character.yearEnd then
-                yearText = "Active: " .. tostring(self.Character.yearStart) .. " - " .. tostring(self.Character.yearEnd)
-            else
-                yearText = "Active from: " .. tostring(self.Character.yearStart)
-            end
-            GameTooltip:AddLine(yearText, 0.7, 0.8, 0.9)
-        elseif self.Character.yearEnd then
-            GameTooltip:AddLine("Died: " .. tostring(self.Character.yearEnd), 0.7, 0.8, 0.9)
-        end
-
-        if self.Character.timeline then
-            GameTooltip:AddLine("Timeline: " .. tostring(self.Character.timeline), 0.7, 0.8, 0.9)
-        end
-
+        -- Add author information if available
         if self.Character.author then
-            GameTooltip:AddLine("Author: " .. self.Character.author, 0.6, 0.7, 0.8)
-        end
-
-        if self.Character.biography then
-            GameTooltip:AddLine(" ", 1, 1, 1)
-            GameTooltip:AddLine("Biography:", 0.8, 0.8, 0.8)
-            GameTooltip:AddLine(self.Character.biography, 0.7, 0.7, 0.7, true)
-        end
-
-        if self.Character.factions and #self.Character.factions > 0 then
-            GameTooltip:AddLine(" ", 1, 1, 1)
-            GameTooltip:AddLine("Associated Factions:", 0.8, 0.8, 0.8)
-            for i, faction in ipairs(self.Character.factions) do
-                if faction and faction.name then
-                    GameTooltip:AddLine("• " .. faction.name, 0.7, 0.7, 0.7)
-                end
-            end
+            GameTooltip:AddLine("Created by: " .. self.Character.author, 0.7, 0.7, 0.7)
         end
 
         GameTooltip:Show()
@@ -157,13 +109,13 @@ function VerticalCharacterListItemMixin:SetSelected(selected)
     if self.SelectionHighlight then
         if selected then
             self.SelectionHighlight:Show()
-            if self.LeftBorder then
-                self.LeftBorder:SetColorTexture(0.0, 0.7, 1.0, 1.0)
+            if self.StatusIndicator then
+                self.StatusIndicator:SetColorTexture(0.0, 0.7, 1.0, 1.0)
             end
         else
             self.SelectionHighlight:Hide()
-            if self.LeftBorder then
-                self.LeftBorder:SetColorTexture(0.3, 0.4, 0.6, 0.7)
+            if self.StatusIndicator then
+                self.StatusIndicator:SetColorTexture(0.3, 0.4, 0.6, 0.7) -- Default color
             end
         end
     end
@@ -181,13 +133,63 @@ function VerticalCharacterListMixin:OnLoad()
 
     self.characterItems = {}
     self.selectedCharacter = nil
+    self.allCharacters = {} -- Cache of all characters for search performance
+    self.currentSearchTerm = ""
+
+    -- Initialize search box
+    if self.SearchBox then
+        self.SearchBox:SetScript(
+            "OnTextChanged",
+            function(editBox, userInput)
+                if userInput then
+                    self:OnSearchTextChanged(editBox:GetText())
+                end
+            end
+        )
+        self.SearchBox:SetScript(
+            "OnEnterPressed",
+            function(editBox)
+                editBox:ClearFocus()
+            end
+        )
+        self.SearchBox:SetScript(
+            "OnEscapePressed",
+            function(editBox)
+                editBox:SetText("")
+                editBox:ClearFocus()
+            end
+        )
+    end
 
     private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
     private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
+
+    -- Use state-based subscription for character selection - consistent with event selection pattern
+    if private.Core.StateManager then
+        local selectedCharacterKey = private.Core.StateManager.buildSelectionKey("character")
+        private.Core.StateManager.subscribe(
+            selectedCharacterKey,
+            function(newCharacterSelection, oldCharacterSelection)
+                if newCharacterSelection then
+                    -- Find the character item that corresponds to this selection
+                    local characterId = newCharacterSelection.characterId or newCharacterSelection
+                    for _, item in pairs(self.characterItems) do
+                        if item.Character and item.Character.id == characterId then
+                            self:UpdateSelectionStates(item)
+                            break
+                        end
+                    end
+                end
+            end,
+            "VerticalCharacterListMixin"
+        )
+    end
 end
 
 function VerticalCharacterListMixin:OnShow()
     self:RefreshCharacterList()
+    -- Ensure selection state is synced when the UI becomes visible
+    self:SyncWithCurrentSelection()
 end
 
 function VerticalCharacterListMixin:OnUIRefresh()
@@ -206,11 +208,24 @@ function VerticalCharacterListMixin:RefreshCharacterList()
         return
     end
 
+    -- Cache all characters for search performance
+    self.allCharacters = characters
+
+    -- Apply current search filter if any
+    local filteredCharacters =
+        self.currentSearchTerm and self.currentSearchTerm ~= "" and
+        self:FilterCharactersByName(characters, self.currentSearchTerm) or
+        characters
+
+    self:DisplayCharacters(filteredCharacters)
+end
+
+function VerticalCharacterListMixin:DisplayCharacters(characters)
     self:ClearCharacterItems()
 
     local contentFrame = self.CharacterScrollFrame.Content
     local yOffset = 0
-    local itemHeight = 34
+    local itemHeight = 24 -- Compact height for character name only display
     local itemCount = 0
 
     for _, character in pairs(characters) do
@@ -237,6 +252,56 @@ function VerticalCharacterListMixin:RefreshCharacterList()
     end
 
     self:UpdateCharacterCount(itemCount)
+
+    -- Check for existing character selection and update display accordingly
+    self:SyncWithCurrentSelection()
+end
+
+function VerticalCharacterListMixin:FilterCharactersByName(characters, searchTerm)
+    if not searchTerm or searchTerm == "" then
+        return characters
+    end
+
+    local filtered = {}
+    local lowerSearchTerm = string.lower(searchTerm)
+
+    for _, character in pairs(characters) do
+        if character.name then
+            local lowerName = string.lower(character.name)
+            if string.find(lowerName, lowerSearchTerm, 1, true) then
+                filtered[character.id] = character
+            end
+        end
+    end
+
+    return filtered
+end
+
+function VerticalCharacterListMixin:OnSearchTextChanged(text)
+    self.currentSearchTerm = text
+
+    -- Throttle search to avoid too many updates
+    if self.searchThrottle then
+        C_Timer.After(
+            0.3,
+            function()
+                if self.currentSearchTerm == text then -- Only search if text hasn't changed
+                    local filteredCharacters = self:FilterCharactersByName(self.allCharacters, text)
+                    self:DisplayCharacters(filteredCharacters)
+                end
+            end
+        )
+    else
+        self.searchThrottle = true
+        C_Timer.After(
+            0.3,
+            function()
+                self.searchThrottle = nil
+                local filteredCharacters = self:FilterCharactersByName(self.allCharacters, self.currentSearchTerm)
+                self:DisplayCharacters(filteredCharacters)
+            end
+        )
+    end
 end
 
 function VerticalCharacterListMixin:ClearCharacterItems()
@@ -270,48 +335,22 @@ function VerticalCharacterListMixin:UpdateSelectionStates(selectedItem)
     self.selectedCharacter = selectedItem
 end
 
-function VerticalCharacterListMixin:SearchCharacters(searchTerm)
-    if not searchTerm or searchTerm == "" then
-        self:RefreshCharacterList()
-        return
-    end
+function VerticalCharacterListMixin:SyncWithCurrentSelection()
+    -- Check if there's already a selected character in StateManager
+    if private.Core.StateManager then
+        local selectedCharacterKey = private.Core.StateManager.buildSelectionKey("character")
+        local currentSelection = private.Core.StateManager.getState(selectedCharacterKey)
 
-    local characters = private.Core.Cache and private.Core.Cache.getSearchCharacters(searchTerm) or {}
+        if currentSelection then
+            -- Find the character item that corresponds to this selection
+            local characterId = currentSelection.characterId or currentSelection
 
-    if not characters then
-        self:UpdateCharacterCount(0)
-        return
-    end
-
-    self:ClearCharacterItems()
-
-    local contentFrame = self.CharacterScrollFrame.Content
-    local yOffset = 0
-    local itemHeight = 34
-    local itemCount = 0
-
-    for _, character in pairs(characters) do
-        if character and type(character) == "table" and character.name then
-            local characterItem = CreateFrame("Button", nil, contentFrame, "VerticalCharacterListItemTemplate")
-            if characterItem then
-                characterItem:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, -yOffset)
-                characterItem:SetPoint("TOPRIGHT", contentFrame, "TOPRIGHT", 0, -yOffset)
-
-                local characterData = {
-                    character = character
-                }
-                characterItem:Init(characterData)
-
-                table.insert(self.characterItems, characterItem)
-                yOffset = yOffset + itemHeight
-                itemCount = itemCount + 1
+            for _, item in pairs(self.characterItems) do
+                if item.Character and item.Character.id == characterId then
+                    self:UpdateSelectionStates(item)
+                    break
+                end
             end
         end
     end
-
-    if contentFrame then
-        contentFrame:SetHeight(math.max(yOffset, 1))
-    end
-
-    self:UpdateCharacterCount(itemCount)
 end

@@ -373,26 +373,6 @@ function Types.ValidateEventSchema(eventType, data)
         if not data.version or not data.timestamp then
             return false, "AddonStartup event requires version and timestamp"
         end
-    elseif eventType == "EventSelected" then
-        local isValid, error = Types.IsValidEvent(data)
-        if not isValid then
-            return false, "EventSelected data is not a valid event: " .. (error or "unknown error")
-        end
-    elseif eventType == "CharacterSelected" then
-        local isValid, error = Types.IsValidCharacter(data)
-        if not isValid then
-            return false, "CharacterSelected data is not a valid character: " .. (error or "unknown error")
-        end
-    elseif eventType == "FactionSelected" then
-        local isValid, error = Types.IsValidFaction(data)
-        if not isValid then
-            return false, "FactionSelected data is not a valid faction: " .. (error or "unknown error")
-        end
-    elseif eventType == "TimelinePeriodSelected" then
-        local isValid, error = Types.IsValidTimelinePeriod(data)
-        if not isValid then
-            return false, "TimelinePeriodSelected data is not a valid period: " .. (error or "unknown error")
-        end
     end
 
     return true, nil

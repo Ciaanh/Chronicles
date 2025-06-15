@@ -70,51 +70,13 @@ constants.events = {
 	AddonShutdown = "Addon.SHUTDOWN",
 	TimelineInit = "Timeline.INIT",
 	UIRefresh = "Timeline.CLEAN",
-	TimelinePeriodSelected = "Timeline.PERIOD_SELECTED",
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
-	EventSelected = "Event.SELECTED",
-	CharacterSelected = "Character.SELECTED",
-	FactionSelected = "Faction.SELECTED",
 	DisplayTimelineLabel = "Timeline.DisplayLabel",
 	DisplayTimelinePeriod = "Timeline.DisplayPeriod",
 	TabUITabSet = "TabUI.TabSet",
-	MainFrameUIOpenFrame = "MainFrameUI.OpenFrame",
-	MainFrameUICloseFrame = "MainFrameUI.CloseFrame",
-	SettingsTabSelected = "Settings.TAB_SELECTED",
 	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
-	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED",
-	-- New event management events
-	EventManagerError = "EventManager.ERROR",
-	EventValidationFailed = "EventManager.VALIDATION_FAILED",
-	EventBatchExecuted = "EventManager.BATCH_EXECUTED"
-}
-
--- Event system configuration
-constants.eventSystem = {
-	enableValidation = true,
-	enableErrorLogging = true,
-	maxEventHistory = 100,
-	batchTimeout = 100, -- milliseconds
-	enableAsyncEvents = false
-}
-
--- Event priority levels for batching and processing
-constants.eventPriority = {
-	CRITICAL = 1, -- UI state changes, errors
-	HIGH = 2, -- User interactions, selections
-	NORMAL = 3, -- Data updates, refreshes
-	LOW = 4 -- Background tasks, logging
-}
-
--- Event categories for organization and filtering
-constants.eventCategories = {
-	UI = "UI",
-	DATA = "DATA",
-	USER_INTERACTION = "USER_INTERACTION",
-	SYSTEM = "SYSTEM",
-	PLUGIN = "PLUGIN",
-	ERROR = "ERROR"
+	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
 }
 
 constants.templateKeys = {

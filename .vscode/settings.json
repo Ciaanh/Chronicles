@@ -14,7 +14,8 @@
         "redundant-parameter",
         "unbalanced-assignments",
         "undefined-field",
-        "undefined-global"
+        "undefined-global",
+        "assign-type-mismatch"
     ],
     "Lua.runtime.version": "Lua 5.1",
     "Lua.runtime.builtin": {
