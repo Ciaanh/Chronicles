@@ -33,7 +33,6 @@
                     </Frame>
                 </Frames>
             </Frame>
-
             <Frame parentKey="Characters" frameLevel="100" hidden="true">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
@@ -41,6 +40,7 @@
                 </Anchors>
                 <Frames>
                     <Frame parentKey="VerticalCharacterList" inherits="VerticalCharacterListTemplate">
+                        <Size x="150" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>

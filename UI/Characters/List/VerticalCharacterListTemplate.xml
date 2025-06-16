@@ -3,74 +3,39 @@
 
     <Script file="VerticalCharacterListTemplate.lua" />
 
-    <!-- Vertical Character List Item Template (inspired by WoW's character frame title list) -->
     <Button name="VerticalCharacterListItemTemplate" mixin="VerticalCharacterListItemMixin" virtual="true">
-        <Size x="130" y="24"/>
+        <Size x="150" y="110"/>
         <KeyValues>
-            <KeyValue key="textureHeight" value="24" type="number"/>
+            <KeyValue key="textureHeight" value="80" type="number"/>
         </KeyValues>
         <Layers>
             <Layer level="BACKGROUND">
-                <!-- Background panel with subtle gradient -->
-                <Texture parentKey="Background" file="Interface\Buttons\WHITE8X8">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-2"/>
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-                    </Anchors>
-                    <Gradient orientation="HORIZONTAL">
-                        <MinColor r="0.1" g="0.1" b="0.15" a="0.8"/>
-                        <MaxColor r="0.05" g="0.05" b="0.1" a="0.6"/>
-                    </Gradient>
-                </Texture>                <!-- Status indicator -->
-                <Texture parentKey="StatusIndicator" file="Interface\Buttons\WHITE8X8">
-                    <Size x="3" y="20"/>
+                <!-- Bookmark side texture -->
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="45" y="64"/>
                     <Anchors>
                         <Anchor point="LEFT" x="0" y="0"/>
                     </Anchors>
-                    <Color r="0.3" g="0.4" b="0.6" a="0.7"/>
                 </Texture>
-            </Layer>
-            <Layer level="BORDER">                <!-- Character icon/indicator -->
-                <Texture parentKey="CharacterIcon" atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="false">
-                    <Size x="16" y="16"/>
+
+                <!-- Bookmark content texture -->
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size x="105" y="64"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="8" y="0"/>
+                        <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
-                    <Color r="0.7" g="0.8" b="0.9" a="0.8"/>
                 </Texture>
             </Layer>
 
-            <Layer level="ARTWORK">                <!-- Character name -->
-                <FontString parentKey="CharacterName" inherits="SystemFont_Med1" justifyH="LEFT">
+            <Layer level="ARTWORK">
+                <!-- Character name -->
+                <FontString parentKey="CharacterName" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
+                    <Size x="100" y="35"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="30" y="0"/>
-                        <Anchor point="RIGHT" x="-8" y="0"/>
+                        <Anchor point="LEFT" x="0" y="0" />
                     </Anchors>
-                    <Color r="0.95" g="0.95" b="1.0"/>
-                    <Shadow>
-                        <Offset x="1" y="-1"/>
-                        <Color r="0" g="0" b="0" a="0.8"/>
-                    </Shadow>
+                    <Color color="WHITE_FONT_COLOR" />
                 </FontString>
-            </Layer>
-            <Layer level="OVERLAY">
-                <!-- Selection indicator -->
-                <Texture parentKey="SelectionHighlight" file="Interface\Buttons\WHITE8X8" hidden="true">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-2"/>
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-                    </Anchors>
-                    <Color r="0.2" g="0.5" b="1.0" a="0.4"/>
-                </Texture>
-
-                <!-- Hover effect -->
-                <Texture parentKey="HoverHighlight" file="Interface\Buttons\WHITE8X8" hidden="true">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-2"/>
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-                    </Anchors>
-                    <Color r="0.4" g="0.6" b="1.0" a="0.2"/>
-                </Texture>
             </Layer>
         </Layers>
         <Scripts>
@@ -80,77 +45,21 @@
         </Scripts>
     </Button>
 
-    <!-- Vertical Character List Template -->
     <Frame name="VerticalCharacterListTemplate" mixin="VerticalCharacterListMixin" virtual="true">
-        <Size x="140" y="650"/>
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
         </KeyValues>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <!-- Main background panel -->
-                <Texture parentKey="Background" file="Interface\Buttons\WHITE8X8">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="5" y="-5"/>
-                        <Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
-                    </Anchors>
-                    <Gradient orientation="VERTICAL">
-                        <MinColor r="0.05" g="0.05" b="0.1" a="0.9"/>
-                        <MaxColor r="0.1" g="0.1" b="0.15" a="0.9"/>
-                    </Gradient>
-                </Texture>
-
-                <!-- Border frame -->
-                <Texture parentKey="Border" atlas="charactercreate-customize-dropdownbox" useAtlasSize="false">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="3" y="-3"/>
-                        <Anchor point="BOTTOMRIGHT" x="-3" y="3"/>
-                    </Anchors>
-                    <Color r="0.2" g="0.3" b="0.4" a="0.8"/>
-                </Texture>
-            </Layer>
-
-            <Layer level="ARTWORK">
-                <!-- Header text -->
-                <FontString parentKey="HeaderText" inherits="SystemFont_Med2" justifyH="CENTER">
-                    <Anchors>
-                        <Anchor point="TOP" x="0" y="-15"/>
-                    </Anchors>
-                    <Color r="0.8" g="0.9" b="1.0"/>
-                    <Shadow>
-                        <Offset x="1" y="-1"/>
-                        <Color r="0" g="0" b="0" a="0.8"/>
-                    </Shadow>
-                </FontString>                <!-- Separator line -->
-                <Texture parentKey="HeaderSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                    <Size x="120" y="8"/>
-                    <Anchors>
-                        <Anchor point="TOP" relativeKey="$parent.HeaderText" relativePoint="BOTTOM" x="0" y="-8"/>
-                    </Anchors>
-                    <Color r="0.3" g="0.4" b="0.6" a="0.6"/>
-                </Texture>
-            </Layer>
-        </Layers>
         <Frames>
             <!-- Search box for filtering characters -->
             <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
                 <Size x="120" y="20"/>
                 <Anchors>
-                    <Anchor point="TOP" relativeKey="$parent.HeaderSeparator" relativePoint="BOTTOM" x="0" y="-8"/>
+                    <Anchor point="TOP" x="-5" y="0"/>
                 </Anchors>
-                <FontString inherits="SystemFont_Small"/>
+                <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
                 <Layers>
-                    <Layer level="BACKGROUND">
-                        <Texture parentKey="SearchBG" file="Interface\Buttons\WHITE8X8">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="-8" y="2"/>
-                                <Anchor point="BOTTOMRIGHT" x="8" y="-2"/>
-                            </Anchors>
-                            <Color r="0.1" g="0.1" b="0.15" a="0.8"/>
-                        </Texture>
-                    </Layer>
                     <Layer level="OVERLAY">
-                        <FontString parentKey="PlaceholderText" inherits="SystemFont_Small" justifyH="LEFT">
+                        <FontString parentKey="PlaceholderText" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                             <Anchors>
                                 <Anchor point="LEFT" x="5" y="0"/>
                             </Anchors>
@@ -175,40 +84,57 @@
                         end
                     </OnEditFocusLost>
                     <OnLoad>
-                        self.PlaceholderText:SetText("Search characters...")
-                        self.PlaceholderText:Show()
+                        self:GetParent():InitializeSearchPlaceholder()
                     </OnLoad>
                 </Scripts>
             </EditBox>
 
-            <!-- Scroll area for character list -->
-            <ScrollFrame parentKey="CharacterScrollFrame" inherits="UIPanelScrollFrameTemplate">
-                <Size x="130" y="540"/>
-                <Anchors>
-                    <Anchor point="TOP" relativeKey="$parent.SearchBox" relativePoint="BOTTOM" x="0" y="-10"/>
-                </Anchors>
+            <!-- Paged character list -->
+            <Frame parentKey="PagedCharacterList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
                 <KeyValues>
-                    <KeyValue key="scrollBarHideable" value="true" type="boolean"/>
+                    <KeyValue key="viewsPerPage" value="1" type="number"/>
+                    <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
+                    <KeyValue key="xPadding" value="5" type="number"/>
+                    <KeyValue key="columnsPerRow" value="1" type="number"/>
+                    <KeyValue key="autoExpandElements" value="true" type="boolean"/>
                 </KeyValues>
-                <ScrollChild>
-                    <Frame parentKey="Content">
-                        <Size x="120" y="1"/>
-                        <Frames>
-                            <!-- Character list items will be dynamically created here -->
-                        </Frames>
+                <Size x="150" y="600"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" x="0" y="0"/>
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="150" y="560"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                        </Anchors>
                     </Frame>
-                </ScrollChild>
-            </ScrollFrame>
-        </Frames>
 
+                    <!-- Paging controls for character list -->
+                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" x="-10" y="5"/>
+                        </Anchors>
+                        <KeyValues>
+                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
+                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
+                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
+                            <KeyValue key="spacing" value="8" type="number"/>
+                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                        </KeyValues>
+                    </Frame>
+                </Frames>
+            </Frame>
+        </Frames>
         <Layers>
             <Layer level="OVERLAY">
                 <!-- Character count label -->
-                <FontString parentKey="CountLabel" inherits="SystemFont_Tiny" justifyH="CENTER">
+                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="BOTTOM" x="0" y="10"/>
+                        <Anchor point="TOP" x="-10" y="-30"/>
                     </Anchors>
-                    <Color r="0.6" g="0.7" b="0.8" a="0.8"/>
+                    <Color color="WHITE_FONT_COLOR"/>
                 </FontString>
             </Layer>
         </Layers>

@@ -84,10 +84,12 @@ if L then
     L["SettingsHomeQuickActionsSectionTitle"] = "Getting Started"
     L["SettingsHomeQuickActionsTip1"] = "1. Start with Event Types to customize which events you want to see"
     L["SettingsHomeQuickActionsTip2"] = "2. Use Collections to enable content from specific expansions or lore sources"
-
     L["SettingsHomeVersionSectionTitle"] = "About Chronicles"
     L["SettingsHomeVersionVersionInfo"] = "A comprehensive timeline addon for World of Warcraft lore and events."
     L["SettingsHomeVersionConfigNote"] = "Settings are automatically saved and will persist between sessions."
+
+    -- Search functionality
+    L["SearchCharactersPlaceholder"] = "Search..."
 
     -- Timeline zoom button text
     L["Zoom Out"] = "-"
