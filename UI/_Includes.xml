@@ -3,6 +3,7 @@
 ..\FrameXML\UI.xsd">
 	<Include file="Fonts.xml" />
 
+	<Include file="Templates\VerticalListTemplate.xml" />
 	<Include file="Templates\BookPages.xml" />
 	<Include file="Templates\SharedBookTemplate.xml" />
 	<Include file="Templates\SharedBookTemplate.lua" />
@@ -14,10 +15,8 @@
 	<Include file="Events\Details\EventBookContentTemplates.xml" />
 
 	<Include file="Characters\Details\CharacterBookContentTemplates.xml" />
-	<Include file="Characters\List\VerticalCharacterListTemplate.xml" />
 
 	<Include file="Factions\Details\FactionBookContentTemplates.xml" />
-	<Include file="Factions\List\FactionListTemplate.xml" />
 
 	<Include file="Events\Details\EventBookTemplate.xml" />
 	<Include file="Characters\Details\CharacterBookTemplate.xml" />

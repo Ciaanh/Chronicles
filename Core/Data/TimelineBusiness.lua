@@ -584,12 +584,12 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
 end
 
 --[[
-    Calculate page index for a specific year
+    Calculate page index for a specific year (with periods parameter)
     @param year [number] The year to find page for
     @param periods [table] Array of timeline periods
     @return [number] Page index containing the specified year
 ]]
-function TimelineBusiness.getYearPageIndex(year, periods)
+function TimelineBusiness.getYearPageIndexWithPeriods(year, periods)
     local selectedYear = year
     local pageSize = private.constants.config.timeline.pageSize
     local numberOfCells = #periods
@@ -715,6 +715,82 @@ function TimelineBusiness.computeTimelinePeriods()
     local consolidatedPeriods = TimelineBusiness.consolidateTimelinePeriods(rawPeriods)
 
     return consolidatedPeriods
+end
+
+--[[
+    Get page index for a specific year (simplified interface)
+    @param year [number] Target year
+    @return [number] Page index containing the year
+]]
+function TimelineBusiness.getYearPageIndex(year)
+    if not year or type(year) ~= "number" then
+        return 1
+    end
+
+    -- Get current timeline periods
+    local periods = TimelineBusiness.computeTimelinePeriods()
+    if not periods or #periods == 0 then
+        return 1
+    end
+
+    -- Use the existing getYearPageIndex function with periods parameter
+    -- Note: We need to call it directly since we have two functions with same name
+    local pageSize = private.constants.config.timeline.pageSize
+    local numberOfCells = #periods
+
+    -- Find the period that contains the selected year
+    local periodIndex = nil
+    for i, period in ipairs(periods) do
+        -- Check if year falls within this period's bounds
+        if year >= period.lower and year <= period.upper then
+            periodIndex = i
+            break
+        end
+        -- Special handling for mythos period (negative values)
+        if period.lower == private.constants.config.mythos and year < private.constants.config.historyStartYear then
+            periodIndex = i
+            break
+        end
+        -- Special handling for future period
+        if period.upper == private.constants.config.futur and year > private.constants.config.currentYear then
+            periodIndex = i
+            break
+        end
+    end
+
+    -- If no period found, find the closest one
+    if periodIndex == nil then
+        local closestDistance = math.huge
+        for i, period in ipairs(periods) do
+            local distance
+            if year < period.lower then
+                distance = period.lower - year
+            elseif year > period.upper then
+                distance = year - period.upper
+            else
+                distance = 0
+            end
+
+            if distance < closestDistance then
+                closestDistance = distance
+                periodIndex = i
+            end
+        end
+    end
+
+    -- If still no period found, default to first period
+    if periodIndex == nil then
+        periodIndex = 1
+    end
+
+    -- Calculate which page contains this period
+    local pageIndex = math.ceil(periodIndex / pageSize)
+
+    -- Ensure page index is within valid bounds
+    local maxPage = math.ceil(numberOfCells / pageSize)
+    pageIndex = math.max(1, math.min(pageIndex, maxPage))
+
+    return pageIndex
 end
 
 return TimelineBusiness

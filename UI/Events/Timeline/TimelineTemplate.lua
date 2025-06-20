@@ -65,13 +65,181 @@ function TimelineMixin:OnLoad()
             end,
             "TimelineMixin"
         )
-    end
-
-    -- Initialize zoom level indicator
+    end -- Initialize zoom level indicator
     self:UpdateZoomLevelIndicator(
         private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep")) or
             private.constants.config.stepValues[1]
     )
+
+    -- Initialize date search
+    self:InitializeDateSearch()
+
+    -- Register for year-specific event display
+    private.Core.registerCallback(private.constants.events.DisplayEventsForYear, self.OnDisplayEventsForYear, self)
+end
+
+-- -------------------------
+-- Year-Specific Event Display
+-- -------------------------
+
+function TimelineMixin:OnDisplayEventsForYear(eventData)
+    if not eventData or not eventData.year or not eventData.events then
+        return
+    end
+
+    local year = eventData.year
+    local events = eventData.events
+
+    -- Update the selected period to show year-specific information
+    if private.Core.StateManager then
+        -- Create a special period data for year-specific display
+        local yearSpecificPeriod = {
+            lower = year,
+            upper = year,
+            text = "Year " .. year,
+            nbEvents = #events,
+            hasEvents = #events > 0,
+            isYearSpecific = true
+        }
+
+        local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+        private.Core.StateManager.setState(selectedPeriodKey, yearSpecificPeriod, "Year-specific period selected")
+    end
+end
+
+-- -------------------------
+-- Date Search Functionality
+-- -------------------------
+
+function TimelineMixin:InitializeDateSearch()
+    -- Set initial state
+    if self.DateSearchInput then
+        self.DateSearchInput:SetText("")
+        -- Set localized placeholder text
+        if self.DateSearchInput.PlaceholderText then
+            self.DateSearchInput.PlaceholderText:SetText(Locale["Enter year..."] or "Enter year...")
+        end
+        self:UpdateDateSearchPlaceholder()
+    end
+
+    -- Set localized button text
+    if self.DateSearchButton then
+        self.DateSearchButton:SetText(Locale["Go"] or "Go")
+    end
+end
+
+function TimelineMixin:OnDateSearchFocusGained()
+    if self.DateSearchInput.PlaceholderText then
+        self.DateSearchInput.PlaceholderText:Hide()
+    end
+end
+
+function TimelineMixin:OnDateSearchFocusLost()
+    self:UpdateDateSearchPlaceholder()
+end
+
+function TimelineMixin:OnDateSearchTextChanged()
+    self:UpdateDateSearchPlaceholder()
+end
+
+function TimelineMixin:UpdateDateSearchPlaceholder()
+    if not self.DateSearchInput or not self.DateSearchInput.PlaceholderText then
+        return
+    end
+
+    local text = self.DateSearchInput:GetText()
+    if text and text ~= "" then
+        self.DateSearchInput.PlaceholderText:Hide()
+    else
+        self.DateSearchInput.PlaceholderText:Show()
+    end
+end
+
+function TimelineMixin:OnDateSearchEnterPressed()
+    self:PerformDateSearch()
+end
+
+function TimelineMixin:OnDateSearchEscapePressed()
+    if self.DateSearchInput then
+        self.DateSearchInput:SetText("")
+        self.DateSearchInput:ClearFocus()
+        self:UpdateDateSearchPlaceholder()
+    end
+end
+
+function TimelineMixin:OnDateSearchButtonClick()
+    self:PerformDateSearch()
+end
+
+function TimelineMixin:PerformDateSearch()
+    if not self.DateSearchInput then
+        return
+    end
+
+    local searchText = self.DateSearchInput:GetText()
+    if not searchText or searchText == "" then
+        return
+    end
+    -- Parse the year from input
+    local year = tonumber(searchText)
+    if not year then
+        -- Show error message for invalid input
+        local errorMsg =
+            Locale["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] or
+            "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
+        private.Chronicles:Print(errorMsg)
+        return
+    end
+
+    -- Validate year range
+    local minYear = private.constants.config.historyStartYear
+    local maxYear = private.constants.config.futur
+
+    if year < minYear or year > maxYear then
+        local errorMsg =
+            string.format(
+            Locale["Year must be between %d and %d"] or "Year must be between %d and %d",
+            minYear,
+            maxYear
+        )
+        private.Chronicles:Print(errorMsg)
+        return
+    end
+
+    self:NavigateToYear(year)
+    self.DateSearchInput:ClearFocus()
+end
+
+function TimelineMixin:NavigateToYear(year)
+    -- Find the period containing this year and display events
+    if not year then
+        return
+    end
+
+    -- Use Timeline business logic to find the correct page for this year
+    if private.Core.Timeline and private.Core.Timeline.NavigateToYear then
+        private.Core.Timeline.NavigateToYear(year)
+    else
+        -- Fallback implementation
+        self:FallbackNavigateToYear(year)
+    end
+end
+
+function TimelineMixin:FallbackNavigateToYear(year)
+    -- Simple fallback that sets the selected year and refreshes timeline
+    if private.Core.StateManager then
+        private.Core.StateManager.setState(
+            private.Core.StateManager.buildTimelineKey("selectedYear"),
+            year,
+            "Date search navigation"
+        )
+    end
+
+    -- Trigger timeline refresh
+    if private.Core.Timeline and private.Core.Timeline.ComputeTimelinePeriods then
+        private.Core.Timeline.ComputeTimelinePeriods()
+        private.Core.Timeline.DisplayTimelineWindow()
+    end
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
@@ -209,6 +377,15 @@ function TimelinePeriodMixin:ResetAllPeriodTextures()
 end
 
 function TimelinePeriodMixin:OnClick()
+    -- Clear year-specific mode when clicking on timeline periods (normal navigation)
+    if private.Core.StateManager then
+        private.Core.StateManager.setState(
+            private.Core.StateManager.buildTimelineKey("yearSpecificMode"),
+            false,
+            "Year-specific mode cleared due to period selection"
+        )
+    end
+
     -- Create a period data structure for state storage
     -- Only store essential data, not calculated values
     local periodData = {

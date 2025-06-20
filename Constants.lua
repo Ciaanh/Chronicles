@@ -74,6 +74,7 @@ constants.events = {
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 	DisplayTimelineLabel = "Timeline.DisplayLabel",
 	DisplayTimelinePeriod = "Timeline.DisplayPeriod",
+	DisplayEventsForYear = "Timeline.DisplayEventsForYear",
 	TabUITabSet = "TabUI.TabSet",
 	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
 	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
@@ -82,11 +83,8 @@ constants.events = {
 constants.templateKeys = {
 	EVENTLIST_TITLE = "EVENTLIST_TITLE",
 	EVENT_DESCRIPTION = "EVENT_DESCRIPTION",
-	EVENT_TITLE = "EVENT_TITLE",
-	CHARACTER_TITLE = "CHARACTER_TITLE",
-	VERTICAL_CHARACTER_LIST_ITEM = "VERTICAL_CHARACTER_LIST_ITEM",
-	FACTION_TITLE = "FACTION_TITLE",
-	FACTION_LIST_ITEM = "FACTION_LIST_ITEM",
+	EVENT_TITLE = "EVENT_TITLE",	CHARACTER_TITLE = "CHARACTER_TITLE",	FACTION_TITLE = "FACTION_TITLE",
+	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM", -- For the shared vertical list template
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",
 	HEADER = "HEADER",
@@ -124,3 +122,7 @@ constants.colors = {
 	Alliance = "|cFF2459FF",
 	Horde = "|cFFFF0000"
 }
+
+-- Global string constants for UI (registered with WoW client)
+CHRONICLES_ENTER_YEAR = "Enter year..."
+CHRONICLES_GO = "Go"

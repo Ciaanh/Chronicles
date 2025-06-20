@@ -178,22 +178,6 @@ function private.Core.Events.TransformEventToBook(event)
         end
     end
 
-    -- Print all properties from data (each chapter/table in the book)
-    -- for i, chapter in ipairs(data) do
-    --     print("Chapter " .. i .. ":")
-    --     for key, value in pairs(chapter) do
-    --         if type(value) == "table" then
-    --             print("  " .. tostring(key) .. " = {")
-    --             for k, v in pairs(value) do
-    --                 print("    " .. tostring(k) .. " = " .. tostring(v))
-    --             end
-    --             print("  }")
-    --         else
-    --             print("  " .. tostring(key) .. " = " .. tostring(value))
-    --         end
-    --     end
-    -- end
-
     return data
 end
 

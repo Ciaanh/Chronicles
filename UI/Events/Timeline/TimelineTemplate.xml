@@ -54,9 +54,54 @@
             <OnClick method="OnClick" />
         </Scripts>
     </Button>
-
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Frames>
+            <!-- Date Search Input -->
+            <EditBox parentKey="DateSearchInput" inherits="InputBoxTemplate">
+                <Size x="120" y="25" />
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="15" y="15" />
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="PlaceholderText" inherits="GameFontNormalSmall" text="CHRONICLES_ENTER_YEAR" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="LEFT" x="8" y="0" />
+                            </Anchors>
+                            <Color r="0.5" g="0.5" b="0.5" a="0.8" />
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnEditFocusGained>
+                        self:GetParent():OnDateSearchFocusGained()
+                    </OnEditFocusGained>
+                    <OnEditFocusLost>
+                        self:GetParent():OnDateSearchFocusLost()
+                    </OnEditFocusLost>
+                    <OnEnterPressed>
+                        self:GetParent():OnDateSearchEnterPressed()
+                    </OnEnterPressed>
+                    <OnEscapePressed>
+                        self:GetParent():OnDateSearchEscapePressed()
+                    </OnEscapePressed>
+                    <OnTextChanged>
+                        self:GetParent():OnDateSearchTextChanged()
+                    </OnTextChanged>
+                </Scripts>
+            </EditBox>
+            <!-- Search Button -->
+            <Button parentKey="DateSearchButton" inherits="UIPanelButtonTemplate" text="CHRONICLES_GO">
+                <Size x="35" y="25" />
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.DateSearchInput" relativePoint="RIGHT" x="5" y="0" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        self:GetParent():OnDateSearchButtonClick()
+                    </OnClick>
+                </Scripts>
+            </Button>
 
             <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
                 <KeyValues>

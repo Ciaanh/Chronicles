@@ -49,6 +49,30 @@ USAGE EXAMPLES:
 ]]
 private.Core.StateManager = {}
 
+-- Lazy initialization to avoid circular dependencies
+local stateManagerDependencies = {
+    chronicles = nil,
+    helperUtils = nil,
+    initialized = false
+}
+
+-- Initialize dependencies safely
+local function initStateManagerDependencies()
+    if stateManagerDependencies.initialized then
+        return
+    end
+
+    if not stateManagerDependencies.helperUtils and private.Core.Utils and private.Core.Utils.HelperUtils then
+        stateManagerDependencies.helperUtils = private.Core.Utils.HelperUtils
+    end
+
+    if not stateManagerDependencies.chronicles and stateManagerDependencies.helperUtils then
+        stateManagerDependencies.chronicles = stateManagerDependencies.helperUtils.getChronicles()
+    end
+
+    stateManagerDependencies.initialized = true
+end
+
 -- Local state storage
 local stateStore = {}
 local subscribers = {}

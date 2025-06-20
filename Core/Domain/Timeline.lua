@@ -3,9 +3,61 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Timeline = {}
 
--- Create convenience accessor for TimelineBusiness (accessed lazily)
+-- Dependency injection container to eliminate circular dependencies
+local function getDependency(name)
+    if private.Core.DependencyContainer then
+        return private.Core.DependencyContainer.resolve(name)
+    end
+    return nil
+end
+
+-- Safe dependency accessor with fallbacks
 local function getTimelineBusiness()
-    return private.Core.Data.TimelineBusiness
+    local timelineBusiness = getDependency("TimelineBusiness")
+    if timelineBusiness then
+        return timelineBusiness
+    end
+    -- Fallback to direct access if container not available
+    return private.Core.Data and private.Core.Data.TimelineBusiness
+end
+
+local function getStateManager()
+    local stateManager = getDependency("StateManager")
+    if stateManager then
+        return stateManager
+    end
+    -- Fallback to direct access if container not available
+    return private.Core.StateManager
+end
+
+local function getChronicles()
+    local chronicles = getDependency("Chronicles")
+    if chronicles then
+        return chronicles
+    end
+    -- Fallback to direct access if container not available
+    return private.Chronicles
+end
+
+-- -------------------------
+-- Year-Specific Mode Management
+-- -------------------------
+
+local function clearYearSpecificMode(description)
+    local stateManager = getStateManager()
+    if not stateManager then
+        return
+    end
+
+    stateManager.setState(
+        stateManager.buildTimelineKey("yearSpecificMode"),
+        false,
+        description or "Year-specific mode cleared"
+    )
+
+    stateManager.setState(stateManager.buildTimelineKey("yearSpecificTarget"), nil, "Year-specific target cleared")
+
+    stateManager.setState(stateManager.buildTimelineKey("yearSpecificEvents"), nil, "Year-specific events cleared")
 end
 
 -- -------------------------
@@ -16,45 +68,51 @@ Timeline.MaxStepIndex = #private.constants.config.stepValues
 Timeline.Periods = {}
 
 local function getCurrentStepValue()
-    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
-
-    return value
+    local stateManager = getStateManager()
+    if not stateManager then
+        return private.constants.config.stepValues[1] -- fallback default
+    end
+    return stateManager.getState(stateManager.buildTimelineKey("currentStep"))
 end
 
 local function getCurrentPage()
-    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentPage"))
-
-    return value
+    local stateManager = getStateManager()
+    if not stateManager then
+        return 1 -- fallback default
+    end
+    return stateManager.getState(stateManager.buildTimelineKey("currentPage"))
 end
 
 local function getSelectedYear()
-    local value = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("selectedYear"))
-
-    return value
+    local stateManager = getStateManager()
+    if not stateManager then
+        return nil
+    end
+    return stateManager.getState(stateManager.buildTimelineKey("selectedYear"))
 end
 
 local function setCurrentStepValue(value, description)
-    private.Core.StateManager.setState(
-        private.Core.StateManager.buildTimelineKey("currentStep"),
-        value,
-        description or "Timeline step changed"
-    )
+    local stateManager = getStateManager()
+    if not stateManager then
+        return
+    end
+    stateManager.setState(stateManager.buildTimelineKey("currentStep"), value, description or "Timeline step changed")
 end
 
 local function setCurrentPage(value, description)
-    private.Core.StateManager.setState(
-        private.Core.StateManager.buildTimelineKey("currentPage"),
-        value,
-        description or "Timeline page changed"
-    )
+    local stateManager = getStateManager()
+    if not stateManager then
+        return
+    end
+    stateManager.setState(stateManager.buildTimelineKey("currentPage"), value, description or "Timeline page changed")
 end
 
 local function setSelectedYear(value, description)
-    private.Core.StateManager.setState(
-        private.Core.StateManager.buildTimelineKey("selectedYear"),
-        value,
-        description or "Timeline year changed"
-    )
+    local stateManager = getStateManager()
+    if not stateManager then
+        return
+    end
+    stateManager.setState(stateManager.buildTimelineKey("selectedYear"), value, description or "Timeline year changed")
 end
 
 local function GetDateCurrentStepIndex(date)
@@ -86,6 +144,9 @@ function private.Core.Timeline.ChangePage(value)
     local newPage = currentPage + value
 
     setCurrentPage(newPage, "Timeline page changed via navigation")
+
+    -- Clear year-specific mode when navigating via timeline pages
+    clearYearSpecificMode("Year-specific mode cleared due to page navigation")
 
     private.Core.Timeline.DisplayTimelineWindow()
 end
@@ -285,4 +346,111 @@ local function onCurrentPageChanged(newPage, oldPage, description)
     if newPage ~= oldPage and oldPage ~= nil then
         private.Core.Timeline.DisplayTimelineWindow()
     end
+end
+
+--[[
+    Navigate to a specific year and display associated events
+    This function finds the appropriate timeline period for the given year,
+    navigates to the correct page, and triggers event display.
+    
+    @param year [number] Target year to navigate to
+]]
+function private.Core.Timeline.NavigateToYear(year)
+    if not year or type(year) ~= "number" then
+        return false, "Invalid year provided"
+    end
+
+    local timelineBusiness = getTimelineBusiness()
+    if not timelineBusiness then
+        return false, "Timeline business logic not available"
+    end
+
+    local stateManager = getStateManager()
+    if not stateManager then
+        return false, "State manager not available"
+    end
+
+    -- Set the selected year in state
+    setSelectedYear(year, "Navigation to specific year: " .. year)
+
+    -- Find the appropriate page for this year
+    local pageIndex = timelineBusiness.getYearPageIndex(year)
+    if pageIndex then
+        setCurrentPage(pageIndex, "Page updated for year navigation")
+    end
+
+    -- Recompute timeline periods to ensure current data
+    private.Core.Timeline.ComputeTimelinePeriods()
+
+    -- Find and select the period containing this year
+    local selectedPeriod = nil
+
+    for i, period in ipairs(Timeline.Periods) do
+        local containsYear = false
+
+        if period.lower == private.constants.config.mythos then
+            containsYear = (year < private.constants.config.historyStartYear)
+        elseif period.upper == private.constants.config.futur then
+            containsYear = (year > private.constants.config.currentYear)
+        else
+            containsYear = (year >= period.lower and year <= period.upper)
+        end
+
+        if containsYear then
+            selectedPeriod = period
+            break
+        end
+    end
+
+    -- Update selected period in state using dependency container
+    if selectedPeriod then
+        local selectedPeriodKey = stateManager.buildUIStateKey("selectedPeriod")
+        stateManager.setState(selectedPeriodKey, selectedPeriod, "Timeline period selected via year navigation") -- Set a flag to indicate we're displaying year-specific events
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificMode"),
+            true,
+            "Year-specific event display mode enabled"
+        )
+
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificTarget"),
+            year,
+            "Target year for year-specific display"
+        )
+
+        -- Search for events specifically for this year, not the entire period
+        local searchEngine = getDependency("SearchEngine")
+        if searchEngine and searchEngine.searchEvents then
+            -- Search for events only for the specific year (yearStart == yearEnd)
+            local events = searchEngine.searchEvents(year, year)
+            -- Store the year-specific events in state
+            stateManager.setState(
+                stateManager.buildTimelineKey("yearSpecificEvents"),
+                events,
+                "Events for year-specific display"
+            )
+        end
+    else
+        return false, "Period not found for year"
+    end
+    -- Refresh the timeline display first
+    private.Core.Timeline.DisplayTimelineWindow()
+
+    -- After timeline refresh, trigger year-specific event display if in year-specific mode
+    local yearSpecificMode = stateManager.getState(stateManager.buildTimelineKey("yearSpecificMode"))
+    if yearSpecificMode then
+        local yearSpecificEvents = stateManager.getState(stateManager.buildTimelineKey("yearSpecificEvents"))
+        local yearSpecificTarget = stateManager.getState(stateManager.buildTimelineKey("yearSpecificTarget"))
+
+        if yearSpecificTarget and yearSpecificEvents then
+            -- Trigger event to display the filtered events for this specific year
+            SafeTriggerEvent(
+                private.constants.events.DisplayEventsForYear,
+                {year = yearSpecificTarget, events = yearSpecificEvents},
+                "Timeline:NavigateToYear"
+            )
+        end
+    end    local successMsg =
+        string.format(Locale["Successfully navigated to year %d"] or "Successfully navigated to year %d", year)
+    return true, successMsg
 end

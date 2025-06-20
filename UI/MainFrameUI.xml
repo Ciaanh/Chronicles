@@ -39,7 +39,7 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="VerticalCharacterList" inherits="VerticalCharacterListTemplate">
+                    <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
                         <Size x="150" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
@@ -61,9 +61,10 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
-                    <Frame parentKey="FactionList" inherits="FactionListTemplate">
+                    <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
+                        <Size x="150" y="650"/>
                         <Anchors>
-                            <Anchor point="TOP" />
+                            <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
 

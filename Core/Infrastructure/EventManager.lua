@@ -202,6 +202,21 @@ local eventSchemas = {
             end
             return true, nil
         end
+    },
+    [private.constants.events.DisplayEventsForYear] = {
+        description = "Fired when events for a specific year need to be displayed",
+        validate = function(data)
+            if not data or type(data) ~= "table" then
+                return false, "DisplayEventsForYear data must be a table"
+            end
+            if not data.year or type(data.year) ~= "number" then
+                return false, "Year must be a number"
+            end
+            if not data.events or type(data.events) ~= "table" then
+                return false, "Events must be a table"
+            end
+            return true, nil
+        end
     }
 }
 

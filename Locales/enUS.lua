@@ -23,6 +23,20 @@ if L then
     L["Delete"] = "Delete"
     L["FactionsCharacters"] = "Factions/Characters"
 
+    -- Date Search Localization
+    L["Enter year..."] = "Enter year..."
+    L["Go"] = "Go"
+    L["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] =
+        "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
+    L["Year must be between %d and %d"] = "Year must be between %d and %d"
+    L["Found %d events for year %d (period %d-%d)"] = "Found %d events for year %d (period %d-%d)"
+    L["No events found for year %d (period %d-%d)"] = "No events found for year %d (period %d-%d)"
+    L["Found %d events for year %d"] = "Found %d events for year %d"
+    L["No events found for year %d"] = "No events found for year %d"
+    L["Displaying events for year %d"] = "Displaying events for year %d"
+    L["Could not find timeline period for year %d"] = "Could not find timeline period for year %d"
+    L["Successfully navigated to year %d"] = "Successfully navigated to year %d"
+
     L["Id_Field"] = "Id"
     L["Title_Field"] = "Title"
     L["YearStart_Field"] = "Year start"
