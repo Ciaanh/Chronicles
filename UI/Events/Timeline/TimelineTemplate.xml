@@ -7,7 +7,7 @@
         <Size x="130" y="25" />
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\timeline\label">
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label">
                     <Size x="130" y="25"/>
                     <Anchors>
                         <Anchor point="TOP" x="0" y="0"/>
@@ -119,7 +119,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
-                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\timeline\label">
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label">
                             <Size x="120" y="25"/>
                             <Anchors>
                                 <Anchor point="CENTER" />

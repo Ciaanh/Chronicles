@@ -335,15 +335,15 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
         local select = isSelected and "-selected" or ""
 
         if periodData.nbEvents < 10 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events" .. select)
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events" .. select)
         elseif periodData.nbEvents < 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events" .. select)
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events" .. select)
         elseif periodData.nbEvents >= 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events" .. select)
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events" .. select)
         end
     else
         self.Text:SetText("")
-        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
+        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\no-events")
     end
 
     self.Background:SetVertexColor(1, 1, 1)
@@ -364,14 +364,14 @@ function TimelinePeriodMixin:ResetAllPeriodTextures()
     for _, period in ipairs(periods) do
         if period.data and period.data.hasEvents then
             if period.data.nbEvents < 10 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events")
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events")
             elseif period.data.nbEvents < 25 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events")
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events")
             elseif period.data.nbEvents >= 25 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events")
+                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events")
             end
         else
-            period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\no-events")
+            period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\no-events")
         end
     end
 end
@@ -407,11 +407,11 @@ function TimelinePeriodMixin:OnClick()
     -- Set the selected texture for this period
     if (periodData ~= nil and periodData.hasEvents) then
         if periodData.nbEvents < 10 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\low-events-selected")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events-selected")
         elseif periodData.nbEvents < 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\medium-events-selected")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events-selected")
         elseif periodData.nbEvents >= 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\timeline\\high-events-selected")
+            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events-selected")
         end
     end
 end
