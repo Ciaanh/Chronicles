@@ -2,9 +2,7 @@ local FOLDER_NAME, private = ...
 
 EmptyMixin = {}
 function EmptyMixin:Init(elementData)
-    -- if elementData.text then
-    --     self.Text:SetText(elementData.text)
-    -- end
+    -- Empty mixin - no initialization needed
 end
 
 AuthorMixin = {}

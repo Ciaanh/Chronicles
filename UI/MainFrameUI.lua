@@ -131,8 +131,7 @@ TabUIMixin.FrameTabs = {
 	Events = 1,
 	Characters = 2,
 	Factions = 3,
-	Settings = 2
-	-- Third = 3
+	Settings = 4
 }
 
 function TabUIMixin:OnLoad()

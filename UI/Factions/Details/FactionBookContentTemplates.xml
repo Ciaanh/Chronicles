@@ -23,12 +23,6 @@
                         <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Title" x="0" y="-20"/>
                     </Anchors>
                 </Texture>
-                <!-- <FontString parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
-                    <Anchors>
-                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Separator" x="0" y="-20"/>
-                    </Anchors>
-                    <Color color="SPELLBOOK_FONT_COLOR" />
-                </FontString> -->
             </Layer>
         </Layers>
     </Frame>

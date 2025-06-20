@@ -4,22 +4,11 @@
     <Script file="BookPages.lua"/>
 
 
-       <Frame name="EmptyTemplate" mixin="EmptyMixin" virtual="true">
+    <Frame name="EmptyTemplate" mixin="EmptyMixin" virtual="true">
         <Size x="$parent.viewWidth" y="25"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
-        <!-- <Layers>
-            <Layer level="ARTWORK">
-                <Texture parentKey="Border" atlas="spellbook-divider" useAtlasSize="false">
-                    <Size y="10"/>
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" x="10" y="5"/>
-                        <Anchor point="BOTTOMRIGHT" x="-10"/>
-                    </Anchors>
-                </Texture>
-            </Layer>
-        </Layers> -->
     </Frame>
 
     <Frame name="AuthorTemplate" mixin="AuthorMixin" virtual="true">

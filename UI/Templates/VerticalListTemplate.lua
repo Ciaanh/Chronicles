@@ -59,14 +59,12 @@ function VerticalListItemMixin:Init(itemData)
 
     self.Item = item
     self.ItemType = self:GetParent():GetParent().itemType or "generic"
-    
+
     -- Store the stateManagerKey directly from the itemData to eliminate parent traversal
     self.stateManagerKey = itemData.stateManagerKey or "generic"
     local contentTexture = self.Content
     local sideTexture = self.Side
-    local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility
-
-    -- Set item name
+    local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility    -- Set item name
     if textElement then
         textElement:SetText(item.name)
     end
@@ -75,17 +73,18 @@ function VerticalListItemMixin:Init(itemData)
     if contentTexture then
         contentTexture:SetTexCoord(0, 1, 0, 1)
         contentTexture:ClearAllPoints()
-        contentTexture:SetPoint("RIGHT", self, nil, 0, 0)
+        contentTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
     end
 
     if sideTexture then
         sideTexture:SetTexCoord(0, 1, 0, 1)
         sideTexture:ClearAllPoints()
-        sideTexture:SetPoint("LEFT", self, nil, 0, 0)
+        sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
     end
+
     if textElement then
         textElement:ClearAllPoints()
-        textElement:SetPoint("LEFT", self, nil, 0, 0)
+        textElement:SetPoint("LEFT", self, "LEFT", 25, 0)
     end
 
     self:SetSelected(false)

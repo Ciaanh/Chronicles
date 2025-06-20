@@ -398,19 +398,25 @@ function SettingsMixin:LoadEventTypes(frame)
     if not content then
         return
     end
-
     content.checkboxes = content.checkboxes or {}
 
     local previousCheckbox = nil
     local yOffset = -15
 
-    for i = #content.checkboxes, 1, -1 do
-        if content.checkboxes[i] then
-            content.checkboxes[i]:Hide()
-            content.checkboxes[i]:SetParent(nil)
+    -- Use UIUtils for cleanup
+    local UIUtils = private.Core.Utils.UIUtils
+    if UIUtils then
+        UIUtils.CleanupElementArray(content.checkboxes)
+    else
+        -- Fallback cleanup
+        for i = #content.checkboxes, 1, -1 do
+            if content.checkboxes[i] then
+                content.checkboxes[i]:Hide()
+                content.checkboxes[i]:SetParent(nil)
+            end
         end
+        content.checkboxes = {}
     end
-    content.checkboxes = {}
     if not private.constants or not private.constants.eventType then
         return
     end
@@ -496,19 +502,25 @@ function SettingsMixin:LoadCollections(frame)
     if not content then
         return
     end
-
     content.checkboxes = content.checkboxes or {}
 
     local previousCheckbox = nil
     local yOffset = -15
 
-    for i = #content.checkboxes, 1, -1 do
-        if content.checkboxes[i] then
-            content.checkboxes[i]:Hide()
-            content.checkboxes[i]:SetParent(nil)
+    -- Use UIUtils for cleanup
+    local UIUtils = private.Core.Utils.UIUtils
+    if UIUtils then
+        UIUtils.CleanupElementArray(content.checkboxes)
+    else
+        -- Fallback cleanup
+        for i = #content.checkboxes, 1, -1 do
+            if content.checkboxes[i] then
+                content.checkboxes[i]:Hide()
+                content.checkboxes[i]:SetParent(nil)
+            end
         end
+        content.checkboxes = {}
     end
-    content.checkboxes = {}
 
     local collections = private.Core.Cache.getCollectionsNames()
     for _, collection in ipairs(collections) do
@@ -645,10 +657,6 @@ function CategoryButtonMixin:SetData(category, index)
     -- Store any additional category properties
     self.eventTypeId = category.eventTypeId
 end
-
--- function CategoryButtonMixin:GetData()
---     return self.category, self.index
--- end
 
 function CategoryButtonMixin:SetSelected(selected)
     self.isSelected = selected

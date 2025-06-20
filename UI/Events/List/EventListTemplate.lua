@@ -13,30 +13,32 @@ function EventListItemMixin:Init(eventData)
 	text:SetText(eventData.text)
 	self.Event = eventData.event
 
-	if self:GetParent().side == "right" then
+	local isRightSide = self:GetParent().side == "right"
+
+	-- Configure bookmark-style positioning based on side
+	if isRightSide then
 		contentTexture:SetTexCoord(1, 0, 0, 1)
 		sideTexture:SetTexCoord(1, 0, 0, 1)
 
 		contentTexture:ClearAllPoints()
-		contentTexture:SetPoint("LEFT", self, nil, 0, 0)
+		contentTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
 
 		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("RIGHT", self, nil, 0, 0)
+		sideTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 
 		text:ClearAllPoints()
-		text:SetPoint("LEFT", self, nil, 0, 0)
+		text:SetPoint("LEFT", self, "LEFT", 25, 0)
 	else
 		contentTexture:SetTexCoord(0, 1, 0, 1)
 		sideTexture:SetTexCoord(0, 1, 0, 1)
 
 		contentTexture:ClearAllPoints()
-		contentTexture:SetPoint("RIGHT", self, nil, 0, 0)
+		contentTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 
 		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("LEFT", self, nil, 0, 0)
-
+		sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
 		text:ClearAllPoints()
-		text:SetPoint("RIGHT", self, nil, 0, 0)
+		text:SetPoint("RIGHT", self, "RIGHT", -25, 0)
 	end
 end
 

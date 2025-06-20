@@ -6,4 +6,5 @@
     <Script file="TableUtils.lua"/>
     <Script file="MathUtils.lua"/>
     <Script file="ValidationUtils.lua"/>
+    <Script file="UIUtils.lua"/>
 </Ui>

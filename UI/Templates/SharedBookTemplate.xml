@@ -4,8 +4,7 @@
 	<Script file="SharedBookTemplate.lua"/>
 
 	<!-- =============================================================================================
-	SHARED BOOK TEMPLATE
-	=============================================================================================
+	SHARED BOOK TEMPLATE =============================================================================================
 	
 	Universal book component that can be used for Events, Characters, and Factions.
 	Provides common functionality including:
@@ -26,12 +25,11 @@
 	- Modify background textures by overriding BookBGLeft/BookBGRight
 	- Adjust page dimensions via viewWidth KeyValue
 	- Customize paging controls through PagingControls KeyValues
-	- Change animation timing in SinglePageBookCornerFlipbook
-	============================================================================================= -->
+	- Change animation timing in SinglePageBookCornerFlipbook ============================================================================================= -->
 
 	<Frame name="SharedBookTemplate" mixin="SharedBookMixin" virtual="true">
 		<Size x="1200" y="650"/>
-		
+
 		<!-- Book Background Layers -->
 		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="1">
@@ -42,7 +40,7 @@
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM"/>
 					</Anchors>
 				</Texture>
-				
+
 				<!-- Right page background -->
 				<Texture parentKey="BookBGRight" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
 					<Anchors>
@@ -51,7 +49,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-			
+
 			<Layer level="BACKGROUND" textureSubLevel="2">
 				<!-- Animated book corner when paging -->
 				<Texture parentKey="SinglePageBookCornerFlipbook" atlas="spellbook-corner-flipbook-evergreen" useAtlasSize="false">
@@ -66,15 +64,8 @@
 					</Animations>
 				</Texture>
 			</Layer>
-			
-			<!-- Debug background - uncomment for layout debugging -->
-			<!-- <Layer level="BACKGROUND" textureSubLevel="1000">
-				<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
-					<Color r="255.0" g="0.0" b="0.0"/>
-				</Texture>
-			</Layer> -->
 		</Layers>
-		
+
 		<!-- Content Frames -->
 		<Frames>
 			<!-- Main paged content display -->
@@ -91,7 +82,7 @@
 					<Anchor point="TOPLEFT" x="50" y="-50"/>
 					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
 				</Anchors>
-				
+
 				<Frames>
 					<!-- Left page view -->
 					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
@@ -99,30 +90,14 @@
 							<Anchor point="TOPLEFT" />
 							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM" x="-50" />
 						</Anchors>
-						<!-- Debug background for left page -->
-						<!-- <Layers>
-							<Layer level="BACKGROUND" textureSubLevel="1000">
-								<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
-									<Color r="0.0" g="0.0" b="255.0"/>
-								</Texture>
-							</Layer>
-						</Layers> -->
-					</Frame>
-					
+						<!-- Debug background for left page --></Frame>
+
 					<!-- Right page view -->
 					<Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
 						<Anchors>
 							<Anchor point="TOPRIGHT" />
 							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM" x="50" />
 						</Anchors>
-						<!-- Debug background for right page -->
-						<!-- <Layers>
-							<Layer level="BACKGROUND" textureSubLevel="1000">
-								<Texture parentKey="DebugBG" setAllPoints="true" alpha="0.5">
-									<Color r="0.0" g="255.0" b="0.0"/>
-								</Texture>
-							</Layer>
-						</Layers> -->
 					</Frame>
 
 					<!-- Paging controls with customizable styling -->
@@ -141,7 +116,7 @@
 				</Frames>
 			</Frame>
 		</Frames>
-		
+
 		<!-- Event Scripts -->
 		<Scripts>
 			<OnLoad method="OnLoad" />
