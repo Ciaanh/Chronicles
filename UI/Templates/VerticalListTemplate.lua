@@ -19,6 +19,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     - Responsive tooltip system
     - Count display with customizable formatting
     - Reusable across different content types
+    - Direct stateManagerKey passing (no parent traversal required)
     
     CONFIGURATION:
     Templates can be specialized by setting KeyValues:
@@ -33,6 +34,11 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     - VerticalCharacterListSharedTemplate: Pre-configured for characters
     - VerticalFactionListSharedTemplate: Pre-configured for factions
     - Custom implementations can inherit from VerticalListTemplate directly
+    
+    RECENT CHANGES:
+    - Refactored to pass stateManagerKey directly to each item during initialization
+    - Eliminated parent traversal in OnClick handler for better performance and reliability
+    - Each list item now stores its own stateManagerKey for direct access
 --]]
 -- -------------------------
 -- Shared Vertical List Item Mixin
@@ -52,7 +58,10 @@ function VerticalListItemMixin:Init(itemData)
     end
 
     self.Item = item
-    self.ItemType = self:GetParent():GetParent().itemType or "generic" -- Set up bookmark textures using Chronicles design patterns
+    self.ItemType = self:GetParent():GetParent().itemType or "generic"
+    
+    -- Store the stateManagerKey directly from the itemData to eliminate parent traversal
+    self.stateManagerKey = itemData.stateManagerKey or "generic"
     local contentTexture = self.Content
     local sideTexture = self.Side
     local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility
@@ -85,23 +94,10 @@ end
 function VerticalListItemMixin:OnClick()
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
 
-    -- Find the VerticalListMixin frame by traversing up the parent chain
-    local frame = self
-    local verticalListFrame = nil
-    local depth = 0
-    
-    while frame and depth < 10 do -- Safety limit
-        if frame.stateManagerKey and frame.stateManagerKey ~= "generic" then
-            verticalListFrame = frame
-            break
-        end
-        frame = frame:GetParent()
-        depth = depth + 1
-    end
-    
-    local stateManagerKey = verticalListFrame and verticalListFrame.stateManagerKey or "generic"
+    -- Use the stateManagerKey stored during initialization instead of parent traversal
+    local stateManagerKey = self.stateManagerKey or "generic"
 
-    -- Only handle state management if the parent list has been properly configured
+    -- Only handle state management if the item has been properly configured
     if private.Core.StateManager and self.Item and stateManagerKey ~= "generic" then
         local itemId = self.Item.id
         local collectionName = self.Item.source
@@ -342,7 +338,9 @@ function VerticalListMixin:DisplayItems(items)
 
             local itemSummary = {
                 templateKey = templateKey,
-                [self.itemType] = item
+                [self.itemType] = item,
+                -- Pass the stateManagerKey to each item during initialization
+                stateManagerKey = self.stateManagerKey
             }
             table.insert(content.elements, itemSummary)
             itemCount = itemCount + 1
