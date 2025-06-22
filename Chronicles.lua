@@ -1,5 +1,7 @@
 local FOLDER_NAME, private = ...
-private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
+private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0", "AceEvent-3.0")
+_G.Chronicles = private.Chronicles
+
 local defaults = {
     global = {
         options = {

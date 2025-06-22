@@ -6,11 +6,6 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
-local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
-
--- Constants
-local MIN_CHARACTER_SEARCH = 3
-
 Chronicles.Data = {}
 Chronicles.Data.Events = {}
 Chronicles.Data.Factions = {}
