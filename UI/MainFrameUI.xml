@@ -17,8 +17,7 @@
                             <Anchor point="TOP" />
                         </Anchors>
                     </Frame>
-
-                    <Frame parentKey="Book" inherits="EventBookTemplate">
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />
@@ -45,8 +44,7 @@
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-
-                    <Frame parentKey="Book" inherits="CharacterBookTemplate">
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />
@@ -67,8 +65,7 @@
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-
-                    <Frame parentKey="Book" inherits="FactionBookTemplate">
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />

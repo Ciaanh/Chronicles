@@ -117,3 +117,11 @@ function ScrollFrameMixin:InitScrollFrameWithScrollBar()
     end
     scrollBar:RegisterCallback(BaseScrollBoxEvents.OnScroll, onScrollBarScroll, scrollFrame)
 end
+
+-- Simple Title Mixin - Unified mixin for characters and factions
+SimpleTitleMixin = {}
+function SimpleTitleMixin:Init(elementData)
+    if elementData.text then
+        self.Title:SetText(elementData.text)
+    end
+end

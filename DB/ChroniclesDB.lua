@@ -3,7 +3,6 @@ local Chronicles = private.Chronicles
 Chronicles.DB = {}
 Chronicles.DB.Modules = {
 	sample = "Sample",
-	origins = "Origins",
 	greatwars = "Greatwars",
 	worldofwarcraft = "Worldofwarcraft",
 	burningcrusade = "Burningcrusade",
@@ -19,10 +18,9 @@ Chronicles.DB.Modules = {
 	warwithin = "Warwithin",
 	expansions = "Expansions"
 }
+
 function Chronicles.DB:Init()
 	Chronicles.Data:RegisterEventDB(Chronicles.DB.Modules.sample, SampleEventsDB)
-
-	--Chronicles.Data:RegisterEventDB(Chronicles.DB.Modules.origins, OriginsEventsDB)
 
 	Chronicles.Data:RegisterEventDB(Chronicles.DB.Modules.future, FutureEventsDB)
 	Chronicles.Data:RegisterFactionDB(Chronicles.DB.Modules.future, FutureFactionsDB)
@@ -32,5 +30,17 @@ function Chronicles.DB:Init()
 	Chronicles.Data:RegisterCharacterDB(Chronicles.DB.Modules.warwithin, WarwithinCharactersDB)
 
 	Chronicles.Data:RegisterEventDB(Chronicles.DB.Modules.expansions, ExpansionsEventsDB)
-   
+end
+
+-- Single-entity lookup methods that delegate to Chronicles.Data
+function Chronicles.DB:FindEventByIdAndCollection(eventId, collectionName)
+	return Chronicles.Data:FindEventByIdAndCollection(eventId, collectionName)
+end
+
+function Chronicles.DB:FindCharacterByIdAndCollection(characterId, collectionName)
+	return Chronicles.Data:FindCharacterByIdAndCollection(characterId, collectionName)
+end
+
+function Chronicles.DB:FindFactionByIdAndCollection(factionId, collectionName)
+	return Chronicles.Data:FindFactionByIdAndCollection(factionId, collectionName)
 end

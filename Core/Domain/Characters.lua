@@ -35,7 +35,7 @@ function private.Core.Characters.TransformCharacterToBook(character)
     -- Add character title page
     local title = {
         header = {
-            templateKey = private.constants.templateKeys.CHARACTER_TITLE,
+            templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
             text = character.name,
             yearStart = character.yearStart,
             yearEnd = character.yearEnd
@@ -52,7 +52,7 @@ function private.Core.Characters.TransformCharacterToBook(character)
     table.insert(
         title.elements,
         {
-            templateKey = private.constants.templateKeys.AUTHOR,
+            templateKey = private.constants.bookTemplateKeys.AUTHOR,
             text = author
         }
     )
@@ -197,7 +197,18 @@ function private.Core.Characters.SortCharacters(characters, sortBy, ascending)
 
             return ascending and comparison or not comparison
         end
-    )
+    )    return sortedCharacters
+end
 
-    return sortedCharacters
+--[[
+    Returns an empty book representation for characters
+    @return [table] Empty book display when no character is selected
+]]
+function private.Core.Characters.EmptyBook()
+    return {
+        {
+            template = private.constants.bookTemplateKeys.EMPTY,
+            text = "No character selected"
+        }
+    }
 end

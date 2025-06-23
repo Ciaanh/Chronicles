@@ -2,24 +2,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
 	<Script file="SharedBookTemplate.lua"/>
-
 	<!-- =============================================================================================
 	SHARED BOOK TEMPLATE =============================================================================================
 	
-	Universal book component that can be used for Events, Characters, and Factions.
-	Provides common functionality including:
-	- Paged content display with templates
-	- Book corner animations
-	- Paging controls with hover effects
-	- State management integration
-	- Period filtering
-	- Empty state handling
+	Agnostic book component that displays already-transformed content.
+	Handles UI interactions, paging controls, and state management.
+	No longer requires type-specific implementations - content is provided pre-transformed.
 	
 	USAGE:
-	Inherit from this template and specify the appropriate mixin in your concrete implementations:
-	- EventBookTemplate: inherits="SharedBookTemplate" mixin="EventBookMixin"
-	- CharacterBookTemplate: inherits="SharedBookTemplate" mixin="CharacterBookMixin"  
-	- FactionBookTemplate: inherits="SharedBookTemplate" mixin="FactionBookMixin"
+	Simply inherit from this template using SharedBookMixin and provide content via OnContentReceived().
+	Content should be pre-transformed into book format with proper template keys.
 	
 	CUSTOMIZATION:
 	- Modify background textures by overriding BookBGLeft/BookBGRight

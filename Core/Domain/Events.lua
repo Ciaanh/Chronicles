@@ -97,7 +97,7 @@ local function CreateChapter(title, pages)
 
     if (title ~= nil and title ~= "") then
         chapter.header = {
-            templateKey = private.constants.templateKeys.HEADER,
+            templateKey = private.constants.bookTemplateKeys.HEADER,
             text = title
         }
     end
@@ -107,7 +107,7 @@ local function CreateChapter(title, pages)
             table.insert(
                 chapter.elements,
                 {
-                    templateKey = private.constants.templateKeys.HTML_CONTENT,
+                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
                     text = StringUtils.CleanHTML(text)
                 }
             )
@@ -117,7 +117,7 @@ local function CreateChapter(title, pages)
             local lines = StringUtils.SplitTextToFitWidth(text, private.constants.viewWidth)
             for i, value in ipairs(lines) do
                 local line = {
-                    templateKey = private.constants.templateKeys.TEXT_CONTENT,
+                    templateKey = private.constants.bookTemplateKeys.TEXT_CONTENT,
                     text = value
                 }
 
@@ -148,7 +148,7 @@ function private.Core.Events.TransformEventToBook(event)
 
     local title = {
         header = {
-            templateKey = private.constants.templateKeys.EVENT_TITLE,
+            templateKey = private.constants.bookTemplateKeys.EVENT_TITLE,
             text = event.label,
             yearStart = event.yearStart,
             yearEnd = event.yearEnd
@@ -164,7 +164,7 @@ function private.Core.Events.TransformEventToBook(event)
     table.insert(
         title.elements,
         {
-            templateKey = private.constants.templateKeys.AUTHOR,
+            templateKey = private.constants.bookTemplateKeys.AUTHOR,
             text = author
         }
     )

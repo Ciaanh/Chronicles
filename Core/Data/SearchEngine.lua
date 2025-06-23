@@ -148,9 +148,71 @@ function SearchEngine.cleanEventObject(event, collectionName)
     return cleanEvent
 end
 
+--[[
+    Find a single event by ID and collection name
+    @param eventId [number] Event ID to find
+    @param collectionName [string] Collection name to search in
+    @return [table|nil] Found event or nil if not found
+]]
+function SearchEngine.findEventByIdAndCollection(eventId, collectionName)
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
+        return nil
+    end
+
+    local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
+    if not isCollectionActive then
+        return nil
+    end
+
+    local eventsGroup = chronicles.Data.Events[collectionName]
+    if not eventsGroup or not eventsGroup.data then
+        return nil
+    end
+
+    for _, event in pairs(eventsGroup.data) do
+        if event and event.id == eventId then
+            return SearchEngine.cleanEventObject(event, collectionName)
+        end
+    end
+
+    return nil
+end
+
 -- -------------------------
 -- Faction Search Operations
 -- -------------------------
+
+--[[
+    Find a single faction by ID and collection name
+    @param factionId [number] Faction ID to find
+    @param collectionName [string] Collection name to search in
+    @return [table|nil] Found faction or nil if not found
+]]
+function SearchEngine.findFactionByIdAndCollection(factionId, collectionName)
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
+        return nil
+    end
+
+    local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
+    if not isCollectionActive then
+        return nil
+    end
+
+    local factionsGroup = chronicles.Data.Factions[collectionName]
+    if not factionsGroup or not factionsGroup.data then
+        return nil
+    end
+
+    for _, faction in pairs(factionsGroup.data) do
+        if faction and faction.id == factionId then
+            return SearchEngine.cleanFactionObject(faction, collectionName)
+        end
+    end
+
+    return nil
+end
 
 --[[
     Search for factions by name
@@ -266,6 +328,37 @@ end
 -- -------------------------
 -- Character Search Operations
 -- -------------------------
+
+--[[
+    Find a single character by ID and collection name
+    @param characterId [number] Character ID to find
+    @param collectionName [string] Collection name to search in
+    @return [table|nil] Found character or nil if not found
+]]
+function SearchEngine.findCharacterByIdAndCollection(characterId, collectionName)
+    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
+    if not chronicles or not chronicles.Data then
+        return nil
+    end
+
+    local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
+    if not isCollectionActive then
+        return nil
+    end
+
+    local charactersGroup = chronicles.Data.Characters[collectionName]
+    if not charactersGroup or not charactersGroup.data then
+        return nil
+    end
+
+    for _, character in pairs(charactersGroup.data) do
+        if character and character.id == characterId then
+            return SearchEngine.cleanCharacterObject(character, collectionName)
+        end
+    end
+
+    return nil
+end
 
 --[[
     Search for characters by name

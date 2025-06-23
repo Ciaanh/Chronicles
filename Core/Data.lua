@@ -205,6 +205,13 @@ function Chronicles.Data:CleanEventObject(event, collectionName)
     return private.Core.Data.SearchEngine.cleanEventObject(event, collectionName)
 end
 
+function Chronicles.Data:FindEventByIdAndCollection(eventId, collectionName)
+    if not private.Core.Data or not private.Core.Data.SearchEngine then
+        return nil
+    end
+    return private.Core.Data.SearchEngine.findEventByIdAndCollection(eventId, collectionName)
+end
+
 -- Search factions ----------------------------------------------------------------------
 
 function Chronicles.Data:SearchFactions(name)
@@ -229,6 +236,13 @@ function Chronicles.Data:CleanFactionObject(faction, collectionName)
     return private.Core.Data.SearchEngine.cleanFactionObject(faction, collectionName)
 end
 
+function Chronicles.Data:FindFactionByIdAndCollection(factionId, collectionName)
+    if not private.Core.Data or not private.Core.Data.SearchEngine then
+        return nil
+    end
+    return private.Core.Data.SearchEngine.findFactionByIdAndCollection(factionId, collectionName)
+end
+
 -- Search characters --------------------------------------------------------------------
 
 function Chronicles.Data:SearchCharacters(name)
@@ -251,6 +265,13 @@ function Chronicles.Data:CleanCharacterObject(character, collectionName)
     --return character
     end
     return private.Core.Data.SearchEngine.cleanCharacterObject(character, collectionName)
+end
+
+function Chronicles.Data:FindCharacterByIdAndCollection(characterId, collectionName)
+    if not private.Core.Data or not private.Core.Data.SearchEngine then
+        return nil
+    end
+    return private.Core.Data.SearchEngine.findCharacterByIdAndCollection(characterId, collectionName)
 end
 
 -- -------------------------

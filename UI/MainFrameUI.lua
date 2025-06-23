@@ -81,6 +81,43 @@ MainFrameUIMixin = {}
     and prepares the frame for display.
 ]]
 function MainFrameUIMixin:OnLoad()
+	-- =============================================================================================
+	-- STATE-BASED BOOK CONTENT SUBSCRIPTION
+	-- =============================================================================================
+	-- Subscribe to selection state changes and update book content accordingly.
+	-- This ensures that SharedBookTemplate always receives already-transformed content.
+	
+	if private.Core.StateManager then
+		-- Event selection subscriber
+		local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
+		private.Core.StateManager.subscribe(
+			eventSelectionKey,
+			function(newSelection, oldSelection, key)
+				self:UpdateEventBookContent(newSelection)
+			end,
+			"MainFrameUI_EventBook"
+		)
+		
+		-- Character selection subscriber
+		local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
+		private.Core.StateManager.subscribe(
+			characterSelectionKey,
+			function(newSelection, oldSelection, key)
+				self:UpdateCharacterBookContent(newSelection)
+			end,
+			"MainFrameUI_CharacterBook"
+		)
+		
+		-- Faction selection subscriber
+		local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
+		private.Core.StateManager.subscribe(
+			factionSelectionKey,
+			function(newSelection, oldSelection, key)
+				self:UpdateFactionBookContent(newSelection)
+			end,
+			"MainFrameUI_FactionBook"
+		)
+	end
 end
 
 --[[
@@ -118,6 +155,75 @@ function MainFrameUIMixin:OnHide()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
 		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed")
+	end
+end
+
+-- =============================================================================================
+-- BOOK CONTENT UPDATE METHODS
+-- =============================================================================================
+-- These methods handle the transformation and display of content in SharedBookTemplate instances.
+-- They ensure that content is always transformed before being passed to OnContentReceived.
+
+function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
+	local eventBook = self.TabUI.Events.Book
+	if not eventBook then return end
+	
+	if eventSelection and eventSelection.eventId and eventSelection.collectionName then
+		-- Fetch the event data
+		local event = Chronicles.DB:FindEventByIdAndCollection(eventSelection.eventId, eventSelection.collectionName)
+		if event then
+			-- Transform to book format and display
+			local bookContent = private.Core.Events.TransformEventToBook(event)
+			eventBook:OnContentReceived(bookContent)
+		else
+			-- Show empty state if event not found
+			eventBook:ShowEmptyBook()
+		end
+	else
+		-- Show empty state if no selection
+		eventBook:ShowEmptyBook()
+	end
+end
+
+function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
+	local characterBook = self.TabUI.Characters.Book
+	if not characterBook then return end
+	
+	if characterSelection and characterSelection.characterId and characterSelection.collectionName then
+		-- Fetch the character data
+		local character = Chronicles.DB:FindCharacterByIdAndCollection(characterSelection.characterId, characterSelection.collectionName)
+		if character then
+			-- Transform to book format and display
+			local bookContent = private.Core.Characters.TransformCharacterToBook(character)
+			characterBook:OnContentReceived(bookContent)
+		else
+			-- Show empty state if character not found
+			characterBook:ShowEmptyBook()
+		end
+	else
+		-- Show empty state if no selection
+		characterBook:ShowEmptyBook()
+	end
+end
+
+function MainFrameUIMixin:UpdateFactionBookContent(factionSelection)
+	local factionBook = self.TabUI.Factions.Book
+	if not factionBook then return end
+	
+	if factionSelection and factionSelection.factionId and factionSelection.collectionName then
+		-- Fetch the faction data
+		local faction = Chronicles.DB:FindFactionByIdAndCollection(factionSelection.factionId, factionSelection.collectionName)
+		if faction then
+			-- Transform to book format and display
+			local bookContent = private.Core.Factions.TransformFactionToBook(faction)
+			factionBook:OnContentReceived(bookContent)
+		else
+			-- Show empty state if faction not found
+			factionBook:ShowEmptyBook()
+		end
+	else
+		-- Show empty state if no selection
+		factionBook:ShowEmptyBook()
 	end
 end
 

@@ -4,16 +4,17 @@ private.constants.templates = {
 	[private.constants.templateKeys.EVENTLIST_TITLE] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
 	[private.constants.templateKeys.EVENT_DESCRIPTION] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init},
 	
-	[private.constants.templateKeys.EVENT_TITLE] = {template = "EventTitleTemplate", initFunc = EventTitleMixin.Init},	
-	[private.constants.templateKeys.CHARACTER_TITLE] = {template = "CharacterTitleTemplate", initFunc = CharacterTitleMixin.Init},
-	[private.constants.templateKeys.FACTION_TITLE] = {template = "FactionTitleTemplate", initFunc = FactionTitleMixin.Init},
+	-- Book content templates
+	[private.constants.bookTemplateKeys.EVENT_TITLE] = {template = "EventTitleTemplate", initFunc = EventTitleMixin.Init},	
+	[private.constants.bookTemplateKeys.SIMPLE_TITLE] = {template = "SimpleTitleTemplate", initFunc = SimpleTitleMixin.Init},
 	
 	-- Generic shared template for the new VerticalListTemplate
 	[private.constants.templateKeys.GENERIC_LIST_ITEM] = {template = "VerticalListItemTemplate", initFunc = VerticalListItemMixin.Init},
 	
-	[private.constants.templateKeys.EMPTY] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
-	[private.constants.templateKeys.AUTHOR] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
-	[private.constants.templateKeys.HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
-	[private.constants.templateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
-	[private.constants.templateKeys.HTML_CONTENT] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
+	-- Book page content templates
+	[private.constants.bookTemplateKeys.EMPTY] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
+	[private.constants.bookTemplateKeys.AUTHOR] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
+	[private.constants.bookTemplateKeys.HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
+	[private.constants.bookTemplateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
+	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
 }

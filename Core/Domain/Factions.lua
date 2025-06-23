@@ -32,7 +32,7 @@ function private.Core.Factions.TransformFactionToBook(faction)
     -- Add faction title page
     local title = {
         header = {
-            templateKey = private.constants.templateKeys.FACTION_TITLE or private.constants.templateKeys.HEADER,
+            templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
             text = faction.name,
             yearStart = faction.yearStart,
             yearEnd = faction.yearEnd
@@ -44,12 +44,10 @@ function private.Core.Factions.TransformFactionToBook(faction)
     local author = ""
     if (faction.author ~= nil) then
         author = "Author: " .. faction.author
-    end
-
-    table.insert(
+    end    table.insert(
         title.elements,
         {
-            templateKey = private.constants.templateKeys.AUTHOR,
+            templateKey = private.constants.bookTemplateKeys.AUTHOR,
             text = author
         }
     )
@@ -194,4 +192,9 @@ function private.Core.Factions.SortFactions(factions, sortBy, ascending)
     )
 
     return sortedFactions
+end
+
+function private.Core.Factions.EmptyBook()
+    local data = {}
+    return data
 end

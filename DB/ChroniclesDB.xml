@@ -4,8 +4,6 @@
 	<Script file="ChroniclesDB.lua" />
 	<Script file="01_Sample\SampleEventsDB.lua" />
 
-	<!-- <Script file="02_Origins\OriginsEventsDB.lua" /> -->
-
 	<Script file="14_Future\FutureEventsDB.lua" />
 	<Script file="14_Future\FutureFactionsDB.lua" />
 	<Script file="14_Future\FutureCharactersDB.lua" />

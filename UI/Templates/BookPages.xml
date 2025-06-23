@@ -96,13 +96,36 @@
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
-                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
-                    </SimpleHTML>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>                    </SimpleHTML>
                 </ScrollChild>
                 <Scripts>
                     <OnLoad method="OnLoad"/>
                 </Scripts>
             </ScrollFrame>
         </Frames>
+    </Frame>
+
+    <!-- Simple Title Template - Unified template for characters and factions -->
+    <Frame name="SimpleTitleTemplate" mixin="SimpleTitleMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="510"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+                <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="400" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Title" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
     </Frame>
 </Ui>
