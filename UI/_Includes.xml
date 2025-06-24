@@ -12,10 +12,6 @@
 	<Include file="Events\List\EventListPagingControls.xml" />
 	<Include file="Events\Details\EventBookContentTemplates.xml" />
 
-	<Include file="Characters\Details\CharacterBookContentTemplates.xml" />
-
-	<Include file="Factions\Details\FactionBookContentTemplates.xml" />
-
 	<Include file="Settings\Settings.xml" />
 
 	<Include file="Templates\Templates.lua" />
