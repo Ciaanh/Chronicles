@@ -17,8 +17,8 @@ RPEventsDB = {}
 function Chronicles.Data:Load()
     self:RegisterEventDB("RP", RPEventsDB)
 
-    if (Chronicles.DB ~= nil) then
-        Chronicles.DB:Init()
+    if (ChroniclesPluginData.Register ~= nil) then
+        ChroniclesPluginData.Register()
     end
 
     -- Initialize the cache system
