@@ -13,6 +13,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
                 pages = {Locale["242_page_1"]} }},
             timeline = 1,
             description = nil,
-            image = nil
+            image = "Interface\\AddOns\\Chronicles\\Art\\Images\\NightElfCrest"
         }
     }

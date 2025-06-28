@@ -13,7 +13,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
                 pages = {Locale["239_page_1"]} }},
             timeline = 1,
             description = nil,
-            image = nil,
-            factions = {}
+            image = "Interface\\AddOns\\Chronicles\\Art\\Portrait\\Tyrande",
+            factions = {1}
         }
     }
