@@ -32,6 +32,15 @@ function private.Core.Characters.TransformCharacterToBook(character)
     -- This would create a book format for character display
     local data = {}
 
+    -- Add cover page as first element
+    table.insert(data, {
+        templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
+        name = character.name or "Unknown Character",
+        description = character.description or "No description available.",
+        image = character.image,
+        entityType = "character"
+    })
+
     -- Add character title page
     local title = {
         header = {

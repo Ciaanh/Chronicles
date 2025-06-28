@@ -1,6 +1,8 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("Chronicles", "enUS", true, true)
                 
-        L["209_test_text"] = "Test text"
+        L["240_the_sample_faction"] = "The sample faction"
 
-        L["210_test_bio_text"] = "test bio text"
+        L["241_chapter_1"] = "Chapter 1"
+
+        L["242_page_1"] = "Page 1"

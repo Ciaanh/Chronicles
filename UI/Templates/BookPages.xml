@@ -128,4 +128,67 @@
             </Layer>
         </Layers>
     </Frame>
+
+    <!-- Cover Page Template for Characters and Factions -->
+    <Frame name="CoverPageTemplate" mixin="CoverPageMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="600"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <!-- Decorative background for cover page -->
+                <Texture parentKey="Background" atlas="spellbook-pagebg" useAtlasSize="false">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="20" y="-20"/>
+                        <Anchor point="BOTTOMRIGHT" x="-20" y="20"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+            
+            <Layer level="ARTWORK">
+                <!-- Character/Faction Portrait -->
+                <Texture parentKey="Portrait" useAtlasSize="false">
+                    <Size x="120" y="120"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-60"/>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Portrait Border/Frame -->
+                <Texture parentKey="TypeBorder" useAtlasSize="false">
+                    <Size x="140" y="140"/>
+                    <Anchors>
+                        <Anchor point="CENTER" relativeKey="$parent.Portrait"/>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Entity Name -->
+                <FontString parentKey="Name" inherits="SystemFont_Huge1" justifyH="CENTER">
+                    <Size x="400" y="60"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativeKey="$parent.Portrait" relativePoint="BOTTOM" x="0" y="-30"/>
+                    </Anchors>
+                    <Color color="HIGHLIGHT_FONT_COLOR"/>
+                </FontString>
+                
+                <!-- Decorative separator -->
+                <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="300" y="15"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativeKey="$parent.Name" relativePoint="BOTTOM" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+                
+                <!-- Description Text -->
+                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER" justifyV="TOP">
+                    <Size x="400" y="200"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativeKey="$parent.Separator" relativePoint="BOTTOM" x="0" y="-30"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
 </Ui>

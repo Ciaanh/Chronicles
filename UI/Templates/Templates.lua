@@ -10,9 +10,9 @@ private.constants.templates = {
 	
 	-- Generic shared template for the new VerticalListTemplate
 	[private.constants.templateKeys.GENERIC_LIST_ITEM] = {template = "VerticalListItemTemplate", initFunc = VerticalListItemMixin.Init},
-	
-	-- Book page content templates
+		-- Book page content templates
 	[private.constants.bookTemplateKeys.EMPTY] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
+	[private.constants.bookTemplateKeys.COVER_PAGE] = {template = "CoverPageTemplate", initFunc = CoverPageMixin.Init},
 	[private.constants.bookTemplateKeys.AUTHOR] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
 	[private.constants.bookTemplateKeys.HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
 	[private.constants.bookTemplateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},

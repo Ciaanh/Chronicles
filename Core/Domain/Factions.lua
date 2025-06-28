@@ -29,6 +29,15 @@ function private.Core.Factions.TransformFactionToBook(faction)
 
     local data = {}
 
+    -- Add cover page as first element
+    table.insert(data, {
+        templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
+        name = faction.name or "Unknown Faction",
+        description = faction.description or "No description available.",
+        image = faction.image,
+        entityType = "faction"
+    })
+
     -- Add faction title page
     local title = {
         header = {

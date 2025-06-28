@@ -2,10 +2,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
     <Script file="01_Sample\sample_events_enUS.lua" />
-    <Script file="14_Future\future_events_enUS.lua" />
-    <Script file="14_Future\future_factions_enUS.lua" />
-    <Script file="14_Future\future_characters_enUS.lua" />
-    <Script file="15_Warwithin\warwithin_events_enUS.lua" />
-    <Script file="15_Warwithin\warwithin_characters_enUS.lua" />
-    <Script file="16_Expansions\expansions_events_enUS.lua" />
+    <Script file="01_Sample\sample_factions_enUS.lua" />
+    <Script file="01_Sample\sample_characters_enUS.lua" />
 </Ui>
