@@ -2,11 +2,12 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ../../FrameXML/UI.xsd"
     xmlns="http://www.blizzard.com/wow/ui/">
 
+    <Script file="Constants.lua"/>
+
     <Include file="Libs\_Includes.xml"/>
     <Include file="Locales\Locales.xml"/>
     <Include file="DB\Locales\Locales.xml"/>
-    
-    <Script file="Constants.lua"/>
+
     <Script file="Chronicles.lua"/>
 
     <Include file="Core\_Includes.xml"/>

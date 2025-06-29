@@ -64,7 +64,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
-                        <FontString parentKey="PlaceholderText" inherits="GameFontNormalSmall" text="CHRONICLES_ENTER_YEAR" justifyH="LEFT">
+                        <FontString parentKey="PlaceholderText" inherits="GameFontNormalSmall" justifyH="LEFT">
                             <Anchors>
                                 <Anchor point="LEFT" x="8" y="0" />
                             </Anchors>
@@ -91,7 +91,7 @@
                 </Scripts>
             </EditBox>
             <!-- Search Button -->
-            <Button parentKey="DateSearchButton" inherits="UIPanelButtonTemplate" text="CHRONICLES_GO">
+            <Button parentKey="DateSearchButton" inherits="UIPanelButtonTemplate">
                 <Size x="35" y="25" />
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.DateSearchInput" relativePoint="RIGHT" x="5" y="0" />

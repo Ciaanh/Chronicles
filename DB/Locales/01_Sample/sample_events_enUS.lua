@@ -1,5 +1,6 @@
+local FOLDER_NAME, private = ...
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("Chronicles", "enUS", true, true)
+local L = AceLocale:NewLocale(private.addon_name, "enUS", true, true)
                 
         L["233_sample_event_for_demo"] = "Sample event for demo"
 

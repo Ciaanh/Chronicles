@@ -133,7 +133,3 @@ constants.colors = {
 	Alliance = "|cFF2459FF",
 	Horde = "|cFFFF0000"
 }
-
--- Global string constants for UI (registered with WoW client)
-CHRONICLES_ENTER_YEAR = "Enter year..."
-CHRONICLES_GO = "Go"
