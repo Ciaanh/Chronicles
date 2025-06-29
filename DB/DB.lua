@@ -15,9 +15,10 @@ function ChroniclesPluginData.Register()
 		end
 	end
 
-	if SampleEventsDB then Chronicles.Data:RegisterEventDB("Sample", SampleEventsDB) end
-	if SampleFactionsDB then Chronicles.Data:RegisterFactionDB("Sample", SampleFactionsDB) end
-	if SampleCharactersDB then Chronicles.Data:RegisterCharacterDB("Sample", SampleCharactersDB) end
+	if SampleEventsDB then DataRegistry:RegisterEventDB("Sample", SampleEventsDB) end
+if SampleFactionsDB then DataRegistry:RegisterFactionDB("Sample", SampleFactionsDB) end
+if SampleCharactersDB then DataRegistry:RegisterCharacterDB("Sample", SampleCharactersDB) end
+
 
 	print("|cff00ff00Chronicles:|r Sample data registered successfully")
 end
