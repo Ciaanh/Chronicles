@@ -96,7 +96,8 @@
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
-                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>                    </SimpleHTML>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
+                    </SimpleHTML>
                 </ScrollChild>
                 <Scripts>
                     <OnLoad method="OnLoad"/>
@@ -145,33 +146,17 @@
                     </Anchors>
                 </Texture>
             </Layer>
-            
+
             <Layer level="ARTWORK">
-                <!-- Character/Faction Portrait -->
-                <Texture parentKey="Portrait" useAtlasSize="false">
-                    <Size x="120" y="120"/>
-                    <Anchors>
-                        <Anchor point="TOP" x="0" y="-60"/>
-                    </Anchors>
-                </Texture>
-                
-                <!-- Portrait Border/Frame -->
-                <Texture parentKey="TypeBorder" useAtlasSize="false">
-                    <Size x="140" y="140"/>
-                    <Anchors>
-                        <Anchor point="CENTER" relativeKey="$parent.Portrait"/>
-                    </Anchors>
-                </Texture>
-                
                 <!-- Entity Name -->
                 <FontString parentKey="Name" inherits="SystemFont_Huge1" justifyH="CENTER">
                     <Size x="400" y="60"/>
                     <Anchors>
-                        <Anchor point="TOP" relativeKey="$parent.Portrait" relativePoint="BOTTOM" x="0" y="-30"/>
+                        <Anchor point="TOP" x="0" y="-60"/>
                     </Anchors>
                     <Color color="HIGHLIGHT_FONT_COLOR"/>
                 </FontString>
-                
+
                 <!-- Decorative separator -->
                 <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
                     <Size x="300" y="15"/>
@@ -179,7 +164,7 @@
                         <Anchor point="TOP" relativeKey="$parent.Name" relativePoint="BOTTOM" x="0" y="-20"/>
                     </Anchors>
                 </Texture>
-                
+
                 <!-- Description Text -->
                 <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER" justifyV="TOP">
                     <Size x="400" y="200"/>

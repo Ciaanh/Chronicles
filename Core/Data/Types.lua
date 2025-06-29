@@ -40,11 +40,10 @@ private.Core.Data.Types = {}
         id = [integer]                      -- Unique identifier for the character
         name = [string]                     -- Character name
         chapters = { [chapter] }            -- Character chapters/content (array of chapter objects)
-        yearStart = [integer]               -- Birth/first appearance year
-        yearEnd = [integer]                 -- Death/last appearance year (optional)
         timeline = [integer]                -- Timeline ID this character belongs to
         factions = { [faction] }            -- Associated factions (array of faction objects)
         author = [string]                   -- Author of the character entry
+        description = [string]              -- Character description
     }
 --]]
 --[[
@@ -53,10 +52,9 @@ private.Core.Data.Types = {}
         id = [integer]              -- Unique identifier for the faction
         name = [string]             -- Faction name
         chapters = { [chapter] }    -- Faction chapters/content (array of chapter objects)
-        yearStart = [integer]       -- Foundation/first appearance year
-        yearEnd = [integer]         -- Dissolution/last appearance year (optional)
         timeline = [integer]        -- Timeline ID this faction belongs to
         author = [string]           -- Author of the faction entry
+        description = [string]      -- Faction description
     }
 --]]
 --[[
@@ -168,18 +166,6 @@ function Types.IsValidCharacter(character)
         return false, "Character chapters must be an array"
     end
 
-    if character.yearStart and type(character.yearStart) ~= "number" then
-        return false, "Character yearStart must be a number"
-    end
-
-    if character.yearEnd and type(character.yearEnd) ~= "number" then
-        return false, "Character yearEnd must be a number"
-    end
-
-    if character.yearStart and character.yearEnd and character.yearStart > character.yearEnd then
-        return false, "Character yearStart cannot be greater than yearEnd"
-    end
-
     if character.timeline and type(character.timeline) ~= "number" then
         return false, "Character timeline must be a number"
     end
@@ -218,18 +204,6 @@ function Types.IsValidFaction(faction)
     -- Validate optional fields if present
     if faction.chapters and type(faction.chapters) ~= "table" then
         return false, "Faction chapters must be an array"
-    end
-
-    if faction.yearStart and type(faction.yearStart) ~= "number" then
-        return false, "Faction yearStart must be a number"
-    end
-
-    if faction.yearEnd and type(faction.yearEnd) ~= "number" then
-        return false, "Faction yearEnd must be a number"
-    end
-
-    if faction.yearStart and faction.yearEnd and faction.yearStart > faction.yearEnd then
-        return false, "Faction yearStart cannot be greater than yearEnd"
     end
 
     if faction.timeline and type(faction.timeline) ~= "number" then

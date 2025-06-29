@@ -83,24 +83,22 @@ constants.events = {
 constants.templateKeys = {
 	EVENTLIST_TITLE = "EVENTLIST_TITLE",
 	EVENT_DESCRIPTION = "EVENT_DESCRIPTION",
-	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM", -- For the shared vertical list template
+	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM" -- For the shared vertical list template
 }
 
 -- Book-specific template keys used in the SharedBookTemplate system
 constants.bookTemplateKeys = {
 	-- Title templates for different content types
-	EVENT_TITLE = "EVENT_TITLE",        -- Complex title with date ranges
-	SIMPLE_TITLE = "SIMPLE_TITLE",      -- Simple title for characters and factions
-	
+	EVENT_TITLE = "EVENT_TITLE", -- Complex title with date ranges
+	SIMPLE_TITLE = "SIMPLE_TITLE", -- Simple title for characters and factions
 	-- Cover page template
-	COVER_PAGE = "COVER_PAGE",           -- Cover page with image, name, and description
-	
+	COVER_PAGE = "COVER_PAGE", -- Cover page with name, and description
 	-- Content structure templates
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",
-	HEADER = "HEADER",  -- For chapter headers
-	TEXT_CONTENT = "TEXT_CONTENT",  -- For regular text lines
-	HTML_CONTENT = "HTML_CONTENT"   -- For HTML formatted content
+	CHAPTER_HEADER = "CHAPTER_HEADER", -- For chapter headers
+	TEXT_CONTENT = "TEXT_CONTENT", -- For regular text lines
+	HTML_CONTENT = "HTML_CONTENT" -- For HTML formatted content
 }
 
 constants.colors = {

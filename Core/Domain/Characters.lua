@@ -1,8 +1,10 @@
 local FOLDER_NAME, private = ...
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Characters = {}
 
 -- Import utilities
+local BookUtils = private.Core.Utils.BookUtils
 local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
@@ -12,11 +14,10 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     id = [integer]					-- Id of the character
     name = [string]				    -- Character name
     chapters = { [chapter] }		-- Character chapters/content
-    yearStart = [integer]			-- Birth/first appearance year
-    yearEnd = [integer]				-- Death/last appearance year
     timeline = [integer]			-- Timeline ID
     factions = { [faction] }		-- Associated factions
     author = [string]				-- Author of the character entry
+    description = [string]          -- Character description
 ]]
 --[[
     Transform the character into a book
@@ -24,50 +25,22 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     @return [table] Book representation of the character
 ]]
 function private.Core.Characters.TransformCharacterToBook(character)
-    if (character == nil) then
+    if not character then
         return nil
     end
 
-    -- Implementation similar to Events.TransformEventToBook
-    -- This would create a book format for character display
-    local data = {}
-
-    -- Add cover page as first element
-    table.insert(data, {
-        templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
-        name = character.name or "Unknown Character",
-        description = character.description or "No description available.",
-        image = character.image,
-        entityType = "character"
-    })
-
-    -- Add character title page
-    local title = {
-        header = {
-            templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
-            text = character.name,
-            yearStart = character.yearStart,
-            yearEnd = character.yearEnd
-        },
-        elements = {}
-    }
-
-    -- Add author information if available
-    local author = ""
-    if (character.author ~= nil) then
-        author = "Author: " .. character.author
+    if not BookUtils then
+        -- Fallback implementation if BookUtils isn't loaded
+        return {
+            {
+                templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
+                text = character.name or "Unknown Character"
+            }
+        }
     end
 
-    table.insert(
-        title.elements,
-        {
-            templateKey = private.constants.bookTemplateKeys.AUTHOR,
-            text = author
-        }
-    )
-    table.insert(data, title)
-
-    return data
+    local result = BookUtils.TransformCharacterToBook(character)
+    return result
 end
 
 --[[
@@ -94,37 +67,6 @@ function private.Core.Characters.GetCharactersByFaction(characters, factionId)
                 end
             end
             return false
-        end
-    )
-end
-
---[[
-    Get characters within a year range (active during that period)
-    @param characters [table] List of characters
-    @param startYear [number] Start year of range
-    @param endYear [number] End year of range
-    @return [table] Characters active within the year range
-]]
-function private.Core.Characters.GetCharactersByYearRange(characters, startYear, endYear)
-    if
-        not ValidationUtils.IsValidTable(characters) or not ValidationUtils.IsValidYear(startYear) or
-            not ValidationUtils.IsValidYear(endYear)
-     then
-        return {}
-    end
-
-    return TableUtils.Filter(
-        characters,
-        function(character)
-            if not ValidationUtils.IsValidCharacter(character) then
-                return false
-            end
-
-            -- Check if character was active during the year range
-            local charStart = character.yearStart or startYear
-            local charEnd = character.yearEnd or endYear
-
-            return not (charEnd < startYear or charStart > endYear)
         end
     )
 end
@@ -181,13 +123,13 @@ function private.Core.Characters.SortCharacters(characters, sortBy, ascending)
 
             if sortBy == "name" then
                 comparison = a.name < b.name
-            elseif sortBy == "year" then
-                local aYear = a.yearStart or 0
-                local bYear = b.yearStart or 0
-                if aYear == bYear then
+            elseif sortBy == "timeline" then
+                local aTimeline = a.timeline or 0
+                local bTimeline = b.timeline or 0
+                if aTimeline == bTimeline then
                     comparison = a.name < b.name
                 else
-                    comparison = aYear < bYear
+                    comparison = aTimeline < bTimeline
                 end
             elseif sortBy == "faction" then
                 local aFaction =
@@ -206,7 +148,8 @@ function private.Core.Characters.SortCharacters(characters, sortBy, ascending)
 
             return ascending and comparison or not comparison
         end
-    )    return sortedCharacters
+    )
+    return sortedCharacters
 end
 
 --[[
@@ -216,7 +159,7 @@ end
 function private.Core.Characters.EmptyBook()
     return {
         {
-            template = private.constants.bookTemplateKeys.EMPTY,
+            templateKey = private.constants.bookTemplateKeys.EMPTY,
             text = "No character selected"
         }
     }

@@ -1,9 +1,11 @@
 local FOLDER_NAME, private = ...
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Factions = {}
 
 -- Import utilities
-local StringUtils = private.Core.Utils.StringUtils
+local BookUtils = private.Core.Utils.BookUtils
+--local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
 
@@ -12,10 +14,9 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     id = [integer]					-- Id of the faction
     name = [string]				    -- Faction name
     chapters = { [chapter] }		-- Faction chapters/content
-    yearStart = [integer]			-- Foundation/first appearance year
-    yearEnd = [integer]				-- Dissolution/last appearance year (optional)
     timeline = [integer]			-- Timeline ID
     author = [string]				-- Author of the faction entry
+    description = [string]          -- Faction description
 ]]
 --[[
     Transform the faction into a book
@@ -23,46 +24,22 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     @return [table] Book representation of the faction
 ]]
 function private.Core.Factions.TransformFactionToBook(faction)
-    if (faction == nil) then
+    if not faction then
         return nil
     end
 
-    local data = {}
-
-    -- Add cover page as first element
-    table.insert(data, {
-        templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
-        name = faction.name or "Unknown Faction",
-        description = faction.description or "No description available.",
-        image = faction.image,
-        entityType = "faction"
-    })
-
-    -- Add faction title page
-    local title = {
-        header = {
-            templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
-            text = faction.name,
-            yearStart = faction.yearStart,
-            yearEnd = faction.yearEnd
-        },
-        elements = {}
-    }
-
-    -- Add author information if available
-    local author = ""
-    if (faction.author ~= nil) then
-        author = "Author: " .. faction.author
-    end    table.insert(
-        title.elements,
-        {
-            templateKey = private.constants.bookTemplateKeys.AUTHOR,
-            text = author
+    if not BookUtils then
+        -- Fallback implementation if BookUtils isn't loaded
+        return {
+            {
+                templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
+                text = faction.name or "Unknown Faction"
+            }
         }
-    )
-    table.insert(data, title)
+    end
 
-    return data
+    local result = BookUtils.TransformFactionToBook(faction)
+    return result
 end
 
 --[[
@@ -80,37 +57,6 @@ function private.Core.Factions.GetFactionsByTimeline(factions, timelineId)
         factions,
         function(faction)
             return ValidationUtils.IsValidFaction(faction) and faction.timeline == timelineId
-        end
-    )
-end
-
---[[
-    Get factions within a year range (active during that period)
-    @param factions [table] List of factions
-    @param startYear [number] Start year of range
-    @param endYear [number] End year of range
-    @return [table] Factions active within the year range
-]]
-function private.Core.Factions.GetFactionsByYearRange(factions, startYear, endYear)
-    if
-        not ValidationUtils.IsValidTable(factions) or not ValidationUtils.IsValidYear(startYear) or
-            not ValidationUtils.IsValidYear(endYear)
-     then
-        return {}
-    end
-
-    return TableUtils.Filter(
-        factions,
-        function(faction)
-            if not ValidationUtils.IsValidFaction(faction) then
-                return false
-            end
-
-            -- Check if faction was active during the year range
-            local factionStart = faction.yearStart or startYear
-            local factionEnd = faction.yearEnd or endYear
-
-            return not (factionEnd < startYear or factionStart > endYear)
         end
     )
 end
@@ -167,13 +113,13 @@ function private.Core.Factions.SortFactions(factions, sortBy, ascending)
 
             if sortBy == "name" then
                 comparison = a.name < b.name
-            elseif sortBy == "year" then
-                local aYear = a.yearStart or 0
-                local bYear = b.yearStart or 0
-                if aYear == bYear then
+            elseif sortBy == "timeline" then
+                local aTimeline = a.timeline or 0
+                local bTimeline = b.timeline or 0
+                if aTimeline == bTimeline then
                     comparison = a.name < b.name
                 else
-                    comparison = aYear < bYear
+                    comparison = aTimeline < bTimeline
                 end
             elseif sortBy == "type" then
                 local aType = a.factionType or ""

@@ -321,6 +321,8 @@ function SearchEngine.cleanFactionObject(faction, collectionName)
         name = faction.name,
         chapters = faction.chapters,
         timeline = faction.timeline,
+        author = faction.author,
+        description = faction.description,
         source = collectionName
     }
 end
@@ -469,6 +471,7 @@ function SearchEngine.cleanCharacterObject(character, collectionName)
         timeline = character.timeline,
         factions = character.factions or {},
         author = character.author,
+        description = character.description,
         source = collectionName
     }
 end

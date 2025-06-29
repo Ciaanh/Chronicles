@@ -23,6 +23,14 @@ SharedBookMixin = {}
 -- =============================================================================================
 
 function SharedBookMixin:OnLoad()
+	if not private.constants.templates then
+		return
+	end
+
+	if not self.PagedDetails then
+		return
+	end
+
 	self.PagedDetails:SetElementTemplateData(private.constants.templates)
 
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
@@ -71,7 +79,7 @@ end
 function SharedBookMixin:ShowEmptyBook()
 	local emptyContent = {
 		{
-			template = private.constants.bookTemplateKeys.EMPTY,
+			templateKey = private.constants.bookTemplateKeys.EMPTY,
 			text = "No content available"
 		}
 	}

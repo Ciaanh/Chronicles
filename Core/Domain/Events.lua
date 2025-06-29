@@ -53,6 +53,7 @@ Dependencies:
 private.Core.Events = {}
 
 -- Import utilities
+local BookUtils = private.Core.Utils.BookUtils
 local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
@@ -75,110 +76,19 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     header = [integer]				-- Title of the chapter
     pages = { [string] }			-- Content of the chapter, either text or HTML
 ]]
---[[
-    Transform title and pages into a structured chapter object for UI rendering
-    
-    This function processes raw chapter content and creates a structured object
-    with proper template keys for the UI rendering system. It handles both
-    text and HTML content, applying appropriate template mappings.
-    
-    @param title string|nil - Title of the chapter (optional)
-    @param pages table - Array of content strings (text or HTML)
-    @return table - Chapter object with header and elements array
-    @example
-        local chapter = CreateChapter("The Fall of Lordaeron", {
-            "Prince Arthas returned from Northrend...",
-            "<h2>The Culling of Stratholme</h2><p>Desperate times...</p>"
-        })
-        -- Returns: { header = {...}, elements = { {...}, {...} } }
-]]
-local function CreateChapter(title, pages)
-    local chapter = {elements = {}}
-
-    if (title ~= nil and title ~= "") then
-        chapter.header = {
-            templateKey = private.constants.bookTemplateKeys.HEADER,
-            text = title
-        }
-    end
-
-    for key, text in pairs(pages) do
-        if (StringUtils.ContainsHTML(text)) then
-            table.insert(
-                chapter.elements,
-                {
-                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                    text = StringUtils.CleanHTML(text)
-                }
-            )
-        else
-            -- transform text => adjust line to width
-            -- then for each line add itemEntry
-            local lines = StringUtils.SplitTextToFitWidth(text, private.constants.viewWidth)
-            for i, value in ipairs(lines) do
-                local line = {
-                    templateKey = private.constants.bookTemplateKeys.TEXT_CONTENT,
-                    text = value
-                }
-
-                table.insert(chapter.elements, line)
-            end
-        end
-    end
-
-    return chapter
-end
-
 function private.Core.Events.EmptyBook()
     local data = {}
-
     return data
 end
 
 --[[
-	Transform the event into a book
-	@param event [event]]
---]]
+    Transform the event into a book
+    @param event [event] Event object
+    @return [table] Book representation of the event
+]]
 function private.Core.Events.TransformEventToBook(event)
-    if (event == nil) then
-        return nil
-    end
-
-    local data = {}
-
-    local title = {
-        header = {
-            templateKey = private.constants.bookTemplateKeys.EVENT_TITLE,
-            text = event.label,
-            yearStart = event.yearStart,
-            yearEnd = event.yearEnd
-        },
-        elements = {}
-    }
-
-    local author = ""
-    if (event.author ~= nil) then
-        author = Locale["Author"] .. event.author
-    end
-
-    table.insert(
-        title.elements,
-        {
-            templateKey = private.constants.bookTemplateKeys.AUTHOR,
-            text = author
-        }
-    )
-    table.insert(data, title)
-
-    local chaptersLength = #event.chapters
-    if chaptersLength > 0 then
-        for key, chapter in pairs(event.chapters) do
-            local bookChapter = CreateChapter(chapter.header, chapter.pages)
-            table.insert(data, bookChapter)
-        end
-    end
-
-    return data
+    -- Events don't use cover pages, only title pages
+    return BookUtils.TransformEventToBook(event)
 end
 
 --[[

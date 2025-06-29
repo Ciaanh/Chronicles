@@ -131,20 +131,11 @@ function CoverPageMixin:Init(elementData)
     if elementData.name then
         self.Name:SetText(elementData.name)
     end
-    
+
     if elementData.description then
         self.Description:SetText(elementData.description)
     end
-    
-    if elementData.image then
-        -- Set the cover image
-        self.Portrait:SetTexture(elementData.image)
-        self.Portrait:Show()
-    else
-        -- Hide portrait if no image provided
-        self.Portrait:Hide()
-    end
-    
+
     -- Set type-specific styling
     if elementData.entityType == "character" then
         self.TypeBorder:SetAtlas("charactercreate-ring")
