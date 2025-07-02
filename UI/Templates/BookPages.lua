@@ -124,22 +124,141 @@ function SimpleTitleMixin:Init(elementData)
     if elementData.text then
         self.Title:SetText(elementData.text)
     end
+
+    -- Set author (hide if not present)
+    if elementData.author and elementData.author ~= "" then
+        self.Author:SetText(elementData.author)
+        self.Author:Show()
+    else
+        self.Author:SetText("")
+        self.Author:Hide()
+    end
 end
 
 CoverPageMixin = {}
 function CoverPageMixin:Init(elementData)
+    -- Set entity name
     if elementData.name then
         self.Name:SetText(elementData.name)
     end
 
-    if elementData.description then
-        self.Description:SetText(elementData.description)
+    -- Set author
+    if elementData.author and elementData.author ~= "" then
+        self.Author:SetText(elementData.author)
+        self.Author:Show()
+    else
+        self.Author:Hide()
     end
 
-    -- Set type-specific styling
-    if elementData.entityType == "character" then
-        self.TypeBorder:SetAtlas("charactercreate-ring")
-    elseif elementData.entityType == "faction" then
-        self.TypeBorder:SetAtlas("UI-Frame-Metal")
+    -- Set portrait/image
+    if elementData.image and elementData.image ~= "" then
+        self.Portrait:SetTexture(elementData.image)
+        self.Portrait:Show()
+    else
+        self.Portrait:Hide()
+    end
+
+    -- Handle description
+    if elementData.text and elementData.text ~= "" then
+        -- Calculate available height for description
+        local totalHeight = 550
+        local portraitHeight = 128 + 20 + 10 -- portrait + top margin + bottom spacing
+        local nameHeight = 60 + 10 -- name height + bottom spacing
+        local authorHeight = 25 -- author height
+        local availableHeight = totalHeight - portraitHeight - nameHeight - authorHeight - 20 -- extra padding
+
+        -- Check if content is HTML using the StringUtils helper if available
+        local isHTML = false
+        if
+            private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
+                private.Core.Utils.StringUtils.ContainsHTML
+         then
+            isHTML = private.Core.Utils.StringUtils.ContainsHTML(elementData.text)
+        else
+            -- Fallback: simple HTML detection
+            isHTML = string.find(elementData.text, "<[^>]+>") ~= nil
+        end
+
+        if isHTML then
+            -- Use HTML ScrollFrame for HTML content
+            self.Description:Hide()
+            self.DescriptionScrollFrame:Show()
+            self.DescriptionScrollFrame:SetHeight(availableHeight)
+
+            -- Clean HTML if utility is available
+            local cleanText = elementData.text
+            if
+                private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
+                    private.Core.Utils.StringUtils.CleanHTML
+             then
+                cleanText = private.Core.Utils.StringUtils.CleanHTML(elementData.text)
+            end
+
+            self.DescriptionScrollFrame.HTML:SetText(cleanText)
+        else
+            -- Use simple FontString for text content
+            self.DescriptionScrollFrame:Hide()
+            self.Description:Show()
+            self.Description:SetHeight(availableHeight)
+            self.Description:SetText(elementData.text)
+        end
+    else
+        -- Hide both description elements if no text
+        self.Description:Hide()
+        self.DescriptionScrollFrame:Hide()
+    end
+end
+
+CoverDescriptionMixin = {}
+function CoverDescriptionMixin:Init(elementData)
+    if elementData.text then
+        self.Description:SetText(elementData.text)
+    end
+end
+
+EventTitleMixin = {}
+function EventTitleMixin:Init(elementData)
+    if elementData.text then
+        self.Title:SetText(elementData.text)
+        self.Title:Show()
+    else
+        self.Title:SetText("")
+        self.Title:Hide()
+    end
+
+    -- Set author (hide if not present)
+    if elementData.author and elementData.author ~= "" then
+        self.Author:SetText(elementData.author)
+        self.Author:Show()
+    else
+        self.Author:SetText("")
+        self.Author:Hide()
+    end
+
+    -- Set dates
+    if elementData.yearStart and private.constants.config.currentYear < elementData.yearStart then
+        self.Dates:SetText("")
+        self.Dates:Hide()
+        return
+    end
+
+    if elementData.yearEnd and elementData.yearEnd < private.constants.config.historyStartYear then
+        self.Dates:SetText("")
+        self.Dates:Hide()
+        return
+    end
+
+    if elementData.yearStart and elementData.yearEnd then
+        local dateText
+        if elementData.yearStart == elementData.yearEnd then
+            dateText = tostring(elementData.yearStart)
+        else
+            dateText = tostring(elementData.yearStart) .. " - " .. tostring(elementData.yearEnd)
+        end
+        self.Dates:SetText(dateText)
+        self.Dates:Show()
+    else
+        self.Dates:SetText("")
+        self.Dates:Hide()
     end
 end

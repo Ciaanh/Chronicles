@@ -11,6 +11,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
                 pages = {Locale["239_page_1"]} }},
             timeline = 1,
             description = Locale["243_this_is_a_character_description"],
+            image = "Interface\\AddOns\\Chronicles\\Art\\Portrait\\Tyrande",
             factions = {1}
         }
     }

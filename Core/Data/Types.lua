@@ -44,6 +44,7 @@ private.Core.Data.Types = {}
         factions = { [faction] }            -- Associated factions (array of faction objects)
         author = [string]                   -- Author of the character entry
         description = [string]              -- Character description
+        image = [string]                    -- Character portrait/image path
     }
 --]]
 --[[
@@ -55,6 +56,7 @@ private.Core.Data.Types = {}
         timeline = [integer]        -- Timeline ID this faction belongs to
         author = [string]           -- Author of the faction entry
         description = [string]      -- Faction description
+        image = [string]            -- Faction image/crest path
     }
 --]]
 --[[
@@ -178,6 +180,14 @@ function Types.IsValidCharacter(character)
         return false, "Character author must be a string"
     end
 
+    if character.description and type(character.description) ~= "string" then
+        return false, "Character description must be a string"
+    end
+
+    if character.image and type(character.image) ~= "string" then
+        return false, "Character image must be a string"
+    end
+
     return true, nil
 end
 
@@ -212,6 +222,14 @@ function Types.IsValidFaction(faction)
 
     if faction.author and type(faction.author) ~= "string" then
         return false, "Faction author must be a string"
+    end
+
+    if faction.description and type(faction.description) ~= "string" then
+        return false, "Faction description must be a string"
+    end
+
+    if faction.image and type(faction.image) ~= "string" then
+        return false, "Faction image must be a string"
     end
 
     return true, nil

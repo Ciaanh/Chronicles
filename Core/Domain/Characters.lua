@@ -18,6 +18,7 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     factions = { [faction] }		-- Associated factions
     author = [string]				-- Author of the character entry
     description = [string]          -- Character description
+    image = [string]                -- Character portrait/image path
 ]]
 --[[
     Transform the character into a book

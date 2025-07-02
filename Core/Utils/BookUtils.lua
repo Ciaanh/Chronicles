@@ -10,39 +10,17 @@ local StringUtils = private.Core.Utils.StringUtils
 
 --[[
     Create a cover page that follows the standard header/elements structure
-    @param entity table - The entity object with name, description
+    @param entity table - The entity object with name, description, image
     @return table - Cover page with header and scrollable elements
 ]]
 local function CreateCoverPage(entity)
     local coverPage = {
-        header = {
-            templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
-            text = entity.name or entity.label or "Unknown Entity"
-        },
-        elements = {}
+        templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
+        name = entity.name or entity.label or "Unknown Entity",
+        author = entity.author and (Locale["Author"] .. entity.author) or nil,
+        text = entity.description or nil,  -- Include description directly
+        image = entity.image or nil        -- Include image directly
     }
-
-    -- Add description as a scrollable HTML element if available
-    if entity.description and entity.description ~= "" then
-        table.insert(
-            coverPage.elements,
-            {
-                templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                text = entity.description
-            }
-        )
-    end
-
-    -- Add author information if available
-    if entity.author and entity.author ~= "" then
-        table.insert(
-            coverPage.elements,
-            {
-                templateKey = private.constants.bookTemplateKeys.AUTHOR,
-                text = Locale["Author"] .. entity.author
-            }
-        )
-    end
 
     return coverPage
 end
@@ -117,41 +95,33 @@ function private.Core.Utils.BookUtils.TransformEntityToBook(entity)
     local data = {}
 
     -- Determine if we should create a cover page or title page
-    local shouldUseCoverPage = (entity.description and entity.description ~= "")
+    local shouldUseCoverPage =
+        (entity.description and entity.description ~= "") or (entity.image and entity.image ~= "")
 
     if shouldUseCoverPage then
-        -- Create cover page with header/elements structure
+        -- Create cover page as a direct element, not with header/elements structure
         local coverPage = CreateCoverPage(entity)
-        table.insert(data, coverPage)
+        table.insert(data, {
+            elements = { coverPage }
+        })
     else
-        -- Create traditional title page
+        -- Create traditional title page as a direct element, not with header/elements structure
         local titleTemplateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE
         if entity.yearStart or entity.yearEnd then
             titleTemplateKey = private.constants.bookTemplateKeys.EVENT_TITLE
         end
 
-        local title = {
-            header = {
-                templateKey = titleTemplateKey,
-                text = entity.name or entity.label or "Unknown Entity",
-                yearStart = entity.yearStart,
-                yearEnd = entity.yearEnd
-            },
-            elements = {}
+        local titleElement = {
+            templateKey = titleTemplateKey,
+            text = entity.name or entity.label or "Unknown Entity",
+            yearStart = entity.yearStart,
+            yearEnd = entity.yearEnd,
+            author = entity.author and (Locale["Author"] .. entity.author) or nil
         }
 
-        -- Add author information if available
-        if entity.author and entity.author ~= "" then
-            table.insert(
-                title.elements,
-                {
-                    templateKey = private.constants.bookTemplateKeys.AUTHOR,
-                    text = Locale["Author"] .. entity.author
-                }
-            )
-        end
-
-        table.insert(data, title)
+        table.insert(data, {
+            elements = { titleElement }
+        })
     end
 
     -- Process chapters if available (same as before)

@@ -92,7 +92,9 @@ constants.bookTemplateKeys = {
 	EVENT_TITLE = "EVENT_TITLE", -- Complex title with date ranges
 	SIMPLE_TITLE = "SIMPLE_TITLE", -- Simple title for characters and factions
 	-- Cover page template
-	COVER_PAGE = "COVER_PAGE", -- Cover page with name, and description
+	COVER_PAGE = "COVER_PAGE", -- Cover page with name only
+	COVER_IMAGE = "COVER_IMAGE", -- Cover page image element
+	COVER_DESCRIPTION = "COVER_DESCRIPTION", -- Cover page description element
 	-- Content structure templates
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",

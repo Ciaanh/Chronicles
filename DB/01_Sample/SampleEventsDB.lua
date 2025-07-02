@@ -15,5 +15,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
             order=0,
             characters={},
             factions={},
+            author = "Ciaanh",
         }
     }

@@ -17,6 +17,7 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     timeline = [integer]			-- Timeline ID
     author = [string]				-- Author of the faction entry
     description = [string]          -- Faction description
+    image = [string]                -- Faction image/crest path
 ]]
 --[[
     Transform the faction into a book
