@@ -169,16 +169,6 @@
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Layers>
-            <Layer level="BACKGROUND">
-                <!-- Type-specific border -->
-                <!-- <Texture parentKey="TypeBorder" atlas="spellbook-background-evergreen-left" useAtlasSize="false">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="10" y="-10"/>
-                        <Anchor point="BOTTOMRIGHT" x="-10" y="10"/>
-                    </Anchors>
-                </Texture> -->
-            </Layer>
-
             <Layer level="ARTWORK">
                 <!-- Portrait/Image -->
                 <Texture parentKey="Portrait">
