@@ -1,20 +1,25 @@
 # Chronicles Addon Changelog
 
-## v2.0.0 (May 23, 2025)
+## v2.0.0 (July 7, 2025)
+- Refactored VerticalListTemplate to pass stateManagerKey directly to each item, improving state management and reducing bugs
+- Enhanced dynamic timeline event display, including event-driven state synchronization and suffix validation for timeline labels/periods
+- Improved UI templates for event lists: consistent bookmark-style visuals and tooltip enhancements
+- Added and improved pagination logic for timeline and event lists for smoother navigation
+- Fixed issues with event type filtering and settings event handling
+- Updated and expanded README with technical architecture and feature documentation
+- General codebase cleanup for maintainability and compatibility with WoW 11.0.2
 - Add detailed README with project documentation
-- Refactor book display system
-- Add container for character list
-- Add image for timeline label
-- Handle timeline period background image by event count
+- Refactor book display system for better modularity
+- Add container for character list in UI
+- Add image support for timeline labels
+- Handle timeline period background images based on event count
 - Improve timeline navigation with variable zoom levels (1000, 500, 250, 100, 50, 10 years)
-- Fix issues with event type filtering
 - Improve settings panel and menu structure
-- Add bookmarks for events
-- Implement pagination for event lists
-- Update UI to use The War Within assets
+- Add bookmarks for events and consistent bookmark-style visuals
+- Implement pagination for event lists and timeline
 - Switch to new UI system as default
 - Update database structure (renamed Chronicles.DB to Chronicles.Data)
-- Update for WoW 11.0.2
+- Update for WoW 11.0.2 and The War Within assets
 
 ## v1.3.0 (November 2022)
 - Populate basic data for the period before the Dark Portal

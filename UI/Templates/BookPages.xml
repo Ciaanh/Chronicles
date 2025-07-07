@@ -169,6 +169,11 @@
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Layers>
+
+            <Layer level="BACKGROUND">
+                
+            </Layer>
+
             <Layer level="ARTWORK">
                 <!-- Portrait/Image -->
                 <Texture parentKey="Portrait">

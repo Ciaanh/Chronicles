@@ -10,5 +10,6 @@
 ## OptionalDeps: totalRP3, MyRolePlay
 ## X-License: MIT
 ## X-Category: Data
+## X-Curse-Project-ID: 358172
 
 Chronicles.xml
