@@ -263,6 +263,8 @@ function TabUIMixin:OnLoad()
 
 	self.frameTabsToTabID = {
 		[TabUIMixin.FrameTabs.Events] = self.EventsTabID,
+		[TabUIMixin.FrameTabs.Characters] = self.CharactersTabID,
+		[TabUIMixin.FrameTabs.Factions] = self.FactionsTabID,
 		[TabUIMixin.FrameTabs.Settings] = self.SettingsTabID
 	}
 end
