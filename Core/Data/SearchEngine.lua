@@ -323,6 +323,7 @@ function SearchEngine.cleanFactionObject(faction, collectionName)
         timeline = faction.timeline,
         author = faction.author,
         description = faction.description,
+        image = faction.image,
         source = collectionName
     }
 end
@@ -472,6 +473,7 @@ function SearchEngine.cleanCharacterObject(character, collectionName)
         factions = character.factions or {},
         author = character.author,
         description = character.description,
+        image = character.image,
         source = collectionName
     }
 end

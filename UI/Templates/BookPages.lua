@@ -154,6 +154,7 @@ function CoverPageMixin:Init(elementData)
     if elementData.image and elementData.image ~= "" then
         self.Portrait:SetTexture(elementData.image)
         self.Portrait:Show()
+        self.Portrait:SetAlpha(1)
     else
         self.Portrait:Hide()
     end

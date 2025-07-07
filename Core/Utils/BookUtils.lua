@@ -18,8 +18,8 @@ local function CreateCoverPage(entity)
         templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
         name = entity.name or entity.label or "Unknown Entity",
         author = entity.author and (Locale["Author"] .. entity.author) or nil,
-        text = entity.description or nil,  -- Include description directly
-        image = entity.image or nil        -- Include image directly
+        text = entity.description or nil,
+        image = entity.image or nil
     }
 
     return coverPage
@@ -101,9 +101,12 @@ function private.Core.Utils.BookUtils.TransformEntityToBook(entity)
     if shouldUseCoverPage then
         -- Create cover page as a direct element, not with header/elements structure
         local coverPage = CreateCoverPage(entity)
-        table.insert(data, {
-            elements = { coverPage }
-        })
+        table.insert(
+            data,
+            {
+                elements = {coverPage}
+            }
+        )
     else
         -- Create traditional title page as a direct element, not with header/elements structure
         local titleTemplateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE
@@ -119,9 +122,12 @@ function private.Core.Utils.BookUtils.TransformEntityToBook(entity)
             author = entity.author and (Locale["Author"] .. entity.author) or nil
         }
 
-        table.insert(data, {
-            elements = { titleElement }
-        })
+        table.insert(
+            data,
+            {
+                elements = {titleElement}
+            }
+        )
     end
 
     -- Process chapters if available (same as before)
