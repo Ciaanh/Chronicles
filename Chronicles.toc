@@ -1,14 +1,15 @@
-## Interface: 100002
+## Interface: 110200
 
 ## Title: Chronicles
 ## Notes: Simple timeline of wow historical events
 
 ## Author: ciaanh
-## Version: v1.3
+## Version: v2.0.0
 ## DefaultState: enabled
 ## SavedVariables: ChroniclesDB
 ## OptionalDeps: totalRP3, MyRolePlay
 ## X-License: MIT
 ## X-Category: Data
+## X-Curse-Project-ID: 358172
 
 Chronicles.xml

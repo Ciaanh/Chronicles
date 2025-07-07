@@ -1,0 +1,198 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <Script file="VerticalListTemplate.lua" />
+
+    <!-- Shared Vertical List Item Template -->
+    <Button name="VerticalListItemTemplate" mixin="VerticalListItemMixin" virtual="true">
+        <Size x="150" y="110"/>
+        <KeyValues>
+            <KeyValue key="textureHeight" value="80" type="number"/>
+        </KeyValues>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <!-- Bookmark side texture -->
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="45" y="64"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <!-- Bookmark content texture -->
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size x="105" y="64"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
+            <Layer level="ARTWORK">
+                <!-- Item name text -->
+                <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
+                    <Size x="100" y="35"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="0" y="0" />
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick method="OnClick"/>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+        </Scripts>
+    </Button>
+
+    <!-- Shared Vertical List Template -->
+    <Frame name="VerticalListTemplate" mixin="VerticalListMixin" virtual="true">
+        <KeyValues>
+            <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
+            <!-- Configuration keys for different item types -->
+            <KeyValue key="itemType" value="generic" type="string" />
+            <KeyValue key="searchPlaceholder" value="Search..." type="string" />
+            <KeyValue key="countLabelFormat" value="%d items" type="string" />
+            <KeyValue key="enableSearch" value="true" type="boolean" />
+            <KeyValue key="enableCount" value="true" type="boolean" />
+            <KeyValue key="stateManagerKey" value="generic" type="string" />
+        </KeyValues>
+        <Frames>
+            <!-- Search box for filtering items -->
+            <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
+                <Size x="120" y="20"/>
+                <Anchors>
+                    <Anchor point="TOP" x="-5" y="0"/>
+                </Anchors>
+                <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="PlaceholderText" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="LEFT" x="5" y="0"/>
+                            </Anchors>
+                            <Color r="0.5" g="0.5" b="0.5" a="0.8"/>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnTextChanged>
+                        if self:GetText() ~= "" then
+                            self.PlaceholderText:Hide()
+                        else
+                            self.PlaceholderText:Show()
+                        end
+                        
+                        -- Notify parent of text change
+                        if self:GetParent().OnSearchTextChanged then
+                            self:GetParent():OnSearchTextChanged(self:GetText())
+                        end
+                    </OnTextChanged>
+                    <OnEditFocusGained>
+                        self.PlaceholderText:Hide()
+                    </OnEditFocusGained>
+                    <OnEditFocusLost>
+                        if self:GetText() == "" then
+                            self.PlaceholderText:Show()
+                        end
+                    </OnEditFocusLost>
+                    <OnLoad>
+                        if self:GetParent().InitializeSearchPlaceholder then
+                            self:GetParent():InitializeSearchPlaceholder()
+                        end
+                    </OnLoad>
+                </Scripts>
+            </EditBox>
+
+            <!-- Paged item list -->
+            <Frame parentKey="PagedItemList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+                <KeyValues>
+                    <KeyValue key="viewsPerPage" value="1" type="number"/>
+                    <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
+                    <KeyValue key="xPadding" value="5" type="number"/>
+                    <KeyValue key="columnsPerRow" value="1" type="number"/>
+                    <KeyValue key="autoExpandElements" value="true" type="boolean"/>
+                </KeyValues>
+                <Size x="150" y="600"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" x="0" y="0"/>
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="150" y="560"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                        </Anchors>
+                    </Frame>
+
+                    <!-- Paging controls for item list -->
+                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOM" x="-10" y="5"/>
+                        </Anchors>
+                        <KeyValues>
+                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
+                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
+                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
+                            <KeyValue key="spacing" value="8" type="number"/>
+                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                        </KeyValues>
+                    </Frame>
+                </Frames>
+            </Frame>
+        </Frames>
+        <Layers>
+            <Layer level="OVERLAY">
+                <!-- Item count label -->
+                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="TOP" x="-10" y="-30"/>
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+        </Scripts>
+    </Frame>    <!-- Specialized Character Vertical List Template -->
+
+    <Frame name="VerticalCharacterListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="itemType" value="character" type="string" />
+            <KeyValue key="searchPlaceholder" value="Search Characters..." type="string" />
+            <KeyValue key="countLabelFormat" value="%d Characters" type="string" />
+            <KeyValue key="stateManagerKey" value="character" type="string" />
+            <KeyValue key="dataSourceMethod" value="getAllCharacters" type="string" />
+        </KeyValues>        <Scripts>
+            <OnLoad>
+                VerticalListMixin.OnLoad(self)
+                self:ConfigureForCharacters()
+                self:InitializeSearchPlaceholder()
+                self:RefreshItemList()
+            </OnLoad>
+        </Scripts>
+    </Frame>    <!-- Specialized Faction Vertical List Template -->
+    <Frame name="VerticalFactionListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="itemType" value="faction" type="string" />
+            <KeyValue key="searchPlaceholder" value="Search Factions..." type="string" />
+            <KeyValue key="countLabelFormat" value="%d Factions" type="string" />
+            <KeyValue key="stateManagerKey" value="faction" type="string" />
+            <KeyValue key="dataSourceMethod" value="SearchFactions" type="string" />
+        </KeyValues>
+        <Scripts>
+            <OnLoad>
+                VerticalListMixin.OnLoad(self)
+                self:ConfigureForFactions()
+                self:InitializeSearchPlaceholder()
+                self:RefreshItemList()
+            </OnLoad>
+        </Scripts>
+    </Frame>
+
+</Ui>

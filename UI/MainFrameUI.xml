@@ -1,0 +1,135 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+    <Script file="MainFrameUI.lua"/>
+
+    <Frame name="TabUITemplate" inherits="TabSystemOwnerTemplate" mixin="TabUIMixin" virtual="true">
+
+        <Frames>
+            <Frame parentKey="Events" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+                    <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                        <Size x="1200" y="175" />
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                        <Size x="1200" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                        <Size x="1480" y="650" />
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+            <Frame parentKey="Characters" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
+                        <Size x="150" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT" x="0" y="0" />
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                        <Size x="1200" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+
+            <Frame parentKey="Factions" frameLevel="100" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+                    <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
+                        <Size x="150" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOMLEFT" x="0" y="0" />
+                        </Anchors>
+                    </Frame>
+                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                        <Size x="1200" y="650"/>
+                        <Anchors>
+                            <Anchor point="BOTTOM" />
+                        </Anchors>
+                    </Frame>
+                </Frames>
+            </Frame>
+
+            <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
+                <Size x="1200" y="650"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" />
+                </Anchors>
+            </Frame>
+
+            <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
+                <KeyValues>
+                    <KeyValue key="minTabWidth" value="100" type="number"/>
+                    <KeyValue key="maxTabWidth" value="150" type="number"/>
+                    <KeyValue key="tabSelectSound" value="SOUNDKIT.UI_CLASS_TALENT_TAB" type="global"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="BOTTOM" x="0" y="-30"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+
+    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
+        <!-- <Size x="1480" y="835"/> -->
+        <Layers>
+            <Layer level="BACKGROUND" textureSubLevel="1000">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="0.0" b="0.0"/>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Anchors>
+            <!-- <Anchor point="CENTER" y="50" /> -->
+            <Anchor point="TOPLEFT" />
+            <Anchor point="BOTTOMRIGHT" />
+        </Anchors>
+        <Frames>
+            <Frame name="TabContainer" parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
+                <Size x="1480" y="825"/>
+                <Anchors>
+                    <Anchor point="CENTER" y="50" />
+                </Anchors>
+            </Frame>
+
+            <Button name="CloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="CENTER" relativePoint="TOPRIGHT" relativeTo="TabContainer" x="-140" y="-175"/>
+                </Anchors>
+            </Button>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+            <OnHide method="OnHide"/>
+        </Scripts>
+    </Frame>
+
+</Ui>

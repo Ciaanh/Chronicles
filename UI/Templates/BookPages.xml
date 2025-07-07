@@ -1,0 +1,264 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+    <Script file="BookPages.lua"/>
+
+
+    <Frame name="EmptyTemplate" mixin="EmptyMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="25"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+    </Frame>
+
+    <Frame name="ChapterHeaderTemplate" mixin="ChapterHeaderMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="50"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="SystemFont_Huge2" setAllPoints="true" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="10" y="-5"/>
+                        <Anchor point="TOPRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+                <Texture parentKey="Border" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size y="10"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="10" y="5"/>
+                        <Anchor point="BOTTOMRIGHT" x="-10"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="ChapterLineTemplate" mixin="ChapterLineMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="25"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" y="-5"/>
+                        <Anchor point="TOPRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Frame name="HtmlPageTemplate" mixin="HtmlPageMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="460"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Frames>
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="false">
+                <KeyValues>
+                    <KeyValue key="scrollOnMouse" value="false" type="boolean"/>
+                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarX" value="14" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-25" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="25" type="number"/>
+                </KeyValues>
+                <Size x="500" y="460"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-20" />
+                </Anchors>
+                <ScrollChild>
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
+                        <Size x="500" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
+                    </SimpleHTML>
+                </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+
+    <!-- Simple Title Template - Unified template for characters and factions -->
+    <Frame name="SimpleTitleTemplate" mixin="SimpleTitleMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="510"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+
+                <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="400" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Title" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                    <Size x="$parent.viewWidth" y="25"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- Event Title Template - Used for events in the book -->
+    <Frame name="EventTitleTemplate" mixin="EventTitleMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="550"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+
+                <Texture parentKey="Separator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="400" y="10"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Title" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+
+                <FontString parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Separator" x="0" y="-20"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                    <Size x="$parent.viewWidth" y="25"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- Cover Page Template for Characters and Factions -->
+    <Frame name="CoverPageTemplate" mixin="CoverPageMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="550"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+
+            <Layer level="BACKGROUND">
+                
+            </Layer>
+
+            <Layer level="ARTWORK">
+                <!-- Portrait/Image -->
+                <Texture parentKey="Portrait">
+                    <Size x="128" y="128"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-20"/>
+                    </Anchors>
+                </Texture>
+
+                <!-- Entity Name -->
+                <FontString parentKey="Name" inherits="SystemFont_Huge1" setAllPoints="true" justifyH="CENTER">
+                    <Size x="400" y="60"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Portrait" x="0" y="-10"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+
+                <!-- Simple Text Description (for non-HTML content) -->
+                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER" justifyV="TOP">
+                    <Size x="400" y="200"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Name" x="0" y="-10"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                    <Size x="$parent.viewWidth" y="25"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <!-- HTML Description ScrollFrame (for HTML content) -->
+            <ScrollFrame parentKey="DescriptionScrollFrame" mixin="ScrollFrameMixin" enableMouse="false">
+                <KeyValues>
+                    <KeyValue key="scrollOnMouse" value="false" type="boolean"/>
+                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarX" value="14" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
+                </KeyValues>
+                <Size x="400" y="200"/>
+                <Anchors>
+                    <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Name" x="0" y="-10"/>
+                </Anchors>
+                <ScrollChild>
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="CENTER">
+                        <Size x="400" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
+                    </SimpleHTML>
+                </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+
+
+
+    <!-- Cover Description Template -->
+    <Frame name="CoverDescriptionTemplate" mixin="CoverDescriptionMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="200"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <!-- Description Text -->
+                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER" justifyV="TOP">
+                    <Size x="400" y="180"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-10"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>

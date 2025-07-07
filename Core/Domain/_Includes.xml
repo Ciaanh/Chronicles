@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+
+    <!-- Load types first for type definitions -->
+    <Script file="Types.lua"/>
+
+    <!-- Domain modules -->
+    <Script file="Characters.lua"/>
+    <Script file="Events.lua"/>
+    <Script file="Timeline.lua"/>
+    <Script file="Factions.lua"/>
+    <Script file="Settings.lua"/>
+</Ui>

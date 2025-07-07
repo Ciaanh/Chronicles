@@ -1,0 +1,125 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+
+    <Script file="EventListTemplate.lua"/>
+
+    <Frame name="EventListTitleTemplate" mixin="EventListTitleMixin" virtual="true">
+        <Size x="50" y="30"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
+                    <Color r="0.0" g="125.0" b="0.0"/>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Huge" setAllPoints="true" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
+        <Size x="150" y="110"/>
+        <KeyValues>
+            <KeyValue key="textureHeight" value="80" type="number"/>
+        </KeyValues>
+        <Layers>
+            <Layer level="BACKGROUND">
+
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="45" y="64"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size x="105" y="64"/>
+                    <Anchors>
+                        <Anchor point="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
+                    <Size x="100" y="35"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="0" y="0" />
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick method="OnClick"/>
+        </Scripts>
+    </Button>
+
+    <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
+        <Frames>
+            <Frame parentKey="PagedEventList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+                <KeyValues>
+                    <KeyValue key="viewsPerPage" value="2" type="number"/>
+                    <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
+                    <KeyValue key="xPadding" value="10" type="number"/>
+                    <KeyValue key="columnsPerRow" value="1" type="number"/>
+                    <KeyValue key="autoExpandElements" value="true" type="boolean"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+                <Frames>
+
+                    <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="150" y="560"/>
+                        <KeyValues>
+                            <KeyValue key="side" value="left" type="string"/>
+                        </KeyValues>
+                        <Anchors>
+                            <Anchor point="LEFT" x="0" y="0" />
+                        </Anchors>
+                    </Frame>
+
+                    <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+                        <Size x="150" y="560"/>
+                        <KeyValues>
+                            <KeyValue key="side" value="right" type="string"/>
+                        </KeyValues>
+                        <Anchors>
+                            <Anchor point="RIGHT" x="0" y="0" />
+                        </Anchors>
+                    </Frame>
+
+                    <!-- TODO implement a new paging control for the event list -->
+                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
+                        <Anchors>
+                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                        </Anchors>
+                        <KeyValues>
+                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
+                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
+                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
+                            <KeyValue key="spacing" value="8" type="number"/>
+                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+                        </KeyValues>
+                    </Frame>
+                </Frames>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+
+</Ui>

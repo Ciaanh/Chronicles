@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="DB.lua" />
+	<Script file="01_Sample\SampleEventsDB.lua" />
+	<Script file="01_Sample\SampleFactionsDB.lua" />
+	<Script file="01_Sample\SampleCharactersDB.lua" />
+
+</Ui>

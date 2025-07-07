@@ -1,38 +1,51 @@
 local FOLDER_NAME, private = ...
+private.Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0", "AceEvent-3.0")
+_G.Chronicles = private.Chronicles
 
--- Init libs ---------------------------------------------------------------------------
+local defaults = {
+    global = {
+        options = {
+            minimap = {hide = false}
+        },
+        uiState = {
+            selectedEvent = nil,
+            selectedCharacter = nil,
+            selectedFaction = nil,
+            selectedPeriod = nil,
+            activeTab = nil,
+            isMainFrameOpen = false
+        },
+        timelineState = {
+            currentStep = nil,
+            currentPage = nil,
+            selectedYear = nil
+        },
+        settingsState = {
+            eventTypes = {},
+            collections = {},
+            debugMode = false
+        },
+        dataState = {
+            lastRefreshTime = 0,
+            isDirty = false
+        }
+    }
+}
+
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
 
-local Chronicles = LibStub("AceAddon-3.0"):NewAddon(private.addon_name, "AceConsole-3.0")
-private.Core = Chronicles
-
------------------------------------------------------------------------------------------
--- Init ---------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
-
+-- -------------------------
+-- Init
+-- -------------------------
+local Chronicles = private.Chronicles
 Chronicles.descName = Locale["Chronicles"]
 Chronicles.description = Locale["Description"]
 
-Chronicles.constants = private.constants
+private.constants = private.constants
 
 function Chronicles:OnInitialize()
-    local defaults = {
-        global = {
-            options = {
-                minimap = {hide = false},
-                myjournal = true
-            },
-            EventTypesStatuses = {},
-            EventDBStatuses = {},
-            FactionDBStatuses = {},
-            CharacterDBStatuses = {},
-            MyJournalEventDB = {},
-            MyJournalFactionDB = {},
-            MyJournalCharacterDB = {}
-        }
-    }
-    self.storage = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+    private.Chronicles.db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
 
     self.mapIcon =
         LibStub("LibDataBroker-1.1"):NewDataObject(
@@ -41,24 +54,19 @@ function Chronicles:OnInitialize()
             type = "launcher",
             text = Locale["Chronicles"],
             icon = "Interface\\ICONS\\Inv_scroll_04",
-            OnClick = function(self, button, down)
-                if (MainFrame:IsVisible()) then
-                    Chronicles.UI:HideWindow()
-                else
-                    Chronicles.UI:DisplayWindow()
-                end
+            OnClick = function(self, button)
+                Chronicles.UI:DisplayWindow()
             end,
             OnTooltipShow = function(tt)
                 tt:AddLine(Locale["Chronicles"], 1, 1, 1)
-                local yearText = Locale["CurrentYear"] .. Chronicles.constants.config.currentYear .. Locale["AfterDP"]
+                local yearText = Locale["CurrentYear"] .. private.constants.config.currentYear .. Locale["AfterDP"]
                 tt:AddLine(yearText)
                 tt:AddLine(" ")
                 tt:AddLine(Locale["Icon tooltip"])
             end
         }
     )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.storage.global.options.minimap)
-
+    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
     self:RegisterChatCommand(
         "chronicles",
         function()
@@ -66,119 +74,82 @@ function Chronicles:OnInitialize()
         end
     )
 
-    Chronicles.UI.EventFilter:Init()
-    Chronicles.DB:Init()
-    Chronicles.UI:Init()
+    if private.Core.StateManager then
+        private.Core.StateManager.init()
+    end
+
+    Chronicles.Data:Load()
+
+    private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
+    C_Timer.After(
+        0.2,
+        function()
+            local startupData = {}
+            private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
+        end
+    )
+end
+
+--[[
+    AddonStartup event handler - checks for existing saved state and restores it
+    
+    This centralizes all state checking logic that was previously done in individual
+    UI component OnLoad methods. By handling this during AddonStartup, we ensure
+    all core systems are fully initialized before checking saved state.
+]]
+function Chronicles:OnAddonStartup(eventData)
+    if not private.Core.StateManager then
+        return
+    end
+
+    private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
+    local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+    local existingPeriod = private.Core.StateManager.getState(selectedPeriodKey)
+    if existingPeriod then
+        private.Core.StateManager.setState(selectedPeriodKey, existingPeriod, "AddonStartup state restoration")
+    end
+
+    local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
+    local existingEventSelection = private.Core.StateManager.getState(eventSelectionKey)
+    if existingEventSelection and type(existingEventSelection) == "table" then
+        private.Core.StateManager.setState(eventSelectionKey, existingEventSelection, "AddonStartup state restoration")
+    end
+
+    local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
+    local existingCharacterSelection = private.Core.StateManager.getState(characterSelectionKey)
+    if existingCharacterSelection and type(existingCharacterSelection) == "table" then
+        private.Core.StateManager.setState(
+            characterSelectionKey,
+            existingCharacterSelection,
+            "AddonStartup state restoration"
+        )
+    end
+
+    local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
+    local existingFactionSelection = private.Core.StateManager.getState(factionSelectionKey)
+    if existingFactionSelection and type(existingFactionSelection) == "table" then
+        private.Core.StateManager.setState(
+            factionSelectionKey,
+            existingFactionSelection,
+            "AddonStartup state restoration"
+        )
+    end
+
+    local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
+    local existingActiveTab = private.Core.StateManager.getState(activeTabKey)
+    if existingActiveTab then
+        private.Core.StateManager.setState(activeTabKey, existingActiveTab, "AddonStartup state restoration")
+    end
+end
+
+function Chronicles:OnDisable()
+    private.Core.triggerEvent(private.constants.events.AddonShutdown, nil, "Chronicles:OnDisable")
 end
 
 function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.DB:RegisterEventDB(pluginName, db)
-    Chronicles.UI:Init()
+    Chronicles.Data:RegisterEventDB(pluginName, db)
+    -- Use safe event triggering
+    private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
 end
 
-function get_constants()
-    return Chronicles.constants
-end
-
-function get_locale(value)
-    return Locale[value]
-end
-
-function adjust_value(value, step)
-    local valueFloor = math.floor(value)
-    local valueMiddle = valueFloor + (step / 2)
-
-    if (value < valueMiddle) then
-        return valueFloor
-    end
-    return valueFloor + step
-end
-
-function tablelength(T)
-    if (T == nil) then
-        return 0
-    end
-
-    local count = 0
-    for _ in pairs(T) do
-        count = count + 1
-    end
-    return count
-end
-
-function copyTable(tableToCopy)
-    if (tableToCopy == nil) then
-        return {}
-    end
-
-    local orig_type = type(tableToCopy)
-    local copy
-    if orig_type == "table" then
-        copy = {}
-        for orig_key, orig_value in pairs(tableToCopy) do
-            local orig_value_type = type(orig_value)
-            if (orig_value_type == "table") then
-                copy[orig_key] = copyTable(orig_value)
-            else
-                copy[orig_key] = orig_value
-            end
-        end
-    else -- number, string, boolean, etc
-        copy = tableToCopy
-    end
-    return copy
-end
-
-function adjustTextLength(text, size, frame)
-    local adjustedText = text
-    if (text:len() > size) then
-        adjustedText = text:sub(0, size)
-
-        frame:SetScript(
-            "OnEnter",
-            function()
-                GameTooltip:SetOwner(frame, "ANCHOR_BOTTOMRIGHT", -5, 30)
-                GameTooltip:SetText(text, nil, nil, nil, nil, true)
-            end
-        )
-        frame:SetScript(
-            "OnLeave",
-            function()
-                GameTooltip:Hide()
-            end
-        )
-    else
-        frame:SetScript(
-            "OnEnter",
-            function()
-            end
-        )
-        frame:SetScript(
-            "OnLeave",
-            function()
-            end
-        )
-    end
-    return adjustedText
-end
-
-function cleanHTML(text)
-    if (text ~= nil) then
-        text = string.gsub(text, "||", "|")
-        text = string.gsub(text, "\\\\", "\\")
-    else
-        text = ""
-    end
-    return text
-end
-
-function containsHTML(text)
-    if (string.lower(text):find("<html>") == nil) then
-        return false
-    else
-        return true
-    end
-end
-
------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+-- -------------------------
