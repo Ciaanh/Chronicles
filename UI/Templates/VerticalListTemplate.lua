@@ -234,7 +234,7 @@ end
 -- Built-in configuration for character lists
 function VerticalListMixin:ConfigureForCharacters()
     self.itemType = "character"
-    self.searchPlaceholder = "Search Characters..."
+    self.searchPlaceholder = "Search..."
     self.countLabelFormat = "%d Characters"
     self.stateManagerKey = "character"
     self.dataSourceMethod = "getAllCharacters"
@@ -252,7 +252,7 @@ end
 -- Built-in configuration for faction lists
 function VerticalListMixin:ConfigureForFactions()
     self.itemType = "faction"
-    self.searchPlaceholder = "Search Factions..."
+    self.searchPlaceholder = "Search..."
     self.countLabelFormat = "%d Factions"
     self.stateManagerKey = "faction"
     self.dataSourceMethod = "SearchFactions"
