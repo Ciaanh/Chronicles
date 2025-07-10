@@ -14,6 +14,7 @@ function EventListItemMixin:Init(eventData)
 	self.Event = eventData.event
 
 	local isRightSide = self:GetParent().side == "right"
+	local textMargin = 5
 
 	-- Configure bookmark-style positioning based on side
 	if isRightSide then
@@ -27,7 +28,7 @@ function EventListItemMixin:Init(eventData)
 		sideTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 
 		text:ClearAllPoints()
-		text:SetPoint("LEFT", self, "LEFT", 25, 0)
+		text:SetPoint("LEFT", self, "LEFT", textMargin, 0)
 	else
 		contentTexture:SetTexCoord(0, 1, 0, 1)
 		sideTexture:SetTexCoord(0, 1, 0, 1)
@@ -37,8 +38,9 @@ function EventListItemMixin:Init(eventData)
 
 		sideTexture:ClearAllPoints()
 		sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
+
 		text:ClearAllPoints()
-		text:SetPoint("RIGHT", self, "RIGHT", -25, 0)
+		text:SetPoint("RIGHT", self, "RIGHT", -1 * textMargin, 0)
 	end
 end
 
