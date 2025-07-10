@@ -94,7 +94,6 @@ constants.bookTemplateKeys = {
 	-- Cover page template
 	COVER_PAGE = "COVER_PAGE", -- Cover page with name only
 	COVER_IMAGE = "COVER_IMAGE", -- Cover page image element
-	COVER_DESCRIPTION = "COVER_DESCRIPTION", -- Cover page description element
 	-- Content structure templates
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",

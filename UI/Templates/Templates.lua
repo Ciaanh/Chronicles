@@ -13,8 +13,6 @@ private.constants.templates = {
 		-- Book page content templates
 	[private.constants.bookTemplateKeys.EMPTY] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
 	[private.constants.bookTemplateKeys.COVER_PAGE] = {template = "CoverPageTemplate", initFunc = CoverPageMixin.Init},
-	[private.constants.bookTemplateKeys.COVER_DESCRIPTION] = {template = "CoverDescriptionTemplate", initFunc = CoverDescriptionMixin.Init},
-	-- [private.constants.bookTemplateKeys.AUTHOR] = {template = "AuthorTemplate", initFunc = AuthorMixin.Init},
 	[private.constants.bookTemplateKeys.CHAPTER_HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
 	[private.constants.bookTemplateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
 	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init}
