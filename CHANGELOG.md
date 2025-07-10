@@ -1,6 +1,6 @@
 # Chronicles Addon Changelog
 
-## v2.0.0 (July 7, 2025)
+## [2.0.0] - 2025-07-07
 - Refactored VerticalListTemplate to pass stateManagerKey directly to each item, improving state management and reducing bugs
 - Enhanced dynamic timeline event display, including event-driven state synchronization and suffix validation for timeline labels/periods
 - Improved UI templates for event lists: consistent bookmark-style visuals and tooltip enhancements
@@ -21,7 +21,7 @@
 - Update database structure (renamed Chronicles.DB to Chronicles.Data)
 - Update for WoW 11.0.2 and The War Within assets
 
-## v1.3.0 (November 2022)
+## [1.3.0] - 2022-11
 - Populate basic data for the period before the Dark Portal
 - Fix bugs and performance issues for timeline with 10 or 1 year time period
 - Add event ordering system
@@ -32,14 +32,14 @@
 - Fix constant definitions
 - Update for WoW 10.0.2 (Dragonflight)
 
-## v1.2.0 (October 2022)
+## [1.2.0] - 2022-10
 - Fix TRP age conversion handling
 - Remove YAML dependencies
 - Add packaging improvements
 - Fix custom data editor background
 - Update for WoW 10.0 release (Dragonflight)
 
-## v1.1.0 (April 2021)
+## [1.1.0] - 2021-04
 - Add Mythos system
 - Add character management for events
 - Fix faction display for events
@@ -52,7 +52,7 @@
 - Improve faction display formatting
 - Update for WoW 9.0.5 (Shadowlands)
 
-## v1.0.0 (November 2020)
+## [1.0.0] - 2020-11
 - Initial release with basic timeline functionality
 - Event filtering system
 - Custom journal implementation
