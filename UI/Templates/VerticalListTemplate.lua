@@ -84,7 +84,7 @@ function VerticalListItemMixin:Init(itemData)
 
     if textElement then
         textElement:ClearAllPoints()
-        textElement:SetPoint("LEFT", self, "LEFT", 25, 0)
+        textElement:SetPoint("RIGHT", self, "RIGHT", 5, 0)
     end
 
     self:SetSelected(false)
@@ -171,7 +171,7 @@ VerticalListMixin = {}
 function VerticalListMixin:OnLoad()
     -- Initialize configuration with defaults (KeyValues are applied via template inheritance)
     self.itemType = "generic"
-    self.searchPlaceholder = "Search..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d items"
     self.enableSearch = true
     self.enableCount = true
@@ -234,7 +234,7 @@ end
 -- Built-in configuration for character lists
 function VerticalListMixin:ConfigureForCharacters()
     self.itemType = "character"
-    self.searchPlaceholder = "Search..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d Characters"
     self.stateManagerKey = "character"
     self.dataSourceMethod = "getAllCharacters"
@@ -252,7 +252,7 @@ end
 -- Built-in configuration for faction lists
 function VerticalListMixin:ConfigureForFactions()
     self.itemType = "faction"
-    self.searchPlaceholder = "Search..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d Factions"
     self.stateManagerKey = "faction"
     self.dataSourceMethod = "SearchFactions"
@@ -429,13 +429,72 @@ function VerticalListMixin:OnSelectionStateChanged(newValue, oldValue, context)
 end
 
 function VerticalListMixin:SyncWithCurrentSelection()
-    -- Selection state is handled by individual items through state management
-    -- This method provides a hook for future enhancements
-    if private.Core.StateManager and self.stateManagerKey and self.stateManagerKey ~= "generic" then
-        local selectedItemKey = private.Core.StateManager.buildSelectionKey(self.stateManagerKey)
-        local currentSelection = private.Core.StateManager.getState(selectedItemKey)
+    -- Synchronize visual selection state with the stored state
+    if not private.Core.StateManager or not self.stateManagerKey or self.stateManagerKey == "generic" then
+        return
+    end
+    
+    if not self.PagedItemList then
+        return
+    end
 
-    -- Individual list items will handle their own selection state
-    -- based on this shared state information
+    local selectedItemKey = private.Core.StateManager.buildSelectionKey(self.stateManagerKey)
+    local currentSelection = private.Core.StateManager.getState(selectedItemKey)
+    
+    if not currentSelection then
+        -- Clear all selections if nothing is selected
+        self:ClearAllSelections()
+        return
+    end
+
+    -- Get the selected item ID based on the state manager key
+    local selectedId = nil
+    if self.stateManagerKey == "character" then
+        selectedId = currentSelection.characterId
+    elseif self.stateManagerKey == "faction" then
+        selectedId = currentSelection.factionId
+    else
+        selectedId = currentSelection.itemId
+    end
+
+    if not selectedId then
+        self:ClearAllSelections()
+        return
+    end
+
+    -- Update visual selection for all visible items
+    self:UpdateVisualSelection(selectedId)
+end
+
+function VerticalListMixin:ClearAllSelections()
+    -- Clear visual selection from all visible list items
+    if not self.PagedItemList then
+        return
+    end
+    
+    local frames = self.PagedItemList:GetFrames()
+    if frames then
+        for _, frame in pairs(frames) do
+            if frame.SetSelected then
+                frame:SetSelected(false)
+            end
+        end
+    end
+end
+
+function VerticalListMixin:UpdateVisualSelection(selectedId)
+    -- Update visual selection to match the selected item ID
+    if not self.PagedItemList or not selectedId then
+        return
+    end
+    
+    local frames = self.PagedItemList:GetFrames()
+    if frames then
+        for _, frame in pairs(frames) do
+            if frame.Item and frame.Item.id and frame.SetSelected then
+                local isSelected = (frame.Item.id == selectedId)
+                frame:SetSelected(isSelected)
+            end
+        end
     end
 end
