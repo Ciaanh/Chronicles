@@ -239,26 +239,4 @@
             </ScrollFrame>
         </Frames>
     </Frame>
-
-
-
-    <!-- Cover Description Template -->
-    <Frame name="CoverDescriptionTemplate" mixin="CoverDescriptionMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="200"/>
-        <Anchors>
-            <Anchor point="TOPLEFT"/>
-        </Anchors>
-        <Layers>
-            <Layer level="ARTWORK">
-                <!-- Description Text -->
-                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER" justifyV="TOP">
-                    <Size x="400" y="180"/>
-                    <Anchors>
-                        <Anchor point="TOP" x="0" y="-10"/>
-                    </Anchors>
-                    <Color color="SPELLBOOK_FONT_COLOR"/>
-                </FontString>
-            </Layer>
-        </Layers>
-    </Frame>
 </Ui>
