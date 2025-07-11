@@ -136,6 +136,10 @@ function SimpleTitleMixin:Init(elementData)
 end
 
 CoverPageMixin = {}
+function CoverPageMixin:OnLoad()
+    -- Initialize the cover page
+end
+
 function CoverPageMixin:Init(elementData)
     -- Set entity name
     if elementData.name then
@@ -150,63 +154,164 @@ function CoverPageMixin:Init(elementData)
         self.Author:Hide()
     end
 
-    -- Set portrait/image
+    -- Set portrait/image and frame
     if elementData.image and elementData.image ~= "" then
-        self.Portrait:SetTexture(elementData.image)
-        self.Portrait:Show()
-        self.Portrait:SetAlpha(1)
+        if self.Portrait then
+            self.Portrait:SetTexture(elementData.image)
+            self.Portrait:Show()
+            self.Portrait:SetAlpha(1)
+        end
+        if self.PortraitFrame then
+            self.PortraitFrame:Show()
+        end
+        -- Content area left-aligned if portrait present
+        if self.ContentArea then
+            self.ContentArea:ClearAllPoints()
+            self.ContentArea:SetPoint("TOP", self.Divider, "BOTTOM", -60, -15)
+            if self.ContentArea.DescriptionScrollFrame then
+                self.ContentArea.DescriptionScrollFrame:SetWidth(300)
+                if self.ContentArea.DescriptionScrollFrame.ScrollContent then
+                    if self.ContentArea.DescriptionScrollFrame.ScrollContent.Description then
+                        self.ContentArea.DescriptionScrollFrame.ScrollContent.Description:SetWidth(280)
+                    end
+                    if self.ContentArea.DescriptionScrollFrame.ScrollContent.HTML then
+                        self.ContentArea.DescriptionScrollFrame.ScrollContent.HTML:SetWidth(280)
+                    end
+                end
+            end
+        end
     else
-        self.Portrait:Hide()
+        if self.Portrait then
+            self.Portrait:Hide()
+        end
+        if self.PortraitFrame then
+            self.PortraitFrame:Hide()
+        end
+        -- Content area centered and wider if no portrait
+        if self.ContentArea then
+            self.ContentArea:ClearAllPoints()
+            self.ContentArea:SetPoint("TOP", self.Divider, "BOTTOM", 0, -15)
+            if self.ContentArea.DescriptionScrollFrame then
+                self.ContentArea.DescriptionScrollFrame:SetWidth(400)
+                if self.ContentArea.DescriptionScrollFrame.ScrollContent then
+                    if self.ContentArea.DescriptionScrollFrame.ScrollContent.Description then
+                        self.ContentArea.DescriptionScrollFrame.ScrollContent.Description:SetWidth(380)
+                    end
+                    if self.ContentArea.DescriptionScrollFrame.ScrollContent.HTML then
+                        self.ContentArea.DescriptionScrollFrame.ScrollContent.HTML:SetWidth(380)
+                    end
+                end
+            end
+        end
     end
 
-    -- Handle description
-    if elementData.text and elementData.text ~= "" then
-        -- Calculate available height for description
-        local totalHeight = 550
-        local portraitHeight = 128 + 20 + 10 -- portrait + top margin + bottom spacing
-        local nameHeight = 60 + 10 -- name height + bottom spacing
-        local authorHeight = 25 -- author height
-        local availableHeight = totalHeight - portraitHeight - nameHeight - authorHeight - 20 -- extra padding
+    -- Handle description (HTML or plain text)
+    if self.ContentArea and self.ContentArea.DescriptionScrollFrame then
+        local scrollFrame = self.ContentArea.DescriptionScrollFrame
+        -- local scrollContent = scrollFrame.ScrollContent
+        local scrollContent = scrollFrame.HTML
 
-        -- Check if content is HTML using the StringUtils helper if available
-        local isHTML = false
-        if
-            private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
-                private.Core.Utils.StringUtils.ContainsHTML
-         then
-            isHTML = private.Core.Utils.StringUtils.ContainsHTML(elementData.text)
-        else
-            -- Fallback: simple HTML detection
-            isHTML = string.find(elementData.text, "<[^>]+>") ~= nil
-        end
+        local desc = elementData.text or elementData.description or ""
 
-        if isHTML then
-            -- Use HTML ScrollFrame for HTML content
-            self.Description:Hide()
-            self.DescriptionScrollFrame:Show()
-            self.DescriptionScrollFrame:SetHeight(availableHeight)
+        -- Debug: Check structure
+        -- print("CoverPageMixin:Init - ScrollFrame exists:", scrollFrame and "yes" or "no")
+        -- print("CoverPageMixin:Init - ScrollContent exists:", scrollContent and "yes" or "no")
+        -- print("CoverPageMixin:Init - Description exists:", scrollContent and scrollContent.Description and "yes" or "no")
+        -- print("CoverPageMixin:Init - HTML exists:", scrollContent and scrollContent.HTML and "yes" or "no")
+        -- print("CoverPageMixin:Init - Description content:", desc and string.len(desc) or "nil")
 
-            -- Clean HTML if utility is available
-            local cleanText = elementData.text
+        if desc and desc ~= "" and scrollContent then
+            local isHTML = false
             if
                 private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
-                    private.Core.Utils.StringUtils.CleanHTML
+                    private.Core.Utils.StringUtils.ContainsHTML
              then
-                cleanText = private.Core.Utils.StringUtils.CleanHTML(elementData.text)
+                isHTML = private.Core.Utils.StringUtils.ContainsHTML(desc)
+            else
+                isHTML = string.find(desc, "<[^>]+>") ~= nil
             end
 
-            self.DescriptionScrollFrame.HTML:SetText(cleanText)
+            print("CoverPageMixin:Init - Is HTML:", isHTML)
+            if isHTML then
+                local cleanText = desc
+                if
+                    private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
+                        private.Core.Utils.StringUtils.CleanHTML
+                 then
+                    cleanText = private.Core.Utils.StringUtils.CleanHTML(desc)
+                end
+                scrollContent:SetText(cleanText)
+            else
+                local formatedContent = "<html><body><p>" .. desc .. "</p></body></html>"
+                scrollContent:SetText(formatedContent)
+            end
+            scrollContent:Show()
+
+            -- if isHTML then
+            --     if scrollContent.Description then
+            --         scrollContent.Description:Hide()
+            --     end
+            --     if scrollContent.HTML then
+            --         scrollContent.HTML:Show()
+            --         local cleanText = desc
+            --         if
+            --             private and private.Core and private.Core.Utils and private.Core.Utils.StringUtils and
+            --                 private.Core.Utils.StringUtils.CleanHTML
+            --          then
+            --             cleanText = private.Core.Utils.StringUtils.CleanHTML(desc)
+            --         end
+            --         scrollContent.HTML:SetText(cleanText)
+            --         print("CoverPageMixin:Init - Set HTML content")
+            --     end
+            -- else
+            --     if scrollContent.HTML then
+            --         scrollContent.HTML:Hide()
+            --     end
+            --     if scrollContent.Description then
+            --         scrollContent.Description:Show()
+            --         scrollContent.Description:SetText(desc)
+
+            --         -- Force update the scroll frame
+            --         C_Timer.After(0.1, function()
+            --             if scrollContent.Description then
+            --                 local stringWidth = scrollContent.Description:GetWidth()
+            --                 local stringHeight = scrollContent.Description:GetStringHeight()
+
+            --                 print("CoverPageMixin:Init - After timer - width:", stringWidth, "height:", stringHeight)
+
+            --                 if stringHeight > 0 then
+            --                     scrollContent.Description:SetHeight(stringHeight)
+            --                     scrollContent:SetHeight(math.max(stringHeight + 10, 200))
+            --                 end
+
+            --                 -- Force scroll frame update
+            --                 scrollFrame:UpdateScrollChildRect()
+            --             end
+            --         end)
+
+            --         print("CoverPageMixin:Init - Set Description content:", desc)
+            --         print("CoverPageMixin:Init - Description shown:", scrollContent.Description:IsShown())
+            --         print("CoverPageMixin:Init - Description text:", scrollContent.Description:GetText())
+            --     end
+            -- end
+
+            -- Show the scroll frame
+            scrollFrame:Show()
         else
-            -- Use simple FontString for text content
-            self.DescriptionScrollFrame:Hide()
-            self.Description:Show()
-            self.Description:SetHeight(availableHeight)
-            self.Description:SetText(elementData.text)
+            -- Hide everything if no description
+            if scrollContent then
+                -- if scrollContent.HTML then
+                --     scrollContent.HTML:Hide()
+                -- end
+                -- if scrollContent.Description then
+                --     scrollContent.Description:Hide()
+                -- end
+                scrollContent:Hide()
+            end
+            print("CoverPageMixin:Init - No description content, hiding elements")
         end
     else
-        -- Hide both description elements if no text
-        self.Description:Hide()
-        self.DescriptionScrollFrame:Hide()
+        print("CoverPageMixin:Init - ContentArea or DescriptionScrollFrame missing!")
     end
 end
 
