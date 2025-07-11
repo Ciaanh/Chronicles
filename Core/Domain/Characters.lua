@@ -4,7 +4,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 private.Core.Characters = {}
 
 -- Import utilities
-local BookUtils = private.Core.Utils.BookUtils
 local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
@@ -21,27 +20,24 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     image = [string]                -- Character portrait/image path
 ]]
 --[[
-    Transform the character into a book
+    Transform the character into a unified book
     @param character [character] Character object
-    @return [table] Book representation of the character
+    @return [table] Unified book representation of the character
 ]]
 function private.Core.Characters.TransformCharacterToBook(character)
     if not character then
         return nil
     end
 
-    if not BookUtils then
-        -- Fallback implementation if BookUtils isn't loaded
-        return {
-            {
-                templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
-                text = character.name or "Unknown Character"
-            }
-        }
+    if not private.Core.Utils.ContentUtils then
+        error("TransformCharacterToBook: ContentUtils not loaded")
     end
 
-    local result = BookUtils.TransformCharacterToBook(character)
-    return result
+    if not private.Core.Utils.ContentUtils.CreateUnifiedContent then
+        error("TransformCharacterToBook: ContentUtils.CreateUnifiedContent not available")
+    end
+
+    return private.Core.Utils.ContentUtils.CreateUnifiedContent(character)
 end
 
 --[[

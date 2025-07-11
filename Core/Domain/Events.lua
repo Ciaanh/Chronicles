@@ -6,7 +6,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 =================================================================================
 Module: Events
 Purpose: Event data processing and transformation for Chronicles timeline
-Dependencies: StringUtils, TableUtils, ValidationUtils, AceLocale-3.0
+Dependencies: StringUtils, TableUtils, ValidationUtils, AceLocale-3.0, ContentUtils
 Author: Chronicles Team
 =================================================================================
 
@@ -53,7 +53,6 @@ Dependencies:
 private.Core.Events = {}
 
 -- Import utilities
-local BookUtils = private.Core.Utils.BookUtils
 local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
@@ -82,13 +81,24 @@ function private.Core.Events.EmptyBook()
 end
 
 --[[
-    Transform the event into a book
+    Transform the event into a unified book (primary method)
     @param event [event] Event object
-    @return [table] Book representation of the event
+    @return [table] Unified book representation of the event
 ]]
 function private.Core.Events.TransformEventToBook(event)
-    -- Events don't use cover pages, only title pages
-    return BookUtils.TransformEventToBook(event)
+    if not event then
+        return nil
+    end
+
+    if not private.Core.Utils.ContentUtils then
+        error("TransformEventToBook: ContentUtils not loaded")
+    end
+    
+    if not private.Core.Utils.ContentUtils.CreateUnifiedContent then
+        error("TransformEventToBook: ContentUtils.CreateUnifiedContent not available")
+    end
+
+    return private.Core.Utils.ContentUtils.CreateUnifiedContent(event)
 end
 
 --[[

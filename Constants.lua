@@ -94,7 +94,11 @@ constants.bookTemplateKeys = {
 	-- Cover page template
 	COVER_PAGE = "COVER_PAGE", -- Cover page with name only
 	COVER_IMAGE = "COVER_IMAGE", -- Cover page image element
-	-- Content structure templates
+	-- Unified content keys - primary templates
+	UNIFIED_CONTENT = "UNIFIED_CONTENT", -- Unified HTML content template
+	COVER_WITH_CONTENT = "COVER_WITH_CONTENT", -- Cover page with integrated content
+	PAGE_BREAK = "PAGE_BREAK", -- For pagination
+	-- Content structure templates (needed for old format compatibility)
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",
 	CHAPTER_HEADER = "CHAPTER_HEADER", -- For chapter headers

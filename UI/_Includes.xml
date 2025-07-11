@@ -4,16 +4,15 @@
 	<Include file="Fonts.xml" />
 	<Include file="Templates\VerticalListTemplate.xml" />
 	<Include file="Templates\BookPages.xml" />
+	<Include file="Templates\ContentDisplayTemplate.xml" />
 	<Include file="Templates\SharedBookTemplate.xml" />
-	<Include file="Templates\SharedBookTemplate.lua" />
-
 	<Include file="Events\Timeline\TimelineTemplate.xml" />
 	<Include file="Events\List\EventListTemplate.xml" />
 	<Include file="Events\List\EventListPagingControls.xml" />
+	<Include file="Templates\SharedBookTemplate.lua" />
+	<Include file="Templates\Templates.lua" />
 
 	<Include file="Settings\Settings.xml" />
-
-	<Include file="Templates\Templates.lua" />
 
 	<Include file="MainFrameUI.xml" />
 

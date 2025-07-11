@@ -4,7 +4,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 private.Core.Factions = {}
 
 -- Import utilities
-local BookUtils = private.Core.Utils.BookUtils
 --local StringUtils = private.Core.Utils.StringUtils
 local TableUtils = private.Core.Utils.TableUtils
 local ValidationUtils = private.Core.Utils.ValidationUtils
@@ -20,27 +19,24 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
     image = [string]                -- Faction image/crest path
 ]]
 --[[
-    Transform the faction into a book
+    Transform the faction into a unified book (primary method)
     @param faction [faction] Faction object
-    @return [table] Book representation of the faction
+    @return [table] Unified book representation of the faction
 ]]
 function private.Core.Factions.TransformFactionToBook(faction)
     if not faction then
         return nil
     end
 
-    if not BookUtils then
-        -- Fallback implementation if BookUtils isn't loaded
-        return {
-            {
-                templateKey = private.constants.bookTemplateKeys.SIMPLE_TITLE,
-                text = faction.name or "Unknown Faction"
-            }
-        }
+    if not private.Core.Utils.ContentUtils then
+        error("TransformFactionToBook: ContentUtils not loaded")
+    end
+    
+    if not private.Core.Utils.ContentUtils.CreateUnifiedContent then
+        error("TransformFactionToBook: ContentUtils.CreateUnifiedContent not available")
     end
 
-    local result = BookUtils.TransformFactionToBook(faction)
-    return result
+    return private.Core.Utils.ContentUtils.CreateUnifiedContent(faction)
 end
 
 --[[
