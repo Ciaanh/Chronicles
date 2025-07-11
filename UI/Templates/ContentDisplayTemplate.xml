@@ -1,0 +1,99 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+    <Script file="ContentDisplayTemplate.lua"/>
+
+    <!-- Unified HTML Content Template - Replaces multiple text templates -->
+    <Frame name="UnifiedContentTemplate" mixin="UnifiedContentMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="1"/> <!-- Dynamic height -->
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Frames>
+            <ScrollFrame parentKey="ScrollFrame" mixin="ContentScrollFrameMixin" enableMouse="true">
+                <KeyValues>
+                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarX" value="14" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-5" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="5" type="number"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+                <ScrollChild>
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
+                        <Size x="400" y="1"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                        <FontString inherits="ChroniclesFontFamily_Text_Medium">
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
+                        </FontString>
+                    </SimpleHTML>
+                </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+
+    <!-- Page Break Template - For pagination -->
+    <Frame name="PageBreakTemplate" mixin="PageBreakMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="20"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Divider" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size x="300" y="5"/>
+                    <Anchors>
+                        <Anchor point="CENTER"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+    </Frame>
+
+    <!-- Cover Page with Integrated Content -->
+    <Frame name="CoverWithContentTemplate" mixin="CoverWithContentMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="550"/>
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+        </Anchors>
+        <Layers>
+            <Layer level="ARTWORK">
+                <!-- Entity Name (Title) -->
+                <FontString parentKey="Name" inherits="SystemFont_Huge1" justifyH="CENTER">
+                    <Size x="420" y="0"/>
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-30"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+                <!-- Author Signature -->
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" justifyH="RIGHT">
+                    <Size x="$parent.viewWidth" y="25"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" x="-20" y="20"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Frames>
+            <!-- Unified content area with portrait integration -->
+            <Frame parentKey="ContentFrame" inherits="UnifiedContentTemplate">
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.Name" relativePoint="BOTTOM" x="0" y="-20"/>
+                    <Anchor point="BOTTOM" relativeKey="$parent.Author" relativePoint="TOP" x="0" y="10"/>
+                    <Anchor point="LEFT" x="20"/>
+                    <Anchor point="RIGHT" x="-20"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+</Ui>

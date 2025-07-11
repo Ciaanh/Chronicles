@@ -82,7 +82,7 @@
 							<Anchor point="TOPLEFT" />
 							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM" x="-50" />
 						</Anchors>
-						<!-- Debug background for left page --></Frame>
+					</Frame>
 
 					<!-- Right page view -->
 					<Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
