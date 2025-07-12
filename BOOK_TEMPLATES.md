@@ -159,12 +159,6 @@ The `CreateUnifiedContent` function transforms input entities into this structur
 - **Data Properties**: None (purely visual)
 - **Usage**: Pagination between content sections
 
-#### ContentScrollFrameTemplate
-- **Purpose**: Scrollable frame with scrollbar support
-- **Mixin**: `ContentScrollFrameMixin`
-- **Features**: Automatic scrollbar, mouse wheel support
-- **Usage**: Container for scrollable content
-
 ### Additional Template Definitions
 
 #### EventTitleTemplate
