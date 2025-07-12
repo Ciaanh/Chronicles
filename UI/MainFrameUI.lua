@@ -86,7 +86,7 @@ function MainFrameUIMixin:OnLoad()
 	-- STATE-BASED BOOK CONTENT SUBSCRIPTION
 	-- =============================================================================================
 	-- Subscribe to selection state changes and update book content accordingly.
-	-- This ensures that SharedBookTemplate always receives already-transformed content.
+	-- This ensures that BookContainerTemplate always receives already-transformed content.
 
 	if private.Core.StateManager then
 		-- Event selection subscriber
@@ -162,7 +162,7 @@ end
 -- =============================================================================================
 -- BOOK CONTENT UPDATE METHODS
 -- =============================================================================================
--- These methods handle the transformation and display of content in SharedBookTemplate instances.
+-- These methods handle the transformation and display of content in BookContainerTemplate instances.
 -- They ensure that content is always transformed before being passed to OnContentReceived.
 
 function MainFrameUIMixin:UpdateEventBookContent(eventSelection)

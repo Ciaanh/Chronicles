@@ -86,7 +86,7 @@ constants.templateKeys = {
 	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM" -- For the shared vertical list template
 }
 
--- Book-specific template keys used in the SharedBookTemplate system
+-- Book-specific template keys used in the BookContainerTemplate system
 constants.bookTemplateKeys = {
 	-- Title templates for different content types
 	EVENT_TITLE = "EVENT_TITLE", -- Complex title with date ranges

@@ -216,9 +216,9 @@ The `CreateUnifiedContent` function transforms input entities into this structur
 
 ### Container Templates
 
-#### SharedBookTemplate
+#### BookContainerTemplate
 - **Purpose**: Main book container with page-flipping animation
-- **Mixin**: `SharedBookMixin`
+- **Mixin**: `BookContainerMixin`
 - **Features**: Page navigation, background textures, animation
 - **Usage**: Primary book display container for all content types
 
