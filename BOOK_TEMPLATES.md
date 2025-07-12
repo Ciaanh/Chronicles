@@ -4,6 +4,12 @@
 
 The Chronicles addon uses a sophisticated book-style templating system to display World of Warcraft lore content. This system transforms entity data (events, characters, factions) into a structured format that can be rendered using various UI templates.
 
+## Current Version & Status
+
+- **Version**: v2.0.1 (July 13, 2025)
+- **Status**: Active development with ongoing template system enhancements
+- **Key Components**: ContentUtils located in `UI/Book/ContentUtils.lua`
+
 ## Template Architecture
 
 ### Core Components
