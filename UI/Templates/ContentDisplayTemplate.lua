@@ -123,6 +123,9 @@ LOCALIZATION SUPPORT:
 - Fallback to original content if localization key not found
 ]]
 
+
+-- last prompt List the book templates used, where and the associated data
+
 local FOLDER_NAME, private = ...
 
 -- Import dependencies
