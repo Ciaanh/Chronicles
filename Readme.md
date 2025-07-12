@@ -125,7 +125,7 @@ Chronicles/
 │   ├── Settings/                    # Settings and configuration UI
 │   └── Templates/                   # Reusable UI templates
 │       ├── VerticalListTemplate.*   # Shared list component
-│       ├── SharedBookTemplate.*     # Book-style content display
+│       ├── BookContainerTemplate.*     # Book-style content display
 │       ├── BookPages.xml            # Chapter and page templates
 │       └── Templates.lua            # Template registration and utilities
 ├── DB/                              # Database and content

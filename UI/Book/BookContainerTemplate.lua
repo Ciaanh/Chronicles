@@ -3,7 +3,7 @@ local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
 -- =============================================================================================
--- SHARED BOOK TEMPLATE MIXIN
+-- BOOK CONTAINER TEMPLATE MIXIN
 -- =============================================================================================
 --
 -- Completely agnostic book component that displays already-transformed content.
@@ -16,13 +16,13 @@ local Chronicles = private.Chronicles
 -- The OnContentReceived method receives already-transformed content, not item IDs.
 -- =============================================================================================
 
-SharedBookMixin = {}
+BookContainerMixin = {}
 
 -- =============================================================================================
 -- INITIALIZATION AND SETUP
 -- =============================================================================================
 
-function SharedBookMixin:OnLoad()
+function BookContainerMixin:OnLoad()
 	if not private.constants.templates then
 		return
 	end
@@ -49,11 +49,11 @@ end
 -- ANIMATION AND UI INTERACTIONS
 -- =============================================================================================
 
-function SharedBookMixin:OnPagingButtonEnter()
+function BookContainerMixin:OnPagingButtonEnter()
 	self.SinglePageBookCornerFlipbook.Anim:Play()
 end
 
-function SharedBookMixin:OnPagingButtonLeave()
+function BookContainerMixin:OnPagingButtonLeave()
 	local reverse = true
 	self.SinglePageBookCornerFlipbook.Anim:Play(reverse)
 end
@@ -64,7 +64,7 @@ end
 
 -- Main method to display content in the book
 -- @param bookContent [table] Already-transformed book content with proper template keys
-function SharedBookMixin:OnContentReceived(bookContent)
+function BookContainerMixin:OnContentReceived(bookContent)
 	if bookContent and #bookContent > 0 then
 		local dataProvider = CreateDataProvider(bookContent)
 		local retainScrollPosition = false
@@ -76,7 +76,7 @@ function SharedBookMixin:OnContentReceived(bookContent)
 end
 
 -- Internal method to display empty book state
-function SharedBookMixin:ShowEmptyBook()
+function BookContainerMixin:ShowEmptyBook()
 	local emptyContent = {
 		{
 			templateKey = private.constants.bookTemplateKeys.EMPTY,
@@ -89,6 +89,6 @@ function SharedBookMixin:ShowEmptyBook()
 	self.currentlyDisplayedContent = nil
 end
 
-function SharedBookMixin:OnUIRefresh()
+function BookContainerMixin:OnUIRefresh()
 	self:ShowEmptyBook()
 end

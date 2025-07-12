@@ -2,15 +2,18 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 	<Include file="Fonts.xml" />
-	<Include file="Templates\VerticalListTemplate.xml" />
-	<Include file="Templates\BookPages.xml" />
-	<Include file="Templates\ContentDisplayTemplate.xml" />
-	<Include file="Templates\SharedBookTemplate.xml" />
-	<Include file="Events\Timeline\TimelineTemplate.xml" />
-	<Include file="Events\List\EventListTemplate.xml" />
-	<Include file="Events\List\EventListPagingControls.xml" />
-	<Include file="Templates\SharedBookTemplate.lua" />
-	<Include file="Templates\Templates.lua" />
+
+	<Include file="VerticalListTemplate.xml" />
+
+	<Include file="Book\BookPages.xml" />
+	<Include file="Book\ContentDisplayTemplate.xml" />
+	<Include file="Book\BookContainerTemplate.xml" />
+
+	<Include file="Events\TimelineTemplate.xml" />
+	<Include file="Events\EventListTemplate.xml" />
+	<Include file="Events\EventListPagingControls.xml" />
+
+	<Include file="PageTemplatesRegistration.lua" />
 
 	<Include file="Settings\Settings.xml" />
 
