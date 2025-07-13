@@ -4,19 +4,19 @@ local FOLDER_NAME, private = ...
 local HTMLBuilder = private.Core.Utils.HTMLBuilder
 
 -- =============================================================================================
--- UNIFIED CONTENT MIXIN
+-- HTML CONTENT MIXIN
 -- =============================================================================================
 
 --[[
-    Mixin for unified content display components
+    Mixin for HTML content display components - the single HTML container
 ]]
-UnifiedContentMixin = {}
+HTMLContentMixin = {}
 
 --[[
-    Initialize unified content display
+    Initialize HTML content display
     @param elementData [table] Element data with content and formatting options
 ]]
-function UnifiedContentMixin:Init(elementData)
+function HTMLContentMixin:Init(elementData)
     if not elementData then
         return
     end
@@ -28,9 +28,7 @@ function UnifiedContentMixin:Init(elementData)
     elseif elementData.text then
         htmlContent = HTMLBuilder.ConvertTextToHTML(elementData.text, elementData.portraitPath)
         if elementData.portraitPath and elementData.portraitPath ~= "" then
-            htmlContent = HTMLBuilder.InjectPortrait(HTMLBuilder.CreateDocument(htmlContent), elementData.portraitPath)
-        else
-            htmlContent = HTMLBuilder.CreateDocument(htmlContent)
+            htmlContent = HTMLBuilder.CreateContentWithPortrait(elementData.text, elementData.portraitPath)
         end
     end
 

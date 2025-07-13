@@ -27,13 +27,13 @@ The system uses template keys to map data elements to specific UI templates:
 | Template Key | XML Template | Lua Mixin | Purpose |
 |--------------|-------------|-----------|---------|
 | `CHAPTER_HEADER` | `ChapterHeaderTemplate` | `ChapterHeaderMixin` | Chapter titles, section headers, entity names |
-| `HTML_CONTENT` | `HtmlPageTemplate` | `HtmlPageMixin` | Rich descriptions, formatted text |
+| `HTML_CONTENT` | `HTMLContentTemplate` | `HTMLContentMixin` | Rich descriptions, formatted text (Single HTML Container) |
 | `TEXT_CONTENT` | `ChapterLineTemplate` | `ChapterLineMixin` | Simple text lines, individual paragraphs |
 | `EVENT_TITLE` | `EventTitleTemplate` | `EventTitleMixin` | Event titles with date ranges |
 | `SIMPLE_TITLE` | `SimpleTitleTemplate` | `SimpleTitleMixin` | Simple titles for characters and factions |
 | `COVER_PAGE` | `CoverPageTemplate` | `CoverPageMixin` | Cover pages with portraits |
 | `EMPTY` | `EmptyTemplate` | `EmptyMixin` | Empty placeholder content |
-| `UNIFIED_CONTENT` | `UnifiedContentTemplate` | `UnifiedContentMixin` | Modern scrollable HTML content |
+| `UNIFIED_CONTENT` | `HTMLContentTemplate` | `HTMLContentMixin` | Modern scrollable HTML content |
 | `COVER_WITH_CONTENT` | `CoverWithContentTemplate` | `CoverWithContentMixin` | Enhanced cover with integrated content |
 | `PAGE_BREAK` | `PageBreakTemplate` | `PageBreakMixin` | Visual dividers between sections |
 | `GENERIC_LIST_ITEM` | `VerticalListItemTemplate` | `VerticalListItemMixin` | Generic list item for vertical lists |
@@ -122,14 +122,6 @@ The `CreateUnifiedContent` function transforms input entities into this structur
 - **Rendering**: Large centered text with separator line
 - **Usage**: Section headers, entity names, chapter beginnings
 
-#### HtmlPageTemplate
-- **Purpose**: Display rich formatted HTML content
-- **Mixin**: `HtmlPageMixin`
-- **Data Properties**: 
-  - `content` (string): HTML formatted content
-- **Rendering**: Scrollable HTML content with proper formatting
-- **Usage**: Entity descriptions, formatted text, rich content
-
 #### ChapterLineTemplate
 - **Purpose**: Display single lines of plain text
 - **Mixin**: `ChapterLineMixin`
@@ -140,9 +132,9 @@ The `CreateUnifiedContent` function transforms input entities into this structur
 
 ### Modern Content Templates
 
-#### UnifiedContentTemplate
-- **Purpose**: Modern scrollable HTML content display
-- **Mixin**: `UnifiedContentMixin`
+#### HTMLContentTemplate
+- **Purpose**: Modern scrollable HTML content display (Single HTML Container)
+- **Mixin**: `HTMLContentMixin`
 - **Data Properties**: 
   - `htmlContent` (string): Pre-formatted HTML content
   - `text` (string): Plain text (converted to HTML)
@@ -293,7 +285,7 @@ The system maintains backward compatibility with the old BookUtils system:
 
 When migrating from old templates:
 
-1. Old templates (`ChapterHeaderTemplate`, `ChapterLineTemplate`, `HtmlPageTemplate`) are restored
+1. Old templates (`ChapterHeaderTemplate`, `ChapterLineTemplate`) are maintained while HTML content uses the single `HTMLContentTemplate`
 2. Data structure maintains the same nested format
 3. Template registration system remains unchanged
 4. Content transformation preserves existing functionality

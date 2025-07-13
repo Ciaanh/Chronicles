@@ -16,10 +16,10 @@ private.constants.templates = {
 	-- Old format templates (for compatibility)
 	[private.constants.bookTemplateKeys.CHAPTER_HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
 	[private.constants.bookTemplateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
-	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HtmlPageTemplate", initFunc = HtmlPageMixin.Init},
+	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init},
 	
-	-- Unified content templates - primary content system
-	[private.constants.bookTemplateKeys.UNIFIED_CONTENT] = {template = "UnifiedContentTemplate", initFunc = UnifiedContentMixin.Init},
+	-- HTML content templates - primary content system
+	[private.constants.bookTemplateKeys.UNIFIED_CONTENT] = {template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init},
 	[private.constants.bookTemplateKeys.COVER_WITH_CONTENT] = {template = "CoverWithContentTemplate", initFunc = CoverWithContentMixin.Init},
 	[private.constants.bookTemplateKeys.PAGE_BREAK] = {template = "PageBreakTemplate", initFunc = PageBreakMixin.Init}
 }

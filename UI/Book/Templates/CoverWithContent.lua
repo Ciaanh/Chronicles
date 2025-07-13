@@ -42,11 +42,10 @@ function CoverWithContentMixin:Init(elementData)
 
     local htmlContent = ""
     if entity.description then
-        htmlContent = HTMLBuilder.ConvertTextToHTML(entity.description, elementData.portraitPath)
         if elementData.portraitPath and elementData.portraitPath ~= "" then
-            htmlContent = HTMLBuilder.InjectPortrait(HTMLBuilder.CreateDocument(htmlContent), elementData.portraitPath)
+            htmlContent = HTMLBuilder.CreateContentWithPortrait(entity.description, elementData.portraitPath)
         else
-            htmlContent = HTMLBuilder.CreateDocument(htmlContent)
+            htmlContent = HTMLBuilder.ConvertTextToHTML(entity.description)
         end
     end
 

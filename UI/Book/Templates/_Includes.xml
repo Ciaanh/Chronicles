@@ -6,8 +6,8 @@
     <Script file="..\HTMLBuilder.lua"/>
     <Script file="..\ContentUtils.lua"/>
     
-    <!-- ContentDisplayTemplate templates -->
-    <Include file="UnifiedContent.xml"/>
+    <!-- HTML Content Template - Single HTML Container -->
+    <Include file="HTMLContent.xml"/>
     <Include file="CoverWithContent.xml"/>
     <Include file="PageBreak.xml"/>
     
@@ -18,5 +18,4 @@
     <Include file="CoverPage.xml"/>
     <Include file="ChapterHeader.xml"/>
     <Include file="ChapterLine.xml"/>
-    <Include file="HtmlPage.xml"/>
 </Ui>

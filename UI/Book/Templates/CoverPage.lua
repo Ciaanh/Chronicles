@@ -59,13 +59,13 @@ function CoverPageMixin:Init(elementData)
             isHTML = string.find(desc, "<[^>]+>") ~= nil
         end
         
-        -- Use ContentUtils if available for better portrait integration
+        -- Use HTMLBuilder directly for better portrait integration
         local finalContent = desc
-        if private.Core.Utils.ContentUtils then
+        if private.Core.Utils.HTMLBuilder then
             if isHTML then
-                finalContent = private.Core.Utils.ContentUtils.InjectPortraitIntoHTML(desc, elementData.image)
+                finalContent = private.Core.Utils.HTMLBuilder.CreateContentWithPortrait("", elementData.image) .. desc
             else
-                finalContent = private.Core.Utils.ContentUtils.ConvertTextToHTML(desc, elementData.image)
+                finalContent = private.Core.Utils.HTMLBuilder.CreateContentWithPortrait(desc, elementData.image)
             end
         else
             -- Fallback logic

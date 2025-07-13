@@ -1,30 +1,31 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
-    <Script file="HtmlPage.lua"/>
+    <Script file="HTMLContent.lua"/>
 
-    <!-- HTML Page Template - Old format compatibility -->
-    <Frame name="HtmlPageTemplate" mixin="HtmlPageMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="400"/>
+    <!-- HTML Content Template - Single scrollable HTML container for rich content -->
+    <Frame name="HTMLContentTemplate" mixin="HTMLContentMixin" virtual="true">
+        <Size x="$parent.viewWidth" y="1"/>
+        <!-- Dynamic height -->
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Frames>
-            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="false">
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
                 <KeyValues>
                     <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
                     <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
                     <KeyValue key="scrollBarX" value="14" type="number"/>
-                    <KeyValue key="scrollBarTopY" value="-25" type="number"/>
-                    <KeyValue key="scrollBarBottomY" value="25" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-5" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="5" type="number"/>
                 </KeyValues>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="10" y="-10"/>
-                    <Anchor point="BOTTOMRIGHT" x="-10" y="10"/>
+                    <Anchor point="TOPLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
                 </Anchors>
                 <ScrollChild>
                     <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
-                        <Size x="380"/>
+                        <Size x="400" y="1"/>
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
