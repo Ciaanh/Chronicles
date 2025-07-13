@@ -30,8 +30,8 @@
             </Layer>
         </Layers>
         <Frames>
-            <!-- Unified content area with portrait integration -->
-            <Frame parentKey="ContentFrame" inherits="UnifiedContentTemplate">
+            <!-- HTML content area with portrait integration -->
+            <Frame parentKey="ContentFrame" inherits="HTMLContentTemplate">
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.Name" relativePoint="BOTTOM" x="0" y="-20"/>
                     <Anchor point="BOTTOM" relativeKey="$parent.Author" relativePoint="TOP" x="0" y="10"/>

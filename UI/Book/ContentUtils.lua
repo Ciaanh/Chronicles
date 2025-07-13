@@ -98,45 +98,46 @@ function ContentUtils.CreateChapterInOldFormat(chapter)
 end
 
 -- =============================================================================================
--- DEPRECATED WRAPPER FUNCTIONS (REMOVE AFTER TEMPLATE MIGRATION)
+-- CONTENT LAYOUT AND ORGANIZATION UTILITIES
 -- =============================================================================================
--- These functions are kept temporarily for backward compatibility.
--- Templates should use HTMLBuilder directly instead of these wrappers.
 
 --[[
-    @deprecated Use HTMLBuilder.ConvertTextToHTML() directly
-    Convert plain text content to structured HTML
+    Create structured content for entity display
+    @param entity [table] Entity with content data
+    @param options [table] Layout and styling options
+    @return [table] Structured content ready for HTMLContentTemplate
 ]]
-function ContentUtils.ConvertTextToHTML(content, portraitPath)
-    local htmlContent = HTMLBuilder.ConvertTextToHTML(content)
-    if portraitPath and portraitPath ~= "" then
-        htmlContent = HTMLBuilder.InjectPortrait(HTMLBuilder.CreateDocument(htmlContent), portraitPath)
-    else
-        htmlContent = HTMLBuilder.CreateDocument(htmlContent)
+function ContentUtils.CreateStructuredContent(entity, options)
+    if not entity then 
+        return {}
     end
-    return htmlContent
-end
-
---[[
-    @deprecated Use HTMLBuilder.InjectPortrait() directly
-    Inject portrait into HTML content
-]]
-function ContentUtils.InjectPortraitIntoHTML(htmlContent, portraitPath)
-    return HTMLBuilder.InjectPortrait(htmlContent, portraitPath)
-end
-
---[[
-    @deprecated Use HTMLBuilder.IsChapterHeader() directly
-    Simple heuristic to detect chapter headers
-]]
-function ContentUtils.IsChapterHeader(line)
-    return HTMLBuilder.IsChapterHeader(line)
-end
-
---[[
-    @deprecated Use HTMLBuilder.CreateChapter() directly
-    Create HTML content for a complete chapter
-]]
-function ContentUtils.CreateChapterHTML(chapter)
-    return HTMLBuilder.CreateChapter(chapter)
+    
+    options = options or {}
+    local content = {}
+    
+    -- Title section
+    if entity.name or entity.label then
+        local titleContent = HTMLBuilder.CreateTitle(entity.name or entity.label, options)
+        table.insert(content, titleContent)
+    end
+    
+    -- Author section
+    if entity.author then
+        local authorContent = HTMLBuilder.CreateAuthor(entity.author, options)
+        table.insert(content, authorContent)
+    end
+    
+    -- Main content with optional portrait
+    if entity.description then
+        local mainContent
+        if entity.image then
+            mainContent = HTMLBuilder.CreateContentWithPortrait(entity.description, entity.image, options)
+        else
+            mainContent = HTMLBuilder.ConvertTextToHTML(entity.description, options)
+        end
+        table.insert(content, mainContent)
+    end
+    
+    -- Combine all content blocks
+    return HTMLBuilder.CombineContentBlocks(content)
 end

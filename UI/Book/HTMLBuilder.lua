@@ -1,8 +1,13 @@
 --[[
     HTMLBuilder.lua
     
-    Dedicated HTML content generation utilities for the Chronicles addon.
-    Provides consistent styling and structured HTML creation for book content.
+    HTML content block generation utilities for the Chronicles addon.
+    Provides functions to generate HTML content blocks that will be passed to the single HTMLContentTemplate.
+    
+    This module focuses ONLY on generating HTML content blocks (paragraphs, titles, portraits, etc.)
+    and does NOT handle HTML document containers, scrolling, or display logic.
+    
+    All generated content is designed to be consumed by the HTMLContentTemplate - the single HTML container.
 ]]
 
 local FOLDER_NAME, private = ...
@@ -47,17 +52,8 @@ local STYLES = {
 }
 
 -- =============================================================================================
--- CORE HTML STRUCTURE BUILDERS
+-- HTML CONTENT BLOCK BUILDERS
 -- =============================================================================================
-
---[[
-    Create a complete HTML document wrapper
-    @param content [string] Body content
-    @return [string] Complete HTML document
-]]
-function HTMLBuilder.CreateDocument(content)
-    return string.format("<html><body>%s</body></html>", content or "")
-end
 
 --[[
     Create a portrait image element
@@ -235,88 +231,6 @@ function HTMLBuilder.CreateChapterHeader(text, options)
 end
 
 -- =============================================================================================
--- COMPOSITE CONTENT BUILDERS
--- =============================================================================================
-
---[[
-    Create a complete cover page with title, portrait, and description
-    @param entity [table] Entity data {name, author, description, image}
-    @param options [table] Optional styling overrides
-    @return [string] Complete HTML for cover page
-]]
-function HTMLBuilder.CreateCoverPage(entity, options)
-    if not entity then
-        return ""
-    end
-    
-    local content = {}
-    
-    -- Portrait (if available)
-    if entity.image then
-        table.insert(content, HTMLBuilder.CreatePortrait(entity.image, options))
-    end
-    
-    -- Title
-    local title = entity.name or entity.label
-    if title then
-        table.insert(content, HTMLBuilder.CreateTitle(title, options))
-    end
-    
-    -- Author
-    if entity.author then
-        table.insert(content, HTMLBuilder.CreateAuthor(entity.author, options))
-    end
-    
-    -- Description content
-    if entity.description then
-        local description = HTMLBuilder.ConvertTextToHTML(entity.description)
-        table.insert(content, description)
-    end
-    
-    return HTMLBuilder.CreateDocument(table.concat(content, "\n"))
-end
-
---[[
-    Create HTML for a complete chapter with header and content
-    @param chapter [table] Chapter data {header, pages}
-    @param options [table] Optional styling overrides
-    @return [string] Complete HTML for chapter
-]]
-function HTMLBuilder.CreateChapter(chapter, options)
-    if not chapter then
-        return ""
-    end
-    
-    local content = {}
-    
-    -- Chapter header
-    if chapter.header and chapter.header ~= "" then
-        local headerText = chapter.header
-        -- Handle localization if available
-        if private.Locale and private.Locale[chapter.header] then
-            headerText = private.Locale[chapter.header]
-        end
-        table.insert(content, HTMLBuilder.CreateChapterHeader(headerText, options))
-    end
-    
-    -- Chapter pages
-    if chapter.pages then
-        for _, pageKey in ipairs(chapter.pages) do
-            local pageContent = pageKey
-            -- Handle localization if available
-            if private.Locale and private.Locale[pageKey] then
-                pageContent = private.Locale[pageKey]
-            end
-            
-            local pageHTML = HTMLBuilder.ConvertTextToHTML(pageContent)
-            table.insert(content, pageHTML)
-        end
-    end
-    
-    return HTMLBuilder.CreateDocument(table.concat(content, "\n"))
-end
-
--- =============================================================================================
 -- TEXT CONVERSION UTILITIES
 -- =============================================================================================
 
@@ -370,25 +284,149 @@ function HTMLBuilder.IsChapterHeader(line)
 end
 
 -- =============================================================================================
--- INTEGRATION HELPERS
+-- CONTENT COMBINATION UTILITIES
 -- =============================================================================================
 
 --[[
-    Inject portrait into existing HTML content
-    @param htmlContent [string] Original HTML content
-    @param portraitPath [string] Portrait image path
-    @return [string] HTML with integrated portrait
+    Combine multiple HTML content blocks into a single content string
+    @param contentBlocks [table] Array of HTML content strings
+    @param separator [string] Optional separator between blocks (default: newline)
+    @return [string] Combined HTML content
 ]]
-function HTMLBuilder.InjectPortrait(htmlContent, portraitPath)
-    if not portraitPath or portraitPath == "" then
-        return htmlContent
+function HTMLBuilder.CombineContentBlocks(contentBlocks, separator)
+    if not contentBlocks or #contentBlocks == 0 then
+        return ""
     end
     
-    local portraitImg = HTMLBuilder.CreatePortrait(portraitPath)
+    separator = separator or "\n"
+    local validBlocks = {}
     
-    if htmlContent:find("<body>") then
-        return htmlContent:gsub("(<body[^>]*>)", "%1" .. portraitImg)
+    for _, block in ipairs(contentBlocks) do
+        if block and block ~= "" then
+            table.insert(validBlocks, block)
+        end
+    end
+    
+    return table.concat(validBlocks, separator)
+end
+
+--[[
+    Create a content block with portrait and text combined
+    @param text [string] Text content
+    @param portraitPath [string] Portrait image path (optional)
+    @param options [table] Optional styling overrides
+    @return [string] Combined HTML content block
+]]
+function HTMLBuilder.CreateContentWithPortrait(text, portraitPath, options)
+    local content = {}
+    
+    -- Add portrait if provided
+    if portraitPath and portraitPath ~= "" then
+        table.insert(content, HTMLBuilder.CreatePortrait(portraitPath, options))
+    end
+    
+    -- Convert and add text content
+    if text and text ~= "" then
+        local htmlText = HTMLBuilder.ConvertTextToHTML(text, options)
+        table.insert(content, htmlText)
+    end
+    
+    return HTMLBuilder.CombineContentBlocks(content)
+end
+
+-- =============================================================================================
+-- ADVANCED CONTENT BUILDERS
+-- =============================================================================================
+
+--[[
+    Create a divider/separator element
+    @param options [table] Optional styling overrides
+    @return [string] HTML divider element
+]]
+function HTMLBuilder.CreateDivider(options)
+    options = options or {}
+    local width = options.width or "80%"
+    local color = options.color or STYLES.colors.author
+    local margin = options.margin or STYLES.spacing.sectionMargin
+    
+    return string.format(
+        '<hr style="width: %s; border: 1px solid %s; margin: %s auto;" />',
+        width, color, margin
+    )
+end
+
+--[[
+    Create a text block with optional styling
+    @param text [string] Text content
+    @param styleClass [string] Optional CSS class name equivalent
+    @param options [table] Optional styling overrides
+    @return [string] HTML text block
+]]
+function HTMLBuilder.CreateTextBlock(text, styleClass, options)
+    if not text or text == "" then
+        return ""
+    end
+    
+    options = options or {}
+    local color = options.color or STYLES.colors.text
+    local fontSize = options.fontSize or STYLES.fonts.text
+    local margin = options.margin or STYLES.spacing.paragraphMargin
+    local align = options.align or "left"
+    
+    -- Apply style class variations
+    if styleClass == "quote" then
+        color = options.color or STYLES.colors.author
+        fontSize = options.fontSize or STYLES.fonts.text
+        margin = options.margin or "15px"
+        return string.format(
+            '<blockquote style="color: %s; font-size: %s; margin: %s; padding-left: 20px; border-left: 3px solid %s; font-style: italic;">%s</blockquote>',
+            color, fontSize, margin, STYLES.colors.subtitle, text
+        )
+    elseif styleClass == "emphasis" then
+        return string.format(
+            '<div style="color: %s; font-size: %s; margin: %s; text-align: %s; font-weight: bold;">%s</div>',
+            STYLES.colors.title, fontSize, margin, align, text
+        )
     else
-        return portraitImg .. htmlContent
+        return string.format(
+            '<div style="color: %s; font-size: %s; margin: %s; text-align: %s;">%s</div>',
+            color, fontSize, margin, align, text
+        )
     end
+end
+
+--[[
+    Create a list (ordered or unordered)
+    @param items [table] Array of list items
+    @param ordered [boolean] True for ordered list, false for unordered
+    @param options [table] Optional styling overrides
+    @return [string] HTML list element
+]]
+function HTMLBuilder.CreateList(items, ordered, options)
+    if not items or #items == 0 then
+        return ""
+    end
+    
+    options = options or {}
+    local color = options.color or STYLES.colors.text
+    local fontSize = options.fontSize or STYLES.fonts.text
+    local margin = options.margin or STYLES.spacing.paragraphMargin
+    
+    local listTag = ordered and "ol" or "ul"
+    local listItems = {}
+    
+    for _, item in ipairs(items) do
+        if item and item ~= "" then
+            table.insert(listItems, string.format('<li>%s</li>', item))
+        end
+    end
+    
+    if #listItems == 0 then
+        return ""
+    end
+    
+    return string.format(
+        '<%s style="color: %s; font-size: %s; margin: %s;">%s</%s>',
+        listTag, color, fontSize, margin, table.concat(listItems, ""), listTag
+    )
 end
