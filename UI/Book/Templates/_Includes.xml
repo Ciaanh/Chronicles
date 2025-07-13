@@ -3,6 +3,7 @@
 ..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
     
     <!-- Content utilities -->
+    <Script file="..\HTMLBuilder.lua"/>
     <Script file="..\ContentUtils.lua"/>
     
     <!-- ContentDisplayTemplate templates -->
