@@ -1,7 +1,7 @@
 local FOLDER_NAME, private = ...
 
--- Import dependencies
-local ContentUtils = private.Core.Utils.ContentUtils
+-- Import dependencies directly
+local HTMLBuilder = private.Core.Utils.HTMLBuilder
 
 -- =============================================================================================
 -- COVER WITH CONTENT MIXIN
@@ -42,7 +42,12 @@ function CoverWithContentMixin:Init(elementData)
 
     local htmlContent = ""
     if entity.description then
-        htmlContent = ContentUtils.ConvertTextToHTML(entity.description, elementData.portraitPath)
+        htmlContent = HTMLBuilder.ConvertTextToHTML(entity.description, elementData.portraitPath)
+        if elementData.portraitPath and elementData.portraitPath ~= "" then
+            htmlContent = HTMLBuilder.InjectPortrait(HTMLBuilder.CreateDocument(htmlContent), elementData.portraitPath)
+        else
+            htmlContent = HTMLBuilder.CreateDocument(htmlContent)
+        end
     end
 
     if self.ContentFrame and htmlContent ~= "" then

@@ -1,7 +1,7 @@
 local FOLDER_NAME, private = ...
 
--- Import dependencies
-local ContentUtils = private.Core.Utils.ContentUtils
+-- Import dependencies directly
+local HTMLBuilder = private.Core.Utils.HTMLBuilder
 
 -- =============================================================================================
 -- UNIFIED CONTENT MIXIN
@@ -26,7 +26,12 @@ function UnifiedContentMixin:Init(elementData)
     if elementData.htmlContent then
         htmlContent = elementData.htmlContent
     elseif elementData.text then
-        htmlContent = ContentUtils.ConvertTextToHTML(elementData.text, elementData.portraitPath)
+        htmlContent = HTMLBuilder.ConvertTextToHTML(elementData.text, elementData.portraitPath)
+        if elementData.portraitPath and elementData.portraitPath ~= "" then
+            htmlContent = HTMLBuilder.InjectPortrait(HTMLBuilder.CreateDocument(htmlContent), elementData.portraitPath)
+        else
+            htmlContent = HTMLBuilder.CreateDocument(htmlContent)
+        end
     end
 
     if htmlContent ~= "" and self.ScrollFrame and self.ScrollFrame.HTML then
@@ -35,6 +40,11 @@ function UnifiedContentMixin:Init(elementData)
 
         self.ScrollFrame.HTML:SetSize(contentWidth, 1)
         self.ScrollFrame.HTML:SetText(htmlContent)
+
+        -- Reset scroll position to top when new content is loaded
+        if self.ScrollFrame.SetVerticalScroll then
+            self.ScrollFrame:SetVerticalScroll(0)
+        end
 
         local estimatedHeight = elementData.estimatedHeight or 400
         self:SetHeight(estimatedHeight)

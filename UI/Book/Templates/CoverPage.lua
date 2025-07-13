@@ -84,6 +84,12 @@ function CoverPageMixin:Init(elementData)
         end
         
         scrollContent:SetText(finalContent)
+        
+        -- Reset scroll position to top when new content is loaded
+        if self.ContentArea and self.ContentArea.DescriptionScrollFrame and self.ContentArea.DescriptionScrollFrame.SetVerticalScroll then
+            self.ContentArea.DescriptionScrollFrame:SetVerticalScroll(0)
+        end
+        
         scrollContent:Show()
     else
         if scrollContent then
