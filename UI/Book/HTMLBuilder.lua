@@ -30,6 +30,9 @@
 ]]
 local FOLDER_NAME, private = ...
 
+-- Import dependencies
+local StringUtils = private.Core.Utils.StringUtils
+
 -- Initialize HTMLBuilder namespace
 private.Core.Utils = private.Core.Utils or {}
 private.Core.Utils.HTMLBuilder = {}
@@ -433,9 +436,12 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
 
     -- Add description if present
     if entity.description and entity.description ~= "" then
-        -- Check if description is already HTML
-        if string.find(entity.description, "<[^>]+>") then
-            -- Description is already HTML, use it directly
+        -- Check if description is a complete HTML document using StringUtils
+        if StringUtils.ContainsHTML(entity.description) then
+            -- Description is a complete HTML document, return it directly
+            return entity.description
+        elseif string.find(entity.description, "<[^>]+>") then
+            -- Description contains HTML tags but isn't a complete document, use it directly
             content = content .. entity.description
         else
             -- Plain text description, wrap in paragraph
@@ -454,8 +460,12 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
             if chapter.pages and type(chapter.pages) == "table" then
                 for _, page in ipairs(chapter.pages) do
                     if page and page ~= "" then
-                        -- Check if page content is HTML
-                        if string.find(page, "<[^>]+>") then
+                        -- Check if page content is a complete HTML document using StringUtils
+                        if StringUtils.ContainsHTML(page) then
+                            -- Page is a complete HTML document, return it directly
+                            return page
+                        elseif string.find(page, "<[^>]+>") then
+                            -- Page contains HTML tags but isn't a complete document
                             content = content .. page
                         else
                             content = content .. HTMLBuilder.CreateParagraph(page)
