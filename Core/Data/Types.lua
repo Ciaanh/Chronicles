@@ -345,7 +345,7 @@ function Types.IsValidTable(tbl)
 end
 
 -- -------------------------
--- EVENT SCHEMA VALIDATION (for EventManager compatibility)
+-- EVENT SCHEMA VALIDATION
 -- -------------------------
 
 --[[

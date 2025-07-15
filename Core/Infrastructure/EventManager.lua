@@ -5,11 +5,6 @@ private.Core.EventManager = {}
 --[[
 Chronicles Event Management System
 
-ARCHITECTURE OVERVIEW:
-This addon has migrated from a pure event-driven architecture to a hybrid
-state-based + event-driven architecture for better maintainability and
-single source of truth patterns.
-
 CURRENT EVENT USAGE:
 ✅ ACTIVELY TRIGGERED EVENTS (All with validation schemas):
 - AddonStartup, AddonShutdown: Application lifecycle
@@ -20,25 +15,10 @@ CURRENT EVENT USAGE:
 - TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
 - DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display (with suffix validation)
 
-CURRENT EVENT USAGE:
-✅ ACTIVELY TRIGGERED EVENTS:
-- AddonStartup, AddonShutdown: Application lifecycle
-- TimelineInit: Timeline initialization
-- UIRefresh: UI component refresh requests
-- TabUITabSet: Tab selection in main UI
-- SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
-- TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
-- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display
-
-❌ LEGACY EVENTS (State-based now):
-- EventSelected, CharacterSelected, FactionSelected: Now handled via StateManager
-- TimelinePeriodSelected: Now handled via StateManager
-
 MIGRATION NOTES:
 - Selection events (Event/Character/Faction) moved to StateManager.setState()
 - UI components subscribe to state changes instead of listening for events
 - This provides single source of truth and better state synchronization
-- Legacy event schemas remain for potential future use or plugin compatibility
 --]]
 -- -------------------------
 -- Global Utility Functions

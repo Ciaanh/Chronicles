@@ -56,9 +56,7 @@ local ContentUtils = private.Core.Utils.ContentUtils
     @return [table] New book format with single HTML content element
 ]]
 function ContentUtils.TransformEntityToBook(entity, options)
-    print("ContentUtils.TransformEntityToBook called with entity:", entity and entity.name or "nil")
     if not entity then
-        print("ContentUtils: No entity provided")
         return {
             {
                 elements = {
@@ -73,7 +71,16 @@ function ContentUtils.TransformEntityToBook(entity, options)
     end
 
     -- Generate complete HTML content using HTMLBuilder
-    local htmlContent = HTMLBuilder.CreateEntityHTML(entity, options)
+    local htmlContent
+    if HTMLBuilder.CreateEntityHTML then
+        htmlContent = HTMLBuilder.CreateEntityHTML(entity, options)
+    else
+        -- Create simple fallback HTML
+        local title = entity.name or entity.label or "Unknown"
+        local description = entity.description or "No description available"
+        htmlContent = string.format("<html><body><h1>%s</h1><p>%s</p></body></html>", title, description)
+    end
+    
     local title = entity.name or entity.label or "Chronicles Content"
 
     -- Return array of section objects, each with an elements array
@@ -90,7 +97,6 @@ function ContentUtils.TransformEntityToBook(entity, options)
         }
     }
 
-    print("ContentUtils: Returning result with section count:", #result)
     return result
 end
 
@@ -362,6 +368,27 @@ end
 function ContentUtils.CreateTestBook(entityType)
     local testEntity = ContentUtils.CreateTestEntity(entityType)
     return ContentUtils.TransformEntityToBook(testEntity)
+end
+
+--[[
+    Create a simple test HTML book for debugging HTML display
+    @return [table] New book format with test HTML content
+]]
+function ContentUtils.CreateTestHTMLBook()
+    local testHtml = HTMLBuilder.CreateTestHTML()
+    
+    return {
+        {
+            elements = {
+                {
+                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
+                    htmlContent = testHtml,
+                    title = "Test Content",
+                    entity = { name = "Test" }
+                }
+            }
+        }
+    }
 end
 
 return ContentUtils
