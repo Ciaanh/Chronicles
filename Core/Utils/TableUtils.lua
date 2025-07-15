@@ -148,8 +148,5 @@ function TableUtils.Map(table, mapper)
     return result
 end
 
--- Export utility functions globally for backwards compatibility
-_G.Set = TableUtils.Set
-_G.tablelength = TableUtils.Length
-_G.copyTable = TableUtils.DeepCopy
-_G.TableUtils = TableUtils
+-- Module export
+return TableUtils

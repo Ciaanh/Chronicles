@@ -210,5 +210,5 @@ function ValidationUtils.IsValidPeriod(period)
     return true
 end
 
--- Export ValidationUtils globally for access by business modules
-_G.ValidationUtils = ValidationUtils
+-- Module export
+return ValidationUtils

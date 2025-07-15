@@ -84,7 +84,8 @@
 ---@field timestamp number Cache creation timestamp
 ---@field ttl number Time to live in seconds
 ---@field size number Cache entry size in bytes
--- Global type aliases for commonly used types
+
+-- Type aliases for commonly used types
 ---@alias ChroniclesEventId number
 ---@alias ChroniclesCharacterId string
 ---@alias ChroniclesTimelineId string

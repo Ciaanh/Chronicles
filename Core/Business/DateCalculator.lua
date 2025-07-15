@@ -4,7 +4,7 @@ local FOLDER_NAME, private = ...
 =================================================================================
 Module: DateCalculator
 Purpose: Business logic for date and time calculations in Chronicles timeline
-Dependencies: ValidationUtils (accessed globally)
+Dependencies: Core.Utils.ValidationUtils (via private namespace)
 Author: Chronicles Team
 =================================================================================
 
@@ -31,7 +31,7 @@ Event Integration:
 - Supports both positive and negative years (BC/AD system)
 
 Dependencies:
-- ValidationUtils (global access pattern)
+- ValidationUtils (via private.Core.Utils.ValidationUtils)
 - Constants for timeline configuration
 =================================================================================
 ]]
@@ -40,6 +40,9 @@ private.Core.Business = private.Core.Business or {}
 private.Core.Business.DateCalculator = {}
 
 local DateCalculator = private.Core.Business.DateCalculator
+
+-- Dependencies
+local ValidationUtils = private.Core.Utils.ValidationUtils
 
 -- Note: Utilities are accessed as globals since they're loaded before this module
 
@@ -324,5 +327,5 @@ function DateCalculator.GetRelativeTimeDescription(fromYear, toYear)
     end
 end
 
--- Export DateCalculator globally for access by other modules
-_G.DateCalculator = DateCalculator
+-- Module export
+return DateCalculator

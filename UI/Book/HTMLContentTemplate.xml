@@ -39,27 +39,27 @@
 
         <Frames>
             <!-- Main scroll frame for HTML content -->
-            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="false">
                 <KeyValues>
                     <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
                     <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
                     <KeyValue key="scrollBarX" value="14" type="number"/>
-                    <KeyValue key="scrollBarTopY" value="-5" type="number"/>
-                    <KeyValue key="scrollBarBottomY" value="5" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-25" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="25" type="number"/>
                 </KeyValues>
+                <Size x="500" y="520"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT"/>
-                    <Anchor point="BOTTOMRIGHT"/>
+                    <Anchor point="TOPLEFT" y="-20"/>
                 </Anchors>
 
                 <ScrollChild>
                     <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
-                        <Size x="400"/>
+                        <Size x="500"/>
                         <Anchors>
-                            <Anchor point="TOPLEFT" />
+                            <Anchor point="TOPLEFT"/>
                         </Anchors>
                         <FontString inherits="ChroniclesFontFamily_Text_Medium">
-                            <Color color="SPELLBOOK_FONT_COLOR" />
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
                         </FontString>
                     </SimpleHTML>
                 </ScrollChild>
@@ -69,11 +69,6 @@
                 </Scripts>
             </ScrollFrame>
         </Frames>
-
-        <!-- <Scripts>
-            <OnLoad method="OnLoad"/>
-            <OnMouseWheel method="OnMouseWheel"/>
-        </Scripts> -->
     </Frame>
 
 </Ui>

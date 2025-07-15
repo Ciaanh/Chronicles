@@ -80,6 +80,5 @@ function MathUtils.InRange(value, min, max)
     return value >= min and value <= max
 end
 
--- Export utility functions globally for backwards compatibility
-_G.adjust_value = MathUtils.AdjustValue
-_G.MathUtils = MathUtils
+-- Module export
+return MathUtils

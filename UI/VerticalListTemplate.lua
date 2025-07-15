@@ -163,12 +163,6 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     6. SEARCH: Built-in search functionality with customizable placeholders
     7. PERFORMANCE: Optimized data handling and rendering
     8. ACCESSIBILITY: Consistent tooltip and interaction patterns
-    
-    BACKWARDS COMPATIBILITY:
-    
-    - Shared template can be used alongside existing templates
-    - No modifications to existing code are required
-    - Gradual migration possible if desired
 --]]
 
 -- -------------------------

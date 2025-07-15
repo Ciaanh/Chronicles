@@ -29,11 +29,9 @@ function HTMLContentMixin:Init(elementData)
         return
     end
 
-    -- Store current content for reference
-    --self.currentContent = elementData
-
     -- Use htmlContent exclusively
     local htmlContent = elementData.htmlContent
+    
     if not htmlContent or htmlContent == "" then
         self:ShowError("No HTML content provided")
         return
@@ -42,22 +40,7 @@ function HTMLContentMixin:Init(elementData)
     -- Set the HTML content in the scroll frame
     if self.ScrollFrame and self.ScrollFrame.HTML then
         local htmlContainer = self.ScrollFrame.HTML
-        local success =
-            pcall(
-            function()
-                htmlContainer:SetText(htmlContent)
-            end
-        )
-
-        if not success then
-            self:ShowError("Failed to display HTML content")
-            return
-        else
-            print("HTMLContentMixin: Successfully set HTML content")
-        end
-
-        -- Calculate and set appropriate height
-        --self:UpdateHeight()
+        htmlContainer:SetText(htmlContent)
 
         -- Scroll to top
         self.ScrollFrame:SetVerticalScroll(0)
@@ -66,7 +49,6 @@ function HTMLContentMixin:Init(elementData)
         htmlContainer:Show()
         self:Show()
     else
-        -- print("HTMLContentMixin: ScrollFrame or HTML component not found")
         self:ShowError("HTML display component not found")
     end
 end
@@ -74,32 +56,32 @@ end
 --[[
     Update the height of the content based on HTML content
 ]]
--- function HTMLContentMixin:UpdateHeight()
---     if not self.ScrollFrame or not self.ScrollFrame.HTML then
---         return
---     end
+function HTMLContentMixin:UpdateHeight()
+    if not self.ScrollFrame or not self.ScrollFrame.HTML then
+        return
+    end
 
---     -- Try to get content height from HTML component
---     local contentHeight = 550 -- Default height
+    -- Try to get content height from HTML component
+    local contentHeight = 550 -- Default height
 
---     if self.ScrollFrame.HTML.GetContentHeight then
---         local htmlHeight = self.ScrollFrame.HTML:GetContentHeight()
---         if htmlHeight and htmlHeight > 0 then
---             contentHeight = math.min(htmlHeight + 20, 800) -- Add padding, cap at 800
---         end
---     end
+    if self.ScrollFrame.HTML.GetContentHeight then
+        local htmlHeight = self.ScrollFrame.HTML:GetContentHeight()
+        if htmlHeight and htmlHeight > 0 then
+            contentHeight = math.min(htmlHeight + 20, 800) -- Add padding, cap at 800
+        end
+    end
 
---     -- Set dynamic height with reasonable bounds
---     contentHeight = math.max(contentHeight, 200) -- Minimum height
---     contentHeight = math.min(contentHeight, 800) -- Maximum height
+    -- Set dynamic height with reasonable bounds
+    contentHeight = math.max(contentHeight, 200) -- Minimum height
+    contentHeight = math.min(contentHeight, 800) -- Maximum height
 
---     self:SetHeight(contentHeight)
+    self:SetHeight(contentHeight)
 
---     -- Update scroll frame size
---     if self.ScrollFrame then
---         self.ScrollFrame:SetHeight(contentHeight - 10)
---     end
--- end
+    -- Update scroll frame size
+    if self.ScrollFrame then
+        self.ScrollFrame:SetHeight(contentHeight - 10)
+    end
+end
 
 --[[
     Show an error message when content cannot be displayed
@@ -108,25 +90,14 @@ end
 function HTMLContentMixin:ShowError(errorMessage)
     errorMessage = errorMessage or "Unknown error occurred"
 
-    local errorHTML =
-        string.format(
-        [[
-        <html>
-        <body style="background-color: #1a1a1a; color: #ff6666; font-family: serif; padding: 20px;">
-            <div style="text-align: center; font-size: 16px; font-weight: bold;">
-                Error: %s
-            </div>
-            <div style="text-align: center; font-size: 12px; margin-top: 10px; color: #cccccc;">
-                HTML Book System
-            </div>
-        </body>
-        </html>
-    ]],
-        errorMessage
-    )
+    -- Create simple HTML error message compatible with SimpleHTML
+    local errorHTML = string.format([[<html><body><h1>Error</h1><p>%s</p></body></html>]], errorMessage)
 
     if self.ScrollFrame and self.ScrollFrame.HTML then
-        self.ScrollFrame.HTML:SetText(errorHTML)
+        local success, err = pcall(function()
+            self.ScrollFrame.HTML:SetText(errorHTML)
+        end)
+        
         self:SetHeight(150)
         self:Show()
     end

@@ -227,5 +227,5 @@ function UIUtils.CleanupElementArray(elementArray, clearArray)
     end
 end
 
--- Export for backwards compatibility
-_G.UIUtils = UIUtils
+-- Module export
+return UIUtils

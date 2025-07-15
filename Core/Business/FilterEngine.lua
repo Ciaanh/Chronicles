@@ -4,7 +4,7 @@ local FOLDER_NAME, private = ...
 =================================================================================
 Module: FilterEngine
 Purpose: Advanced filtering system for Chronicles events and content
-Dependencies: ValidationUtils (global), DateCalculator
+Dependencies: Core.Utils.ValidationUtils, Core.Business.DateCalculator
 Author: Chronicles Team
 =================================================================================
 
@@ -54,7 +54,10 @@ private.Core.Business.FilterEngine = {}
 
 local FilterEngine = private.Core.Business.FilterEngine
 
--- Note: Utilities are accessed as globals since they're loaded before this module
+-- Dependencies
+local ValidationUtils = private.Core.Utils.ValidationUtils
+local TableUtils = private.Core.Utils.TableUtils
+local DateCalculator = private.Core.Business.DateCalculator
 
 --[[
     Filter Configuration Structure:

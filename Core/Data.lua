@@ -6,6 +6,12 @@
 local FOLDER_NAME, private = ...
 local Chronicles = private.Chronicles
 
+-- Initialize Core.Utils namespace if it doesn't exist
+private.Core = private.Core or {}
+private.Core.Utils = private.Core.Utils or {}
+
+local TableUtils = private.Core.Utils.TableUtils
+
 Chronicles.Data = {}
 Chronicles.Data.Events = {}
 Chronicles.Data.Factions = {}
@@ -22,7 +28,7 @@ function Chronicles.Data:Load()
     end
 
     -- Initialize the cache system
-    private.Core.Cache.init()
+    private.Core.Cache.init()   
 end
 
 function Chronicles.Data:RefreshPeriods()
@@ -95,7 +101,7 @@ end
 
 function Chronicles.Data:DefinePeriodsForEvent(period, eventId)
     if period ~= nil then
-        local items = Set(period)
+        local items = TableUtils.Set(period)
         if items[eventId] ~= nil then
         else
             table.insert(period, eventId)

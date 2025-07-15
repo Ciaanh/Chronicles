@@ -129,7 +129,7 @@ end
     
     Event Flow:
     1. Update tab system to reflect current state
-    2. Set global UI state to indicate frame is open
+    2. Set UI state to indicate frame is open
     3. Play appropriate UI sound for user feedback
 ]]
 function MainFrameUIMixin:OnShow()
@@ -149,7 +149,7 @@ end
     
     Event Flow:
     1. Play appropriate UI sound for user feedback
-    2. Update global UI state to indicate frame is closed
+    2. Update UI state to indicate frame is closed
 ]]
 function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
@@ -172,25 +172,16 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 	end
 
 	if eventSelection and eventSelection.eventId and eventSelection.collectionName then
-		-- print("MainFrameUI: Event selection found:", eventSelection.eventId, eventSelection.collectionName)
 		-- Fetch the event data
 		local event = Chronicles.Data:FindEventByIdAndCollection(eventSelection.eventId, eventSelection.collectionName)
-		-- print("MainFrameUI: Found event:", event and event.name or event and event.label or "nil")
 		if event then
 			-- Transform to book format and display
 			local success, bookContent = pcall(private.Core.Events.TransformEventToBook, event)
-			-- print("MainFrameUI: Transform success:", success, "bookContent:", bookContent and "exists" or "nil")
 			if success and bookContent then
 				eventBook:OnContentReceived(bookContent)
 				return
-			-- else
-			-- 	print("MainFrameUI: Transform failed or returned nil")
 			end
-		-- else
-		-- 	print("MainFrameUI: No event found for selection")
 		end
-	-- else
-	-- 	print("MainFrameUI: No valid event selection")
 	end
 
 	eventBook:ShowEmptyBook()
@@ -303,3 +294,50 @@ end
 function TabUIMixin:IsTabAvailable(tabID)
 	return true
 end
+
+-- =============================================================================================
+-- GLOBAL TEST FUNCTIONS (for console debugging)
+-- =============================================================================================
+
+-- Global function to test HTML content from console
+function CHRONICLES_TEST_HTML()
+    print("CHRONICLES_TEST_HTML: Starting test...")
+    
+    if not ChroniclesMainFrame then
+        print("ERROR: ChroniclesMainFrame not found")
+        return
+    end
+    
+    if not ChroniclesMainFrame.TestHTMLContent then
+        print("ERROR: TestHTMLContent function not found")
+        return
+    end
+    
+    ChroniclesMainFrame:TestHTMLContent()
+end
+
+-- Global function to test simple HTML validation
+function CHRONICLES_TEST_HTML_VALIDATION()
+    print("CHRONICLES_TEST_HTML_VALIDATION: Starting test...")
+    
+    if not private.Core.Utils.HTMLBuilder then
+        print("ERROR: HTMLBuilder not available")
+        return
+    end
+    
+    local HTMLBuilder = private.Core.Utils.HTMLBuilder
+    
+    -- Test the validation function
+    local testHTML = HTMLBuilder.CreateTestHTML()
+    print("Generated test HTML:", string.sub(testHTML, 1, 100))
+    
+    local isValid, message = HTMLBuilder.ValidateSimpleHTML(testHTML)
+    print("HTML validation result:", isValid, message)
+    
+    -- Test a simple HTML string directly
+    local simpleHTML = "<html><body><h1>Test</h1><p>Simple test</p></body></html>"
+    local isValid2, message2 = HTMLBuilder.ValidateSimpleHTML(simpleHTML)
+    print("Simple HTML validation:", isValid2, message2)
+end
+
+-- =============================================================================================
