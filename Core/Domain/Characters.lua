@@ -33,11 +33,11 @@ function private.Core.Characters.TransformCharacterToBook(character)
         error("TransformCharacterToBook: ContentUtils not loaded")
     end
 
-    if not private.Core.Utils.ContentUtils.CreateUnifiedContent then
-        error("TransformCharacterToBook: ContentUtils.CreateUnifiedContent not available")
+    if not private.Core.Utils.ContentUtils.TransformEntityToBook then
+        error("TransformCharacterToBook: ContentUtils.TransformEntityToBook not available")
     end
 
-    return private.Core.Utils.ContentUtils.CreateUnifiedContent(character)
+    return private.Core.Utils.ContentUtils.TransformEntityToBook(character)
 end
 
 --[[

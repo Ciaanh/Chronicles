@@ -7,8 +7,7 @@
 	<Include file="Fonts.xml" />
 	<Include file="VerticalListTemplate.xml" />
 	
-	<Include file="Book\Templates\_Includes.xml" />
-	<Include file="Book\BookContainerTemplate.xml" />
+	<Include file="Book\_Includes.xml" />
 
 	<Include file="Events\TimelineTemplate.xml" />
 	<Include file="Events\EventListTemplate.xml" />
