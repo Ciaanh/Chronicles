@@ -135,7 +135,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     -- In MainFrameUI.xml, you could add:
     <Frame parentKey="Characters" frameLevel="100" hidden="true">
         <Frames>
-            <!-- New shared template for factions in character tab -->
+            <!-- shared template for factions in character tab -->
             <Frame parentKey="RelatedFactions" inherits="VerticalFactionListSharedTemplate">
                 <Size x="150" y="300"/>
                 <Anchors>
@@ -166,7 +166,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     
     BACKWARDS COMPATIBILITY:
     
-    - New shared template can be used alongside existing templates
+    - Shared template can be used alongside existing templates
     - No modifications to existing code are required
     - Gradual migration possible if desired
 --]]

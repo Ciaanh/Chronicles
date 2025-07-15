@@ -31,7 +31,7 @@
     ============================================================================================= -->
 
     <Frame name="HTMLContentTemplate" mixin="HTMLContentMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="550"/>
+        <Size x="500" y="550"/>
         <!-- Dynamic height, will be adjusted based on content -->
         <Anchors>
             <Anchor point="TOPLEFT"/>
