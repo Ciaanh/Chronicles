@@ -5,8 +5,6 @@
     FONT FAMILIES (Base Definitions)
     ============================================================================================= -->
 
-
-
     <FontFamily name="ChroniclesFontFamily_Text_Shadow_Small" virtual="true">
         <Member alphabet="roman">
             <Font font="Fonts\FRIZQT__.TTF" height="12">
@@ -83,24 +81,6 @@
 
 
 
-    <!-- Chronicles Medium Font Family (12px base) -->
-    <FontFamily name="ChroniclesFontFamily_Medium" virtual="true">
-        <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="12"/>
-        </Member>
-        <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="12" spacing="8"/>
-        </Member>
-        <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="12"/>
-        </Member>
-        <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="12"/>
-        </Member>
-        <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="12"/>
-        </Member>
-    </FontFamily>
 
     <!-- Chronicles Large Font Family (16px base) -->
     <FontFamily name="ChroniclesFontFamily_Large" virtual="true">
@@ -121,6 +101,38 @@
         </Member>
     </FontFamily>
 
+    <!-- Chronicles Medium Font Family (12px base) -->
+    <FontFamily name="ChroniclesFontFamily_Medium" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\MORPHEUS.ttf" height="12"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\K_Pagetext.ttf" height="12" spacing="8"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="12"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\blei00d.ttf" height="12"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\MORPHEUS_CYR.TTF" height="12"/>
+        </Member>
+    </FontFamily>
+
+    <!-- Chronicles Gold - Medium -->
+    <Font name="ChroniclesFontFamily_Shadow_Medium" inherits="ChroniclesFontFamily_Medium" virtual="true">
+        <Shadow>
+            <Offset>
+                <AbsDimension x="1" y="-1"/>
+            </Offset>
+            <Color r="0" g="0" b="0"/>
+        </Shadow>
+        <Color r="1" g=".82" b="0"/>
+    </Font>
+
+
+
     <!-- Timeline Font Family (14px base) -->
     <FontFamily name="TimelineFontFamily_Medium" virtual="true">
         <Member alphabet="roman">
@@ -139,109 +151,5 @@
             <Font font="Fonts\MORPHEUS_CYR.TTF" height="14"/>
         </Member>
     </FontFamily>
-
-    <!-- =============================================================================================
-    BASE CHRONICLES FONTS (Primary Brand Colors)
-    ============================================================================================= -->
-
-    <!-- Chronicles Gold - Medium -->
-    <Font name="ChroniclesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-    </Font>
-
-    <!-- Chronicles Gold - Large -->
-    <!-- <Font name="ChroniclesFontLarge" inherits="ChroniclesFontFamily_Large" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-    </Font> -->
-
-    <!-- Chronicles White - Medium -->
-    <!-- <Font name="ChroniclesFontWhite" inherits="ChroniclesFontFamily_Medium" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r=".88" g=".88" b=".88"/>
-    </Font> -->
-
-    <!-- Chronicles White - Large -->
-    <!-- <Font name="ChroniclesFontLargeWhite" inherits="ChroniclesFontFamily_Large" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r=".88" g=".88" b=".88"/>
-    </Font> -->
-
-    <!-- =============================================================================================
-    SPECIALIZED FONTS (Context-Specific)
-    ============================================================================================= -->
-
-    <!-- UI Filter Title -->
-    <!-- <Font name="FilterTitleFont" inherits="ChroniclesFontFamily_Text_Medium" virtual="true">
-        <Color r="0.50" g="0.5" b="0.5"/>
-    </Font> -->
-
-    <!-- Timeline Display -->
-    <!-- <Font name="TimelineStepInfoFont" inherits="TimelineFontFamily_Medium" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0" g="0" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-    </Font> -->
-
-    <!-- =============================================================================================
-    EVENT FONTS (Event-Specific Styling)
-    ============================================================================================= -->
-
-    <!-- Event Title (Large, Golden) -->
-    <!-- <Font name="EventDescriptionTitleFont" inherits="QuestFont_Large" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0.30" g="0.18" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-    </Font> -->
-
-    <!-- Event Dates (Chronicles Medium, Golden) -->
-    <!-- <Font name="EventDescriptionDatesFont" inherits="ChroniclesFontFamily_Medium" virtual="true">
-        <Shadow>
-            <Offset>
-                <AbsDimension x="1" y="-1"/>
-            </Offset>
-            <Color r="0.30" g="0.18" b="0"/>
-        </Shadow>
-        <Color r="1" g=".82" b="0"/>
-    </Font> -->
-
-    <!-- Event Body Text (Dark Brown) -->
-    <!-- <Font name="EventDescriptionFont" inherits="ChroniclesFontFamily_Text_Medium" virtual="true">
-        <Color r="0.30" g="0.18" b="0"/>
-    </Font> -->
-
-    <!-- Event Secondary Text (Light Brown) -->
-    <!-- <Font name="EventDescriptionFontLight" inherits="ChroniclesFontFamily_Text_Medium" virtual="true">
-        <Color r=".77" g=".67" b=".49"/>
-    </Font> -->
 
 </Ui>

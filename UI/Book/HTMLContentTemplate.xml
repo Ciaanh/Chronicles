@@ -61,6 +61,10 @@
                         <FontString inherits="ChroniclesFontFamily_Text_Medium">
                             <Color color="SPELLBOOK_FONT_COLOR"/>
                         </FontString>
+                        <FontStringHeader1 inherits="ChroniclesFontFamily_Text_Huge" spacing="4">
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
+                        </FontStringHeader1>
+                        <!-- <FontStringHeader2 inherits="GameFontHighlight" spacing="4"/> -->
                     </SimpleHTML>
                 </ScrollChild>
 

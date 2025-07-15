@@ -45,7 +45,7 @@ local HTMLBuilder = private.Core.Utils.HTMLBuilder
 -- WoW color codes
 local WOW_COLORS = {
     title = "|cFFffd100",
-    subtitle = "|cFFd4af37", 
+    subtitle = "|cFFd4af37",
     text = "|cFFffffff",
     author = "|cFFcccccc",
     date = "|cFFffd100",
@@ -70,11 +70,11 @@ local HTML_ENTITIES = {
 
 -- Extended HTML entities from LibMarkdown for spacing
 local EXTENDED_ENTITIES = {
-    ["&nbsp;"] = "&nbsp;",    -- Non-breaking space
-    ["&emsp;"] = "&emsp;",    -- Font-size space
-    ["&ensp;"] = "&ensp;",    -- Half font-size space
-    ["&em13;"] = "&em13;",    -- 1/3 font-size space
-    ["&em14;"] = "&em14;",    -- 1/4 font-size space
+    ["&nbsp;"] = "&nbsp;", -- Non-breaking space
+    ["&emsp;"] = "&emsp;", -- Font-size space
+    ["&ensp;"] = "&ensp;", -- Half font-size space
+    ["&em13;"] = "&em13;", -- 1/3 font-size space
+    ["&em14;"] = "&em14;", -- 1/4 font-size space
     ["&thinsp;"] = "&thinsp;" -- 1/5 font-size space (non-breaking)
 }
 
@@ -83,7 +83,9 @@ local EXTENDED_ENTITIES = {
 -- =============================================================================================
 
 local function EscapeHTMLText(text)
-    if not text then return "" end
+    if not text then
+        return ""
+    end
     text = tostring(text)
     for char, entity in pairs(HTML_ENTITIES) do
         text = text:gsub(char, entity)
@@ -92,9 +94,13 @@ local function EscapeHTMLText(text)
 end
 
 local function ApplyWoWColor(text, colorCode)
-    if not text or text == "" then return "" end
-    if not colorCode then return text end
-    
+    if not text or text == "" then
+        return ""
+    end
+    if not colorCode then
+        return text
+    end
+
     return colorCode .. text .. WOW_COLORS.reset
 end
 
@@ -110,8 +116,10 @@ end
     @return [string] Complete HTML document
 ]]
 function HTMLBuilder.CreateHTMLDocument(content)
-    if not content then content = "" end
-    
+    if not content then
+        content = ""
+    end
+
     -- SimpleHTML requires minimal structure - no CSS, no DOCTYPE, no head styling
     local html = string.format("<html><body>%s</body></html>", content)
     return html
@@ -133,8 +141,23 @@ function HTMLBuilder.CreateTitle(title)
     end
 
     local safeTitle = EscapeHTMLText(title)
-    local coloredTitle = ApplyWoWColor(safeTitle, WOW_COLORS.title)
-    return string.format("<h1>%s</h1>", coloredTitle)
+    --local coloredTitle = ApplyWoWColor(safeTitle, WOW_COLORS.title)
+
+    local width = '500'
+    local height = '20'
+    local align = "center"
+
+    -- Ensure path is properly escaped for HTML
+    local safePath = EscapeHTMLText("Interface\\AddOns\\Chronicles\\Art\\Divider")
+
+    return string.format(
+        '<h1 align="center">%s</h1><img src="%s" width="%s" height="%s" align="%s"/>',
+        safeTitle,
+        safePath,
+        width,
+        height,
+        align
+    )
 end
 
 --[[
@@ -149,8 +172,7 @@ function HTMLBuilder.CreateSubtitle(subtitle)
     end
 
     local safeSubtitle = EscapeHTMLText(subtitle)
-    local coloredSubtitle = ApplyWoWColor(safeSubtitle, WOW_COLORS.subtitle)
-    return string.format("<h2>%s</h2>", coloredSubtitle)
+    return string.format("<h2>%s</h2>", safeSubtitle)
 end
 
 --[[
@@ -165,8 +187,7 @@ function HTMLBuilder.CreateChapterHeader(header)
     end
 
     local safeHeader = EscapeHTMLText(header)
-    local coloredHeader = ApplyWoWColor(safeHeader, WOW_COLORS.chapter)
-    return string.format("<h3>%s</h3>", coloredHeader)
+    return string.format("<h3>%s</h3>", safeHeader)
 end
 
 --[[
@@ -181,8 +202,7 @@ function HTMLBuilder.CreateAuthor(author)
     end
 
     local safeAuthor = EscapeHTMLText(author)
-    local coloredAuthor = ApplyWoWColor(safeAuthor, WOW_COLORS.author)
-    return string.format('<p align="right">%s</p>', coloredAuthor)
+    return string.format('<p align="right">%s</p>', safeAuthor)
 end
 
 --[[
@@ -211,8 +231,7 @@ function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
     end
 
     local safeDateText = EscapeHTMLText(dateText)
-    local coloredDate = ApplyWoWColor(safeDateText, WOW_COLORS.date)
-    return string.format('<p align="center">%s</p>', coloredDate)
+    return string.format('<p align="right">%s</p>', safeDateText)
 end
 
 --[[
@@ -234,7 +253,7 @@ function HTMLBuilder.CreatePortrait(portraitPath, options)
 
     -- Ensure path is properly escaped for HTML
     local safePath = EscapeHTMLText(portraitPath)
-    
+
     return string.format('<img src="%s" width="%s" height="%s" align="%s"/>', safePath, width, height, align)
 end
 
@@ -252,7 +271,7 @@ function HTMLBuilder.CreateParagraph(text, options)
 
     options = options or {}
     local safeText = EscapeHTMLText(text)
-    
+
     if options.align then
         return string.format('<p align="%s">%s</p>', options.align, safeText)
     else
@@ -292,7 +311,7 @@ function HTMLBuilder.CreateLink(text, url)
 
     local safeText = EscapeHTMLText(text)
     local safeUrl = EscapeHTMLText(url)
-    
+
     return string.format('<a href="%s">%s</a>', safeUrl, safeText)
 end
 
@@ -312,7 +331,7 @@ function HTMLBuilder.CreateChroniclesLink(text, linkType, linkData)
     local safeText = EscapeHTMLText(text)
     local safeLinkData = EscapeHTMLText(tostring(linkData))
     local href = linkType .. ":" .. safeLinkData
-    
+
     return string.format('<a href="%s">%s</a>', href, safeText)
 end
 
@@ -392,7 +411,6 @@ end
         HTMLBuilder.CreateParagraph("Click " .. HTMLBuilder.CreateChroniclesLink("here", "event", 123) .. " to view the First War.")
     )
 --]]
-
 -- =============================================================================================
 -- ENTITY CONTENT GENERATION
 -- =============================================================================================
@@ -407,8 +425,7 @@ end
 function HTMLBuilder.CreateEntityHTML(entity, options)
     if not entity then
         return HTMLBuilder.CreateHTMLDocument(
-            HTMLBuilder.CreateTitle("Error") ..
-            HTMLBuilder.CreateParagraph("No entity data provided")
+            HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
         )
     end
 
@@ -456,7 +473,7 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
             if chapter.header then
                 content = content .. HTMLBuilder.CreateChapterHeader(chapter.header)
             end
-            
+
             if chapter.pages and type(chapter.pages) == "table" then
                 for _, page in ipairs(chapter.pages) do
                     if page and page ~= "" then
@@ -473,14 +490,19 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
                     end
                 end
             end
-            
+
             content = content .. HTMLBuilder.CreateDivider()
         end
     end
 
     -- If no content was generated, create a minimal message
     if content == "" or content == HTMLBuilder.CreateTitle(title) then
-        content = content .. HTMLBuilder.CreateParagraph("No content available for this " .. (entity.eventType and "event" or entity.factions and "character" or "faction") .. ".")
+        content =
+            content ..
+            HTMLBuilder.CreateParagraph(
+                "No content available for this " ..
+                    (entity.eventType and "event" or entity.factions and "character" or "faction") .. "."
+            )
     end
 
     return HTMLBuilder.CreateHTMLDocument(content)
@@ -491,14 +513,15 @@ end
     @return [string] Test HTML document
 ]]
 function HTMLBuilder.CreateTestHTML()
-    local content = HTMLBuilder.CreateTitle("Test Content") ..
-                   HTMLBuilder.CreateSubtitle("This is a test") ..
-                   HTMLBuilder.CreateParagraph("This is a simple test paragraph to verify HTML display is working.") ..
-                   HTMLBuilder.CreateDivider() ..
-                   HTMLBuilder.CreateChapterHeader("Test Chapter") ..
-                   HTMLBuilder.CreateParagraph("Chapter content goes here.") ..
-                   HTMLBuilder.CreateAuthor("Chronicles Team")
-    
+    local content =
+        HTMLBuilder.CreateTitle("Test Content") ..
+        HTMLBuilder.CreateSubtitle("This is a test") ..
+            HTMLBuilder.CreateParagraph("This is a simple test paragraph to verify HTML display is working.") ..
+                HTMLBuilder.CreateDivider() ..
+                    HTMLBuilder.CreateChapterHeader("Test Chapter") ..
+                        HTMLBuilder.CreateParagraph("Chapter content goes here.") ..
+                            HTMLBuilder.CreateAuthor("Chronicles Team")
+
     return HTMLBuilder.CreateHTMLDocument(content)
 end
 
