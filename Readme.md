@@ -114,20 +114,25 @@ Chronicles/
 │       ├── TableUtils.lua           # Table operation utilities
 │       ├── MathUtils.lua            # Mathematical calculations
 │       ├── ValidationUtils.lua      # Input validation utilities
+│       ├── BookUtils.lua            # Book content transformation utilities
 │       └── UIUtils.lua              # UI-specific helper functions
 ├── UI/                              # User interface components
 │   ├── MainFrameUI.lua/xml          # Main interface frame (1200x850)
 │   ├── Events/                      # Events tab components
-│   │   ├── Timeline/                # Timeline visualization
-│   │   └── List/                    # Event list and pagination
-│   ├── Characters/                  # Characters tab components
-│   ├── Factions/                    # Factions tab components
+│   │   ├── EventListTemplate.xml/lua
+│   │   ├── EventListPagingControls.xml/lua
+│   │   └── TimelineTemplate.xml/lua # Timeline visualization
+│   ├── Book/                        # Book-style content display
+│   │   ├── BookContainerTemplate.xml/lua
+│   │   ├── HTMLContentTemplate.xml/lua
+│   │   ├── HTMLBuilder.lua
+│   │   └── ContentUtils.lua         # Content transformation utilities
 │   ├── Settings/                    # Settings and configuration UI
-│   └── Templates/                   # Reusable UI templates
-│       ├── VerticalListTemplate.*   # Shared list component
-│       ├── BookContainerTemplate.*     # Book-style content display
-│       ├── BookPages.xml            # Chapter and page templates
-│       └── Templates.lua            # Template registration and utilities
+│   │   ├── Settings.xml             # Configuration interface XML
+│   │   └── Settings.lua             # Configuration interface logic
+│   ├── VerticalListTemplate.xml/lua # Shared list component
+│   ├── ScrollFrameMixin.lua         # Scroll functionality
+│   └── PageTemplatesRegistration.lua # Template registration
 ├── DB/                              # Database and content
 │   ├── DB.lua                       # Database registration and initialization
 │   └── 01_Sample/                   # Sample data sets
@@ -226,6 +231,6 @@ ciaanh
 
 ## Version
 
-v2.0.0 (July 7, 2025)
+v2.0.1 (July 7, 2025)
 
 Compatible with World of Warcraft 11.2.0 (The War Within)

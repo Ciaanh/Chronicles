@@ -172,16 +172,25 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 	end
 
 	if eventSelection and eventSelection.eventId and eventSelection.collectionName then
+		-- print("MainFrameUI: Event selection found:", eventSelection.eventId, eventSelection.collectionName)
 		-- Fetch the event data
 		local event = Chronicles.Data:FindEventByIdAndCollection(eventSelection.eventId, eventSelection.collectionName)
+		-- print("MainFrameUI: Found event:", event and event.name or event and event.label or "nil")
 		if event then
 			-- Transform to book format and display
 			local success, bookContent = pcall(private.Core.Events.TransformEventToBook, event)
+			-- print("MainFrameUI: Transform success:", success, "bookContent:", bookContent and "exists" or "nil")
 			if success and bookContent then
 				eventBook:OnContentReceived(bookContent)
 				return
+			-- else
+			-- 	print("MainFrameUI: Transform failed or returned nil")
 			end
+		-- else
+		-- 	print("MainFrameUI: No event found for selection")
 		end
+	-- else
+	-- 	print("MainFrameUI: No valid event selection")
 	end
 
 	eventBook:ShowEmptyBook()

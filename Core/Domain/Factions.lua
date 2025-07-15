@@ -32,11 +32,11 @@ function private.Core.Factions.TransformFactionToBook(faction)
         error("TransformFactionToBook: ContentUtils not loaded")
     end
     
-    if not private.Core.Utils.ContentUtils.CreateUnifiedContent then
-        error("TransformFactionToBook: ContentUtils.CreateUnifiedContent not available")
+    if not private.Core.Utils.ContentUtils.TransformEntityToBook then
+        error("TransformFactionToBook: ContentUtils.TransformEntityToBook not available")
     end
 
-    return private.Core.Utils.ContentUtils.CreateUnifiedContent(faction)
+    return private.Core.Utils.ContentUtils.TransformEntityToBook(faction)
 end
 
 --[[

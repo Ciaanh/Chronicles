@@ -7,19 +7,23 @@ private.constants.templates = {
 	-- Generic shared template for the new VerticalListTemplate
 	[private.constants.templateKeys.GENERIC_LIST_ITEM] = {template = "VerticalListItemTemplate", initFunc = VerticalListItemMixin.Init},
 	
-	-- Book content templates - unified system
-	[private.constants.bookTemplateKeys.EVENT_TITLE] = {template = "EventTitleTemplate", initFunc = EventTitleMixin.Init},	
-	[private.constants.bookTemplateKeys.SIMPLE_TITLE] = {template = "SimpleTitleTemplate", initFunc = SimpleTitleMixin.Init},
-	[private.constants.bookTemplateKeys.EMPTY] = {template = "EmptyTemplate", initFunc = EmptyMixin.Init},
-	[private.constants.bookTemplateKeys.COVER_PAGE] = {template = "CoverPageTemplate", initFunc = CoverPageMixin.Init},
-	
-	-- Old format templates (for compatibility)
-	[private.constants.bookTemplateKeys.CHAPTER_HEADER] = {template = "ChapterHeaderTemplate", initFunc = ChapterHeaderMixin.Init},
-	[private.constants.bookTemplateKeys.TEXT_CONTENT] = {template = "ChapterLineTemplate", initFunc = ChapterLineMixin.Init},
-	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init},
-	
-	-- HTML content templates - primary content system
-	[private.constants.bookTemplateKeys.UNIFIED_CONTENT] = {template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init},
-	[private.constants.bookTemplateKeys.COVER_WITH_CONTENT] = {template = "CoverWithContentTemplate", initFunc = CoverWithContentMixin.Init},
-	[private.constants.bookTemplateKeys.PAGE_BREAK] = {template = "PageBreakTemplate", initFunc = PageBreakMixin.Init}
+	-- Book system templates
+	[private.constants.bookTemplateKeys.HTML_CONTENT] = {template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init}
 }
+
+-- Debug template registration
+-- print("PageTemplatesRegistration: Templates being registered:")
+-- for key, data in pairs(private.constants.templates) do
+--     print("  - " .. tostring(key) .. " -> " .. tostring(data.template) .. " (mixin: " .. tostring(data.initFunc) .. ")")
+-- end
+
+-- Additional debug for HTML_CONTENT template specifically
+-- local htmlTemplate = private.constants.templates[private.constants.bookTemplateKeys.HTML_CONTENT]
+-- if htmlTemplate then
+--     print("PageTemplatesRegistration: HTML_CONTENT template registered successfully:")
+--     print("  Template: " .. tostring(htmlTemplate.template))
+--     print("  InitFunc: " .. tostring(htmlTemplate.initFunc))
+--     print("  HTMLContentMixin exists: " .. tostring(HTMLContentMixin ~= nil))
+-- else
+--     print("PageTemplatesRegistration: ERROR - HTML_CONTENT template not found!")
+-- end

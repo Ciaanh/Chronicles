@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+    
+    <!-- Book System Includes -->
+    <Script file="HTMLBuilder.lua"/>
+    <Script file="ContentUtils.lua"/>
+    
+    <!-- Templates (loaded first so mixins are available) -->
+    <Include file="HTMLContentTemplate.xml"/>
+    <Include file="BookContainerTemplate.xml"/>
+    
+</Ui>
