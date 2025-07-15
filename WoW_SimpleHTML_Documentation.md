@@ -4,15 +4,71 @@
 
 World of Warcraft's `SimpleHTML` widget is a **very limited** HTML renderer designed for displaying basic formatted text in addon interfaces. It supports only a small subset of HTML elements and has significant restrictions compared to web browsers.
 
+SimpleHTML is commonly used for displaying formatted text, documentation, error messages with links, and anywhere that requires rich text presentation in the game's UI system.
+
+## XML Frame Definition
+
+### Basic SimpleHTML Frame
+```xml
+<SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
+    <Size x="500"/>
+    <Anchors>
+        <Anchor point="TOPLEFT"/>
+    </Anchors>
+    <FontString inherits="GameFontNormal">
+        <Color color="NORMAL_FONT_COLOR"/>
+    </FontString>
+</SimpleHTML>
+```
+
+### Advanced Configuration with Hyperlinks
+```xml
+<SimpleHTML parentKey="Text" inherits="InlineHyperlinkFrameTemplate" resizeToFitContents="true">
+    <Anchors>
+        <Anchor point="TOPLEFT"/>
+        <Anchor point="TOPRIGHT"/>
+    </Anchors>
+    <Scripts>
+        <OnHyperlinkClick>
+            SetItemRef(link, text, button, self);
+        </OnHyperlinkClick>
+    </Scripts>
+    <FontString inherits="GameFontNormal" justifyV="TOP" spacing="2">
+        <Color r="1" g="1" b="1"/>
+    </FontString>
+    <FontStringHeader1 inherits="GameFontNormalLarge" spacing="4"/>
+    <FontStringHeader2 inherits="GameFontHighlight" spacing="4"/>
+</SimpleHTML>
+```
+
+### Common Attributes
+- `parentKey="HTML"` - Associates the element with parent frame
+- `inherits="InlineHyperlinkFrameTemplate"` - Enables hyperlink support
+- `resizeToFitContents="true"` - Automatically adjusts height based on content
+- `justifyH="LEFT|CENTER|RIGHT"` - Horizontal text alignment
+- `spacing="2"` - Line spacing value
+
 ## Supported HTML Elements
 
-### Document Structure
+### Required Document Structure
+SimpleHTML requires proper HTML document structure:
 ```html
 <html>
 <body>
-  <!-- Content goes here -->
+  <p>Content goes here</p>
 </body>
 </html>
+```
+
+### WoW HTML Constants
+```lua
+-- Predefined constants for HTML structure
+HTML_START = "<html><body><p>";
+HTML_START_CENTERED = "<html><body><p align=\"center\">";
+HTML_END = "</p></body></html>";
+
+-- Usage
+local content = HTML_START .. "Your content here" .. HTML_END;
 ```
 
 ### Headings
@@ -22,7 +78,7 @@ World of Warcraft's `SimpleHTML` widget is a **very limited** HTML renderer desi
 <h3>Section Header</h3>
 ```
 - **Note**: `<h4>`, `<h5>`, `<h6>` are treated as `<h3>`
-- Headings automatically have default styling
+- Headings automatically use FontStringHeader1 and FontStringHeader2 styling
 
 ### Paragraphs
 ```html
@@ -55,32 +111,13 @@ World of Warcraft's `SimpleHTML` widget is a **very limited** HTML renderer desi
   - `Interface\Pictures\` - Game artwork
 - **Supported align values**: `left`, `center`, `right`
 
-### Hyperlinks (Advanced)
+### Hyperlinks
 ```html
 <a href="event:123">View Event Details</a>
 <a href="character:Thrall">Learn about Thrall</a>
-<a href="external:https://wow.gamepedia.com">WoW Wiki</a>
-```
-
-**Hyperlink Implementation**:
-```lua
--- On your SimpleHTML frame
-frame:SetHyperlinksEnabled(true)
-frame:SetScript("OnHyperlinkClick", function(self, link, text, button)
-    local linkType, linkData = link:match("([^:]+):(.+)")
-    
-    if linkType == "event" then
-        local eventId = tonumber(linkData)
-        -- Show event details
-        ShowEventDetails(eventId)
-    elseif linkType == "character" then
-        -- Show character information
-        ShowCharacterInfo(linkData)
-    elseif linkType == "external" then
-        -- Handle external links (copy to clipboard, etc.)
-        HandleExternalLink(linkData)
-    end
-end)
+<a href="item:12345">Item Link</a>
+<a href="spell:67890">Spell Link</a>
+<a href="url:https://wow.gamepedia.com">External Link</a>
 ```
 
 ## HTML Entities
@@ -132,6 +169,70 @@ local COLORS = {
     gray = "|cFF808080",
     reset = "|r"
 }
+```
+
+## Hyperlink Implementation
+
+### XML Configuration
+Enable hyperlinks in your SimpleHTML frame:
+```xml
+<SimpleHTML parentKey="HTML" inherits="InlineHyperlinkFrameTemplate">
+    <Scripts>
+        <OnHyperlinkClick>
+            SetItemRef(link, text, button, self);
+        </OnHyperlinkClick>
+        <OnHyperlinkEnter function="GameTooltip_OnHyperlinkEnter"/>
+        <OnHyperlinkLeave function="GameTooltip_OnHyperlinkLeave"/>
+    </Scripts>
+</SimpleHTML>
+```
+
+### Lua Event Handlers
+```lua
+-- Basic hyperlink handler
+frame:SetHyperlinksEnabled(true)
+frame:SetScript("OnHyperlinkClick", function(self, link, text, button)
+    local linkType, linkData = link:match("([^:]+):(.+)")
+    
+    if linkType == "event" then
+        local eventId = tonumber(linkData)
+        ShowEventDetails(eventId)
+    elseif linkType == "character" then
+        ShowCharacterInfo(linkData)
+    elseif linkType == "item" then
+        local itemId = tonumber(linkData)
+        ShowItemTooltip(itemId)
+    elseif linkType == "spell" then
+        local spellId = tonumber(linkData)
+        ShowSpellDetails(spellId)
+    elseif linkType == "url" then
+        -- Copy URL to clipboard (can't open external browsers)
+        local url = table.concat({linkData}, ":", 2)
+        CopyToClipboard(url)
+        print("URL copied to clipboard: " .. url)
+    end
+end)
+```
+
+### Advanced Hyperlink Patterns
+```lua
+-- Multiple link types with validation
+frame:SetScript("OnHyperlinkClick", function(self, link, text, button)
+    local parts = {strsplit(":", link)}
+    local linkType = parts[1]
+    
+    if linkType == "urlIndex" then
+        -- Load indexed URLs (used in Store UI)
+        local index = tonumber(parts[2])
+        if index then LoadURLIndex(index) end
+    elseif linkType == "launch" then
+        -- Launch external URLs
+        LaunchURL(table.concat(parts, ":", 2))
+    else
+        -- Handle standard item/spell/achievement links
+        SetItemRef(link, text, button, self)
+    end
+end)
 ```
 
 ## NOT SUPPORTED
@@ -219,9 +320,9 @@ local function EscapeHTML(text)
 end
 ```
 
-## Complete Example
+## Complete Implementation Examples
 
-### HTML Generation
+### Character Display with Portrait
 ```lua
 local function CreateCharacterHTML(character)
     local html = string.format([[
@@ -250,64 +351,117 @@ local function CreateCharacterHTML(character)
 end
 ```
 
-### Frame Setup
+### Event Timeline Entry
 ```lua
--- Create SimpleHTML frame
-local htmlFrame = CreateFrame("SimpleHTML", "MyHTMLFrame", UIParent)
-htmlFrame:SetSize(400, 500)
-htmlFrame:SetPoint("CENTER")
+local function CreateEventHTML(event)
+    local dateRange = ""
+    if event.yearStart and event.yearEnd then
+        if event.yearStart == event.yearEnd then
+            dateRange = string.format("|cFFFFD700Year %d|r", event.yearStart)
+        else
+            dateRange = string.format("|cFFFFD700Years %d - %d|r", event.yearStart, event.yearEnd)
+        end
+    end
+    
+    local html = string.format([[
+<html>
+<body>
+<h1>|cFFFFD700%s|r</h1>
+<p align="center">%s</p>
+<br/>
+<p>%s</p>
+%s
+<p><a href="event:%s">View Details</a> | <a href="timeline:%s">See Timeline</a></p>
+</body>
+</html>
+    ]],
+        EscapeHTML(event.name),
+        dateRange,
+        EscapeHTML(event.description or ""),
+        event.image and string.format('<img src="%s" width="64" height="64" align="left"/>', event.image) or "",
+        event.id,
+        event.timelineId or event.id
+    )
+    return html
+end
+```
 
--- Enable hyperlinks
+### Frame Setup with Scroll Support
+```lua
+-- Create SimpleHTML frame within a scroll frame
+local scrollFrame = CreateFrame("ScrollFrame", nil, parentFrame, "UIPanelScrollFrameTemplate")
+scrollFrame:SetSize(400, 500)
+scrollFrame:SetPoint("CENTER")
+
+local htmlFrame = CreateFrame("SimpleHTML", nil, scrollFrame)
+htmlFrame:SetSize(380, 500)
+htmlFrame:SetPoint("TOPLEFT")
+
+-- Configure the HTML frame
 htmlFrame:SetHyperlinksEnabled(true)
+htmlFrame:SetFontObject("GameFontNormal")
+
+-- Set up scroll child
+scrollFrame:SetScrollChild(htmlFrame)
 
 -- Set hyperlink handler
 htmlFrame:SetScript("OnHyperlinkClick", function(self, link, text, button)
     local linkType, linkData = link:match("([^:]+):(.+)")
     
     if linkType == "character" then
-        -- Show character details
         ShowCharacterDetails(linkData)
     elseif linkType == "event" then
-        -- Show event details
         ShowEventDetails(tonumber(linkData))
+    elseif linkType == "timeline" then
+        ShowTimeline(tonumber(linkData))
     end
 end)
 
--- Set the HTML content
-local character = GetCharacterData("Thrall")
-htmlFrame:SetText(CreateCharacterHTML(character))
+-- Set content and resize
+local content = CreateCharacterHTML(characterData)
+htmlFrame:SetText(content)
+
+-- Auto-resize frame height based on content
+local contentHeight = htmlFrame:GetContentHeight()
+if contentHeight then
+    htmlFrame:SetHeight(math.max(contentHeight, 500))
+end
 ```
 
-### Advanced Hyperlink Patterns
-```lua
--- Multiple link types with validation
-htmlFrame:SetScript("OnHyperlinkClick", function(self, link, text, button)
-    local parts = {strsplit(":", link)}
-    local linkType = parts[1]
-    
-    if linkType == "item" and button == "LeftButton" then
-        local itemId = tonumber(parts[2])
-        if itemId then
-            -- Show item tooltip or details
-            ShowItemTooltip(itemId)
-        end
-    elseif linkType == "spell" then
-        local spellId = tonumber(parts[2])
-        if spellId then
-            ShowSpellDetails(spellId)
-        end
-    elseif linkType == "achievement" then
-        local achievementId = tonumber(parts[2])
-        if achievementId then
-            ShowAchievementDetails(achievementId)
-        end
-    elseif linkType == "url" then
-        -- Copy URL to clipboard (can't open external browsers)
-        local url = table.concat(parts, ":", 2)
-        CopyToClipboard(url)
-        print("URL copied to clipboard: " .. url)
-    end
-end)
+## Common Use Cases in WoW UI
+
+### 1. Guild Message of the Day
+```xml
+<SimpleHTML parentKey="MOTD">
+    <Size x="246" y="46"/>
+    <Scripts>
+        <OnHyperlinkClick>
+            SetItemRef(link, text, button, self);
+        </OnHyperlinkClick>
+    </Scripts>
+    <FontString inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP" spacing="2">
+        <Color r="1" g="1" b="1"/>
+    </FontString>
+</SimpleHTML>
+```
+
+### 2. Item Text Display
+```xml
+<SimpleHTML name="ItemTextPageText">
+    <Size x="270" y="304"/>
+    <FontString inherits="QuestFont" justifyH="LEFT"/>
+</SimpleHTML>
+```
+
+### 3. Store UI with URL Links
+```xml
+<SimpleHTML parentKey="Notice">
+    <Size x="260" y="240"/>
+    <Scripts>
+        <OnHyperlinkClick function="GetURLIndexAndLoadURL" />
+    </Scripts>
+    <FontString inherits="GameFontBlackMedium" justifyH="LEFT" />
+</SimpleHTML>
 ```
 
 ## Troubleshooting
@@ -324,6 +478,7 @@ end)
    - Ensure `SetHyperlinksEnabled(true)` is called
    - Check that `OnHyperlinkClick` script is set
    - Verify href format matches your handler logic
+   - Use `InlineHyperlinkFrameTemplate` for automatic setup
 
 3. **Color Codes Not Working**
    - Ensure proper format: `|cFFRRGGBB`
@@ -334,7 +489,12 @@ end)
    - Remember: no CSS support
    - Use `align` attributes on `<p>` and `<img>`
    - Use `<br/>` for spacing
-   - Consider using multiple paragraphs instead of complex layouts
+   - Consider using multiple SimpleHTML frames for complex layouts
+
+5. **Content Not Displaying**
+   - Check HTML structure: must have `<html><body><p>` tags
+   - Use HTML constants: `HTML_START` and `HTML_END`
+   - Ensure frame size is adequate for content
 
 ### Testing Your HTML
 ```lua
@@ -353,12 +513,40 @@ local function TestHTML(htmlString)
 end
 
 -- Usage
-TestHTML([[
-<html><body>
-<h1>|cFFFF0000Test Title|r</h1>
-<p>This is a test paragraph with <a href="test:123">a link</a>.</p>
-</body></html>
-]])
+TestHTML(HTML_START .. "|cFFFF0000Test Title|r<br/>This is a test paragraph with <a href=\"test:123\">a link</a>." .. HTML_END)
 ```
 
-This documentation covers all the essential aspects of working with SimpleHTML in World of Warcraft addons, including the hyperlink system with practical examples.
+### Content Validation
+```lua
+-- Check if content is HTML formatted
+local function IsHTMLContent(text)
+    return text and strfind(strlower(text), "<html><body><p>") ~= nil
+end
+
+-- Auto-wrap non-HTML content
+local function EnsureHTMLFormat(text)
+    if IsHTMLContent(text) then
+        return text
+    else
+        return HTML_START .. EscapeHTML(text) .. HTML_END
+    end
+end
+```
+
+## Performance Considerations
+
+1. **Content Size**: SimpleHTML performance can degrade with very large amounts of content
+2. **Resize Behavior**: Use `resizeToFitContents="true"` carefully as it can impact performance
+3. **Scrolling**: For large content, always use within scroll frames
+4. **Width Setting**: Set frame width before calling SetText for proper resizing
+5. **Image Loading**: Preload textures when possible to avoid UI stuttering
+
+## Integration Tips
+
+- **Localization**: Use localization strings in your HTML content
+- **Theming**: Leverage font inheritance for consistent styling
+- **Accessibility**: Provide alternative text methods for screen readers
+- **Memory**: Cache frequently used HTML content to reduce string operations
+- **Updates**: Use events to refresh HTML content when underlying data changes
+
+This documentation provides comprehensive coverage of SimpleHTML usage in World of Warcraft addons, from basic implementation to advanced integration patterns.
