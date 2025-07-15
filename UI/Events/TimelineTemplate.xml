@@ -41,7 +41,7 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFont" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Shadow_Medium" setAllPoints="true" justifyH="CENTER">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT" />
