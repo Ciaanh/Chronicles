@@ -416,62 +416,73 @@ end
 -- =============================================================================================
 
 --[[
-    Create complete HTML content for any entity type (event, character, faction)
+    Create a list of HTML documents for any entity type (event, character, faction)
     This is the main function called by ContentUtils.TransformEntityToBook
     @param entity [table] Entity data with properties like name, description, chapters, etc.
     @param options [table] Optional styling and layout options
-    @return [string] Complete HTML document for the entity
+    @return [table] Array of complete HTML documents for the entity
 ]]
 function HTMLBuilder.CreateEntityHTML(entity, options)
     if not entity then
-        return HTMLBuilder.CreateHTMLDocument(
-            HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
-        )
+        return {
+            HTMLBuilder.CreateHTMLDocument(
+                HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
+            )
+        }
     end
 
     options = options or {}
-    local content = ""
-
-    -- Add title (entity name)
+    local htmlDocuments = {}
+    
+    -- Create main/cover page with title, description and portrait
+    local coverContent = ""
     local title = entity.name or entity.label or "Untitled"
-    content = content .. HTMLBuilder.CreateTitle(title)
+    
+    coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
 
     -- Add date range for events
     if entity.yearStart or entity.yearEnd then
-        content = content .. HTMLBuilder.CreateDateRange(entity.yearStart, entity.yearEnd)
+        coverContent = coverContent .. HTMLBuilder.CreateDateRange(entity.yearStart, entity.yearEnd)
     end
 
     -- Add author if present
     if entity.author and entity.author ~= "" then
-        content = content .. HTMLBuilder.CreateAuthor(entity.author)
+        coverContent = coverContent .. HTMLBuilder.CreateAuthor(entity.author)
     end
 
     -- Add portrait/image if present
     if entity.image and entity.image ~= "" then
-        content = content .. HTMLBuilder.CreatePortrait(entity.image)
+        coverContent = coverContent .. HTMLBuilder.CreatePortrait(entity.image)
     end
 
     -- Add description if present
     if entity.description and entity.description ~= "" then
         -- Check if description is a complete HTML document using StringUtils
         if StringUtils.ContainsHTML(entity.description) then
-            -- Description is a complete HTML document, return it directly
-            return entity.description
+            -- Description is a complete HTML document, add it as separate document
+            table.insert(htmlDocuments, entity.description)
         elseif string.find(entity.description, "<[^>]+>") then
             -- Description contains HTML tags but isn't a complete document, use it directly
-            content = content .. entity.description
+            coverContent = coverContent .. entity.description
         else
             -- Plain text description, wrap in paragraph
-            content = content .. HTMLBuilder.CreateParagraph(entity.description)
+            coverContent = coverContent .. HTMLBuilder.CreateParagraph(entity.description)
         end
-        content = content .. HTMLBuilder.CreateDivider()
     end
 
-    -- Add chapters if present
+    -- Add cover page as first document (if it has content)
+    if coverContent ~= "" then
+        table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(coverContent))
+    end
+
+    -- Add chapters as separate documents if present
     if entity.chapters and type(entity.chapters) == "table" then
         for _, chapter in ipairs(entity.chapters) do
+            local chapterContent = ""
+            local chapterDocuments = {}
+            
             if chapter.header then
-                content = content .. HTMLBuilder.CreateChapterHeader(chapter.header)
+                chapterContent = chapterContent .. HTMLBuilder.CreateChapterHeader(chapter.header)
             end
 
             if chapter.pages and type(chapter.pages) == "table" then
@@ -479,78 +490,70 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
                     if page and page ~= "" then
                         -- Check if page content is a complete HTML document using StringUtils
                         if StringUtils.ContainsHTML(page) then
-                            -- Page is a complete HTML document, return it directly
-                            return page
+                            -- Page is a complete HTML document, add to chapter documents
+                            table.insert(chapterDocuments, page)
                         elseif string.find(page, "<[^>]+>") then
                             -- Page contains HTML tags but isn't a complete document
-                            content = content .. page
+                            chapterContent = chapterContent .. page
                         else
-                            content = content .. HTMLBuilder.CreateParagraph(page)
+                            chapterContent = chapterContent .. HTMLBuilder.CreateParagraph(page)
                         end
                     end
                 end
             end
 
-            content = content .. HTMLBuilder.CreateDivider()
+            -- Add chapter content as a document if it has content
+            if chapterContent ~= "" then
+                table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(chapterContent))
+            end
+            
+            -- Add any complete HTML page documents for this chapter in order
+            for _, pageDoc in ipairs(chapterDocuments) do
+                table.insert(htmlDocuments, pageDoc)
+            end
         end
     end
 
-    -- If no content was generated, create a minimal message
-    if content == "" or content == HTMLBuilder.CreateTitle(title) then
-        content =
-            content ..
+    -- If no documents were generated, create a minimal message
+    if #htmlDocuments == 0 then
+        local fallbackContent = HTMLBuilder.CreateTitle(title) ..
             HTMLBuilder.CreateParagraph(
                 "No content available for this " ..
                     (entity.eventType and "event" or entity.factions and "character" or "faction") .. "."
             )
+        table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(fallbackContent))
     end
 
-    return HTMLBuilder.CreateHTMLDocument(content)
+    return htmlDocuments
 end
 
---[[
-    Create a test HTML document for debugging
-    @return [string] Test HTML document
-]]
-function HTMLBuilder.CreateTestHTML()
-    local content =
-        HTMLBuilder.CreateTitle("Test Content") ..
-        HTMLBuilder.CreateSubtitle("This is a test") ..
-            HTMLBuilder.CreateParagraph("This is a simple test paragraph to verify HTML display is working.") ..
-                HTMLBuilder.CreateDivider() ..
-                    HTMLBuilder.CreateChapterHeader("Test Chapter") ..
-                        HTMLBuilder.CreateParagraph("Chapter content goes here.") ..
-                            HTMLBuilder.CreateAuthor("Chronicles Team")
-
-    return HTMLBuilder.CreateHTMLDocument(content)
-end
 
 -- =============================================================================================
 -- VALIDATION AND DEBUG FUNCTIONS
 -- =============================================================================================
 
---[[
-    Validate that an HTML string is compatible with SimpleHTML
-    @param htmlString [string] HTML content to validate
-    @return [boolean, string] isValid, errorMessage
-]]
-function HTMLBuilder.ValidateSimpleHTML(htmlString)
-    if not htmlString or htmlString == "" then
-        return false, "Empty HTML content"
-    end
+-- --[[
+--     Validate that an HTML string is compatible with SimpleHTML
+--     @param htmlString [string] HTML content to validate
+--     @return [boolean, string] isValid, errorMessage
+-- ]]
+-- function HTMLBuilder.ValidateSimpleHTML(htmlString)
+--     if not htmlString or htmlString == "" then
+--         return false, "Empty HTML content"
+--     end
 
-    -- Check for unsupported tags
-    local unsupportedTags = {"<div", "<span", "<style", "<script", "<ul", "<ol", "<li", "<table"}
-    for _, tag in ipairs(unsupportedTags) do
-        if string.find(htmlString, tag) then
-            return false, "Unsupported HTML tag found: " .. tag
-        end
-    end
+--     -- Check for unsupported tags
+--     local unsupportedTags = {"<div", "<span", "<style", "<script", "<ul", "<ol", "<li", "<table"}
+--     for _, tag in ipairs(unsupportedTags) do
+--         if string.find(htmlString, tag) then
+--             return false, "Unsupported HTML tag found: " .. tag
+--         end
+--     end
 
-    -- Check for required structure
-    if not string.find(htmlString, "<html>") or not string.find(htmlString, "<body>") then
-        return false, "Missing required <html> or <body> tags"
-    end
+--     -- Check for required structure
+--     if not string.find(htmlString, "<html>") or not string.find(htmlString, "<body>") then
+--         return false, "Missing required <html> or <body> tags"
+--     end
 
-    return true, "Valid SimpleHTML"
-end
+--     return true, "Valid SimpleHTML"
+-- end
