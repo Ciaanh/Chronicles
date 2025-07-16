@@ -53,7 +53,7 @@ local ContentUtils = private.Core.Utils.ContentUtils
     Transform any entity into HTML book content for the new system
     @param entity [table] Entity data (event, character, faction)
     @param options [table] Optional styling and layout options
-    @return [table] New book format with single HTML content element
+    @return [table] New book format with multiple HTML content elements
 ]]
 function ContentUtils.TransformEntityToBook(entity, options)
     if not entity then
@@ -70,30 +70,49 @@ function ContentUtils.TransformEntityToBook(entity, options)
         }
     end
 
-    -- Generate complete HTML content using HTMLBuilder
-    local htmlContent
+    -- Generate list of HTML documents using HTMLBuilder
+    local htmlDocuments
     if HTMLBuilder.CreateEntityHTML then
-        htmlContent = HTMLBuilder.CreateEntityHTML(entity, options)
+        htmlDocuments = HTMLBuilder.CreateEntityHTML(entity, options)
     else
         -- Create simple fallback HTML
         local title = entity.name or entity.label or "Unknown"
         local description = entity.description or "No description available"
-        htmlContent = string.format("<html><body><h1>%s</h1><p>%s</p></body></html>", title, description)
+        htmlDocuments = {
+            string.format("<html><body><h1>%s</h1><p>%s</p></body></html>", title, description)
+        }
+    end
+    
+    -- Ensure we have a valid array of HTML documents
+    if not htmlDocuments or type(htmlDocuments) ~= "table" or #htmlDocuments == 0 then
+        local title = entity.name or entity.label or "Unknown"
+        htmlDocuments = {
+            string.format("<html><body><h1>%s</h1><p>No content available</p></body></html>", title)
+        }
     end
     
     local title = entity.name or entity.label or "Chronicles Content"
 
+    -- Create one section with multiple elements, one for each HTML document
+    local elements = {}
+    for i, htmlContent in ipairs(htmlDocuments) do
+        -- local elementTitle = title
+        -- if #htmlDocuments > 1 then
+        --     elementTitle = title .. " - Page " .. i
+        -- end
+        
+        table.insert(elements, {
+            templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
+            htmlContent = htmlContent, -- Use 'htmlContent' property for HTMLContentMixin
+            -- title = elementTitle,
+            -- entity = entity -- Keep reference for debugging/future use
+        })
+    end
+
     -- Return array of section objects, each with an elements array
     local result = {
         {
-            elements = {
-                {
-                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                    htmlContent = htmlContent, -- Use 'htmlContent' property for HTMLContentMixin
-                    title = title,
-                    entity = entity -- Keep reference for debugging/future use
-                }
-            }
+            elements = elements
         }
     }
 
@@ -251,144 +270,6 @@ function ContentUtils.CreateRecommendedOptions(entity)
     end
 
     return options
-end
-
--- =============================================================================================
--- DEBUGGING AND TESTING UTILITIES
--- =============================================================================================
-
---[[
-    Create a test entity for development purposes
-    @param entityType [string] Type of entity to create ("event", "character", "faction")
-    @return [table] Test entity data
-]]
-function ContentUtils.CreateTestEntity(entityType)
-    entityType = entityType or "character"
-
-    local testEntities = {
-        character = {
-            id = 1,
-            name = "Tyrande Whisperwind",
-            description = "High Priestess of Elune and leader of the night elves. Tyrande has guided her people through countless trials, from the War of the Ancients to the modern conflicts of Azeroth.",
-            image = "Interface/AddOns/Chronicles/Art/Portrait/Tyrande.tga",
-            author = "Chronicles Team",
-            timeline = 1,
-            chapters = {
-                {
-                    header = "Early Life",
-                    pages = {
-                        "Born in the ancient city of Suramar, Tyrande showed an affinity for the goddess Elune from an early age.",
-                        "She trained as a priestess in the Temple of Elune, learning the sacred arts of her people.",
-                        "During her youth, she formed close bonds with Malfurion Stormrage and his brother Illidan."
-                    }
-                },
-                {
-                    header = "War of the Ancients",
-                    pages = {
-                        "When the Burning Legion first invaded Azeroth, Tyrande stood alongside the resistance.",
-                        "She fought bravely in the War of the Ancients, helping to prevent the world's destruction.",
-                        "Her courage and faith in Elune proved instrumental in the Legion's defeat."
-                    }
-                },
-                {
-                    header = "Leader of the Kaldorei",
-                    pages = {
-                        "After the war, Tyrande became the High Priestess and leader of the night elf people.",
-                        "She guided them through the long vigil, watching over the World Tree Nordrassil.",
-                        "Her wisdom and strength have been a beacon for her people through dark times."
-                    }
-                }
-            }
-        },
-        event = {
-            id = 1,
-            name = "The War of the Ancients",
-            label = "War of the Ancients",
-            yearStart = -10000,
-            yearEnd = -9500,
-            author = "Chronicles Team",
-            timeline = 1,
-            eventType = 3,
-            description = "The first invasion of the Burning Legion, a cataclysmic war that reshaped Azeroth forever.",
-            chapters = {
-                {
-                    header = "The Legion's Arrival",
-                    pages = {
-                        "Queen Azshara and her Highborne opened a portal for the Burning Legion.",
-                        "Demons poured through the portal, beginning their assault on Azeroth.",
-                        "The kaldorei empire was caught unprepared for this otherworldly threat."
-                    }
-                },
-                {
-                    header = "The Resistance Forms",
-                    pages = {
-                        "Malfurion Stormrage learned druidism from Cenarius to fight the Legion.",
-                        "Tyrande Whisperwind led the priestesses of Elune in battle.",
-                        "Unlikely alliances formed between different races to face the common threat."
-                    }
-                }
-            }
-        },
-        faction = {
-            id = 1,
-            name = "Darnassus",
-            description = "The great tree city of the night elves, serving as their capital and spiritual center. Built upon Teldrassil, it represents the rebirth of night elf civilization.",
-            image = "Interface/AddOns/Chronicles/Art/Images/NightElfCrest.tga",
-            author = "Chronicles Team",
-            timeline = 1,
-            chapters = {
-                {
-                    header = "Foundation",
-                    pages = {
-                        "After the destruction of Mount Hyjal's World Tree, the night elves needed a new home.",
-                        "Fandral Staghelm proposed growing a new World Tree, despite concerns from other druids.",
-                        "Teldrassil was grown, and upon it the great city of Darnassus was built."
-                    }
-                },
-                {
-                    header = "Architecture and Design",
-                    pages = {
-                        "The city was carved into the living wood of Teldrassil itself.",
-                        "Great branches form the roads and platforms of the city.",
-                        "The Temple of the Moon stands as the spiritual heart of Darnassus."
-                    }
-                }
-            }
-        }
-    }
-
-    return testEntities[entityType] or testEntities.character
-end
-
---[[
-    Generate a test HTML book for development
-    @param entityType [string] Type of entity to test
-    @return [table] New book format with test content
-]]
-function ContentUtils.CreateTestBook(entityType)
-    local testEntity = ContentUtils.CreateTestEntity(entityType)
-    return ContentUtils.TransformEntityToBook(testEntity)
-end
-
---[[
-    Create a simple test HTML book for debugging HTML display
-    @return [table] New book format with test HTML content
-]]
-function ContentUtils.CreateTestHTMLBook()
-    local testHtml = HTMLBuilder.CreateTestHTML()
-    
-    return {
-        {
-            elements = {
-                {
-                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                    htmlContent = testHtml,
-                    title = "Test Content",
-                    entity = { name = "Test" }
-                }
-            }
-        }
-    }
 end
 
 return ContentUtils
