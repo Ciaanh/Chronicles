@@ -187,7 +187,7 @@ function TimelineMixin:PerformDateSearch()
         local errorMsg =
             Locale["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] or
             "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
-        private.Chronicles:Print(errorMsg)
+        -- print(errorMsg)
         return
     end
 
@@ -202,7 +202,7 @@ function TimelineMixin:PerformDateSearch()
             minYear,
             maxYear
         )
-        private.Chronicles:Print(errorMsg)
+        -- print(errorMsg)
         return
     end
 

@@ -44,12 +44,17 @@ local HTMLBuilder = private.Core.Utils.HTMLBuilder
 
 -- WoW color codes
 local WOW_COLORS = {
-    title = "|cFFffd100",
-    subtitle = "|cFFd4af37",
-    text = "|cFFffffff",
-    author = "|cFFcccccc",
-    date = "|cFFffd100",
-    chapter = "|cFFe6b800",
+    title = "|cFFffd100", -- Gold
+    subtitle = "|cFFd4af37", -- Dark gold
+    text = "|cFFffffff", -- White
+    author = "|cFFcccccc", -- Light gray
+    date = "|cFFffd100", -- Gold
+    chapter = "|cFFe6b800", -- Yellow gold
+    quote = "|cFFaaaaaa", -- Medium gray
+    source = "|cFF888888", -- Dark gray
+    important = "|cFFff6600", -- Orange
+    warning = "|cFFff0000", -- Red
+    success = "|cFF00ff00", -- Green
     reset = "|r"
 }
 
@@ -81,17 +86,6 @@ local EXTENDED_ENTITIES = {
 -- =============================================================================================
 -- UTILITY FUNCTIONS
 -- =============================================================================================
-
-local function EscapeHTMLText(text)
-    if not text then
-        return ""
-    end
-    text = tostring(text)
-    for char, entity in pairs(HTML_ENTITIES) do
-        text = text:gsub(char, entity)
-    end
-    return text
-end
 
 local function ApplyWoWColor(text, colorCode)
     if not text or text == "" then
@@ -140,24 +134,11 @@ function HTMLBuilder.CreateTitle(title)
         return ""
     end
 
-    local safeTitle = EscapeHTMLText(title)
     --local coloredTitle = ApplyWoWColor(safeTitle, WOW_COLORS.title)
 
-    local width = '500'
-    local height = '20'
-    local align = "center"
+    local divider = HTMLBuilder.CreateDecorativeDivider()
 
-    -- Ensure path is properly escaped for HTML
-    local safePath = EscapeHTMLText("Interface\\AddOns\\Chronicles\\Art\\Divider")
-
-    return string.format(
-        '<h1 align="center">%s</h1><img src="%s" width="%s" height="%s" align="%s"/>',
-        safeTitle,
-        safePath,
-        width,
-        height,
-        align
-    )
+    return string.format('<h1 align="center">%s</h1>%s', title, divider)
 end
 
 --[[
@@ -171,23 +152,7 @@ function HTMLBuilder.CreateSubtitle(subtitle)
         return ""
     end
 
-    local safeSubtitle = EscapeHTMLText(subtitle)
-    return string.format("<h2>%s</h2>", safeSubtitle)
-end
-
---[[
-    Create a chapter header block with WoW color codes
-    Uses <h3> which is supported by SimpleHTML
-    @param header [string] Chapter header text
-    @return [string] HTML chapter header element
-]]
-function HTMLBuilder.CreateChapterHeader(header)
-    if not header or header == "" then
-        return ""
-    end
-
-    local safeHeader = EscapeHTMLText(header)
-    return string.format("<h3>%s</h3>", safeHeader)
+    return string.format("<h2>%s</h2>", subtitle)
 end
 
 --[[
@@ -201,8 +166,7 @@ function HTMLBuilder.CreateAuthor(author)
         return ""
     end
 
-    local safeAuthor = EscapeHTMLText(author)
-    return string.format('<p align="right">%s</p>', safeAuthor)
+    return string.format('<p align="right">%s</p>', author)
 end
 
 --[[
@@ -230,8 +194,7 @@ function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
         dateText = string.format("Until Year %d", yearEnd)
     end
 
-    local safeDateText = EscapeHTMLText(dateText)
-    return string.format('<p align="right">%s</p>', safeDateText)
+    return string.format('<p align="right">%s</p>', dateText)
 end
 
 --[[
@@ -251,10 +214,7 @@ function HTMLBuilder.CreatePortrait(portraitPath, options)
     local height = options.height or PORTRAIT_SETTINGS.height
     local align = options.align or PORTRAIT_SETTINGS.align
 
-    -- Ensure path is properly escaped for HTML
-    local safePath = EscapeHTMLText(portraitPath)
-
-    return string.format('<img src="%s" width="%s" height="%s" align="%s"/>', safePath, width, height, align)
+    return string.format('<img src="%s" width="%s" height="%s" align="%s"/>', portraitPath, width, height, align)
 end
 
 --[[
@@ -270,12 +230,10 @@ function HTMLBuilder.CreateParagraph(text, options)
     end
 
     options = options or {}
-    local safeText = EscapeHTMLText(text)
-
     if options.align then
-        return string.format('<p align="%s">%s</p>', options.align, safeText)
+        return string.format('<p align="%s">%s</p>', options.align, text)
     else
-        return string.format("<p>%s</p>", safeText)
+        return string.format("<p>%s</p>", text)
     end
 end
 
@@ -298,24 +256,6 @@ function HTMLBuilder.CreatePageBreak()
 end
 
 --[[
-    Create a hyperlink element (basic support in SimpleHTML)
-    Uses <a> with href attribute - supported by SimpleHTML but requires frame handler
-    @param text [string] Link text
-    @param url [string] Link URL or reference
-    @return [string] HTML link element
-]]
-function HTMLBuilder.CreateLink(text, url)
-    if not text or text == "" or not url or url == "" then
-        return EscapeHTMLText(text or "")
-    end
-
-    local safeText = EscapeHTMLText(text)
-    local safeUrl = EscapeHTMLText(url)
-
-    return string.format('<a href="%s">%s</a>', safeUrl, safeText)
-end
-
---[[
     Create a hyperlink element for Chronicles navigation
     Uses <a> with href attribute - supported by SimpleHTML but requires frame handler
     @param text [string] Link text to display
@@ -323,16 +263,14 @@ end
     @param linkData [string|number] Link data (ID, name, or URL)
     @return [string] HTML link element
 ]]
-function HTMLBuilder.CreateChroniclesLink(text, linkType, linkData)
+function HTMLBuilder.CreateLink(text, linkType, linkData)
     if not text or text == "" or not linkType or not linkData then
-        return EscapeHTMLText(text or "")
+        return text or ""
     end
 
-    local safeText = EscapeHTMLText(text)
-    local safeLinkData = EscapeHTMLText(tostring(linkData))
-    local href = linkType .. ":" .. safeLinkData
+    local href = linkType .. ":" .. tostring(linkData)
 
-    return string.format('<a href="%s">%s</a>', href, safeText)
+    return string.format('<a href="%s">%s</a>', href, text)
 end
 
 --[[
@@ -351,7 +289,7 @@ function HTMLBuilder.CreateNavigationLinks(links, separator)
 
     for _, link in ipairs(links) do
         if link.text and link.linkType and link.linkData then
-            table.insert(linkElements, HTMLBuilder.CreateChroniclesLink(link.text, link.linkType, link.linkData))
+            table.insert(linkElements, HTMLBuilder.CreateLink(link.text, link.linkType, link.linkData))
         end
     end
 
@@ -364,6 +302,124 @@ function HTMLBuilder.CreateNavigationLinks(links, separator)
 end
 
 --[[
+    Create decorative dividers with different types
+    @param dividerType [string] Type of divider: "chapter", "section", or default
+    @return [string] HTML img element for divider
+]]
+function HTMLBuilder.CreateDecorativeDivider(dividerType)
+    local dividerPath = "Interface\\AddOns\\Chronicles\\Art\\"
+
+    if dividerType == "chapter" then
+        return string.format(
+            '<img src="%s" width="256" height="32" align="center"/>',
+            (dividerPath .. "ChapterDivider")
+        )
+    elseif dividerType == "section" then
+        return string.format(
+            '<img src="%s" width="128" height="16" align="center"/>',
+            (dividerPath .. "SectionDivider")
+        )
+    else
+        return string.format('<img src="%s" width="450" height="25" align="center"/>', (dividerPath .. "Divider"))
+    end
+end
+
+--[[
+    Create a table of contents with clickable navigation links
+    @param entity [table] Entity with chapters
+    @param navigationData [table] Navigation data with page mapping
+    @return [string] HTML table of contents
+]]
+function HTMLBuilder.CreateTableOfContents(entity, navigationData)
+    if not entity or not entity.chapters then
+        return ""
+    end
+
+    local tocContent = HTMLBuilder.CreateSubtitle("Contents")
+
+    for i, chapter in ipairs(entity.chapters) do
+        local chapterTitle = chapter.header or ("Chapter " .. i)
+        local chapterNumber = string.format("Chapter %d", i)
+
+        -- Create clickable link to navigate to the chapter
+        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", chapter.id or ("chapter_" .. i))
+
+        -- Format: "Chapter 1: Chapter Title"
+        local tocEntry = string.format("%s: %s", chapterNumber, chapterLink)
+        tocContent = tocContent .. HTMLBuilder.CreateParagraph(tocEntry, {align = "left"})
+    end
+
+    return tocContent
+end
+
+--[[
+    Create chapter navigation data structure
+    @param entity [table] Entity with chapters
+    @return [table] Navigation data with chapter mappings
+]]
+function HTMLBuilder.CreateChapterNavigationData(entity)
+    if not entity or not entity.chapters then
+        return {}
+    end
+
+    local navigationData = {
+        chapters = {},
+        pageMapping = {}, -- Maps chapter ID to page index in htmlDocuments
+        chapterLookup = {} -- Maps chapter ID to chapter data
+    }
+
+    local currentPageIndex = 1
+
+    -- Cover page (page 1)
+    navigationData.pageMapping["cover"] = currentPageIndex
+    currentPageIndex = currentPageIndex + 1
+
+    -- TOC page (only if entity has more than 1 chapter)
+    if entity.chapters and #entity.chapters > 1 then
+        navigationData.pageMapping["toc"] = currentPageIndex
+        currentPageIndex = currentPageIndex + 1
+    end
+
+    -- Chapter pages
+    for i, chapter in ipairs(entity.chapters) do
+        local chapterId = chapter.id or ("chapter_" .. i)
+
+        navigationData.chapters[i] = {
+            id = chapterId,
+            title = chapter.header or ("Chapter " .. i),
+            startPage = currentPageIndex,
+            index = i
+        }
+
+        navigationData.pageMapping[chapterId] = currentPageIndex
+        navigationData.chapterLookup[chapterId] = navigationData.chapters[i]
+
+        -- Account for multiple pages per chapter if needed
+        local pagesInChapter = chapter.pageCount or 1
+        currentPageIndex = currentPageIndex + pagesInChapter
+    end
+
+    return navigationData
+end
+
+--[[
+    Create page header with chapter information
+    @param chapter [table] Chapter data
+    @param navigationData [table] Navigation data
+    @return [string] HTML page header
+]]
+function HTMLBuilder.CreatePageHeader(chapter, navigationData)
+    if not chapter then
+        return ""
+    end
+
+    local headerContent =
+        HTMLBuilder.CreateParagraph(string.format("Chapter %d: %s", chapter.index, chapter.title), {align = "center"})
+
+    return headerContent .. HTMLBuilder.CreateDivider()
+end
+
+--[[
     HYPERLINK USAGE EXAMPLE:
     
     To use hyperlinks in Chronicles, you need to set up a hyperlink handler on your SimpleHTML frame:
@@ -373,9 +429,25 @@ end
     
     -- Set up the hyperlink click handler
     frame:SetScript("OnHyperlinkClick", function(self, link, text, button)
-        local linkType, linkData = link:match("([^:]+):(.+)
+        local linkType, linkData = link:match("([^:]+):(.+)")
         
-        if linkType == "event" then
+        if linkType == "chapter" then
+            -- Navigate to specific chapter using BookContainerTemplate
+            if self.BookContainer then
+                self.BookContainer:NavigateToChapter(linkData)
+                PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+            end
+        elseif linkType == "toc" then
+            -- Navigate to table of contents
+            if self.BookContainer then
+                self.BookContainer:NavigateToChapter("toc")
+            end
+        elseif linkType == "cover" then
+            -- Navigate to cover page
+            if self.BookContainer then
+                self.BookContainer:NavigateToChapter("cover")
+            end
+        elseif linkType == "event" then
             local eventId = tonumber(linkData)
             if eventId and private.Core.StateManager then
                 private.Core.StateManager.setState("selection.event", eventId, "Hyperlink navigation")
@@ -397,20 +469,65 @@ end
         end
     end)
     
-    -- Example usage in HTML generation:
-    local navigationLinks = {
-        {text = "View Timeline", linkType = "timeline", linkData = "main"},
-        {text = "Browse Events", linkType = "tab", linkData = "events"},
-        {text = "Character List", linkType = "tab", linkData = "characters"}
-    }
+    -- INTEGRATION WITH BOOKCONTAINERTEMPLATE:
     
-    local html = HTMLBuilder.CreateHTMLDocument(
-        HTMLBuilder.CreateTitle("Welcome to Chronicles") ..
-        HTMLBuilder.CreateParagraph("Explore the world of Azeroth through interactive timelines.") ..
-        HTMLBuilder.CreateNavigationLinks(navigationLinks) ..
-        HTMLBuilder.CreateParagraph("Click " .. HTMLBuilder.CreateChroniclesLink("here", "event", 123) .. " to view the First War.")
-    )
+    -- In BookContainerMixin or related module, add these functions:
+    function BookContainerMixin:SetupChapterNavigation(navigationData)
+        self.chapterNavigationData = navigationData
+        if self.PagedDetails then
+            self.PagedDetails.chapterNavigationData = navigationData
+        end
+    end
+
+    function BookContainerMixin:NavigateToChapter(chapterId)
+        if not self.chapterNavigationData then return false end
+        
+        local pageIndex = self.chapterNavigationData.pageMapping[chapterId]
+        if pageIndex then
+            if self.PagedDetails and self.PagedDetails.PagingControls then
+                self.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
+                return true
+            end
+        end
+        return false
+    end
+    
+    -- Example usage in HTML generation:
+    local bookData = HTMLBuilder.CreateEntityHTML(entity)
+    
+    -- Set up the book container with navigation
+    if self.BookContainer then
+        self.BookContainer:SetupChapterNavigation(bookData.navigationData)
+        self.BookContainer.PagedDetails:SetContent(bookData.documents)
+        
+        -- Enable hyperlinks on view frames
+        for _, viewFrame in ipairs(self.BookContainer.PagedDetails.ViewFrames) do
+            if viewFrame.ScrollFrame and viewFrame.ScrollFrame.Child then
+                viewFrame.ScrollFrame.Child:SetHyperlinksEnabled(true)
+            end
+        end
+    end
 --]]
+-- =============================================================================================
+-- NAVIGATION UTILITY FUNCTIONS
+-- =============================================================================================
+
+-- --[[
+--     Create back to table of contents link
+--     @return [string] HTML link to TOC
+-- ]]
+-- function HTMLBuilder.CreateBackToTOCLink()
+--     return HTMLBuilder.CreateLink("← Back to Contents", "toc", "main")
+-- end
+
+-- --[[
+--     Create back to cover page link
+--     @return [string] HTML link to cover
+-- ]]
+-- function HTMLBuilder.CreateBackToCoverLink()
+--     return HTMLBuilder.CreateLink("← Back to Cover", "cover", "main")
+-- end
+
 -- =============================================================================================
 -- ENTITY CONTENT GENERATION
 -- =============================================================================================
@@ -420,24 +537,30 @@ end
     This is the main function called by ContentUtils.TransformEntityToBook
     @param entity [table] Entity data with properties like name, description, chapters, etc.
     @param options [table] Optional styling and layout options
-    @return [table] Array of complete HTML documents for the entity
+    @return [table] Table with 'documents' array and 'navigationData' for BookContainerTemplate
 ]]
 function HTMLBuilder.CreateEntityHTML(entity, options)
     if not entity then
         return {
-            HTMLBuilder.CreateHTMLDocument(
-                HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
-            )
+            documents = {
+                HTMLBuilder.CreateHTMLDocument(
+                    HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
+                )
+            },
+            navigationData = {}
         }
     end
 
     options = options or {}
     local htmlDocuments = {}
-    
+
+    -- Create navigation data structure first
+    local navigationData = HTMLBuilder.CreateChapterNavigationData(entity)
+
     -- Create main/cover page with title, description and portrait
     local coverContent = ""
     local title = entity.name or entity.label or "Untitled"
-    
+
     coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
 
     -- Add date range for events
@@ -475,14 +598,31 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
         table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(coverContent))
     end
 
+    -- Create table of contents page (only create if entity has more than 1 chapter)
+    if entity.chapters and #entity.chapters > 1 then
+        local tocContent = HTMLBuilder.CreateTableOfContents(entity, navigationData)
+        local toc = HTMLBuilder.CreateHTMLDocument(tocContent)
+        table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(toc))
+
+        print("Creating Table of Contents", toc)
+    end
+
     -- Add chapters as separate documents if present
     if entity.chapters and type(entity.chapters) == "table" then
-        for _, chapter in ipairs(entity.chapters) do
+        for i, chapter in ipairs(entity.chapters) do
+            local chapterData = navigationData.chapters[i]
             local chapterContent = ""
             local chapterDocuments = {}
-            
+
+            -- Create chapter header with navigation
+            if chapterData then
+                chapterContent = chapterContent .. HTMLBuilder.CreatePageHeader(chapterData, navigationData)
+            end
+
             if chapter.header then
-                chapterContent = chapterContent .. HTMLBuilder.CreateChapterHeader(chapter.header)
+                chapterContent =
+                    chapterContent ..
+                    string.format("<h3>%s</h3>", chapter.header) .. HTMLBuilder.CreateDecorativeDivider("section") --"chapter"
             end
 
             if chapter.pages and type(chapter.pages) == "table" then
@@ -502,11 +642,19 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
                 end
             end
 
+            -- -- Add navigation footer if we have chapter data
+            -- if chapterData then
+            --     local navigation = HTMLBuilder.CreateChapterNavigationBar(chapterData, navigationData)
+            --     chapterContent = chapterContent .. HTMLBuilder.CreateDivider() .. navigation
+            -- end
+
+            print(HTMLBuilder.CreateDecorativeDivider())
+
             -- Add chapter content as a document if it has content
             if chapterContent ~= "" then
                 table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(chapterContent))
             end
-            
+
             -- Add any complete HTML page documents for this chapter in order
             for _, pageDoc in ipairs(chapterDocuments) do
                 table.insert(htmlDocuments, pageDoc)
@@ -516,7 +664,8 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
 
     -- If no documents were generated, create a minimal message
     if #htmlDocuments == 0 then
-        local fallbackContent = HTMLBuilder.CreateTitle(title) ..
+        local fallbackContent =
+            HTMLBuilder.CreateTitle(title) ..
             HTMLBuilder.CreateParagraph(
                 "No content available for this " ..
                     (entity.eventType and "event" or entity.factions and "character" or "faction") .. "."
@@ -524,9 +673,51 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
         table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(fallbackContent))
     end
 
-    return htmlDocuments
+    -- Return both documents and navigation data
+    return {
+        documents = htmlDocuments,
+        navigationData = navigationData
+    }
 end
 
+-- --[[
+--     Create an enhanced cover page with better formatting
+--     @param entity [table] Entity data
+--     @return [string] Complete HTML document for cover page
+-- ]]
+-- function HTMLBuilder.CreateEnhancedCoverPage(entity)
+--     local coverContent = ""
+
+--     -- Add title with fancy formatting
+--     local title = entity.name or entity.label or "Untitled"
+--     coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
+
+--     -- Add image centered if it's a cover image
+--     if entity.coverImage then
+--         coverContent =
+--             coverContent ..
+--             HTMLBuilder.CreatePortrait(entity.coverImage, {width = "300", height = "300", align = "center"})
+--     elseif entity.image then
+--         coverContent = coverContent .. HTMLBuilder.CreatePortrait(entity.image)
+--     end
+
+--     -- Add author with special formatting
+--     if entity.author then
+--         coverContent = coverContent .. HTMLBuilder.CreateAuthor(WOW_COLORS.author .. entity.author .. WOW_COLORS.reset)
+--     end
+
+--     -- Add short summary/preview if available
+--     if entity.summary then
+--         coverContent = coverContent .. HTMLBuilder.CreateParagraph(entity.summary, {align = "center"})
+--     end
+
+--     -- Add date range for events on cover page
+--     if entity.yearStart or entity.yearEnd then
+--         coverContent = coverContent .. HTMLBuilder.CreateDateRange(entity.yearStart, entity.yearEnd)
+--     end
+
+--     return HTMLBuilder.CreateHTMLDocument(coverContent)
+-- end
 
 -- =============================================================================================
 -- VALIDATION AND DEBUG FUNCTIONS
@@ -545,7 +736,7 @@ end
 --     -- Check for unsupported tags
 --     local unsupportedTags = {"<div", "<span", "<style", "<script", "<ul", "<ol", "<li", "<table"}
 --     for _, tag in ipairs(unsupportedTags) do
---         if string.find(htmlString, tag) then
+--         if string.find(htmlString:lower(), tag) then
 --             return false, "Unsupported HTML tag found: " .. tag
 --         end
 --     end

@@ -53,7 +53,7 @@
                 </Anchors>
 
                 <ScrollChild>
-                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT">
+                    <SimpleHTML parentKey="HTML" resizeToFitContents="true" justifyH="LEFT" inherits="InlineHyperlinkFrameTemplate">
                         <Size x="500"/>
                         <Anchors>
                             <Anchor point="TOPLEFT"/>

@@ -73,7 +73,23 @@ function ContentUtils.TransformEntityToBook(entity, options)
     -- Generate list of HTML documents using HTMLBuilder
     local htmlDocuments
     if HTMLBuilder.CreateEntityHTML then
-        htmlDocuments = HTMLBuilder.CreateEntityHTML(entity, options)
+        local htmlResult = HTMLBuilder.CreateEntityHTML(entity, options)
+        
+        -- HTMLBuilder.CreateEntityHTML returns {documents = [...], navigationData = {...}}
+        -- We need the documents array for content transformation
+        if htmlResult and htmlResult.documents then
+            htmlDocuments = htmlResult.documents
+        elseif htmlResult and type(htmlResult) == "table" and #htmlResult > 0 then
+            -- Fallback: if it's an array, use it directly
+            htmlDocuments = htmlResult
+        else
+            -- Create simple fallback HTML
+            local title = entity.name or entity.label or "Unknown"
+            local description = entity.description or "No description available"
+            htmlDocuments = {
+                string.format("<html><body><h1>%s</h1><p>%s</p></body></html>", title, description)
+            }
+        end
     else
         -- Create simple fallback HTML
         local title = entity.name or entity.label or "Unknown"
@@ -91,7 +107,7 @@ function ContentUtils.TransformEntityToBook(entity, options)
         }
     end
     
-    local title = entity.name or entity.label or "Chronicles Content"
+    -- local title = entity.name or entity.label or "Chronicles Content"
 
     -- Create one section with multiple elements, one for each HTML document
     local elements = {}

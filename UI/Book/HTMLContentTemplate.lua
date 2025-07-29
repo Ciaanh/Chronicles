@@ -31,7 +31,7 @@ function HTMLContentMixin:Init(elementData)
 
     -- Use htmlContent exclusively
     local htmlContent = elementData.htmlContent
-    
+
     if not htmlContent or htmlContent == "" then
         self:ShowError("No HTML content provided")
         return
@@ -41,6 +41,17 @@ function HTMLContentMixin:Init(elementData)
     if self.ScrollFrame and self.ScrollFrame.HTML then
         local htmlContainer = self.ScrollFrame.HTML
         htmlContainer:SetText(htmlContent)
+
+        -- Enable hyperlinks
+        htmlContainer:SetHyperlinksEnabled(true)
+
+        -- Set up hyperlink click handler
+        htmlContainer:SetScript(
+            "OnHyperlinkClick",
+            function(frame, link, text, button)
+                self:OnHyperlinkClick(link, text, button)
+            end
+        )
 
         -- Scroll to top
         self.ScrollFrame:SetVerticalScroll(0)
@@ -94,13 +105,105 @@ function HTMLContentMixin:ShowError(errorMessage)
     local errorHTML = string.format([[<html><body><h1>Error</h1><p>%s</p></body></html>]], errorMessage)
 
     if self.ScrollFrame and self.ScrollFrame.HTML then
-        local success, err = pcall(function()
-            self.ScrollFrame.HTML:SetText(errorHTML)
-        end)
-        
+        local success, err =
+            pcall(
+            function()
+                self.ScrollFrame.HTML:SetText(errorHTML)
+            end
+        )
+
         self:SetHeight(150)
         self:Show()
     end
 
     self.isLoaded = false
+end
+
+--[[
+    Handle hyperlink clicks for Chronicles navigation
+    @param link [string] The link href value
+    @param text [string] The link text
+    @param button [string] The mouse button used
+]]
+function HTMLContentMixin:OnHyperlinkClick(link, text, button)
+    print("Chronicles: OnHyperlinkClick")
+    -- Parse Chronicles links
+    if link:match("^chronicles:") then
+        local linkType, linkData = link:match("^chronicles:([^:]+):(.+)$")
+
+        if linkType == "chapter" then
+            -- Navigate to chapter
+            self:NavigateToChapter(linkData)
+        elseif linkType == "event" then
+            -- Navigate to event
+            self:NavigateToEvent(linkData)
+        elseif linkType == "character" then
+            -- Navigate to character
+            self:NavigateToCharacter(linkData)
+        elseif linkType == "faction" then
+            -- Navigate to faction
+            self:NavigateToFaction(linkData)
+        else
+            print("Chronicles: Unknown link type: " .. tostring(linkType))
+        end
+    else
+        -- Handle regular links
+        print("Chronicles: External link clicked: " .. tostring(link))
+    end
+end
+
+--[[
+    Navigate to a specific chapter
+    @param chapterData [string] Chapter identifier
+]]
+function HTMLContentMixin:NavigateToChapter(chapterData)
+    -- Find the parent BookContainer
+    local bookContainer = self:GetParent()
+    while bookContainer and not bookContainer.PagedDetails do
+        bookContainer = bookContainer:GetParent()
+    end
+
+    if bookContainer and bookContainer.navigationData then
+        local pageIndex = bookContainer.navigationData.chapters[chapterData]
+        if pageIndex then
+            bookContainer.PagedDetails:SetCurrentPage(pageIndex)
+        else
+            print("Chronicles: Chapter not found: " .. tostring(chapterData))
+        end
+    else
+        print("Chronicles: Navigation data not available")
+    end
+end
+
+--[[
+    Navigate to a specific event
+    @param eventId [string] Event ID
+]]
+function HTMLContentMixin:NavigateToEvent(eventId)
+    -- Use StateManager to update event selection
+    if private.Core.StateManager then
+        private.Core.StateManager.setState("selection.event", eventId, "Hyperlink navigation")
+    end
+end
+
+--[[
+    Navigate to a specific character
+    @param characterId [string] Character ID
+]]
+function HTMLContentMixin:NavigateToCharacter(characterId)
+    -- Use StateManager to update character selection
+    if private.Core.StateManager then
+        private.Core.StateManager.setState("selection.character", characterId, "Hyperlink navigation")
+    end
+end
+
+--[[
+    Navigate to a specific faction
+    @param factionId [string] Faction ID
+]]
+function HTMLContentMixin:NavigateToFaction(factionId)
+    -- Use StateManager to update faction selection
+    if private.Core.StateManager then
+        private.Core.StateManager.setState("selection.faction", factionId, "Hyperlink navigation")
+    end
 end

@@ -86,9 +86,7 @@ end
     @return [table] Unified book representation of the event
 ]]
 function private.Core.Events.TransformEventToBook(event)
-    -- print("Events.TransformEventToBook called with event:", event and event.name or event and event.label or "nil")
     if not event then
-        -- print("Events: No event provided")
         return nil
     end
 
@@ -101,7 +99,6 @@ function private.Core.Events.TransformEventToBook(event)
     end
 
     local result = private.Core.Utils.ContentUtils.TransformEntityToBook(event)
-    -- print("Events: Transform result:", result and #result.elements or "nil")
     return result
 end
 
