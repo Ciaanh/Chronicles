@@ -24,34 +24,18 @@ BookContainerMixin = {}
 -- =============================================================================================
 
 function BookContainerMixin:OnLoad()
-    -- print("BookContainerMixin:OnLoad called")
     if not private.constants.templates then
-        -- print("BookContainerMixin: ERROR - private.constants.templates is nil!")
         return
     end
 
     if not self.PagedDetails then
-        -- print("BookContainerMixin: ERROR - self.PagedDetails is nil!")
         return
     end
 
-    -- Debug template data being set
-    -- print("BookContainerMixin: Setting element template data...")
-    -- print("BookContainerMixin: Available templates:")
-    -- for key, data in pairs(private.constants.templates) do
-    --     print("  - " .. tostring(key) .. " -> " .. tostring(data.template))
-    -- end
-    
     local htmlTemplate = private.constants.templates[private.constants.bookTemplateKeys.HTML_CONTENT]
-    -- if htmlTemplate then
-    --     print("BookContainerMixin: HTML_CONTENT template found: " .. tostring(htmlTemplate.template))
-    -- else
-    --     print("BookContainerMixin: ERROR - HTML_CONTENT template not found!")
-    -- end
 
     -- Set up template system
     self.PagedDetails:SetElementTemplateData(private.constants.templates)
-    -- print("BookContainerMixin: Template data set successfully")
 
     -- Register for UI refresh events
     private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
@@ -92,36 +76,17 @@ end
     @param bookContent [table] Already-transformed book content with proper template keys
 ]]
 function BookContainerMixin:OnContentReceived(bookContent)
-    -- print("BookContainerMixin:OnContentReceived called with content length: " .. tostring(#bookContent))
-    
     if bookContent and #bookContent > 0 then
-        -- Debug the content structure
-        -- print("BookContainerMixin: Content structure:")
-        -- for i, section in ipairs(bookContent) do
-        --     print("  Section " .. i .. ":")
-        --     if section.elements then
-        --         print("    Elements count: " .. #section.elements)
-        --         for j, element in ipairs(section.elements) do
-        --             print("    Element " .. j .. ":")
-        --             print("      templateKey: " .. tostring(element.templateKey))
-        --             if element.templateKey == private.constants.bookTemplateKeys.HTML_CONTENT then
-        --                 print("      htmlContent length: " .. tostring(element.htmlContent and string.len(element.htmlContent) or "nil"))
-        --                 print("      title: " .. tostring(element.title))
-        --                 print("      HTML_CONTENT constant: " .. tostring(private.constants.bookTemplateKeys.HTML_CONTENT))
-        --             end
-        --         end
-        --     else
-        --         print("    No elements found!")
-        --     end
-        -- end
-        
+        -- Store navigation data if available (from HTMLBuilder result)
+        if bookContent.navigationData then
+            self.navigationData = bookContent.navigationData
+        end
+
         local dataProvider = CreateDataProvider(bookContent)
         local retainScrollPosition = false
         self.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
         self.currentlyDisplayedContent = bookContent
-        -- print("BookContainerMixin: Data provider set successfully")
     else
-        -- print("BookContainerMixin: No content provided, showing empty book")
         self:ShowEmptyBook()
     end
 end
@@ -130,20 +95,22 @@ end
     Display empty book state
 ]]
 function BookContainerMixin:ShowEmptyBook()
-    local emptyContent = {
+    -- Test with HTML content first
+    local testContent = {
         {
             elements = {
                 {
-                    templateKey = private.constants.bookTemplateKeys.EMPTY,
-                    text = "No content available"
+                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
+                    htmlContent = "<html><body><h1>Test HTML Content</h1><p>This is a test to verify the HTML content template is working.</p></body></html>",
+                    title = "Test"
                 }
             }
         }
     }
 
-    local dataProvider = CreateDataProvider(emptyContent)
+    local dataProvider = CreateDataProvider(testContent)
     self.PagedDetails:SetDataProvider(dataProvider, false)
-    self.currentlyDisplayedContent = nil
+    self.currentlyDisplayedContent = testContent
 end
 
 --[[
