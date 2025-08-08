@@ -536,10 +536,9 @@ end
     Create a list of HTML documents for any entity type (event, character, faction)
     This is the main function called by ContentUtils.TransformEntityToBook
     @param entity [table] Entity data with properties like name, description, chapters, etc.
-    @param options [table] Optional styling and layout options
     @return [table] Table with 'documents' array and 'navigationData' for BookContainerTemplate
 ]]
-function HTMLBuilder.CreateEntityHTML(entity, options)
+function HTMLBuilder.CreateEntityHTML(entity)
     if not entity then
         return {
             documents = {
@@ -551,7 +550,6 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
         }
     end
 
-    options = options or {}
     local htmlDocuments = {}
 
     -- Create navigation data structure first
@@ -640,6 +638,17 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
                         end
                     end
                 end
+            elseif chapter.content and chapter.content ~= "" then
+                -- Support for single content field (alternative to pages array)
+                if StringUtils.ContainsHTML(chapter.content) then
+                    -- Content is a complete HTML document, add to chapter documents
+                    table.insert(chapterDocuments, chapter.content)
+                elseif string.find(chapter.content, "<[^>]+>") then
+                    -- Content contains HTML tags but isn't a complete document
+                    chapterContent = chapterContent .. chapter.content
+                else
+                    chapterContent = chapterContent .. HTMLBuilder.CreateParagraph(chapter.content)
+                end
             end
 
             -- -- Add navigation footer if we have chapter data
@@ -648,7 +657,7 @@ function HTMLBuilder.CreateEntityHTML(entity, options)
             --     chapterContent = chapterContent .. HTMLBuilder.CreateDivider() .. navigation
             -- end
 
-            print(HTMLBuilder.CreateDecorativeDivider())
+            -- print(HTMLBuilder.CreateDecorativeDivider())
 
             -- Add chapter content as a document if it has content
             if chapterContent ~= "" then
