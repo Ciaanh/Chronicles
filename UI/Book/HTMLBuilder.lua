@@ -32,6 +32,7 @@ local FOLDER_NAME, private = ...
 
 -- Import dependencies
 local StringUtils = private.Core.Utils.StringUtils
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- Initialize HTMLBuilder namespace
 private.Core.Utils = private.Core.Utils or {}
@@ -98,6 +99,43 @@ local function ApplyWoWColor(text, colorCode)
     return colorCode .. text .. WOW_COLORS.reset
 end
 
+-- Minimal HTML escaping for SimpleHTML-safe text
+local function EscapeHTML(text)
+    if not text or text == "" then return "" end
+    text = text:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub('"', "&quot;")
+    return text
+end
+
+--[[
+    Extract inner HTML content from a full HTML string.
+    Prefers <body>...</body>, falls back to <html>...</html>, and finally the original string.
+    Case-insensitive search while preserving original content.
+    @param html [string]
+    @return [string] inner content
+]]
+local function ExtractInnerHTML(html)
+    if not html or html == "" then return "" end
+
+    local lower = html:lower()
+    local sOpen, eOpen = lower:find("<body[^>]*>")
+    if sOpen then
+        local sClose = lower:find("</body>", eOpen + 1, true)
+        if sClose then
+            return html:sub(eOpen + 1, sClose - 1)
+        end
+    end
+
+    sOpen, eOpen = lower:find("<html[^>]*>")
+    if sOpen then
+        local sClose = lower:find("</html>", eOpen + 1, true)
+        if sClose then
+            return html:sub(eOpen + 1, sClose - 1)
+        end
+    end
+
+    return html
+end
+
 -- =============================================================================================
 -- HTML BUILDERS
 -- =============================================================================================
@@ -138,7 +176,7 @@ function HTMLBuilder.CreateTitle(title)
 
     local divider = HTMLBuilder.CreateDecorativeDivider()
 
-    return string.format('<h1 align="center">%s</h1>%s', title, divider)
+    return string.format('<h1 align="center">%s</h1>%s', EscapeHTML(title), divider)
 end
 
 --[[
@@ -152,7 +190,7 @@ function HTMLBuilder.CreateSubtitle(subtitle)
         return ""
     end
 
-    return string.format("<h2>%s</h2>", subtitle)
+    return string.format("<h2>%s</h2>", EscapeHTML(subtitle))
 end
 
 --[[
@@ -166,7 +204,7 @@ function HTMLBuilder.CreateAuthor(author)
         return ""
     end
 
-    return string.format('<p align="right">%s</p>', author)
+    return string.format('<p align="right">%s</p>', EscapeHTML(author))
 end
 
 --[[
@@ -184,14 +222,19 @@ function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
     local dateText = ""
     if yearStart and yearEnd then
         if yearStart == yearEnd then
-            dateText = string.format("Year %d", yearStart)
+            dateText = Locale["BOOK_DATE_YEAR"] and string.format(Locale["BOOK_DATE_YEAR"], yearStart) or
+                           string.format("Year %d", yearStart)
         else
-            dateText = string.format("Years %d - %d", yearStart, yearEnd)
+            dateText = Locale["BOOK_DATE_YEARS_RANGE"] and
+                           string.format(Locale["BOOK_DATE_YEARS_RANGE"], yearStart, yearEnd) or
+                           string.format("Years %d - %d", yearStart, yearEnd)
         end
     elseif yearStart then
-        dateText = string.format("From Year %d", yearStart)
+        dateText = Locale["BOOK_DATE_FROM_YEAR"] and string.format(Locale["BOOK_DATE_FROM_YEAR"], yearStart) or
+                       string.format("From Year %d", yearStart)
     elseif yearEnd then
-        dateText = string.format("Until Year %d", yearEnd)
+        dateText = Locale["BOOK_DATE_UNTIL_YEAR"] and string.format(Locale["BOOK_DATE_UNTIL_YEAR"], yearEnd) or
+                       string.format("Until Year %d", yearEnd)
     end
 
     return string.format('<p align="right">%s</p>', dateText)
@@ -230,10 +273,11 @@ function HTMLBuilder.CreateParagraph(text, options)
     end
 
     options = options or {}
+    local safe = EscapeHTML(text)
     if options.align then
-        return string.format('<p align="%s">%s</p>', options.align, text)
+        return string.format('<p align="%s">%s</p>', options.align, safe)
     else
-        return string.format("<p>%s</p>", text)
+        return string.format("<p>%s</p>", safe)
     end
 end
 
@@ -268,9 +312,9 @@ function HTMLBuilder.CreateLink(text, linkType, linkData)
         return text or ""
     end
 
-    local href = linkType .. ":" .. tostring(linkData)
+    local href = string.format("chronicles:%s:%s", linkType, tostring(linkData))
 
-    return string.format('<a href="%s">%s</a>', href, text)
+    return string.format('<a href="%s">%s</a>', href, EscapeHTML(text))
 end
 
 --[[
@@ -312,15 +356,15 @@ function HTMLBuilder.CreateDecorativeDivider(dividerType)
     if dividerType == "chapter" then
         return string.format(
             '<img src="%s" width="256" height="32" align="center"/>',
-            (dividerPath .. "ChapterDivider")
+            (dividerPath .. "ChapterDivider.tga")
         )
     elseif dividerType == "section" then
         return string.format(
             '<img src="%s" width="128" height="16" align="center"/>',
-            (dividerPath .. "SectionDivider")
+            (dividerPath .. "SectionDivider.tga")
         )
     else
-        return string.format('<img src="%s" width="450" height="25" align="center"/>', (dividerPath .. "Divider"))
+        return string.format('<img src="%s" width="450" height="25" align="center"/>', (dividerPath .. "Divider.tga"))
     end
 end
 
@@ -335,11 +379,12 @@ function HTMLBuilder.CreateTableOfContents(entity, navigationData)
         return ""
     end
 
-    local tocContent = HTMLBuilder.CreateSubtitle("Contents")
+    local tocTitle = Locale["BOOK_CONTENTS_TITLE"] or "Contents"
+    local tocContent = HTMLBuilder.CreateSubtitle(tocTitle)
 
     for i, chapter in ipairs(entity.chapters) do
-        local chapterTitle = chapter.header or ("Chapter " .. i)
-        local chapterNumber = string.format("Chapter %d", i)
+        local chapterTitle = chapter.title or chapter.header or ((Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or ("Chapter " .. i))
+        local chapterNumber = (Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or string.format("Chapter %d", i)
 
         -- Create clickable link to navigate to the chapter
         local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", chapter.id or ("chapter_" .. i))
@@ -386,7 +431,7 @@ function HTMLBuilder.CreateChapterNavigationData(entity)
 
         navigationData.chapters[i] = {
             id = chapterId,
-            title = chapter.header or ("Chapter " .. i),
+            title = chapter.title or chapter.header or ((Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or ("Chapter " .. i)),
             startPage = currentPageIndex,
             index = i
         }
@@ -413,8 +458,8 @@ function HTMLBuilder.CreatePageHeader(chapter, navigationData)
         return ""
     end
 
-    local headerContent =
-        HTMLBuilder.CreateParagraph(string.format("Chapter %d: %s", chapter.index, chapter.title), {align = "center"})
+    local headerFmt = Locale["BOOK_CHAPTER_HEADER"] or "Chapter %d: %s"
+    local headerContent = HTMLBuilder.CreateParagraph(string.format(headerFmt, chapter.index, EscapeHTML(chapter.title or "")), {align = "center"})
 
     return headerContent .. HTMLBuilder.CreateDivider()
 end
@@ -540,10 +585,12 @@ end
 ]]
 function HTMLBuilder.CreateEntityHTML(entity)
     if not entity then
+        local errorTitle = Locale["BOOK_ERROR_TITLE"] or "Error"
+        local errorMsg = Locale["BOOK_ERROR_NO_ENTITY"] or "No entity data provided"
         return {
             documents = {
                 HTMLBuilder.CreateHTMLDocument(
-                    HTMLBuilder.CreateTitle("Error") .. HTMLBuilder.CreateParagraph("No entity data provided")
+                    HTMLBuilder.CreateTitle(errorTitle) .. HTMLBuilder.CreateParagraph(errorMsg)
                 )
             },
             navigationData = {}
@@ -557,7 +604,7 @@ function HTMLBuilder.CreateEntityHTML(entity)
 
     -- Create main/cover page with title, description and portrait
     local coverContent = ""
-    local title = entity.name or entity.label or "Untitled"
+    local title = entity.name or entity.label or (Locale["BOOK_UNTITLED"] or "Untitled")
 
     coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
 
@@ -578,12 +625,11 @@ function HTMLBuilder.CreateEntityHTML(entity)
 
     -- Add description if present
     if entity.description and entity.description ~= "" then
-        -- Check if description is a complete HTML document using StringUtils
+        -- If it's a full HTML document, extract inner content so it renders on the cover page
         if StringUtils.ContainsHTML(entity.description) then
-            -- Description is a complete HTML document, add it as separate document
-            table.insert(htmlDocuments, entity.description)
+            coverContent = coverContent .. ExtractInnerHTML(entity.description)
         elseif string.find(entity.description, "<[^>]+>") then
-            -- Description contains HTML tags but isn't a complete document, use it directly
+            -- Description contains some HTML tags, append as-is
             coverContent = coverContent .. entity.description
         else
             -- Plain text description, wrap in paragraph
@@ -600,9 +646,9 @@ function HTMLBuilder.CreateEntityHTML(entity)
     if entity.chapters and #entity.chapters > 1 then
         local tocContent = HTMLBuilder.CreateTableOfContents(entity, navigationData)
         local toc = HTMLBuilder.CreateHTMLDocument(tocContent)
-        table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(toc))
-
-        print("Creating Table of Contents", toc)
+        -- toc is already a complete document; avoid double-wrapping
+        table.insert(htmlDocuments, toc)
+        -- removed debug print
     end
 
     -- Add chapters as separate documents if present
@@ -673,12 +719,8 @@ function HTMLBuilder.CreateEntityHTML(entity)
 
     -- If no documents were generated, create a minimal message
     if #htmlDocuments == 0 then
-        local fallbackContent =
-            HTMLBuilder.CreateTitle(title) ..
-            HTMLBuilder.CreateParagraph(
-                "No content available for this " ..
-                    (entity.eventType and "event" or entity.factions and "character" or "faction") .. "."
-            )
+        local fallbackText = Locale["BOOK_NO_CONTENT"] or "No content available."
+        local fallbackContent = HTMLBuilder.CreateParagraph(fallbackText, { align = "center" })
         table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(fallbackContent))
     end
 
