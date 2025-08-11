@@ -1,6 +1,9 @@
 /BlizzardInterfaceCode
 /.vscode
 
+/.github/tmp.md
+/.github/tmp copy.md
+
 # Build output and make-release.ps1 staging folder
 .build/
 /Chronicles/
