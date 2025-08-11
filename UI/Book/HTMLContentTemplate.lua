@@ -126,7 +126,6 @@ end
     @param button [string] The mouse button used
 ]]
 function HTMLContentMixin:OnHyperlinkClick(link, text, button)
-    print("Chronicles: OnHyperlinkClick")
     -- Parse Chronicles links
     if link:match("^chronicles:") then
         local linkType, linkData = link:match("^chronicles:([^:]+):(.+)$")
@@ -148,7 +147,7 @@ function HTMLContentMixin:OnHyperlinkClick(link, text, button)
         end
     else
         -- Handle regular links
-        print("Chronicles: External link clicked: " .. tostring(link))
+    -- Optionally, route to SetItemRef for default handling or ignore
     end
 end
 
@@ -164,9 +163,14 @@ function HTMLContentMixin:NavigateToChapter(chapterData)
     end
 
     if bookContainer and bookContainer.navigationData then
-        local pageIndex = bookContainer.navigationData.chapters[chapterData]
+        -- navigationData.pageMapping holds id -> page index
+        local pageIndex = bookContainer.navigationData.pageMapping[chapterData]
         if pageIndex then
-            bookContainer.PagedDetails:SetCurrentPage(pageIndex)
+            if bookContainer.PagedDetails and bookContainer.PagedDetails.SetCurrentPage then
+                bookContainer.PagedDetails:SetCurrentPage(pageIndex)
+            elseif bookContainer.PagedDetails and bookContainer.PagedDetails.PagingControls and bookContainer.PagedDetails.PagingControls.SetCurrentPage then
+                bookContainer.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
+            end
         else
             print("Chronicles: Chapter not found: " .. tostring(chapterData))
         end
@@ -182,7 +186,8 @@ end
 function HTMLContentMixin:NavigateToEvent(eventId)
     -- Use StateManager to update event selection
     if private.Core.StateManager then
-        private.Core.StateManager.setState("selection.event", eventId, "Hyperlink navigation")
+    local key = private.Core.StateManager.buildSelectionKey("event")
+    private.Core.StateManager.setState(key, tonumber(eventId) or eventId, "Hyperlink navigation")
     end
 end
 
@@ -193,7 +198,8 @@ end
 function HTMLContentMixin:NavigateToCharacter(characterId)
     -- Use StateManager to update character selection
     if private.Core.StateManager then
-        private.Core.StateManager.setState("selection.character", characterId, "Hyperlink navigation")
+    local key = private.Core.StateManager.buildSelectionKey("character")
+    private.Core.StateManager.setState(key, characterId, "Hyperlink navigation")
     end
 end
 
@@ -204,6 +210,7 @@ end
 function HTMLContentMixin:NavigateToFaction(factionId)
     -- Use StateManager to update faction selection
     if private.Core.StateManager then
-        private.Core.StateManager.setState("selection.faction", factionId, "Hyperlink navigation")
+    local key = private.Core.StateManager.buildSelectionKey("faction")
+    private.Core.StateManager.setState(key, factionId, "Hyperlink navigation")
     end
 end
