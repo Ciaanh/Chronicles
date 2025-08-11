@@ -3,39 +3,16 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Timeline = {}
 
--- Dependency injection container to eliminate circular dependencies
-local function getDependency(name)
-    if private.Core.DependencyContainer then
-        return private.Core.DependencyContainer.resolve(name)
-    end
-    return nil
-end
-
--- Safe dependency accessor with fallbacks
+-- Direct access helpers
 local function getTimelineBusiness()
-    local timelineBusiness = getDependency("TimelineBusiness")
-    if timelineBusiness then
-        return timelineBusiness
-    end
-    -- Fallback to direct access if container not available
     return private.Core.Data and private.Core.Data.TimelineBusiness
 end
 
 local function getStateManager()
-    local stateManager = getDependency("StateManager")
-    if stateManager then
-        return stateManager
-    end
-    -- Fallback to direct access if container not available
     return private.Core.StateManager
 end
 
 local function getChronicles()
-    local chronicles = getDependency("Chronicles")
-    if chronicles then
-        return chronicles
-    end
-    -- Fallback to direct access if container not available
     return private.Chronicles
 end
 
@@ -402,55 +379,14 @@ function private.Core.Timeline.NavigateToYear(year)
         end
     end
 
-    -- Update selected period in state using dependency container
     if selectedPeriod then
-        local selectedPeriodKey = stateManager.buildUIStateKey("selectedPeriod")
-        stateManager.setState(selectedPeriodKey, selectedPeriod, "Timeline period selected via year navigation") -- Set a flag to indicate we're displaying year-specific events
-        stateManager.setState(
-            stateManager.buildTimelineKey("yearSpecificMode"),
-            true,
-            "Year-specific event display mode enabled"
+        local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+        private.Core.StateManager.setState(
+            selectedPeriodKey,
+            selectedPeriod,
+            "Timeline period selected after year navigation"
         )
-
-        stateManager.setState(
-            stateManager.buildTimelineKey("yearSpecificTarget"),
-            year,
-            "Target year for year-specific display"
-        )
-
-        -- Search for events specifically for this year, not the entire period
-        local searchEngine = getDependency("SearchEngine")
-        if searchEngine and searchEngine.searchEvents then
-            -- Search for events only for the specific year (yearStart == yearEnd)
-            local events = searchEngine.searchEvents(year, year)
-            -- Store the year-specific events in state
-            stateManager.setState(
-                stateManager.buildTimelineKey("yearSpecificEvents"),
-                events,
-                "Events for year-specific display"
-            )
-        end
-    else
-        return false, "Period not found for year"
     end
-    -- Refresh the timeline display first
-    private.Core.Timeline.DisplayTimelineWindow()
 
-    -- After timeline refresh, trigger year-specific event display if in year-specific mode
-    local yearSpecificMode = stateManager.getState(stateManager.buildTimelineKey("yearSpecificMode"))
-    if yearSpecificMode then
-        local yearSpecificEvents = stateManager.getState(stateManager.buildTimelineKey("yearSpecificEvents"))
-        local yearSpecificTarget = stateManager.getState(stateManager.buildTimelineKey("yearSpecificTarget"))
-
-        if yearSpecificTarget and yearSpecificEvents then
-            -- Trigger event to display the filtered events for this specific year
-            SafeTriggerEvent(
-                private.constants.events.DisplayEventsForYear,
-                {year = yearSpecificTarget, events = yearSpecificEvents},
-                "Timeline:NavigateToYear"
-            )
-        end
-    end    local successMsg =
-        string.format(Locale["Successfully navigated to year %d"] or "Successfully navigated to year %d", year)
-    return true, successMsg
+    return true
 end

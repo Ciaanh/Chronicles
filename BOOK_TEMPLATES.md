@@ -2,27 +2,25 @@
 
 ## Overview
 
-The Chronicles addon uses a sophisticated templating system to display World of Warcraft lore content. As of v2.0.1, the system features modern HTML-based content display. The primary book content uses a unified HTML container approach via `HTMLContentTemplate`, along with specialized list components for UI elements.
-
-The template registration is managed through `UI/PageTemplatesRegistration.lua`, which maps template keys to their corresponding XML templates and Lua mixins.
+The Chronicles addon uses a templating system to display lore content. As of v2.0.1, the primary path is HTML-based content via `HTMLContentTemplate`. Template registration is centralized in `UI/PageTemplatesRegistration.lua`.
 
 ## Template Keys and Mappings
 
-### Book Content Templates (Primary System)
+### Book Content Templates (Primary)
 
-| Template Key         | XML Template           | Lua Mixin           | Purpose                                      | Status |
-|---------------------|-----------------------|---------------------|----------------------------------------------|--------|
-| `HTML_CONTENT`      | HTMLContentTemplate   | HTMLContentMixin    | **Primary**: Complete HTML documents for all content types | **Active** |
+| Template Key   | XML Template        | Lua Mixin        | Purpose                                      | Status |
+| -------------- | ------------------- | ---------------- | -------------------------------------------- | ------ |
+| `HTML_CONTENT` | HTMLContentTemplate | HTMLContentMixin | Complete HTML documents for all book content | Active |
 
 ### List and UI Component Templates
 
-| Template Key         | XML Template           | Lua Mixin           | Purpose                                      | Status |
-|---------------------|-----------------------|---------------------|----------------------------------------------|--------|
-| `GENERIC_LIST_ITEM` | VerticalListItemTemplate | VerticalListItemMixin | Generic list item for vertical lists (characters, factions) | **Active** |
-| `EVENTLIST_TITLE`   | EventListTitleTemplate | EventListTitleMixin | Event list section titles                    | **Active** |
-| `EVENT_DESCRIPTION` | EventListItemTemplate  | EventListItemMixin  | Event list item content                      | **Active** |
+| Template Key        | XML Template             | Lua Mixin             | Purpose                              | Status |
+| ------------------- | ------------------------ | --------------------- | ------------------------------------ | ------ |
+| `GENERIC_LIST_ITEM` | VerticalListItemTemplate | VerticalListItemMixin | Generic list item for vertical lists | Active |
+| `EVENTLIST_TITLE`   | EventListTitleTemplate   | EventListTitleMixin   | Event list section titles            | Active |
+| `EVENT_DESCRIPTION` | EventListItemTemplate    | EventListItemMixin    | Event list item content              | Active |
 
-> **Architecture Note:** The system uses `HTML_CONTENT` for all book display, which provides rich formatting and unified content handling.
+Architecture note: `HTML_CONTENT` is the single source of truth for book display.
 
 ## Data Structures
 
@@ -30,189 +28,84 @@ The template registration is managed through `UI/PageTemplatesRegistration.lua`,
 
 ```lua
 {
-    name = "Entity Name",                    -- Display name
-    label = "Alternative Label",             -- Fallback if name is missing
-    description = "Entity description...",   -- Text or HTML description
-    image = "path/to/image.tga",            -- Portrait/image path
-    author = "Author Name",                  -- Creator attribution
-    yearStart = 25,                         -- For events: start year (optional)
-    yearEnd = 30,                           -- For events: end year (optional)
-    chapters = {                            -- Content chapters
-        {
-            header = "Chapter Title",        -- Chapter title text or localization key
-            pages = {                       -- Array of page content
-                "Text content or localization key",
-                "More content...",
-                -- Additional pages...
-            }
-        },
-        -- Additional chapters...
-    }
+  name = "Entity Name",
+  label = "Fallback Label",
+  description = "Entity description...",
+  image = "Interface\\AddOns\\Chronicles\\Art\\Portrait\\Tyrande.tga",
+  author = "Author Name",
+  yearStart = -10000,
+  yearEnd = -9995,
+  chapters = {
+    { header = "Chapter Title", pages = { "Text or HTML..." } },
+    -- ...
+  }
 }
 ```
 
-### Transformed Data Structure (Modern HTML System)
-
-The modern transformation produces a single-section array with one HTML element:
+### Transformed Structure (Modern HTML System)
 
 ```lua
 {
-    [1] = {
-        elements = {
-            {
-                templateKey = "HTML_CONTENT",
-                htmlContent = "<html><body>...complete HTML document...</body></html>",
-                title = "Entity Name",       -- optional
-                entity = {...}              -- optional original entity reference
-            }
-        }
+  [1] = {
+    elements = {
+      {
+        templateKey = "HTML_CONTENT",
+        htmlContent = "<html><body>...complete HTML document...</body></html>",
+        title = "Entity Name",
+        entity = { ... }
+      }
     }
+  },
+  navigationData = { totalPages = 1, chapters = { } }
 }
 ```
 
-## Architecture and Template Registration
-
-### Template Registration System
+## Registration
 
 Templates are registered in `UI/PageTemplatesRegistration.lua`:
 
 ```lua
 private.constants.templates = {
-    -- Modern HTML system
-    [private.constants.bookTemplateKeys.HTML_CONTENT] = {
-        template = "HTMLContentTemplate", 
-        initFunc = HTMLContentMixin.Init
-    },
-    
-    -- List components
-    [private.constants.templateKeys.GENERIC_LIST_ITEM] = {
-        template = "VerticalListItemTemplate", 
-        initFunc = VerticalListItemMixin.Init
-    },
-    
-    -- Event list components
-    [private.constants.templateKeys.EVENTLIST_TITLE] = {
-        template = "EventListTitleTemplate", 
-        initFunc = EventListTitleMixin.Init
-    },
-    [private.constants.templateKeys.EVENT_DESCRIPTION] = {
-        template = "EventListItemTemplate", 
-        initFunc = EventListItemMixin.Init
-    }
+  [private.constants.bookTemplateKeys.HTML_CONTENT] = { template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init },
+  [private.constants.templateKeys.GENERIC_LIST_ITEM] = { template = "VerticalListItemTemplate", initFunc = VerticalListItemMixin.Init },
+  [private.constants.templateKeys.EVENTLIST_TITLE] = { template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init },
+  [private.constants.templateKeys.EVENT_DESCRIPTION] = { template = "EventListItemTemplate", initFunc = EventListItemMixin.Init },
 }
 ```
 
-### Book Container System
+## Flow (Modern HTML)
 
-The main book display uses `BookContainerTemplate` which supports modern HTML content:
-
-- **Modern Path**: `ContentUtils.TransformEntityToBook()` → `HTML_CONTENT` → `HTMLContentTemplate`
-
-## Transformation Flow
-
-### Modern HTML Flow
-
-1. **Entity Data** (event, character, faction)
-2. **ContentUtils.TransformEntityToBook()** - Transforms entity to book format
-3. **HTMLBuilder.CreateEntityHTML()** - Generates complete HTML document
-4. **Output**: Single section with `HTML_CONTENT` element
-5. **UI Rendering**: `BookContainerTemplate` → `HTMLContentTemplate` → Rich HTML display
+1. Entity data (event/character/faction)
+2. `ContentUtils.TransformEntityToBook(entity)`
+3. `HTMLBuilder.CreateEntityHTML(entity)` generates complete HTML documents
+4. Output: single section with `HTML_CONTENT` elements
+5. UI: `BookContainerTemplate` → `HTMLContentTemplate`
 
 ## Template Definitions
 
-### HTMLContentTemplate (Primary Content System)
+### HTMLContentTemplate
 
-- **Purpose:** Modern scrollable HTML content display using WoW's SimpleHTML widget
-- **Mixin:** `HTMLContentMixin`
-- **File Location:** `UI/Book/HTMLContentTemplate.xml`
-- **Data Properties:**
-  - `htmlContent` (string): Complete HTML document generated by HTMLBuilder
-  - `title` (string): Content title for reference
-  - `entity` (table): Optional original entity reference for debugging
-- **Usage:** Primary template for all book content in the modern system
-- **Features:**
-  - Complete HTML document rendering
-  - Automatic height adjustment
-  - Scroll support for long content
-  - Error handling and fallback display
-  - WoW color code support within HTML
+-   Purpose: Scrollable SimpleHTML-based renderer for complete HTML documents
+-   Mixin: `HTMLContentMixin`
+-   Files: `UI/Book/HTMLContentTemplate.xml`, `UI/Book/HTMLContentTemplate.lua`
+-   Data: `htmlContent` (required), optional `title`, `entity`
 
-### VerticalListItemTemplate (List Components)
+### VerticalListItemTemplate
 
-- **Purpose:** Generic list item for vertical lists (characters, factions, events)
-- **Mixin:** `VerticalListItemMixin`
-- **File Location:** `UI/VerticalListTemplate.xml`
-- **Data Properties:**
-  - `character`, `faction`, or `item` (table): Item data
-  - `stateManagerKey` (string): State management integration key
-- **Usage:** Items in character lists, faction lists, and other vertical collections
-- **Features:**
-  - Consistent bookmark-style visual treatment
-  - Integrated state management
-  - Tooltip support
-  - Click handling with sound effects
+-   Purpose: Generic list item for vertical lists
+-   Mixin: `VerticalListItemMixin`
+-   Files: `UI/VerticalListTemplate.xml`, `UI/VerticalListTemplate.lua`
 
-### EventListTitleTemplate / EventListItemTemplate (Event Lists)
+### EventListTitleTemplate / EventListItemTemplate
 
-- **Purpose:** Specialized templates for event list section titles and items
-- **Mixins:** `EventListTitleMixin` / `EventListItemMixin`
-- **File Location:** `UI/Events/EventListTemplate.xml`
-- **Usage:** Event list display in timeline and search views
-- **Features:**
-  - Event-specific styling and layout
-  - Timeline integration
-  - Period-based organization
-
-## Development Guidelines
-
-### For New Content
-
-```lua
--- Use the modern HTML transformation
-local bookContent = ContentUtils.TransformEntityToBook(entity, options)
-bookFrame:OnContentReceived(bookContent)
-```
-
-### HTML Content Creation
-
-```lua
--- Generate complete HTML documents
-local htmlContent = HTMLBuilder.CreateEntityHTML(entity, options)
-local bookContent = {
-    {
-        elements = {
-            {
-                templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                htmlContent = htmlContent,
-                title = entity.name,
-                entity = entity
-            }
-        }
-    }
-}
-```
-
-### Template Registration
-
-Add new templates to `UI/PageTemplatesRegistration.lua`:
-
-```lua
-private.constants.templates = {
-    [constants.templateKeys.YOUR_NEW_TEMPLATE] = {
-        template = "YourTemplateXMLName", 
-        initFunc = YourTemplateMixin.Init
-    }
-}
-```
+-   Purpose: Specialized event list components
+-   Mixins: `EventListTitleMixin` / `EventListItemMixin`
+-   Files: `UI/Events/EventListTemplate.xml`, `UI/Events/EventListTemplate.lua`
 
 ## Best Practices
 
-1. **Use HTML System**: Use `HTML_CONTENT` for all book content
-2. **Consistent Registration**: Register templates in `PageTemplatesRegistration.lua`
-3. **State Management**: Use proper `stateManagerKey` values for list components
-4. **Error Handling**: Implement proper fallbacks in template mixins
-5. **Performance**: Cache transformed content when possible
-
----
-
-**Note:** This documentation reflects the modern system in Chronicles v2.0.1+ which uses HTML-based content for all book display.
+1. Use `HTML_CONTENT` for all book content
+2. Register templates only in `PageTemplatesRegistration.lua`
+3. Keep payloads small; generate heavy HTML on demand
+4. Validate element data before Init
+5. Localize all user-visible strings
