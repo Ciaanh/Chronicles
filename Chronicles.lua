@@ -141,13 +141,23 @@ function Chronicles:RestoreStartupState()
         local selectedPeriodKey = stateManager.buildUIStateKey("selectedPeriod")
         local existingPeriod = stateManager.getState(selectedPeriodKey)
         if existingPeriod then
-            stateManager.setState(selectedPeriodKey, existingPeriod, "Startup state restoration")
+            stateManager.setState(
+                selectedPeriodKey,
+                existingPeriod,
+                "Startup state restoration",
+                {forceNotify = true, skipIfUnchanged = true}
+            )
         end
 
         local eventSelectionKey = stateManager.buildSelectionKey("event")
         local existingEventSelection = stateManager.getState(eventSelectionKey)
         if existingEventSelection and type(existingEventSelection) == "table" then
-            stateManager.setState(eventSelectionKey, existingEventSelection, "Startup state restoration")
+            stateManager.setState(
+                eventSelectionKey,
+                existingEventSelection,
+                "Startup state restoration",
+                {forceNotify = true, skipIfUnchanged = true}
+            )
         end
 
         local characterSelectionKey = stateManager.buildSelectionKey("character")
@@ -156,7 +166,8 @@ function Chronicles:RestoreStartupState()
             stateManager.setState(
                 characterSelectionKey,
                 existingCharacterSelection,
-                "Startup state restoration"
+                "Startup state restoration",
+                {forceNotify = true, skipIfUnchanged = true}
             )
         end
 
@@ -166,14 +177,20 @@ function Chronicles:RestoreStartupState()
             stateManager.setState(
                 factionSelectionKey,
                 existingFactionSelection,
-                "Startup state restoration"
+                "Startup state restoration",
+                {forceNotify = true, skipIfUnchanged = true}
             )
         end
 
         local activeTabKey = stateManager.buildUIStateKey("activeTab")
         local existingActiveTab = stateManager.getState(activeTabKey)
         if existingActiveTab then
-            stateManager.setState(activeTabKey, existingActiveTab, "Startup state restoration")
+            stateManager.setState(
+                activeTabKey,
+                existingActiveTab,
+                "Startup state restoration",
+                {forceNotify = true, skipIfUnchanged = true}
+            )
         end
     end
 end

@@ -193,15 +193,6 @@ end
     @param lookUpTable [table] Table to search in
     @return [boolean] True if value exists in table
 ]]
-local function existInTable(value, lookUpTable)
-    for key, item in pairs(lookUpTable) do
-        if (item.name == value) then
-            return true
-        end
-    end
-    return false
-end
-
 --[[
     Get a list of all registered collections with their status
     @return [table] Array of collection information objects
@@ -212,58 +203,46 @@ function DataRegistry.getCollectionsNames()
         return {}
     end
     local dataGroups = {}
+    local seen = {}
 
-    for eventCollectionName, group in pairs(chronicles.Data.Events) do
-        if eventCollectionName and type(eventCollectionName) == "string" and eventCollectionName ~= "" then
-            local collectionKey = private.Core.StateManager.buildCollectionKey(eventCollectionName)
-            local isActive = private.Core.StateManager.getState(collectionKey)
-            if isActive == nil then
-                isActive = true
-            end
+    local function appendCollection(collectionKey, group)
+        if not collectionKey or type(collectionKey) ~= "string" or collectionKey == "" then
+            return
+        end
 
-            local groupProjection = {
-                name = group.name,
+        if seen[collectionKey] then
+            return
+        end
+
+        local stateKey = private.Core.StateManager.buildCollectionKey(collectionKey)
+        local isActive = private.Core.StateManager.getState(stateKey)
+        if isActive == nil then
+            isActive = true
+        end
+
+        local name = group and group.name or collectionKey
+
+        table.insert(
+            dataGroups,
+            {
+                name = name,
                 isActive = isActive
             }
+        )
 
-            if not existInTable(eventCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
-            end
-        end
-    end
-    for factionCollectionName, group in pairs(chronicles.Data.Factions) do
-        if factionCollectionName and type(factionCollectionName) == "string" and factionCollectionName ~= "" then
-            local collectionKey = private.Core.StateManager.buildCollectionKey(factionCollectionName)
-            local isActive = private.Core.StateManager.getState(collectionKey)
-            if isActive == nil then
-                isActive = true
-            end
-            local groupProjection = {
-                name = group.name,
-                isActive = isActive
-            }
-            if not existInTable(factionCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
-            end
-        end
+        seen[collectionKey] = true
     end
 
-    for characterCollectionName, group in pairs(chronicles.Data.Characters) do
-        if characterCollectionName and type(characterCollectionName) == "string" and characterCollectionName ~= "" then
-            local collectionKey = private.Core.StateManager.buildCollectionKey(characterCollectionName)
-            local isActive = private.Core.StateManager.getState(collectionKey)
-            if isActive == nil then
-                isActive = true
-            end
-            local groupProjection = {
-                name = group.name,
-                isActive = isActive
-            }
+    for collectionName, group in pairs(chronicles.Data.Events) do
+        appendCollection(collectionName, group)
+    end
 
-            if not existInTable(characterCollectionName, dataGroups) then
-                table.insert(dataGroups, groupProjection)
-            end
-        end
+    for collectionName, group in pairs(chronicles.Data.Factions) do
+        appendCollection(collectionName, group)
+    end
+
+    for collectionName, group in pairs(chronicles.Data.Characters) do
+        appendCollection(collectionName, group)
     end
 
     return dataGroups
