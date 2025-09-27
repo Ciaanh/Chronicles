@@ -72,23 +72,6 @@
                         </FontString>
                     </Layer>
                 </Layers>
-                <Scripts>
-                    <OnEditFocusGained>
-                        self:GetParent():OnDateSearchFocusGained()
-                    </OnEditFocusGained>
-                    <OnEditFocusLost>
-                        self:GetParent():OnDateSearchFocusLost()
-                    </OnEditFocusLost>
-                    <OnEnterPressed>
-                        self:GetParent():OnDateSearchEnterPressed()
-                    </OnEnterPressed>
-                    <OnEscapePressed>
-                        self:GetParent():OnDateSearchEscapePressed()
-                    </OnEscapePressed>
-                    <OnTextChanged>
-                        self:GetParent():OnDateSearchTextChanged()
-                    </OnTextChanged>
-                </Scripts>
             </EditBox>
             <!-- Search Button -->
             <Button parentKey="DateSearchButton" inherits="UIPanelButtonTemplate">
@@ -96,11 +79,6 @@
                 <Anchors>
                     <Anchor point="LEFT" relativeKey="$parent.DateSearchInput" relativePoint="RIGHT" x="5" y="0" />
                 </Anchors>
-                <Scripts>
-                    <OnClick>
-                        self:GetParent():OnDateSearchButtonClick()
-                    </OnClick>
-                </Scripts>
             </Button>
 
             <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
@@ -198,14 +176,6 @@
                         <Anchor point="CENTER" y="1"/>
                     </Anchors>
                 </HighlightTexture>
-                <Scripts>
-                    <OnLoad >
-                        self:GetNormalTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetHighlightTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetPushedTexture():SetTexCoord(1, 0, 0, 1)
-                        self:GetDisabledTexture():SetTexCoord(1, 0, 0, 1)
-                    </OnLoad >
-                </Scripts>
             </Button>
 
             <Frame name="Label1" inherits="TimelineLabelTemplate">
@@ -349,6 +319,8 @@
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+            <OnHide method="OnHide" />
             <OnMouseWheel method="OnMouseWheel" />
         </Scripts>
     </Frame>

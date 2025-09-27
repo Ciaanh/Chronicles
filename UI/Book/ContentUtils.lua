@@ -11,6 +11,47 @@ local FOLDER_NAME, private = ...
 
 -- Import dependencies
 local HTMLBuilder = private.Core.Utils.HTMLBuilder
+local Cache = private.Core.Cache
+local TableUtils = private.Core.Utils.TableUtils
+
+local function countEntries(tbl)
+    if type(tbl) ~= "table" then
+        return 0
+    end
+
+    if TableUtils and TableUtils.Length then
+        return TableUtils.Length(tbl)
+    end
+
+    local count = 0
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
+local function buildEntityCacheKey(entity)
+    if type(entity) ~= "table" then
+        return nil
+    end
+
+    if entity.__cacheKey then
+        return tostring(entity.__cacheKey)
+    end
+
+    local id = entity.id or entity.eventId or entity.characterId or entity.factionId or entity.name or entity.label
+    if not id then
+        return nil
+    end
+
+    local source = entity.source or entity.collection or entity.collectionName or "default"
+    local revision =
+        entity.lastModified or entity.updatedAt or entity.version or (entity.metadata and entity.metadata.revision) or 0
+    local chaptersCount = countEntries(entity.chapters)
+    local descriptionLength = entity.description and #entity.description or 0
+
+    return string.format("%s:%s:%s:%s:%s", tostring(source), tostring(id), tostring(revision), tostring(chaptersCount), tostring(descriptionLength))
+end
 
 -- Initialize ContentUtils namespace
 private.Core.Utils = private.Core.Utils or {}
@@ -67,6 +108,14 @@ function ContentUtils.TransformEntityToBook(entity)
                 }
             }
         }
+    end
+
+    local cacheKey = buildEntityCacheKey(entity)
+    if cacheKey and Cache and Cache.getBookContent then
+        local cachedPayload = Cache.getBookContent(cacheKey)
+        if cachedPayload then
+            return cachedPayload
+        end
     end
 
     -- Generate list of HTML documents using HTMLBuilder
@@ -130,6 +179,10 @@ function ContentUtils.TransformEntityToBook(entity)
             elements = elements
         }
     }
+
+    if cacheKey and Cache and Cache.setBookContent then
+        Cache.setBookContent(cacheKey, result)
+    end
 
     return result
 end

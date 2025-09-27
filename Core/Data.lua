@@ -28,7 +28,7 @@ function Chronicles.Data:Load()
     end
 
     -- Initialize the cache system
-    private.Core.Cache.init()   
+        private.Core.Cache.init()
 end
 
 function Chronicles.Data:RefreshPeriods()
@@ -51,6 +51,10 @@ function Chronicles.Data:AddRPEvent(event)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
     private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.BOOK_CONTENT)
+        if private.Core.Business and private.Core.Business.FilterEngine and private.Core.Business.FilterEngine.ClearCache then
+            private.Core.Business.FilterEngine.ClearCache()
+        end
 end
 
 -- function to retrieve the list of dates for all eventsGroup
@@ -287,21 +291,42 @@ function Chronicles.Data:RegisterEventDB(collectionName, db)
     if not private.Core.Data or not private.Core.Data.DataRegistry then
         return false
     end
-    return private.Core.Data.DataRegistry.registerEventDB(collectionName, db)
+    local registered = private.Core.Data.DataRegistry.registerEventDB(collectionName, db)
+    if registered then
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.BOOK_CONTENT)
+            if private.Core.Business and private.Core.Business.FilterEngine and private.Core.Business.FilterEngine.ClearCache then
+                private.Core.Business.FilterEngine.ClearCache()
+            end
+    end
+    return registered
 end
 
 function Chronicles.Data:RegisterCharacterDB(collectionName, db)
     if not private.Core.Data or not private.Core.Data.DataRegistry then
         return false
     end
-    return private.Core.Data.DataRegistry.registerCharacterDB(collectionName, db)
+    local registered = private.Core.Data.DataRegistry.registerCharacterDB(collectionName, db)
+    if registered then
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.BOOK_CONTENT)
+            if private.Core.Business and private.Core.Business.FilterEngine and private.Core.Business.FilterEngine.ClearCache then
+                private.Core.Business.FilterEngine.ClearCache()
+            end
+    end
+    return registered
 end
 
 function Chronicles.Data:RegisterFactionDB(collectionName, db)
     if not private.Core.Data or not private.Core.Data.DataRegistry then
         return false
     end
-    return private.Core.Data.DataRegistry.registerFactionDB(collectionName, db)
+    local registered = private.Core.Data.DataRegistry.registerFactionDB(collectionName, db)
+    if registered then
+        private.Core.Cache.invalidate(private.Core.Cache.KEYS.BOOK_CONTENT)
+            if private.Core.Business and private.Core.Business.FilterEngine and private.Core.Business.FilterEngine.ClearCache then
+                private.Core.Business.FilterEngine.ClearCache()
+            end
+    end
+    return registered
 end
 
 function Chronicles.Data:GetCollectionsNames()
