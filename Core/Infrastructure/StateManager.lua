@@ -454,9 +454,10 @@ end
     @param key [string] State key (should be built using buildStateKey functions)
     @param value [any] New state value (any JSON-serializable type)
     @param description [string] Optional description for logging and debugging
+    @param options [table] Optional behavior flags (e.g., { forceNotify = true, skipIfUnchanged = true })
     @return [boolean] Success status (false indicates validation failure)
 ]]
-function private.Core.StateManager.setState(key, value, description)
+function private.Core.StateManager.setState(key, value, description, options)
     if not key then
         return false
     end
@@ -470,6 +471,24 @@ function private.Core.StateManager.setState(key, value, description)
     end
 
     local oldValue = stateStore[key]
+    local shouldForceNotify = options and options.forceNotify
+    local shouldSkipIfUnchanged = options and options.skipIfUnchanged
+
+    if oldValue == value then
+        stateStore[key] = value
+
+        if shouldSkipIfUnchanged then
+            if shouldForceNotify then
+                private.Core.StateManager.notifySubscribers(key, value, oldValue)
+            end
+            return true
+        end
+
+        private.Core.StateManager.persistState(key, value)
+        private.Core.StateManager.notifySubscribers(key, value, oldValue)
+        return true
+    end
+
     stateStore[key] = value
 
     private.Core.StateManager.persistState(key, value)

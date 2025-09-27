@@ -115,6 +115,13 @@ function MainFrameUIMixin:EnableStateSubscriptions()
 
 	for _, definition in ipairs(self._stateSubscriptionDefs) do
 		private.Core.StateManager.subscribe(definition.key, definition.callback, definition.id)
+
+		if definition.callback then
+			local success, currentValue = pcall(private.Core.StateManager.getState, definition.key)
+			if success then
+				local ok, _ = pcall(definition.callback, currentValue, nil)
+			end
+		end
 	end
 
 	self._stateSubscriptionsActive = true
