@@ -80,6 +80,8 @@ constants.events = {
 	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
 }
 
+constants.eventPayloadSchemas = constants.eventPayloadSchemas or {}
+
 constants.templateKeys = {
 	EVENTLIST_TITLE = "EVENTLIST_TITLE",
 	EVENT_DESCRIPTION = "EVENT_DESCRIPTION",

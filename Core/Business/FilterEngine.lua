@@ -59,6 +59,69 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
 local TableUtils = private.Core.Utils.TableUtils
 local DateCalculator = private.Core.Business.DateCalculator
 
+local filterCache = setmetatable({}, {__mode = "k"})
+
+local function normalizeList(list)
+    if not ValidationUtils.ValidateTable(list, {allowEmpty = true}) then
+        return ""
+    end
+
+    local normalized = {}
+    for _, value in ipairs(list) do
+        normalized[#normalized + 1] = tostring(value)
+    end
+
+    table.sort(normalized)
+    return table.concat(normalized, ",")
+end
+
+local function buildFilterSignature(filters)
+    if not ValidationUtils.ValidateTable(filters, {allowEmpty = true}) then
+        return nil
+    end
+
+    local parts = {}
+
+    if filters.yearRange and filters.yearRange.enabled then
+        parts[#parts + 1] = string.format(
+            "yr:%s:%s",
+            tostring(filters.yearRange.startYear or ""),
+            tostring(filters.yearRange.endYear or "")
+        )
+    end
+
+    if filters.eventTypes and filters.eventTypes.enabled then
+        parts[#parts + 1] = "et:" .. normalizeList(filters.eventTypes.allowedTypes)
+    end
+
+    if filters.collections and filters.collections.enabled then
+        parts[#parts + 1] = "col:" .. normalizeList(filters.collections.allowedCollections)
+    end
+
+    if filters.timelines and filters.timelines.enabled then
+        parts[#parts + 1] = "tl:" .. normalizeList(filters.timelines.allowedTimelines)
+    end
+
+    if filters.characters and filters.characters.enabled then
+        parts[#parts + 1] = "ch:" .. normalizeList(filters.characters.allowedCharacters)
+    end
+
+    if filters.factions and filters.factions.enabled then
+        parts[#parts + 1] = "fa:" .. normalizeList(filters.factions.allowedFactions)
+    end
+
+    if filters.search and filters.search.enabled then
+        local searchText = string.lower(filters.search.searchText or "")
+        parts[#parts + 1] = "se:" .. searchText .. ":" .. normalizeList(filters.search.searchFields or {})
+    end
+
+    if #parts == 0 then
+        return nil
+    end
+
+    return table.concat(parts, "|")
+end
+
 --[[
     Filter Configuration Structure:
     {
@@ -119,12 +182,20 @@ local DateCalculator = private.Core.Business.DateCalculator
         })
 ]]
 function FilterEngine.ApplyFilters(events, filters)
-    if not ValidationUtils.IsValidTable(events) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) then
         return {}
     end
 
-    if not ValidationUtils.IsValidTable(filters) then
+    if not ValidationUtils.ValidateTable(filters, {allowEmpty = true}) then
         return events
+    end
+
+    local cacheKey = buildFilterSignature(filters)
+    if cacheKey then
+        local cachedBucket = filterCache[events]
+        if cachedBucket and cachedBucket[cacheKey] then
+            return cachedBucket[cacheKey]
+        end
     end
 
     local filteredEvents = events
@@ -166,6 +237,15 @@ function FilterEngine.ApplyFilters(events, filters)
             FilterEngine.FilterBySearch(filteredEvents, filters.search.searchText, filters.search.searchFields)
     end
 
+    if cacheKey then
+        local bucket = filterCache[events]
+        if not bucket then
+            bucket = setmetatable({}, {__mode = "v"})
+            filterCache[events] = bucket
+        end
+        bucket[cacheKey] = filteredEvents
+    end
+
     return filteredEvents
 end
 
@@ -177,7 +257,7 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByYearRange(events, startYear, endYear)
-    if not ValidationUtils.IsValidTable(events) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) then
         return {}
     end
 
@@ -205,7 +285,7 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByEventTypes(events, allowedTypes)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedTypes) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or not ValidationUtils.ValidateTable(allowedTypes, false) then
         return events
     end
 
@@ -230,7 +310,8 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByCollections(events, allowedCollections)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedCollections) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or
+        not ValidationUtils.ValidateTable(allowedCollections, false) then
         return events
     end
 
@@ -255,7 +336,8 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByTimelines(events, allowedTimelines)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedTimelines) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or
+        not ValidationUtils.ValidateTable(allowedTimelines, false) then
         return events
     end
 
@@ -280,7 +362,8 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByCharacters(events, allowedCharacters)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedCharacters) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or
+        not ValidationUtils.ValidateTable(allowedCharacters, false) then
         return events
     end
 
@@ -311,7 +394,8 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterByFactions(events, allowedFactions)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidTable(allowedFactions) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or
+        not ValidationUtils.ValidateTable(allowedFactions, false) then
         return events
     end
 
@@ -343,7 +427,7 @@ end
     @return [table] Filtered events
 ]]
 function FilterEngine.FilterBySearch(events, searchText, searchFields)
-    if not ValidationUtils.IsValidTable(events) or not ValidationUtils.IsValidString(searchText) then
+    if not ValidationUtils.ValidateTable(events, {allowEmpty = true}) or not ValidationUtils.IsValidString(searchText) then
         return events
     end
 
@@ -415,6 +499,10 @@ function FilterEngine.CreateFilterConfig(options)
             searchFields = options.searchFields or {"label"}
         }
     }
+end
+
+function FilterEngine.ClearCache()
+    filterCache = setmetatable({}, {__mode = "k"})
 end
 
 --[[

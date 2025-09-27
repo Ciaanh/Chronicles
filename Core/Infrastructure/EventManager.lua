@@ -41,6 +41,14 @@ function private.Core.registerCallback(eventName, callback, owner)
     end
 end
 
+function private.Core.unregisterCallback(eventName, owner)
+    if private.Core.EventManager and private.Core.EventManager.safeUnregisterCallback then
+        private.Core.EventManager.safeUnregisterCallback(eventName, owner)
+    else
+        EventRegistry:UnregisterCallback(eventName, owner)
+    end
+end
+
 -- -------------------------
 -- Event Validation & Schema
 -- -------------------------
@@ -200,6 +208,11 @@ local eventSchemas = {
     }
 }
 
+private.constants.eventPayloadSchemas = private.constants.eventPayloadSchemas or {}
+for eventName, schema in pairs(eventSchemas) do
+    private.constants.eventPayloadSchemas[eventName] = schema
+end
+
 -- -------------------------
 -- Event Validator
 -- -------------------------
@@ -230,6 +243,17 @@ private.Core.EventManager.Validator = {
     end,
     addSchema = function(self, eventName, schema)
         eventSchemas[eventName] = schema
+        if private.constants then
+            private.constants.eventPayloadSchemas = private.constants.eventPayloadSchemas or {}
+            private.constants.eventPayloadSchemas[eventName] = schema
+        end
+    end,
+    getAllSchemas = function(self)
+        local copy = {}
+        for name, schema in pairs(eventSchemas) do
+            copy[name] = schema
+        end
+        return copy
     end
 }
 
@@ -269,6 +293,10 @@ private.Core.EventManager.safeRegisterCallback = function(eventName, callback, o
     end
 
     EventRegistry:RegisterCallback(eventName, wrappedCallback, owner)
+end
+
+private.Core.EventManager.safeUnregisterCallback = function(eventName, owner)
+    EventRegistry:UnregisterCallback(eventName, owner)
 end
 
 -- -------------------------

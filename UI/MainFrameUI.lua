@@ -75,6 +75,63 @@ end
 -- -------------------------
 MainFrameUIMixin = {}
 
+function MainFrameUIMixin:SetupStateSubscriptions()
+	if not private.Core.StateManager then
+		return
+	end
+
+	if not self._stateSubscriptionDefs then
+		local frameName = self:GetName() or "MainFrameUI"
+		self._stateSubscriptionDefs = {
+			{
+				key = private.Core.StateManager.buildSelectionKey("event"),
+				id = frameName .. "_EventBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateEventBookContent(newSelection)
+				end
+			},
+			{
+				key = private.Core.StateManager.buildSelectionKey("character"),
+				id = frameName .. "_CharacterBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateCharacterBookContent(newSelection)
+				end
+			},
+			{
+				key = private.Core.StateManager.buildSelectionKey("faction"),
+				id = frameName .. "_FactionBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateFactionBookContent(newSelection)
+				end
+			}
+		}
+	end
+end
+
+function MainFrameUIMixin:EnableStateSubscriptions()
+	if self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+		return
+	end
+
+	for _, definition in ipairs(self._stateSubscriptionDefs) do
+		private.Core.StateManager.subscribe(definition.key, definition.callback, definition.id)
+	end
+
+	self._stateSubscriptionsActive = true
+end
+
+function MainFrameUIMixin:DisableStateSubscriptions()
+	if not self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+		return
+	end
+
+	for _, definition in ipairs(self._stateSubscriptionDefs) do
+		private.Core.StateManager.unsubscribe(definition.key, definition.id)
+	end
+
+	self._stateSubscriptionsActive = false
+end
+
 --[[
     Initialize the main frame UI component
     
@@ -88,37 +145,7 @@ function MainFrameUIMixin:OnLoad()
 	-- Subscribe to selection state changes and update book content accordingly.
 	-- This ensures that BookContainerTemplate always receives already-transformed content.
 
-	if private.Core.StateManager then
-		-- Event selection subscriber
-		local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
-		private.Core.StateManager.subscribe(
-			eventSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateEventBookContent(newSelection)
-			end,
-			"MainFrameUI_EventBook"
-		)
-
-		-- Character selection subscriber
-		local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
-		private.Core.StateManager.subscribe(
-			characterSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateCharacterBookContent(newSelection)
-			end,
-			"MainFrameUI_CharacterBook"
-		)
-
-		-- Faction selection subscriber
-		local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
-		private.Core.StateManager.subscribe(
-			factionSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateFactionBookContent(newSelection)
-			end,
-			"MainFrameUI_FactionBook"
-		)
-	end
+	self:SetupStateSubscriptions()
 end
 
 --[[
@@ -134,6 +161,8 @@ end
 ]]
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
+	self:SetupStateSubscriptions()
+	self:EnableStateSubscriptions()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
 		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
@@ -152,6 +181,7 @@ end
     2. Update UI state to indicate frame is closed
 ]]
 function MainFrameUIMixin:OnHide()
+	self:DisableStateSubscriptions()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
