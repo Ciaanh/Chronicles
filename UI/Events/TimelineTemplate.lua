@@ -515,7 +515,8 @@ function TimelinePeriodMixin:OnClick()
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("yearSpecificMode"),
             false,
-            "Year-specific mode cleared due to period selection"
+            "Year-specific mode cleared due to period selection",
+            {skipIfUnchanged = true}
         )
     end
 
@@ -532,7 +533,18 @@ function TimelinePeriodMixin:OnClick()
     -- Update state instead of triggering event - provides single source of truth
     if private.Core.StateManager then
         local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
-        private.Core.StateManager.setState(selectedPeriodKey, periodData, "Timeline period selected")
+        local currentSelection = private.Core.StateManager.getState(selectedPeriodKey)
+
+        if currentSelection and currentSelection.lower == periodData.lower and currentSelection.upper == periodData.upper then
+            return
+        end
+
+        private.Core.StateManager.setState(
+            selectedPeriodKey,
+            periodData,
+            "Timeline period selected",
+            {skipIfUnchanged = true}
+        )
     end
 
     self:ResetAllPeriodTextures()

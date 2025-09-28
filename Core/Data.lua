@@ -10,13 +10,40 @@ local Chronicles = private.Chronicles
 private.Core = private.Core or {}
 private.Core.Utils = private.Core.Utils or {}
 
-local TableUtils = private.Core.Utils.TableUtils
-
 Chronicles.Data = {}
 Chronicles.Data.Events = {}
 Chronicles.Data.Factions = {}
 Chronicles.Data.Characters = {}
 Chronicles.Data.RP = {}
+
+local PERIOD_BUCKETS = {
+    {key = "mod1000", step = 1000},
+    {key = "mod500", step = 500},
+    {key = "mod250", step = 250},
+    {key = "mod100", step = 100},
+    {key = "mod50", step = 50},
+    {key = "mod10", step = 10}
+    --{key = "mod1", step = 1}
+}
+
+local function initializePeriodBuckets()
+    local buckets = {}
+    for _, bucket in ipairs(PERIOD_BUCKETS) do
+        buckets[bucket.key] = {}
+    end
+    return buckets
+end
+
+local function addEventToBucketRange(bucketTable, startIndex, endIndex, eventId)
+    for index = startIndex, endIndex do
+        local bucket = bucketTable[index]
+        if not bucket then
+            bucket = {}
+            bucketTable[index] = bucket
+        end
+        bucket[#bucket + 1] = eventId
+    end
+end
 
 RPEventsDB = {}
 
@@ -59,15 +86,7 @@ end
 
 -- function to retrieve the list of dates for all eventsGroup
 function Chronicles.Data:GetPeriodsFillingBySteps()
-    local periods = {
-        mod1000 = {},
-        mod500 = {},
-        mod250 = {},
-        mod100 = {},
-        mod50 = {},
-        mod10 = {}
-        --mod1 = {}
-    }
+    local periods = initializePeriodBuckets()
     for collectionName, eventsGroup in pairs(Chronicles.Data.Events) do
         if Chronicles.Data:GetCollectionStatus(collectionName) then
             if eventsGroup and eventsGroup.data then
@@ -76,8 +95,23 @@ function Chronicles.Data:GetPeriodsFillingBySteps()
                         local isActive = Chronicles.Data:GetEventTypeStatus(event.eventType)
 
                         if (isActive) then
-                            for date = event.yearStart, event.yearEnd, 1 do
-                                periods = Chronicles.Data:SetPeriodsForEvent(periods, date, event.id)
+                            local yearStart = tonumber(event.yearStart)
+                            local yearEnd = tonumber(event.yearEnd)
+
+                            if yearStart and yearEnd then
+                                if yearStart > yearEnd then
+                                    yearStart, yearEnd = yearEnd, yearStart
+                                end
+
+                                for _, bucket in ipairs(PERIOD_BUCKETS) do
+                                    local bucketTable = periods[bucket.key]
+                                    local startIndex = math.floor(yearStart / bucket.step)
+                                    local endIndex = math.floor(yearEnd / bucket.step)
+
+                                    if endIndex >= startIndex then
+                                        addEventToBucketRange(bucketTable, startIndex, endIndex, event.id)
+                                    end
+                                end
                             end
                         end
                     end
@@ -89,37 +123,6 @@ function Chronicles.Data:GetPeriodsFillingBySteps()
     return periods
 end
 
-function Chronicles.Data:SetPeriodsForEvent(periods, date, eventId)
-    local profile = Chronicles.Data:ComputeEventDateProfile(date)
-
-    periods.mod1000[profile.mod1000] = Chronicles.Data:DefinePeriodsForEvent(periods.mod1000[profile.mod1000], eventId)
-    periods.mod500[profile.mod500] = Chronicles.Data:DefinePeriodsForEvent(periods.mod500[profile.mod500], eventId)
-    periods.mod250[profile.mod250] = Chronicles.Data:DefinePeriodsForEvent(periods.mod250[profile.mod250], eventId)
-    periods.mod100[profile.mod100] = Chronicles.Data:DefinePeriodsForEvent(periods.mod100[profile.mod100], eventId)
-    periods.mod50[profile.mod50] = Chronicles.Data:DefinePeriodsForEvent(periods.mod50[profile.mod50], eventId)
-    periods.mod10[profile.mod10] = Chronicles.Data:DefinePeriodsForEvent(periods.mod10[profile.mod10], eventId)
-    --periods.mod1[profile.mod1] = Chronicles.Data:DefinePeriodsForEvent(periods.mod1[profile.mod1], eventId)
-
-    return periods
-end
-
-function Chronicles.Data:DefinePeriodsForEvent(period, eventId)
-    if period ~= nil then
-        local items = TableUtils.Set(period)
-        if items[eventId] ~= nil then
-        else
-            table.insert(period, eventId)
-        end
-
-        return period
-    else
-        local data = {}
-        table.insert(data, eventId)
-
-        return data
-    end
-end
-
 function Chronicles.Data:ComputeEventDateProfile(date)
     return {
         mod1000 = math.floor(date / 1000),
@@ -127,8 +130,8 @@ function Chronicles.Data:ComputeEventDateProfile(date)
         mod250 = math.floor(date / 250),
         mod100 = math.floor(date / 100),
         mod50 = math.floor(date / 50),
-        mod10 = math.floor(date / 10)
-        --mod1 = date
+        mod10 = math.floor(date / 10),
+        mod1 = math.floor(date)
     }
 end
 
