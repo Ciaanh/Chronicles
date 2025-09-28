@@ -340,6 +340,7 @@ function TimelineMixin:PerformDateSearch()
     end
 
     self:NavigateToYear(year)
+    self:DisplayEventsForYear(year)
     self.DateSearchInput:ClearFocus()
 end
 
@@ -356,6 +357,53 @@ function TimelineMixin:NavigateToYear(year)
         -- Fallback implementation
         self:FallbackNavigateToYear(year)
     end
+end
+
+function TimelineMixin:DisplayEventsForYear(year)
+    if not year or not private.Core then
+        return
+    end
+
+    local triggerEvent = private.Core.triggerEvent
+    if not triggerEvent or not private.constants or not private.constants.events then
+        return
+    end
+
+    local eventsProvider = private.Core.Cache and private.Core.Cache.getSearchEvents and private.Core.Cache.getSearchEvents(year, year) or {}
+
+    local filteredEvents = eventsProvider
+    if private.Core.Events and private.Core.Events.FilterEvents then
+        filteredEvents = private.Core.Events.FilterEvents(eventsProvider)
+    end
+
+    local stateManager = private.Core.StateManager
+    if stateManager then
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificMode"),
+            true,
+            "Year-specific search activated",
+            {skipIfUnchanged = true}
+        )
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificTarget"),
+            year,
+            "Year-specific search target"
+        )
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificEvents"),
+            filteredEvents,
+            "Year-specific events cached"
+        )
+    end
+
+    triggerEvent(
+        private.constants.events.DisplayEventsForYear,
+        {
+            year = year,
+            events = filteredEvents
+        },
+        "TimelineMixin:DisplayEventsForYear"
+    )
 end
 
 function TimelineMixin:FallbackNavigateToYear(year)

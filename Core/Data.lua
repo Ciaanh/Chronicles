@@ -23,7 +23,6 @@ local PERIOD_BUCKETS = {
     {key = "mod100", step = 100},
     {key = "mod50", step = 50},
     {key = "mod10", step = 10}
-    --{key = "mod1", step = 1}
 }
 
 local function initializePeriodBuckets()
@@ -130,8 +129,7 @@ function Chronicles.Data:ComputeEventDateProfile(date)
         mod250 = math.floor(date / 250),
         mod100 = math.floor(date / 100),
         mod50 = math.floor(date / 50),
-        mod10 = math.floor(date / 10),
-        mod1 = math.floor(date)
+           mod10 = math.floor(date / 10)
     }
 end
 

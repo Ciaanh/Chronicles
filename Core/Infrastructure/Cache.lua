@@ -84,6 +84,114 @@ local Cache = {
     }
 }
 
+Cache._lastWarmError = nil
+
+local WARM_TASK_INTERVAL_DEFAULT = 0.05
+local warmQueue = {}
+local warmTaskInterval = WARM_TASK_INTERVAL_DEFAULT
+local isWarmQueueActive = false
+
+local function processWarmQueue()
+    if #warmQueue == 0 then
+        isWarmQueueActive = false
+        return
+    end
+
+    local task = table.remove(warmQueue, 1)
+    local ok, err = pcall(task)
+    if not ok then
+        Cache._lastWarmError = err
+    end
+
+    if #warmQueue > 0 then
+        C_Timer.After(warmTaskInterval, processWarmQueue)
+    else
+        isWarmQueueActive = false
+    end
+end
+
+local function enqueueWarmTasks(tasks, interval)
+    if not tasks or #tasks == 0 then
+        return
+    end
+
+    if not isWarmQueueActive then
+        warmTaskInterval = interval or WARM_TASK_INTERVAL_DEFAULT
+    end
+
+    for _, task in ipairs(tasks) do
+        warmQueue[#warmQueue + 1] = task
+    end
+
+    if not isWarmQueueActive then
+        isWarmQueueActive = true
+        processWarmQueue()
+    end
+end
+
+local function buildWarmTaskList()
+    local tasks = {}
+
+    if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getPeriodsFillingBySteps()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.MIN_EVENT_YEAR] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getMinEventYear()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.MAX_EVENT_YEAR] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getMaxEventYear()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.COLLECTIONS_NAMES] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getCollectionsNames()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.ALL_CHARACTERS] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getAllCharacters()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.BOOK_CONTENT] then
+        table.insert(
+            tasks,
+            function()
+                Cache._data[CACHE_KEYS.BOOK_CONTENT] = {}
+                Cache._dirty[CACHE_KEYS.BOOK_CONTENT] = false
+            end
+        )
+    end
+
+    table.insert(
+        tasks,
+        function()
+            private.Core.Cache.preWarmSearchCache()
+        end
+    )
+
+    return tasks
+end
+
 -- -------------------------
 -- Core Cache Management Functions
 -- -------------------------
@@ -312,29 +420,22 @@ function private.Core.Cache.preWarmSearchCache()
     end
 end
 
-function private.Core.Cache.warmAllCaches()
-    if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
-        private.Core.Cache.getPeriodsFillingBySteps()
-    end
-    if Cache._dirty[CACHE_KEYS.MIN_EVENT_YEAR] then
-        private.Core.Cache.getMinEventYear()
-    end
-    if Cache._dirty[CACHE_KEYS.MAX_EVENT_YEAR] then
-        private.Core.Cache.getMaxEventYear()
-    end
-    if Cache._dirty[CACHE_KEYS.COLLECTIONS_NAMES] then
-        private.Core.Cache.getCollectionsNames()
-    end
-    if Cache._dirty[CACHE_KEYS.ALL_CHARACTERS] then
-        private.Core.Cache.getAllCharacters()
+function private.Core.Cache.warmAllCaches(options)
+    options = options or {}
+    local tasks = buildWarmTaskList()
+
+    if #tasks == 0 then
+        return
     end
 
-    if Cache._dirty[CACHE_KEYS.BOOK_CONTENT] then
-        Cache._data[CACHE_KEYS.BOOK_CONTENT] = {}
-        Cache._dirty[CACHE_KEYS.BOOK_CONTENT] = false
+    if options.async then
+        Cache._lastWarmError = nil
+        enqueueWarmTasks(tasks, options.interval)
+    else
+        for _, task in ipairs(tasks) do
+            task()
+        end
     end
-
-    private.Core.Cache.preWarmSearchCache()
 end
 
 function private.Core.Cache.clearAll()
@@ -356,7 +457,7 @@ function private.Core.Cache.init()
     C_Timer.After(
         1.0,
         function()
-            private.Core.Cache.warmAllCaches()
+            private.Core.Cache.warmAllCaches({async = true})
         end
     )
 end
