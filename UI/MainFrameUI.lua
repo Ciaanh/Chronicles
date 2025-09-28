@@ -172,7 +172,7 @@ function MainFrameUIMixin:OnShow()
 	self:EnableStateSubscriptions()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
+		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened", {skipIfUnchanged = true})
 	end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
@@ -192,7 +192,7 @@ function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed")
+		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed", {skipIfUnchanged = true})
 	end
 end
 

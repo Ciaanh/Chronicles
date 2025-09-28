@@ -49,16 +49,26 @@ function EventListItemMixin:OnClick()
 	if private.Core.StateManager then
 		-- Use the centralized state key builder for entity selection
 		local selectionKey = private.Core.StateManager.buildSelectionKey("event")
+		local currentSelection = private.Core.StateManager.getState(selectionKey)
 
 		-- Pass both event ID and collection name for unique identification
 		local eventSelection = nil
 		if self.Event and self.Event.id then
+			local collectionName = self.Event.source or "Origins"
+
+			if currentSelection and currentSelection.eventId == self.Event.id and currentSelection.collectionName == collectionName then
+				return
+			end
+
 			eventSelection = {
 				eventId = self.Event.id,
-				collectionName = self.Event.source or "Origins" -- Default to Origins if source not available
+				collectionName = collectionName
 			}
+		elseif currentSelection == nil then
+			-- No change required when clearing an already empty selection
+			return
 		end
-		private.Core.StateManager.setState(selectionKey, eventSelection, "Event selected from list")
+		private.Core.StateManager.setState(selectionKey, eventSelection, "Event selected from list", {skipIfUnchanged = true})
 	end
 end
 
