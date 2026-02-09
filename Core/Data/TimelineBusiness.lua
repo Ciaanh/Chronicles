@@ -289,14 +289,23 @@ function TimelineBusiness.countEventsInPeriod(block)
             for i = lowerDateIndex, upperDateIndex - 1, 1 do
                 local periodEvents = periodsFilling[i]
                 if (periodEvents ~= nil) then
-                    local periodsCount = #periodEvents
+                    -- Count hash-set entries (eventId as keys)
+                    local periodsCount = 0
+                    for _ in pairs(periodEvents) do
+                        periodsCount = periodsCount + 1
+                    end
                     eventCount = eventCount + periodsCount
                 end
             end
         elseif lowerDateIndex == upperDateIndex then
             local periodEvents = periodsFilling[lowerDateIndex]
             if (periodEvents ~= nil) then
-                eventCount = #periodEvents
+                -- Count hash-set entries (eventId as keys)
+                local periodsCount = 0
+                for _ in pairs(periodEvents) do
+                    periodsCount = periodsCount + 1
+                end
+                eventCount = periodsCount
             end
         end
     end
@@ -564,7 +573,7 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
     end
 
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
-        firstIndex = numberOfCells - 7
+        firstIndex = numberOfCells - (pageSize - 1)
         currentPage = maxPageValue
     end
 
@@ -727,70 +736,13 @@ function TimelineBusiness.getYearPageIndex(year)
         return 1
     end
 
-    -- Get current timeline periods
+    -- Get current timeline periods and delegate to the full implementation
     local periods = TimelineBusiness.computeTimelinePeriods()
     if not periods or #periods == 0 then
         return 1
     end
 
-    -- Use the existing getYearPageIndex function with periods parameter
-    -- Note: We need to call it directly since we have two functions with same name
-    local pageSize = private.constants.config.timeline.pageSize
-    local numberOfCells = #periods
-
-    -- Find the period that contains the selected year
-    local periodIndex = nil
-    for i, period in ipairs(periods) do
-        -- Check if year falls within this period's bounds
-        if year >= period.lower and year <= period.upper then
-            periodIndex = i
-            break
-        end
-        -- Special handling for mythos period (negative values)
-        if period.lower == private.constants.config.mythos and year < private.constants.config.historyStartYear then
-            periodIndex = i
-            break
-        end
-        -- Special handling for future period
-        if period.upper == private.constants.config.futur and year > private.constants.config.currentYear then
-            periodIndex = i
-            break
-        end
-    end
-
-    -- If no period found, find the closest one
-    if periodIndex == nil then
-        local closestDistance = math.huge
-        for i, period in ipairs(periods) do
-            local distance
-            if year < period.lower then
-                distance = period.lower - year
-            elseif year > period.upper then
-                distance = year - period.upper
-            else
-                distance = 0
-            end
-
-            if distance < closestDistance then
-                closestDistance = distance
-                periodIndex = i
-            end
-        end
-    end
-
-    -- If still no period found, default to first period
-    if periodIndex == nil then
-        periodIndex = 1
-    end
-
-    -- Calculate which page contains this period
-    local pageIndex = math.ceil(periodIndex / pageSize)
-
-    -- Ensure page index is within valid bounds
-    local maxPage = math.ceil(numberOfCells / pageSize)
-    pageIndex = math.max(1, math.min(pageIndex, maxPage))
-
-    return pageIndex
+    return TimelineBusiness.getYearPageIndexWithPeriods(year, periods)
 end
 
 return TimelineBusiness

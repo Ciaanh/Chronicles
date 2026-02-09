@@ -1,93 +1,66 @@
 ---@meta
 -- Chronicles Domain Types
--- This file contains all type definitions for the Chronicles addon domain objects
+-- This file contains type definitions for the Chronicles addon domain objects
+-- These match the actual data structures used throughout the addon
+
 ---@class ChroniclesEvent
 ---@field id number Unique identifier for the event
----@field name string Display name of the event
----@field description string Detailed description
----@field startDate number Unix timestamp for event start
----@field endDate number|nil Unix timestamp for event end (nil for ongoing)
----@field category string Event category (e.g., "expansion", "patch", "lore")
----@field expansion string|nil Associated expansion
----@field patch string|nil Associated patch version
----@field importance number Importance level (1-5)
----@field tags string[] Array of tags for categorization
+---@field label string Event name/title
+---@field chapters ChroniclesChapter[] Event chapters/content (array of chapter objects)
+---@field yearStart number Start year of the event
+---@field yearEnd number End year of the event
+---@field eventType number Type/category of event
+---@field timeline number|nil Timeline ID this event belongs to
+---@field order number|nil Display order in timeline
+---@field characters table|nil Associated characters (array of character objects)
+---@field factions table|nil Associated factions (array of faction objects)
+---@field author string|nil Author of the event entry
+---@field source string|nil Source collection name
+
 ---@class ChroniclesCharacter
+---@field id number Unique identifier for the character
 ---@field name string Character name
----@field realm string Server/realm name
----@field faction string "Alliance" or "Horde"
----@field race string Character race
----@field class string Character class
----@field level number Character level
----@field guild string|nil Guild name
----@field lastSeen number Unix timestamp of last login
----@field achievements number[] Array of achievement IDs
----@class ChroniclesTimeline
----@field id string Unique timeline identifier
----@field name string Timeline display name
----@field description string Timeline description
----@field events ChroniclesEvent[] Array of events in this timeline
----@field startDate number Timeline start date
----@field endDate number|nil Timeline end date
----@field isActive boolean Whether timeline is currently active
----@field filters ChroniclesTimelineFilter Applied filters
----@class ChroniclesTimelineFilter
----@field categories string[]|nil Filter by event categories
----@field expansions string[]|nil Filter by expansions
----@field dateRange {start: number, end: number}|nil Date range filter
----@field importance {min: number, max: number}|nil Importance range filter
----@field tags string[]|nil Filter by tags
+---@field chapters ChroniclesChapter[] Character chapters/content (array of chapter objects)
+---@field timeline number|nil Timeline ID this character belongs to
+---@field factions table|nil Associated factions (array of faction objects)
+---@field author string|nil Author of the character entry
+---@field description string|nil Character description
+---@field image string|nil Character portrait/image path
+---@field source string|nil Source collection name
+
 ---@class ChroniclesFaction
----@field id string Faction identifier
----@field name string Faction display name
----@field description string Faction description
----@field alignment string "Alliance", "Horde", or "Neutral"
----@field reputation number Current reputation level
----@field standing string Reputation standing text
----@field isActive boolean Whether faction is currently active
----@class ChroniclesSettings
----@field display ChroniclesDisplaySettings
----@field filters ChroniclesFilterSettings
----@field notifications ChroniclesNotificationSettings
----@field data ChroniclesDataSettings
----@class ChroniclesDisplaySettings
----@field theme string UI theme ("classic", "modern", "minimal")
----@field fontSize number Font size multiplier
----@field showTooltips boolean Whether to show tooltips
----@field compactMode boolean Whether to use compact display
----@field timeFormat string "12h" or "24h"
----@field dateFormat string Date display format
----@class ChroniclesFilterSettings
----@field defaultCategories string[] Default event categories to show
----@field autoFilter boolean Whether to automatically apply filters
----@field rememberFilters boolean Whether to save filter states
----@field quickFilters string[] Quick filter presets
----@class ChroniclesNotificationSettings
----@field enabled boolean Whether notifications are enabled
----@field eventReminders boolean Notify about upcoming events
----@field newContent boolean Notify about new content
----@field soundEnabled boolean Whether to play notification sounds
----@field chatOutput boolean Whether to output to chat
----@class ChroniclesDataSettings
----@field autoUpdate boolean Whether to automatically update data
----@field cacheSize number Maximum cache size in MB
----@field backupEnabled boolean Whether to backup data
----@field syncEnabled boolean Whether to sync across characters
----@class ChroniclesSearchResult
----@field type string Result type ("event", "character", "timeline", etc.)
----@field object any The actual result object
----@field score number Search relevance score
----@field matches string[] Array of matched search terms
----@class ChroniclesCache
----@field key string Cache key
----@field data any Cached data
----@field timestamp number Cache creation timestamp
----@field ttl number Time to live in seconds
----@field size number Cache entry size in bytes
+---@field id number Unique identifier for the faction
+---@field name string Faction name
+---@field chapters ChroniclesChapter[]|nil Faction chapters/content (array of chapter objects)
+---@field timeline number|nil Timeline ID this faction belongs to
+---@field author string|nil Author of the faction entry
+---@field description string|nil Faction description
+---@field image string|nil Faction image/crest path
+---@field source string|nil Source collection name
+
+---@class ChroniclesChapter
+---@field header number|string Chapter header/title identifier
+---@field pages string[] Content of the chapter (array of strings, text or HTML)
+
+---@class ChroniclesTimelinePeriod
+---@field lower number Lower bound of the period (year)
+---@field upper number Upper bound of the period (year)
+---@field text string|nil Period label/name (optional)
+---@field hasEvents boolean Whether this period contains events
+---@field nbEvents number Number of events in this period
+
+---@class ChroniclesTimelineConfig
+---@field isOverlapping boolean Whether timeline crosses year 0
+---@field pastEvents boolean Whether there are events before historyStartYear
+---@field futurEvents boolean Whether there are events after currentYear
+---@field before number Number of periods before year 0
+---@field after number Number of periods after year 0
+---@field minYear number Minimum year in timeline
+---@field maxYear number Maximum year in timeline
+---@field numberOfTimelineBlock number Total number of timeline blocks
+
 -- Global type aliases for commonly used types
 ---@alias ChroniclesEventId number
----@alias ChroniclesCharacterId string
----@alias ChroniclesTimelineId string
----@alias ChroniclesFactionId string
----@alias ChroniclesTimestamp number
----@alias ChroniclesReputationLevel number
+---@alias ChroniclesCharacterId number
+---@alias ChroniclesFactionId number
+---@alias ChroniclesYear number

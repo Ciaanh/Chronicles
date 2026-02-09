@@ -43,16 +43,20 @@ local isResolving = {}
     @param name [string] Unique name for the dependency
     @param dependency [any] The dependency to register (can be nil for lazy loading)
     @param resolver [function] Optional resolver function for lazy loading
+    @return [boolean] True if registration succeeded, false otherwise
+    @return [string] Error message if registration failed
 ]]
 function DependencyContainer.register(name, dependency, resolver)
     if type(name) ~= "string" or name == "" then
-        error("Dependency name must be a non-empty string")
+        return false, "Dependency name must be a non-empty string"
     end
     
     dependencies[name] = dependency
     if resolver and type(resolver) == "function" then
         resolvers[name] = resolver
     end
+    
+    return true
 end
 
 --[[

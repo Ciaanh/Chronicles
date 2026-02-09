@@ -1,5 +1,31 @@
 # Chronicles Addon Changelog
 
+## v2.0.1 (February 9, 2026)
+### Critical Bug Fixes
+- Fixed TableUtils.Filter producing sparse tables causing incorrect array counts and pagination issues
+- Expanded IsValidYear range from [-25000, 100] to [-999999, 999999] to match timeline constants
+- Fixed isEventInRange missing events that fully span the search range
+- Fixed IsValidPeriod checking wrong field names (now correctly checks lower/upper instead of yearStart/yearEnd)
+- Fixed StateManager method call (addListener → subscribe) with proper owner argument
+- Fixed onCurrentPageChanged forward reference issue in Timeline initialization
+
+### Performance Improvements
+- Optimized DefinePeriodsForEvent from O(n²) to O(1) using hash-sets for event deduplication
+- Added cache size limits (MAX_CACHE_ENTRIES = 100) to prevent unbounded memory growth
+- Improved period counting to work with hash-set data structure
+
+### Code Quality & Architecture
+- Removed ~20 global namespace exports (Set, Trim, adjust_value, etc.) - now use module pattern
+- Updated DateCalculator and FilterEngine to use private.Core.Utils.* instead of globals
+- Rewrote Domain Types to match actual data structures (yearStart/yearEnd, chapters, etc.)
+- Replaced ~120 lines of boilerplate in Data.lua with proxy generator pattern
+- Simplified getYearPageIndex to delegate to getYearPageIndexWithPeriods (~70 lines removed)
+- Made DependencyContainer error handling consistent (returns status instead of throwing)
+
+### Configuration Updates
+- Updated Interface version from 120001 to 110100 for War Within compatibility
+- Fixed hardcoded pagination magic number (7 → pageSize - 1)
+
 ## v2.0.0 (July 7, 2025)
 - Refactored VerticalListTemplate to pass stateManagerKey directly to each item, improving state management and reducing bugs
 - Enhanced dynamic timeline event display, including event-driven state synchronization and suffix validation for timeline labels/periods

@@ -94,20 +94,13 @@ function Chronicles.Data:SetPeriodsForEvent(periods, date, eventId)
 end
 
 function Chronicles.Data:DefinePeriodsForEvent(period, eventId)
-    if period ~= nil then
-        local items = Set(period)
-        if items[eventId] ~= nil then
-        else
-            table.insert(period, eventId)
-        end
-
-        return period
-    else
-        local data = {}
-        table.insert(data, eventId)
-
-        return data
+    -- Use hash-set (table with eventId as key) for O(1) insertion and dedup
+    -- instead of array + Set() conversion which is O(n) every time
+    period = period or {}
+    if not period[eventId] then
+        period[eventId] = true
     end
+    return period
 end
 
 function Chronicles.Data:ComputeEventDateProfile(date)
@@ -169,7 +162,32 @@ function Chronicles.Data:MaxEventYear()
     return MaxEventYear
 end
 
--- Search events ------------------------------------------------------------------------
+-- -------------------------
+-- Proxy Generator Pattern
+-- -------------------------
+-- Eliminates repetitive guard-and-delegate boilerplate
+
+local function createSearchEngineProxy(method, default)
+    return function(self, ...)
+        if not private.Core.Data or not private.Core.Data.SearchEngine then
+            return default
+        end
+        return private.Core.Data.SearchEngine[method](...)
+    end
+end
+
+local function createDataRegistryProxy(method, default)
+    return function(self, ...)
+        if not private.Core.Data or not private.Core.Data.DataRegistry then
+            return default
+        end
+        return private.Core.Data.DataRegistry[method](...)
+    end
+end
+
+-- -------------------------
+-- Search Events (with special handling for default year range)
+-- -------------------------
 
 function Chronicles.Data:SearchEvents(yearStart, yearEnd)
     if not private.Core.Data or not private.Core.Data.SearchEngine then
@@ -188,129 +206,34 @@ function Chronicles.Data:SearchEvents(yearStart, yearEnd)
     return private.Core.Data.SearchEngine.searchEvents(yearStart, yearEnd)
 end
 
-function Chronicles.Data:SearchEventsInDB(yearStart, yearEnd, db)
-    return private.Core.Data.SearchEngine.searchEventsInDB(yearStart, yearEnd, db)
-end
+-- -------------------------
+-- Search Engine Proxies
+-- -------------------------
 
-function Chronicles.Data:IsInRange(event, yearStart, yearEnd)
-    return private.Core.Data.SearchEngine.isEventInRange(event, yearStart, yearEnd)
-end
+Chronicles.Data.SearchEventsInDB               = createSearchEngineProxy("searchEventsInDB", {})
+Chronicles.Data.IsInRange                      = createSearchEngineProxy("isEventInRange", false)
+Chronicles.Data.CleanEventObject               = createSearchEngineProxy("cleanEventObject", nil)
+Chronicles.Data.FindEventByIdAndCollection     = createSearchEngineProxy("findEventByIdAndCollection", nil)
 
-function Chronicles.Data:CleanEventObject(event, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    --return event
-    end
+Chronicles.Data.SearchFactions                 = createSearchEngineProxy("searchFactions", {})
+Chronicles.Data.FindFactions                   = createSearchEngineProxy("findFactions", {})
+Chronicles.Data.CleanFactionObject             = createSearchEngineProxy("cleanFactionObject", nil)
+Chronicles.Data.FindFactionByIdAndCollection   = createSearchEngineProxy("findFactionByIdAndCollection", nil)
 
-    return private.Core.Data.SearchEngine.cleanEventObject(event, collectionName)
-end
-
-function Chronicles.Data:FindEventByIdAndCollection(eventId, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    end
-    return private.Core.Data.SearchEngine.findEventByIdAndCollection(eventId, collectionName)
-end
-
--- Search factions ----------------------------------------------------------------------
-
-function Chronicles.Data:SearchFactions(name)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return {}
-    end
-    return private.Core.Data.SearchEngine.searchFactions(name)
-end
-
-function Chronicles.Data:FindFactions(ids)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return {}
-    end
-    return private.Core.Data.SearchEngine.findFactions(ids)
-end
-
-function Chronicles.Data:CleanFactionObject(faction, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    --return faction
-    end
-    return private.Core.Data.SearchEngine.cleanFactionObject(faction, collectionName)
-end
-
-function Chronicles.Data:FindFactionByIdAndCollection(factionId, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    end
-    return private.Core.Data.SearchEngine.findFactionByIdAndCollection(factionId, collectionName)
-end
-
--- Search characters --------------------------------------------------------------------
-
-function Chronicles.Data:SearchCharacters(name)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return {}
-    end
-    return private.Core.Data.SearchEngine.searchCharacters(name)
-end
-
-function Chronicles.Data:FindCharacters(ids)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return {}
-    end
-    return private.Core.Data.SearchEngine.findCharacters(ids)
-end
-
-function Chronicles.Data:CleanCharacterObject(character, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    --return character
-    end
-    return private.Core.Data.SearchEngine.cleanCharacterObject(character, collectionName)
-end
-
-function Chronicles.Data:FindCharacterByIdAndCollection(characterId, collectionName)
-    if not private.Core.Data or not private.Core.Data.SearchEngine then
-        return nil
-    end
-    return private.Core.Data.SearchEngine.findCharacterByIdAndCollection(characterId, collectionName)
-end
+Chronicles.Data.SearchCharacters               = createSearchEngineProxy("searchCharacters", {})
+Chronicles.Data.FindCharacters                 = createSearchEngineProxy("findCharacters", {})
+Chronicles.Data.CleanCharacterObject           = createSearchEngineProxy("cleanCharacterObject", nil)
+Chronicles.Data.FindCharacterByIdAndCollection = createSearchEngineProxy("findCharacterByIdAndCollection", nil)
 
 -- -------------------------
--- External DB tools
+-- Data Registry Proxies
 -- -------------------------
-function Chronicles.Data:RegisterEventDB(collectionName, db)
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        return false
-    end
-    return private.Core.Data.DataRegistry.registerEventDB(collectionName, db)
-end
 
-function Chronicles.Data:RegisterCharacterDB(collectionName, db)
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        return false
-    end
-    return private.Core.Data.DataRegistry.registerCharacterDB(collectionName, db)
-end
-
-function Chronicles.Data:RegisterFactionDB(collectionName, db)
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        return false
-    end
-    return private.Core.Data.DataRegistry.registerFactionDB(collectionName, db)
-end
-
-function Chronicles.Data:GetCollectionsNames()
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        return {}
-    end
-    return private.Core.Data.DataRegistry.getCollectionsNames()
-end
-
-function Chronicles.Data:GetCollectionStatus(collectionName)
-    if not private.Core.Data or not private.Core.Data.DataRegistry then
-        return false
-    end
-    return private.Core.Data.DataRegistry.getCollectionStatus(collectionName)
-end
+Chronicles.Data.RegisterEventDB      = createDataRegistryProxy("registerEventDB", false)
+Chronicles.Data.RegisterCharacterDB  = createDataRegistryProxy("registerCharacterDB", false)
+Chronicles.Data.RegisterFactionDB    = createDataRegistryProxy("registerFactionDB", false)
+Chronicles.Data.GetCollectionsNames  = createDataRegistryProxy("getCollectionsNames", {})
+Chronicles.Data.GetCollectionStatus  = createDataRegistryProxy("getCollectionStatus", false)
 
 function Chronicles.Data:GetEventTypeStatus(eventTypeId)
     if not private.Core.StateManager then

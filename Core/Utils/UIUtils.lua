@@ -227,5 +227,6 @@ function UIUtils.CleanupElementArray(elementArray, clearArray)
     end
 end
 
--- Export for backwards compatibility
-_G.UIUtils = UIUtils
+-- REMOVED: Global export for UIUtils
+-- This module is now accessed via: private.Core.Utils.UIUtils.*
+-- External plugins should update to use the module pattern instead of globals

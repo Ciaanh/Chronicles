@@ -99,8 +99,13 @@ function ValidationUtils.IsValidYear(year)
         return false
     end
 
-    -- Assuming WoW timeline spans from ancient times to future
-    return year >= -25000 and year <= 100
+    -- Timeline spans from mythos (-999999) to future (999999)
+    -- Use constants if available, otherwise use safe hard-coded bounds
+    local config = private.constants and private.constants.config
+    local minBound = config and config.mythos or -999999
+    local maxBound = config and config.futur or 999999
+    
+    return year >= minBound and year <= maxBound
 end
 
 --[[
@@ -191,24 +196,25 @@ function ValidationUtils.IsValidPeriod(period)
         return false
     end
 
-    if not ValidationUtils.IsValidNumber(period.id) then
+    -- Support both period formats: lower/upper (TimelineBusiness) and yearStart/yearEnd (legacy)
+    local startYear = period.lower or period.yearStart
+    local endYear = period.upper or period.yearEnd
+
+    if not ValidationUtils.IsValidNumber(startYear) then
         return false
     end
 
-    if not ValidationUtils.IsValidYear(period.yearStart) then
+    if not ValidationUtils.IsValidNumber(endYear) then
         return false
     end
 
-    if not ValidationUtils.IsValidYear(period.yearEnd) then
-        return false
-    end
-
-    if period.yearStart > period.yearEnd then
+    if startYear > endYear then
         return false
     end
 
     return true
 end
 
--- Export ValidationUtils globally for access by business modules
-_G.ValidationUtils = ValidationUtils
+-- REMOVED: Global export for ValidationUtils
+-- This module is now accessed via: private.Core.Utils.ValidationUtils.*
+-- External plugins should update to use the module pattern instead of globals
