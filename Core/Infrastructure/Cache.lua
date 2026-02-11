@@ -60,6 +60,8 @@ private.Core.Cache.KEYS = CACHE_KEYS
 -- Cache Structure & Configuration
 -- -------------------------
 
+local MAX_CACHE_ENTRIES = 100 -- Prevent unbounded cache growth
+
 local Cache = {
     _data = {
         [CACHE_KEYS.PERIODS_FILLING] = nil,
@@ -140,9 +142,27 @@ end
 
 function private.Core.Cache.set(cacheType, value, cacheKey)
     if cacheType == CACHE_KEYS.FILTERED_EVENTS then
+        -- Enforce cache size limit to prevent unbounded growth
+        local count = 0
+        for _ in pairs(Cache._data[CACHE_KEYS.FILTERED_EVENTS]) do
+            count = count + 1
+        end
+        if count >= MAX_CACHE_ENTRIES then
+            -- Clear cache when limit exceeded (simple LRU alternative)
+            Cache._data[CACHE_KEYS.FILTERED_EVENTS] = {}
+        end
         Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] = value
         Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] = false
     elseif cacheType == CACHE_KEYS.FILTERED_CHARACTERS then
+        -- Enforce cache size limit to prevent unbounded growth
+        local count = 0
+        for _ in pairs(Cache._data[CACHE_KEYS.FILTERED_CHARACTERS]) do
+            count = count + 1
+        end
+        if count >= MAX_CACHE_ENTRIES then
+            -- Clear cache when limit exceeded (simple LRU alternative)
+            Cache._data[CACHE_KEYS.FILTERED_CHARACTERS] = {}
+        end
         Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey] = value
         Cache._dirty[CACHE_KEYS.FILTERED_CHARACTERS] = false
     else

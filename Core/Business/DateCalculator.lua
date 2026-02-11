@@ -31,7 +31,7 @@ Event Integration:
 - Supports both positive and negative years (BC/AD system)
 
 Dependencies:
-- ValidationUtils (global access pattern)
+- ValidationUtils (module access pattern)
 - Constants for timeline configuration
 =================================================================================
 ]]
@@ -40,8 +40,7 @@ private.Core.Business = private.Core.Business or {}
 private.Core.Business.DateCalculator = {}
 
 local DateCalculator = private.Core.Business.DateCalculator
-
--- Note: Utilities are accessed as globals since they're loaded before this module
+local ValidationUtils = private.Core.Utils.ValidationUtils
 
 --[[
     Calculate the duration of an event in years

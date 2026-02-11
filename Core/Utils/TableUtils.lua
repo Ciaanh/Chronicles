@@ -108,20 +108,20 @@ end
 
 --[[
     Filter a table based on a predicate function
-    @param table [table] Table to filter
+    @param tbl [table] Table to filter
     @param predicate [function] Function that returns true for items to keep
-    @return [table] Filtered table
+    @return [table] Filtered table (always returns contiguous array)
 ]]
-function TableUtils.Filter(table, predicate)
+function TableUtils.Filter(tbl, predicate)
     local result = {}
 
-    if table == nil or predicate == nil then
+    if tbl == nil or predicate == nil then
         return result
     end
 
-    for key, value in pairs(table) do
+    for key, value in pairs(tbl) do
         if predicate(value, key) then
-            result[key] = value
+            table.insert(result, value)
         end
     end
 
@@ -148,8 +148,6 @@ function TableUtils.Map(table, mapper)
     return result
 end
 
--- Export utility functions globally for backwards compatibility
-_G.Set = TableUtils.Set
-_G.tablelength = TableUtils.Length
-_G.copyTable = TableUtils.DeepCopy
-_G.TableUtils = TableUtils
+-- REMOVED: Global exports for Set, tablelength, copyTable
+-- These functions are now accessed via: private.Core.Utils.TableUtils.*
+-- External plugins should update to use the module pattern instead of globals

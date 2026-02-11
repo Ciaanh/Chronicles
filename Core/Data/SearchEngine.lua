@@ -109,11 +109,9 @@ function SearchEngine.isEventInRange(event, yearStart, yearEnd)
         return true
     end
 
-    -- Single year search: event spans the target year
-    if yearStart == yearEnd then
-        if event.yearStart <= yearStart and yearStart <= event.yearEnd then
-            return true
-        end
+    -- Event fully spans the range (covers all cases including single-year)
+    if event.yearStart <= yearStart and event.yearEnd >= yearEnd then
+        return true
     end
 
     return false

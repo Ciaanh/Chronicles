@@ -4,7 +4,7 @@ local FOLDER_NAME, private = ...
 =================================================================================
 Module: FilterEngine
 Purpose: Advanced filtering system for Chronicles events and content
-Dependencies: ValidationUtils (global), DateCalculator
+Dependencies: ValidationUtils, TableUtils
 Author: Chronicles Team
 =================================================================================
 
@@ -45,6 +45,7 @@ Event Filtering Pipeline:
 
 Dependencies:
 - ValidationUtils: Data validation and safety checks
+- TableUtils: Array filtering operations
 - DateCalculator: Year range and timeline calculations
 =================================================================================
 ]]
@@ -53,8 +54,8 @@ private.Core.Business = private.Core.Business or {}
 private.Core.Business.FilterEngine = {}
 
 local FilterEngine = private.Core.Business.FilterEngine
-
--- Note: Utilities are accessed as globals since they're loaded before this module
+local ValidationUtils = private.Core.Utils.ValidationUtils
+local TableUtils = private.Core.Utils.TableUtils
 
 --[[
     Filter Configuration Structure:

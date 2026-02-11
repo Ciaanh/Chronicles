@@ -319,6 +319,12 @@ end
 -- Initialization
 -- -------------------------
 
+local function onCurrentPageChanged(newPage, oldPage, description)
+    if newPage ~= oldPage and oldPage ~= nil then
+        private.Core.Timeline.DisplayTimelineWindow()
+    end
+end
+
 function private.Core.Timeline.Init()
     local currentStep = getCurrentStepValue()
     if not currentStep then
@@ -331,21 +337,16 @@ function private.Core.Timeline.Init()
         setCurrentPage(1, "Timeline page initialized to default")
     end
 
-    private.Core.StateManager.addListener(
+    private.Core.StateManager.subscribe(
         private.Core.StateManager.buildTimelineKey("currentPage"),
-        onCurrentPageChanged
+        onCurrentPageChanged,
+        "Timeline"
     )
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
 
     SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
-end
-
-local function onCurrentPageChanged(newPage, oldPage, description)
-    if newPage ~= oldPage and oldPage ~= nil then
-        private.Core.Timeline.DisplayTimelineWindow()
-    end
 end
 
 --[[

@@ -160,20 +160,8 @@ function StringUtils.AdjustTextLength(text, size, frame)
 end
 
 -- -------------------------
--- Global Exports (Backwards Compatibility)
+-- Global Exports Removed
 -- -------------------------
--- The following global exports are intentionally maintained for backwards compatibility
--- with existing code and external integrations. This allows both modern module-style
--- access (StringUtils.Trim) and legacy global function calls (_G.Trim).
--- 
--- Usage patterns supported:
--- Modern: private.Core.Utils.StringUtils.Trim(text)
--- Legacy: Trim(text) or _G.Trim(text)
-
--- Export utility functions globally for backwards compatibility
-_G.Trim = StringUtils.Trim
-_G.SplitTextToFitWidth = StringUtils.SplitTextToFitWidth
-_G.cleanHTML = StringUtils.CleanHTML
-_G.containsHTML = StringUtils.ContainsHTML
-_G.adjustTextLength = StringUtils.AdjustTextLength
-_G.StringUtils = StringUtils
+-- REMOVED: _G.Trim, _G.SplitTextToFitWidth, _G.cleanHTML, _G.containsHTML, _G.adjustTextLength
+-- These functions are now accessed via: private.Core.Utils.StringUtils.*
+-- External plugins should update to use the module pattern instead of globals

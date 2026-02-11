@@ -80,6 +80,6 @@ function MathUtils.InRange(value, min, max)
     return value >= min and value <= max
 end
 
--- Export utility functions globally for backwards compatibility
-_G.adjust_value = MathUtils.AdjustValue
-_G.MathUtils = MathUtils
+-- REMOVED: Global exports for adjust_value and MathUtils
+-- These functions are now accessed via: private.Core.Utils.MathUtils.*
+-- External plugins should update to use the module pattern instead of globals
