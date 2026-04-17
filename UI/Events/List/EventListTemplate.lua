@@ -11,6 +11,9 @@ function EventListItemMixin:Init(eventData)
 	local sideTexture = self.Side
 
 	text:SetText(eventData.text)
+	text:SetWordWrap(true)
+	text:SetMaxLines(2)
+	text:SetJustifyV("MIDDLE")
 	self.Event = eventData.event
 
 	local isRightSide = self:GetParent().side == "right"
@@ -25,9 +28,6 @@ function EventListItemMixin:Init(eventData)
 
 		sideTexture:ClearAllPoints()
 		sideTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
-
-		text:ClearAllPoints()
-		text:SetPoint("LEFT", self, "LEFT", 25, 0)
 	else
 		contentTexture:SetTexCoord(0, 1, 0, 1)
 		sideTexture:SetTexCoord(0, 1, 0, 1)
@@ -37,9 +37,11 @@ function EventListItemMixin:Init(eventData)
 
 		sideTexture:ClearAllPoints()
 		sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
-		text:ClearAllPoints()
-		text:SetPoint("RIGHT", self, "RIGHT", -25, 0)
 	end
+
+	text:ClearAllPoints()
+	text:SetPoint("TOPLEFT", contentTexture, "TOPLEFT", 10, -12)
+	text:SetPoint("BOTTOMRIGHT", contentTexture, "BOTTOMRIGHT", -10, 18)
 end
 
 function EventListItemMixin:OnClick()

@@ -17,7 +17,7 @@ local function CreateCoverPage(entity)
     local coverPage = {
         templateKey = private.constants.bookTemplateKeys.COVER_PAGE,
         name = entity.name or entity.label or "Unknown Entity",
-        author = entity.author and (Locale["Author"] .. entity.author) or nil,
+        author = (entity.author and entity.author ~= "") and (Locale["Author"] .. entity.author) or nil,
         text = entity.description or nil,
         image = entity.image or nil
     }
@@ -46,7 +46,7 @@ local function CreateChapter(title, pages)
         }
     end
 
-    for key, text in pairs(pages) do
+    for _, text in ipairs(pages) do
         if StringUtils and StringUtils.ContainsHTML and StringUtils.ContainsHTML(text) then
             table.insert(
                 chapter.elements,
@@ -119,7 +119,7 @@ function private.Core.Utils.BookUtils.TransformEntityToBook(entity)
             text = entity.name or entity.label or "Unknown Entity",
             yearStart = entity.yearStart,
             yearEnd = entity.yearEnd,
-            author = entity.author and (Locale["Author"] .. entity.author) or nil
+            author = (entity.author and entity.author ~= "") and (Locale["Author"] .. entity.author) or nil
         }
 
         table.insert(
@@ -132,7 +132,7 @@ function private.Core.Utils.BookUtils.TransformEntityToBook(entity)
 
     -- Process chapters if available (same as before)
     if entity.chapters and #entity.chapters > 0 then
-        for key, chapter in pairs(entity.chapters) do
+        for _, chapter in ipairs(entity.chapters) do
             local bookChapter = CreateChapter(chapter.header, chapter.pages)
             table.insert(data, bookChapter)
         end

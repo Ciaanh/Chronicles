@@ -18,6 +18,12 @@ local Chronicles = private.Chronicles
 
 SharedBookMixin = {}
 
+local function SetBookContent(bookFrame, bookContent, retainScrollPosition)
+	local dataProvider = CreateDataProvider(bookContent)
+	bookFrame.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
+	bookFrame.currentlyDisplayedContent = bookContent
+end
+
 -- =============================================================================================
 -- INITIALIZATION AND SETUP
 -- =============================================================================================
@@ -66,10 +72,7 @@ end
 -- @param bookContent [table] Already-transformed book content with proper template keys
 function SharedBookMixin:OnContentReceived(bookContent)
 	if bookContent and #bookContent > 0 then
-		local dataProvider = CreateDataProvider(bookContent)
-		local retainScrollPosition = false
-		self.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
-		self.currentlyDisplayedContent = bookContent
+		SetBookContent(self, bookContent, false)
 	else
 		self:ShowEmptyBook()
 	end
@@ -90,5 +93,10 @@ function SharedBookMixin:ShowEmptyBook()
 end
 
 function SharedBookMixin:OnUIRefresh()
+	if self.currentlyDisplayedContent and #self.currentlyDisplayedContent > 0 then
+		SetBookContent(self, self.currentlyDisplayedContent, true)
+		return
+	end
+
 	self:ShowEmptyBook()
 end

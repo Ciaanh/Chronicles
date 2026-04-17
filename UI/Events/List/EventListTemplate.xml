@@ -16,9 +16,10 @@
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Huge" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Huge" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="CENTER"/>
+                        <Anchor point="LEFT"/>
+                        <Anchor point="RIGHT"/>
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -50,10 +51,10 @@
 
             </Layer>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
-                    <Size x="100" y="35"/>
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="0" />
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="18" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>

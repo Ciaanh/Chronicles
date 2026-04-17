@@ -30,10 +30,10 @@
 
             <Layer level="ARTWORK">
                 <!-- Item name text -->
-                <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" setAllPoints="true" justifyH="CENTER">
-                    <Size x="100" y="35"/>
+                <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="LEFT" x="0" y="0" />
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="18" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>

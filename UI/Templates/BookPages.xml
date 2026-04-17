@@ -18,7 +18,7 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="SystemFont_Huge2" setAllPoints="true" justifyH="LEFT">
+                <FontString parentKey="Text" inherits="SystemFont_Huge2" justifyH="LEFT">
                     <Anchors>
                         <Anchor point="TOPLEFT" x="10" y="-5"/>
                         <Anchor point="TOPRIGHT"/>
@@ -43,7 +43,7 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="LEFT">
+                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
                     <Anchors>
                         <Anchor point="TOPLEFT" y="-5"/>
                         <Anchor point="TOPRIGHT"/>
@@ -90,15 +90,16 @@
 
     <!-- Simple Title Template - Unified template for characters and factions -->
     <Frame name="SimpleTitleTemplate" mixin="SimpleTitleMixin" virtual="true">
-        <Size x="$parent.viewWidth" y="510"/>
+        <Size x="$parent.viewWidth" y="550"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="CENTER"/>
+                        <Anchor point="LEFT" x="10" y="0"/>
+                        <Anchor point="RIGHT" x="-10" y="0"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
@@ -110,7 +111,7 @@
                     </Anchors>
                 </Texture>
 
-                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" justifyH="RIGHT">
                     <Size x="$parent.viewWidth" y="25"/>
                     <Anchors>
                         <Anchor point="BOTTOMRIGHT"/>
@@ -129,9 +130,10 @@
         </Anchors>
         <Layers>
             <Layer level="ARTWORK">
-                <FontString parentKey="Title" inherits="SystemFont_Huge4" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Title" inherits="SystemFont_Huge4" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="CENTER"/>
+                        <Anchor point="LEFT" x="10" y="0"/>
+                        <Anchor point="RIGHT" x="-10" y="0"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
@@ -143,14 +145,15 @@
                     </Anchors>
                 </Texture>
 
-                <FontString parentKey="Dates" inherits="SystemFont_Large2" setAllPoints="true" justifyH="RIGHT">
+                <FontString parentKey="Dates" inherits="SystemFont_Large2" justifyH="RIGHT">
+                    <Size x="400" y="25"/>
                     <Anchors>
                         <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Separator" x="0" y="-20"/>
                     </Anchors>
                     <Color color="SPELLBOOK_FONT_COLOR" />
                 </FontString>
 
-                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" justifyH="RIGHT">
                     <Size x="$parent.viewWidth" y="25"/>
                     <Anchors>
                         <Anchor point="BOTTOMRIGHT"/>
@@ -184,7 +187,7 @@
                 </Texture>
 
                 <!-- Entity Name -->
-                <FontString parentKey="Name" inherits="SystemFont_Huge1" setAllPoints="true" justifyH="CENTER">
+                <FontString parentKey="Name" inherits="SystemFont_Huge1" justifyH="CENTER" wordWrap="true">
                     <Size x="400" y="60"/>
                     <Anchors>
                         <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Portrait" x="0" y="-10"/>
@@ -201,7 +204,7 @@
                     <Color color="SPELLBOOK_FONT_COLOR"/>
                 </FontString>
 
-                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" setAllPoints="true" justifyH="RIGHT">
+                <FontString parentKey="Author" inherits="ChroniclesFontFamily_Text_Medium" justifyH="RIGHT">
                     <Size x="$parent.viewWidth" y="25"/>
                     <Anchors>
                         <Anchor point="BOTTOMRIGHT"/>
