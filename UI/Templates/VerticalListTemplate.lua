@@ -67,6 +67,9 @@ function VerticalListItemMixin:Init(itemData)
     local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility    -- Set item name
     if textElement then
         textElement:SetText(item.name)
+        textElement:SetWordWrap(true)
+        textElement:SetMaxLines(2)
+        textElement:SetJustifyV("MIDDLE")
     end
 
     -- Configure bookmark textures for left orientation
@@ -84,7 +87,8 @@ function VerticalListItemMixin:Init(itemData)
 
     if textElement then
         textElement:ClearAllPoints()
-        textElement:SetPoint("LEFT", self, "LEFT", 25, 0)
+        textElement:SetPoint("TOPLEFT", contentTexture, "TOPLEFT", 10, -12)
+        textElement:SetPoint("BOTTOMRIGHT", contentTexture, "BOTTOMRIGHT", -10, 18)
     end
 
     self:SetSelected(false)

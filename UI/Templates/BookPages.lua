@@ -137,7 +137,20 @@ end
 
 CoverPageMixin = {}
 function CoverPageMixin:Init(elementData)
+    local hasPortrait = elementData.image and elementData.image ~= ""
+    local nameTopAnchorTarget = self
+    local nameTopAnchorPoint = "TOP"
+    local nameTopOffsetY = -20
+
     -- Set entity name
+    self.Name:ClearAllPoints()
+    if hasPortrait then
+        nameTopAnchorTarget = self.Portrait
+        nameTopAnchorPoint = "BOTTOM"
+        nameTopOffsetY = -10
+    end
+    self.Name:SetPoint("TOP", nameTopAnchorTarget, nameTopAnchorPoint, 0, nameTopOffsetY)
+
     if elementData.name then
         self.Name:SetText(elementData.name)
     end
@@ -151,7 +164,7 @@ function CoverPageMixin:Init(elementData)
     end
 
     -- Set portrait/image
-    if elementData.image and elementData.image ~= "" then
+    if hasPortrait then
         self.Portrait:SetTexture(elementData.image)
         self.Portrait:Show()
         self.Portrait:SetAlpha(1)
@@ -163,7 +176,7 @@ function CoverPageMixin:Init(elementData)
     if elementData.text and elementData.text ~= "" then
         -- Calculate available height for description
         local totalHeight = 550
-        local portraitHeight = 128 + 20 + 10 -- portrait + top margin + bottom spacing
+        local portraitHeight = hasPortrait and (128 + 20 + 10) or 0 -- portrait + top margin + bottom spacing
         local nameHeight = 60 + 10 -- name height + bottom spacing
         local authorHeight = 25 -- author height
         local availableHeight = totalHeight - portraitHeight - nameHeight - authorHeight - 20 -- extra padding
