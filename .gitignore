@@ -1,5 +1,7 @@
-/BlizzardInterfaceCode
 /.vscode
+/.github
+
+refs
 
 # Build output and make-release.ps1 staging folder
 .build/
