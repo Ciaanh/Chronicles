@@ -146,9 +146,62 @@ function Chronicles:OnDisable()
     private.Core.triggerEvent(private.constants.events.AddonShutdown, nil, "Chronicles:OnDisable")
 end
 
-function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.Data:RegisterEventDB(pluginName, db)
-    -- Use safe event triggering
+--[[
+    Register an external plugin's databases at runtime.
+
+    @param pluginName [string] Unique name for the plugin
+    @param pluginData [table] Manifest table: { events = {...}, characters = {...}, factions = {...} }
+]]
+function Chronicles:RegisterPluginDB(pluginName, pluginData)
+    if type(pluginName) ~= "string" or pluginName == "" then
+        print("|cffff0000Error:|r Chronicles:RegisterPluginDB called with invalid pluginName")
+        return
+    end
+
+    if type(pluginData) ~= "table" then
+        return
+    end
+
+    if not (pluginData.events or pluginData.characters or pluginData.factions) then
+        print("|cffff0000Error:|r Chronicles:RegisterPluginDB requires events, characters, or factions key")
+        return
+    end
+
+    local hasNameConflict = (Chronicles.Data.Events[pluginName] ~= nil) or (Chronicles.Data.Factions[pluginName] ~= nil) or
+        (Chronicles.Data.Characters[pluginName] ~= nil)
+    if hasNameConflict then
+        print(
+            "|cffff9900Warning:|r Chronicles:RegisterPluginDB skipped duplicate collection name: " .. tostring(pluginName)
+        )
+        return
+    end
+
+    local registered = false
+
+    if pluginData.events then
+        if Chronicles.Data:RegisterEventDB(pluginName, pluginData.events) then
+            registered = true
+        end
+    end
+    if pluginData.characters then
+        if Chronicles.Data:RegisterCharacterDB(pluginName, pluginData.characters) then
+            registered = true
+        end
+    end
+    if pluginData.factions then
+        if Chronicles.Data:RegisterFactionDB(pluginName, pluginData.factions) then
+            registered = true
+        end
+    end
+
+    if not registered then
+        print(
+            "|cffff9900Warning:|r Chronicles:RegisterPluginDB did not register data for collection: " ..
+            tostring(pluginName)
+        )
+        return
+    end
+
     private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
 end
 

@@ -17,12 +17,79 @@ RPEventsDB = {}
 function Chronicles.Data:Load()
     self:RegisterEventDB("RP", RPEventsDB)
 
-    if (ChroniclesPluginData.Register ~= nil) then
-        ChroniclesPluginData.Register()
+    -- Load internal bundled databases (Sample DBs from DB/ folder)
+    if private.registerInternalDBs then
+        private.registerInternalDBs()
     end
+
+    -- Process any external plugin manifests already populated before Chronicles loaded
+    self:LoadPluginManifests()
+
+    -- Listen for other addons loading after us — re-scan manifests for late arrivals
+    -- ADDON_LOADED fires for every addon, but LoadPluginManifests skips already-processed plugins
+    Chronicles:RegisterEvent("ADDON_LOADED", function()
+        if Chronicles.Data:LoadPluginManifests() then
+            private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:ADDON_LOADED manifest scan")
+        end
+    end)
+
+    -- Once all addons are loaded, stop listening — LoD addons are unlikely to be Chronicles plugins
+    Chronicles:RegisterEvent("PLAYER_LOGIN", function()
+        Chronicles:UnregisterEvent("ADDON_LOADED")
+        Chronicles:UnregisterEvent("PLAYER_LOGIN")
+    end)
 
     -- Initialize the cache system
     private.Core.Cache.init()
+end
+
+--[[
+    Process external plugin manifests from the ChroniclesPlugins global table.
+
+    External plugins populate this table during their file load phase:
+        ChroniclesPlugins = ChroniclesPlugins or {}
+        ChroniclesPlugins["MyPlugin"] = {
+            events     = myEventsDB,       -- optional
+            characters = myCharactersDB,   -- optional
+            factions   = myFactionsDB,     -- optional
+        }
+
+    This function is safe to call multiple times — already-processed plugin names
+    are tracked and skipped on subsequent calls.
+
+    @return [boolean] true if any new plugin data was registered
+]]
+local processedPlugins = {}
+
+function Chronicles.Data:LoadPluginManifests()
+    if not _G.ChroniclesPlugins then return false end
+
+    local registered = false
+    for pluginName, manifest in pairs(_G.ChroniclesPlugins) do
+        if type(pluginName) == "string" and not processedPlugins[pluginName] and type(manifest) == "table" then
+            local hasNameConflict = (self.Events[pluginName] ~= nil) or (self.Factions[pluginName] ~= nil) or
+                (self.Characters[pluginName] ~= nil)
+            if hasNameConflict then
+                print(
+                    "|cffff9900Warning:|r Chronicles plugin manifest skipped due to duplicate collection name: " ..
+                    tostring(pluginName)
+                )
+                processedPlugins[pluginName] = true
+            else
+                processedPlugins[pluginName] = true
+                if manifest.events and self:RegisterEventDB(pluginName, manifest.events) then
+                    registered = true
+                end
+                if manifest.characters and self:RegisterCharacterDB(pluginName, manifest.characters) then
+                    registered = true
+                end
+                if manifest.factions and self:RegisterFactionDB(pluginName, manifest.factions) then
+                    registered = true
+                end
+            end
+        end
+    end
+    return registered
 end
 
 function Chronicles.Data:RefreshPeriods()

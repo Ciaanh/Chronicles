@@ -1,9 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-	<Script file="DB.lua" />
-	<Script file="01_Sample\SampleEventsDB.lua" />
-	<Script file="01_Sample\SampleFactionsDB.lua" />
-	<Script file="01_Sample\SampleCharactersDB.lua" />
+	<Script file="01_Expansions\ExpansionsEventsDB.lua" />
 
+	<Script file="02_Origins\OriginsEventsDB.lua" />
+
+	<Script file="03_Greatwars\GreatwarsEventsDB.lua" />
+	<Script file="03_Greatwars\GreatwarsFactionsDB.lua" />
+	<Script file="03_Greatwars\GreatwarsCharactersDB.lua" />
+
+	<Script file="04_Worldofwarcraft\WorldofwarcraftEventsDB.lua" />
+	<Script file="04_Worldofwarcraft\WorldofwarcraftFactionsDB.lua" />
+	<Script file="04_Worldofwarcraft\WorldofwarcraftCharactersDB.lua" />
+
+	<Script file="05_Burningcrusade\BurningcrusadeEventsDB.lua" />
+	<Script file="05_Burningcrusade\BurningcrusadeFactionsDB.lua" />
+	<Script file="05_Burningcrusade\BurningcrusadeCharactersDB.lua" />
+
+	<Script file="06_Lichking\LichkingEventsDB.lua" />
+	<Script file="06_Lichking\LichkingFactionsDB.lua" />
+	<Script file="06_Lichking\LichkingCharactersDB.lua" />
+
+	<Script file="07_Cataclysm\CataclysmEventsDB.lua" />
+	<Script file="07_Cataclysm\CataclysmFactionsDB.lua" />
+	<Script file="07_Cataclysm\CataclysmCharactersDB.lua" />
+
+	<Script file="08_Mistsofpandaria\MistsofpandariaEventsDB.lua" />
+	<Script file="08_Mistsofpandaria\MistsofpandariaFactionsDB.lua" />
+	<Script file="08_Mistsofpandaria\MistsofpandariaCharactersDB.lua" />
+
+	<Script file="09_Warlords\WarlordsEventsDB.lua" />
+	<Script file="09_Warlords\WarlordsFactionsDB.lua" />
+	<Script file="09_Warlords\WarlordsCharactersDB.lua" />
+
+	<Script file="10_Legion\LegionEventsDB.lua" />
+	<Script file="10_Legion\LegionFactionsDB.lua" />
+	<Script file="10_Legion\LegionCharactersDB.lua" />
+
+	<Script file="11_Battleforazeroth\BattleforazerothEventsDB.lua" />
+	<Script file="11_Battleforazeroth\BattleforazerothFactionsDB.lua" />
+	<Script file="11_Battleforazeroth\BattleforazerothCharactersDB.lua" />
+
+	<Script file="12_Shadowlands\ShadowlandsEventsDB.lua" />
+	<Script file="12_Shadowlands\ShadowlandsFactionsDB.lua" />
+	<Script file="12_Shadowlands\ShadowlandsCharactersDB.lua" />
+
+	<Script file="13_Dragonflight\DragonflightEventsDB.lua" />
+	<Script file="13_Dragonflight\DragonflightFactionsDB.lua" />
+	<Script file="13_Dragonflight\DragonflightCharactersDB.lua" />
+
+	<Script file="14_Future\FutureEventsDB.lua" />
+	<Script file="14_Future\FutureFactionsDB.lua" />
+	<Script file="14_Future\FutureCharactersDB.lua" />
+
+	<Script file="15_Warwithin\WarwithinEventsDB.lua" />
+	<Script file="15_Warwithin\WarwithinFactionsDB.lua" />
+	<Script file="15_Warwithin\WarwithinCharactersDB.lua" />
+
+	<Script file="DB.lua" />
 </Ui>
