@@ -134,23 +134,23 @@ function VerticalListItemMixin:OnEnter()
 
     if self.Item then
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText(self.Item.name or "Item", 1, 1, 1)
+        GameTooltip:SetText(self.Item.name or Locale["TooltipDefaultItemName"], 1, 1, 1)
 
         -- Add contextual information based on item type
         if self.Item.chapters and #self.Item.chapters > 0 then
-            GameTooltip:AddLine("Available Content: " .. #self.Item.chapters .. " chapters", 0.6, 0.8, 0.6)
+            GameTooltip:AddLine(string.format(Locale["TooltipChapterCount"], #self.Item.chapters), 0.6, 0.8, 0.6)
         end
 
         if self.Item.author then
-            GameTooltip:AddLine("Created by: " .. self.Item.author, 0.7, 0.7, 0.7)
+            GameTooltip:AddLine(string.format(Locale["TooltipCreatedBy"], self.Item.author), 0.7, 0.7, 0.7)
         end
 
         -- Add item type specific information
         local itemType = self.ItemType
         if itemType == "faction" and self.Item.allegiance then
-            GameTooltip:AddLine("Allegiance: " .. self.Item.allegiance, 0.8, 0.8, 0.6)
+            GameTooltip:AddLine(string.format(Locale["TooltipAllegiance"], self.Item.allegiance), 0.8, 0.8, 0.6)
         elseif itemType == "character" and self.Item.race then
-            GameTooltip:AddLine("Race: " .. self.Item.race, 0.6, 0.8, 1.0)
+            GameTooltip:AddLine(string.format(Locale["TooltipRace"], self.Item.race), 0.6, 0.8, 1.0)
         end
 
         GameTooltip:Show()

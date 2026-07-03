@@ -1,6 +1,7 @@
 local FOLDER_NAME, private = ...
 
 local Chronicles = private.Chronicles
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- =============================================================================================
 -- SHARED BOOK TEMPLATE MIXIN
@@ -83,7 +84,7 @@ function SharedBookMixin:ShowEmptyBook()
 	local emptyContent = {
 		{
 			templateKey = private.constants.bookTemplateKeys.EMPTY,
-			text = "No content available"
+			text = Locale["NoContentAvailable"]
 		}
 	}
 

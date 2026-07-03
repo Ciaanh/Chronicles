@@ -451,6 +451,3 @@ function FilterEngine.HasActiveFilters(filters)
 
     return false
 end
-
--- Export FilterEngine globally for access by other modules
-_G.FilterEngine = FilterEngine
