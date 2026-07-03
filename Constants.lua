@@ -6,18 +6,6 @@ private.Core = {}
 local constants = {}
 private.constants = constants
 
-constants.defaults = {
-	profile = {},
-	global = {
-		options = {
-			version = "",
-			minimap = {
-				hide = false
-			}
-		}
-	}
-}
-
 constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
 
 constants.viewWidth = 425
@@ -58,7 +46,6 @@ constants.config = {
 	collectionsFilter = {
 		pageSize = 7
 	},
-	-- stepValues = {1000, 500, 250, 100, 50, 10, 1}
 	stepValues = {1000, 500, 100, 10}
 }
 

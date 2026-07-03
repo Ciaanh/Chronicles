@@ -322,6 +322,3 @@ function DateCalculator.GetRelativeTimeDescription(fromYear, toYear)
         end
     end
 end
-
--- Export DateCalculator globally for access by other modules
-_G.DateCalculator = DateCalculator

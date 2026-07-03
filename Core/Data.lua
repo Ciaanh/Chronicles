@@ -12,7 +12,7 @@ Chronicles.Data.Factions = {}
 Chronicles.Data.Characters = {}
 Chronicles.Data.RP = {}
 
-RPEventsDB = {}
+local RPEventsDB = {}
 
 function Chronicles.Data:Load()
     self:RegisterEventDB("RP", RPEventsDB)

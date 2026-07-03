@@ -7,7 +7,6 @@ if L then
     L["Icon tooltip"] = "Click to show the timeline."
     L["CurrentYear"] = "Current year is "
     L["currentstep"] = "Step: "
-    L["year"] = " year"
     L["years"] = " years"
     L["AfterDP"] = " after the Dark Portal"
     L["start"] = "Start"
@@ -56,18 +55,23 @@ if L then
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
 
-    L["mythos"] = "Mythos"
-    L["beforedarkportal"] = "Before the Dark Portal"
-    L["threewars"] = "The Three Great Wars"
-    L["vanilla"] = "Vanilla"
-    L["burningcrusade"] = "The Burning Crusade"
-    L["lichking"] = "Wrath of the Lich King"
-    L["cataclysm"] = "Cataclysm"
-    L["pandaria"] = "Mists of Pandaria"
-    L["warlords"] = "Warlords of Draenor"
-    L["legion"] = "Legion"
-    L["battleforazeroth"] = "Battle for Azeroth"
-    L["shadowlands"] = "Shadowlands"
+    -- Collection display names — keys must match the names registered in DB\DB.lua
+    L["Expansions"] = "Expansions"
+    L["Origins"] = "Origins"
+    L["Greatwars"] = "The Great Wars"
+    L["Worldofwarcraft"] = "World of Warcraft"
+    L["Burningcrusade"] = "The Burning Crusade"
+    L["Lichking"] = "Wrath of the Lich King"
+    L["Cataclysm"] = "Cataclysm"
+    L["Mistsofpandaria"] = "Mists of Pandaria"
+    L["Warlords"] = "Warlords of Draenor"
+    L["Legion"] = "Legion"
+    L["Battleforazeroth"] = "Battle for Azeroth"
+    L["Shadowlands"] = "Shadowlands"
+    L["Dragonflight"] = "Dragonflight"
+    L["Future"] = "Future"
+    L["Warwithin"] = "The War Within"
+    L["RP"] = "Roleplay"
 
     L["Author"] = "by "
 
@@ -98,12 +102,23 @@ if L then
     L["SettingsHomeQuickActionsSectionTitle"] = "Getting Started"
     L["SettingsHomeQuickActionsTip1"] = "1. Start with Event Types to customize which events you want to see"
     L["SettingsHomeQuickActionsTip2"] = "2. Use Collections to enable content from specific expansions or lore sources"
+    L["SettingsHomeQuickActionsTip3"] = "3. Open the timeline with /chronicles or the minimap button to explore events"
     L["SettingsHomeVersionSectionTitle"] = "About Chronicles"
     L["SettingsHomeVersionVersionInfo"] = "A comprehensive timeline addon for World of Warcraft lore and events."
     L["SettingsHomeVersionConfigNote"] = "Settings are automatically saved and will persist between sessions."
 
     -- Search functionality
     L["SearchCharactersPlaceholder"] = "Search..."
+
+    -- List item tooltips
+    L["TooltipDefaultItemName"] = "Item"
+    L["TooltipChapterCount"] = "Available Content: %d chapters"
+    L["TooltipCreatedBy"] = "Created by: %s"
+    L["TooltipAllegiance"] = "Allegiance: %s"
+    L["TooltipRace"] = "Race: %s"
+
+    -- Book view
+    L["NoContentAvailable"] = "No content available"
 
     -- Timeline zoom button text
     L["Zoom Out"] = "-"
