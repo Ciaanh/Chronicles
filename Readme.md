@@ -156,7 +156,7 @@ Chronicles/
 - **Optional dependencies** on roleplay addons (totalRP3, MyRolePlay)
 - **Minimap button** for quick access
 - **Saved variables** for persistent user data and preferences
-- **Plugin-compatible** architecture for custom content extensions
+- **Plugin-compatible** architecture for custom content extensions — see [PLUGINS.md](PLUGINS.md) to author a content pack
 
 ## Installation
 
