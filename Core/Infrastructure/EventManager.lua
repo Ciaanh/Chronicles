@@ -13,22 +13,12 @@ single source of truth patterns.
 CURRENT EVENT USAGE:
 ✅ ACTIVELY TRIGGERED EVENTS (All with validation schemas):
 - AddonStartup, AddonShutdown: Application lifecycle
-- TimelineInit: Timeline initialization 
-- UIRefresh: UI component refresh requests
-- TabUITabSet: Tab selection in main UI
-- SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
-- TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
-- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display (with suffix validation)
-
-CURRENT EVENT USAGE:
-✅ ACTIVELY TRIGGERED EVENTS:
-- AddonStartup, AddonShutdown: Application lifecycle
 - TimelineInit: Timeline initialization
 - UIRefresh: UI component refresh requests
 - TabUITabSet: Tab selection in main UI
 - SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
 - TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
-- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display
+- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display (with suffix validation)
 
 ❌ LEGACY EVENTS (State-based now):
 - EventSelected, CharacterSelected, FactionSelected: Now handled via StateManager
@@ -68,7 +58,6 @@ end
 local eventSchemas = {
     [private.constants.events.AddonStartup] = {
         description = "Fired when the addon is starting up and initializing components",
-        required = {"version", "timestamp"},
         optional = {"profile"},
         validate = function(data)
             if not data then
@@ -79,7 +68,6 @@ local eventSchemas = {
     },
     [private.constants.events.AddonShutdown] = {
         description = "Fired when the addon is shutting down",
-        required = {"version", "timestamp"},
         optional = {"profile"},
         validate = function(data)
             return true, nil
@@ -241,6 +229,22 @@ private.Core.EventManager.Validator = {
 
         if not schema then
             return true, nil
+        end
+
+        -- Enforce declared required fields generically so the `required` list is
+        -- a real contract, not just documentation. Per-schema validate() runs
+        -- afterwards for type/value checks.
+        if schema.required then
+            if type(data) ~= "table" then
+                return false,
+                    eventName .. ": payload must be a table with required fields: " ..
+                        table.concat(schema.required, ", ")
+            end
+            for _, field in ipairs(schema.required) do
+                if data[field] == nil then
+                    return false, eventName .. ": missing required field '" .. field .. "'"
+                end
+            end
         end
 
         return schema.validate(data)
