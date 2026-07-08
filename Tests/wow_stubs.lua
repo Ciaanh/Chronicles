@@ -55,6 +55,15 @@ _G.strsplit = function(sep, str)
     return unpack(parts)
 end
 
+-- Fail-fast error surfacing routes through geterrorhandler(). Under test,
+-- return a handler that re-raises so a swallowed error would fail the test
+-- loudly rather than pass silently.
+_G.geterrorhandler = function()
+    return function(err)
+        error("geterrorhandler received: " .. tostring(err), 0)
+    end
+end
+
 -- Some modules reference C_Timer.After; make it a no-op scheduler.
 _G.C_Timer = {
     After = function(_, callback)

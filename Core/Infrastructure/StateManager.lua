@@ -502,6 +502,33 @@ function private.Core.StateManager.getState(key)
     return stateStore[key]
 end
 
+--[[
+    Re-emit the current value of a state key to its subscribers without
+    mutating or persisting it.
+
+    Used on addon startup to wake UI subscribers with state that was restored
+    from SavedVariables during init(), instead of writing each value back to
+    itself via setState just to trigger a notification (which also incurred a
+    redundant AceDB write). Subscribers receive newValue == oldValue, which
+    reads as "restored" rather than "changed".
+
+    @param key [string] State key to re-broadcast
+    @return [boolean] true if a value existed and subscribers were notified
+]]
+function private.Core.StateManager.rehydrate(key)
+    if type(key) ~= "string" or key == "" then
+        return false
+    end
+
+    local value = stateStore[key]
+    if value == nil then
+        return false
+    end
+
+    private.Core.StateManager.notifySubscribers(key, value, value)
+    return true
+end
+
 function private.Core.StateManager.persistState(key, value)
     local chronicles = private.Core.Utils.HelperUtils.getChronicles()
     if not chronicles or not chronicles.db or not chronicles.db.global then
@@ -598,7 +625,12 @@ function private.Core.StateManager.notifySubscribers(key, newValue, oldValue)
     end
     for subscriberId, callback in pairs(subscribers[key]) do
         if type(callback) == "function" then
+            -- pcall isolates one subscriber's failure from the others, but we
+            -- fail fast: surface the error in-game rather than swallowing it.
             local success, errorMsg = pcall(callback, newValue, oldValue, key)
+            if not success then
+                geterrorhandler()(errorMsg)
+            end
         end
     end
 end
