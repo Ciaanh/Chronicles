@@ -438,18 +438,17 @@ end
     
     This is the primary method for updating Chronicles state. It provides:
     • Automatic initialization if StateManager hasn't been set up yet
-    • Input validation with detailed error logging
+    • Input validation (returns false on invalid key)
     • Immediate persistence to AceDB storage
     • Change event notification to all subscribers
-    • Optional description for debugging and audit trails
-    
+    • Optional description passed through for audit/debugging context
+
     PERSISTENCE FLOW:
     1. Validate input parameters
     2. Store old value for change comparison
     3. Update in-memory state store
     4. Persist to appropriate AceDB storage location
     5. Notify subscribers with old and new values
-    6. Log the change with optional description
     
     @param key [string] State key (should be built using buildStateKey functions)
     @param value [any] New state value (any JSON-serializable type)
