@@ -40,7 +40,6 @@ local ValidationUtils = private.Core.Utils.ValidationUtils
         position = [number]             -- Minimap icon position
     }
     advanced = {
-        debugMode = [boolean]           -- Enable debug logging
         cacheEnabled = [boolean]        -- Enable data caching
         preloadData = [boolean]         -- Preload all data on startup
     }

@@ -69,7 +69,7 @@ local eventSchemas = {
     [private.constants.events.AddonStartup] = {
         description = "Fired when the addon is starting up and initializing components",
         required = {"version", "timestamp"},
-        optional = {"debugMode", "profile"},
+        optional = {"profile"},
         validate = function(data)
             if not data then
                 return false, "Startup data is nil"
@@ -274,6 +274,9 @@ private.Core.EventManager.safeTrigger = function(eventName, data, source)
     if success then
         return true
     else
+        -- Fail fast: surface the error in-game (WoW's error handler / BugSack)
+        -- instead of hiding it, while still isolating the caller from the failure.
+        geterrorhandler()(errorMsg)
         return false
     end
 end
@@ -284,8 +287,13 @@ end
 
 private.Core.EventManager.safeRegisterCallback = function(eventName, callback, owner)
     local wrappedCallback = function(...)
+        -- pcall isolates one subscriber's failure from the others, but we fail
+        -- fast: forward the error to WoW's handler so it stays visible in-game
+        -- during testing rather than being silently swallowed.
         local success, errorMsg = pcall(callback, ...)
-        -- Silently ignore callback failures to prevent cascade errors
+        if not success then
+            geterrorhandler()(errorMsg)
+        end
     end
 
     EventRegistry:RegisterCallback(eventName, wrappedCallback, owner)

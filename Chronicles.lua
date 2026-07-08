@@ -22,8 +22,7 @@ local defaults = {
         },
         settingsState = {
             eventTypes = {},
-            collections = {},
-            debugMode = false
+            collections = {}
         },
         dataState = {
             lastRefreshTime = 0,
