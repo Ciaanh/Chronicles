@@ -97,48 +97,22 @@ end
     all core systems are fully initialized before checking saved state.
 ]]
 function Chronicles:OnAddonStartup(eventData)
-    if not private.Core.StateManager then
+    local StateManager = private.Core.StateManager
+    if not StateManager then
         return
     end
 
     private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
-    local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
-    local existingPeriod = private.Core.StateManager.getState(selectedPeriodKey)
-    if existingPeriod then
-        private.Core.StateManager.setState(selectedPeriodKey, existingPeriod, "AddonStartup state restoration")
-    end
 
-    local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
-    local existingEventSelection = private.Core.StateManager.getState(eventSelectionKey)
-    if existingEventSelection and type(existingEventSelection) == "table" then
-        private.Core.StateManager.setState(eventSelectionKey, existingEventSelection, "AddonStartup state restoration")
-    end
-
-    local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
-    local existingCharacterSelection = private.Core.StateManager.getState(characterSelectionKey)
-    if existingCharacterSelection and type(existingCharacterSelection) == "table" then
-        private.Core.StateManager.setState(
-            characterSelectionKey,
-            existingCharacterSelection,
-            "AddonStartup state restoration"
-        )
-    end
-
-    local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
-    local existingFactionSelection = private.Core.StateManager.getState(factionSelectionKey)
-    if existingFactionSelection and type(existingFactionSelection) == "table" then
-        private.Core.StateManager.setState(
-            factionSelectionKey,
-            existingFactionSelection,
-            "AddonStartup state restoration"
-        )
-    end
-
-    local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
-    local existingActiveTab = private.Core.StateManager.getState(activeTabKey)
-    if existingActiveTab then
-        private.Core.StateManager.setState(activeTabKey, existingActiveTab, "AddonStartup state restoration")
-    end
+    -- Re-notify subscribers of state restored from SavedVariables during
+    -- StateManager.init(). rehydrate re-emits the stored value without changing
+    -- or re-persisting it (no set-value-to-itself round-trip). rehydrate is a
+    -- no-op for keys with no saved value.
+    StateManager.rehydrate(StateManager.buildUIStateKey("selectedPeriod"))
+    StateManager.rehydrate(StateManager.buildSelectionKey("event"))
+    StateManager.rehydrate(StateManager.buildSelectionKey("character"))
+    StateManager.rehydrate(StateManager.buildSelectionKey("faction"))
+    StateManager.rehydrate(StateManager.buildUIStateKey("activeTab"))
 end
 
 function Chronicles:OnDisable()

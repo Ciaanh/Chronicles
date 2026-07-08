@@ -25,7 +25,8 @@ local specs = {
     "MathUtils_spec.lua",
     "TableUtils_spec.lua",
     "StringUtils_spec.lua",
-    "TimelineBusiness_spec.lua"
+    "TimelineBusiness_spec.lua",
+    "StateManager_spec.lua"
 }
 
 for _, spec in ipairs(specs) do
