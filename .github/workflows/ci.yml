@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lua:
+    name: Syntax check & tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lua 5.1
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+
+      - name: Syntax-check all addon Lua files
+        run: |
+          # luac -p compiles without running — a cheap syntax gate over every
+          # addon Lua file. Third-party Libs/ is excluded.
+          status=0
+          while IFS= read -r file; do
+            if ! luac -p "$file"; then
+              echo "Syntax error in $file"
+              status=1
+            fi
+          done < <(find . -name '*.lua' -not -path './Libs/*')
+          exit $status
+
+      - name: Run test suite
+        run: lua Tests/run_tests.lua
