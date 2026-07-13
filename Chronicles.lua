@@ -43,6 +43,44 @@ Chronicles.description = Locale["Description"]
 
 private.constants = private.constants
 
+--[[
+    Register a Chronicles entry in Blizzard's Settings panel (Escape > Options >
+    AddOns). This is a lightweight canvas category with a button that opens the
+    addon's own window — the addon keeps its rich in-frame settings, this just
+    makes it discoverable through the standard game options, per Blizzard's
+    modern Settings API (Settings.RegisterCanvasLayoutCategory).
+]]
+local function RegisterSettingsPanel()
+    if not (Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory) then
+        return
+    end
+
+    local panel = CreateFrame("Frame")
+
+    local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText(Locale["Chronicles"])
+
+    local desc = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    desc:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
+    desc:SetText(Locale["Description"])
+
+    local openButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    openButton:SetSize(200, 24)
+    openButton:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -16)
+    openButton:SetText(Locale["OpenChronicles"])
+    openButton:SetScript(
+        "OnClick",
+        function()
+            private.Chronicles.UI.DisplayWindow()
+        end
+    )
+
+    local category = Settings.RegisterCanvasLayoutCategory(panel, Locale["Chronicles"])
+    category.ID = "Chronicles"
+    Settings.RegisterAddOnCategory(category)
+end
+
 function Chronicles:OnInitialize()
     private.Chronicles.db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
 
@@ -72,6 +110,8 @@ function Chronicles:OnInitialize()
             self.UI:DisplayWindow()
         end
     )
+
+    RegisterSettingsPanel()
 
     if private.Core.StateManager then
         private.Core.StateManager.init()

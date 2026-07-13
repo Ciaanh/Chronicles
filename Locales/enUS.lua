@@ -5,6 +5,7 @@ if L then
     L["Chronicles"] = true
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
+    L["OpenChronicles"] = "Open Chronicles"
     L["CurrentYear"] = "Current year is "
     L["currentstep"] = "Step: "
     L["years"] = " years"

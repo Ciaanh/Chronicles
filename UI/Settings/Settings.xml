@@ -4,12 +4,23 @@
 
     <Script file="Settings.lua"></Script>
 
-    <CheckButton name="ChroniclesSettingsCheckboxTemplate" inherits="InterfaceOptionsCheckButtonTemplate" virtual="true">
+    <!-- Modern replacement for the removed InterfaceOptionsCheckButtonTemplate (12.0.0).
+         UICheckButtonTemplate's own label is `.text` (lowercase); we add an explicit
+         `.Text` FontString so the existing Lua (checkbox.Text:SetText/SetFont) keeps working. -->
+    <CheckButton name="ChroniclesSettingsCheckboxTemplate" inherits="UICheckButtonTemplate" virtual="true">
         <Layers>
             <Layer level="BACKGROUND" textureSubLevel="0">
                 <Texture parentKey="BackgroundHighlight" setAllPoints="true" alpha="0" hidden="true">
                     <Color r="0.3" g="0.3" b="0.5"/>
                 </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Text" inherits="GameFontHighlight" justifyH="LEFT">
+                    <Size x="350" y="20"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0"/>
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
         <Scripts>
