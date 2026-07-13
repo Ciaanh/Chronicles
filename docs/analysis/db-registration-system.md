@@ -1,5 +1,13 @@
 # DB Registration System Analysis
 
+> **Update 2026-07-08:** This doc's "Current Architecture" / "Issues" sections
+> describe the OLD design and are historical. The redesign is **implemented**: the
+> `ChroniclesPluginData.Register()` global no longer exists; internal DBs load via
+> `private.registerInternalDBs()` (`DB/DB.lua`) and external plugins use the
+> `ChroniclesPlugins` manifest table / `Chronicles:RegisterPluginDB()`
+> (`Core/Data.lua`). See the "Implemented Design" section below and the authored
+> plugin guide `PLUGINS.md` for current behavior.
+
 ## Summary
 
 The current registration system mixes internal (sample) DB loading with external plugin registration through a single `ChroniclesPluginData.Register()` global function. This creates coupling, limits extensibility, and makes the external plugin pattern fragile.

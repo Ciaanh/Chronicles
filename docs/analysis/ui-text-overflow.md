@@ -1,5 +1,13 @@
 # UI Text Overflow & Positioning Analysis
 
+> **Update 2026-07-08:** IMPLEMENTED. All three phases of the Fix Plan below are
+> in the code (commit 28d170e and follow-ups): Phase 1 empty-author guard
+> (`BookUtils.lua:20,122`), Phase 2 book-page title/cover wrapping + two-point
+> anchoring (`BookPages.xml`), Phase 3 list-item `SetWordWrap`+two-point anchoring
+> (`EventListTemplate.lua`/`.xml`, `VerticalListTemplate.lua`/`.xml`). The separate
+> `EventListTitleTemplate.BlackBG` color bug (`0/125/0` → `0/0/0`) is also fixed.
+> This document is retained as the rationale record.
+
 ## Summary
 
 Multiple UI components have text overflow issues caused by conflicting layout directives (`setAllPoints="true"` combined with explicit `<Size>` and anchors), missing truncation/wrapping logic, and an empty-author display bug in the book content pipeline.

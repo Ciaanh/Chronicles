@@ -6,44 +6,32 @@ branch are recorded at the bottom; everything above is remaining work, in sugges
 
 ---
 
-## Next up — Phase 2: Testability (unchanged, still highest leverage)
+## Next up — Phase 3: Robustness (reduced scope — 3.2 is done)
 
-Nothing has been started here. Do this before larger refactors.
+### 3.1 Fail-fast error surfacing (REPLACES the original "debug logging helper")
+Decision (2026-07-08): No debug-mode / verbose-logging toggle. Chronicles is debugged in-game
+with a fail-fast principle — errors must be visible during testing, never suppressed or gated.
+See memory `fail-fast-debugging`.
+- **Remove** dead `settingsState.debugMode` config (`Chronicles.lua` defaults; schema label in
+  `EventManager.lua`). Do NOT wire it up.
+- **Surface swallowed errors** instead of hiding them:
+  - `EventManager.safeRegisterCallback` (EventManager.lua:285-292) catches callback errors and
+    silently discards them ("Silently ignore callback failures to prevent cascade errors").
+  - `EventManager.safeTrigger` (EventManager.lua:268-278) discards `errorMsg` on dispatch failure.
+  - Fix: keep `pcall` isolation between subscribers, but forward the captured error to
+    `geterrorhandler()(errorMsg)` so it shows in-game. Or drop the `pcall` where cascade
+    isolation isn't needed and let it propagate to WoW's built-in handler.
+- `StateManager.lua:442` doc comment promises "detailed error logging" that was never
+  implemented; update the comment to match reality (validation uses `error(...)`, which already
+  fails fast).
 
-### 2.1 Stand up a standalone Lua test harness
-- Pure-logic modules (`Core/Data/TimelineBusiness.lua`, `Core/Business/DateCalculator.lua`,
-  `Core/Utils/StringUtils.lua`, `MathUtils.lua`, `TableUtils.lua`) run without the WoW client.
-- Harness must fake the `local FOLDER_NAME, private = ...` vararg pattern and stub WoW globals
-  (`C_Timer`, etc.).
-- A local Lua 5.1 toolchain exists at `C:\Program Files (x86)\Lua\5.1\` (lua.exe + luac.exe) —
-  matches WoW's Lua version.
-- **Done when:** `TimelineBusiness` plus two utility modules have tests covering main paths and
-  edge cases (empty input, single event, boundary years).
-
-### 2.2 Edge-case coverage for timeline math
-- Test against the extreme constants: `historyStartYear = -150000`, `mythos = -999999`,
-  `futur = 999999`, and zoom transitions across `stepValues = {1000, 500, 100, 10}`.
-
-### 2.3 Wire tests into GitHub Actions
-- `.github/workflows/` does not exist yet. Minimal workflow: install Lua 5.1 + runner, run suite
-  on push. Could also run `luac -p` over all addon Lua files as a cheap syntax gate.
-
----
-
-## Phase 3: Robustness (reduced scope — 3.2 is done)
-
-### 3.1 Debug logging helper
-- `settingsState.debugMode` (defined in `Chronicles.lua` defaults) is dead config — never read.
-- `StateManager.lua:442` doc comment promises "detailed error logging" that was never implemented;
-  `EventManager`'s pcall wrapper captures callback errors and silently discards them.
-- Build `private.Core.log(level, msg, source)` gated on `debugMode`; use it in StateManager,
-  EventManager (surface swallowed pcall errors), and data loading.
-
-### 3.3 StateManager rehydrate method
-- `Chronicles:OnAddonStartup` still re-notifies subscribers by `setState(key, existingValue)`
-  round-trips. `setState` never short-circuits on equal values and always re-persists to AceDB.
-- Add `StateManager.rehydrate(key)` (re-emit current value to subscribers without persisting)
-  and use it in `OnAddonStartup`.
+### 3.3 StateManager rehydrate method — DONE (commit ca407d9, 2026-07-08)
+- Added `StateManager.rehydrate(key)`: re-emits the stored value to subscribers
+  (newValue == oldValue) without mutating or persisting it; no-op when unset.
+- `Chronicles:OnAddonStartup` now calls rehydrate for the five restored keys instead of the
+  `getState`/`setState` round-trips (which also re-persisted redundantly).
+- Also fixed the silent-swallow in `notifySubscribers` (forwards to `geterrorhandler()`).
+- Covered by `Tests/specs/StateManager_spec.lua`.
 
 ### 3.x (new) Known plugin-timing gap
 - `ADDON_LOADED` manifest scanning is unregistered at `PLAYER_LOGIN` (`Core/Data.lua:37-40`),
@@ -52,27 +40,16 @@ Nothing has been started here. Do this before larger refactors.
 
 ---
 
-## Phase 4: Documentation
+## Phase 4: Documentation — DONE (commits 6757ccc, 9701323; 2026-07-08)
 
-### 4.1 PLUGINS.md
-- The plugin API is complete and totally undocumented: `Chronicles:RegisterPluginDB(name, manifest)`
-  and the `ChroniclesPlugins` global manifest table (`Core/Data.lua:47-93`).
-- Document expected DB shape (events/characters/factions) + a minimal working example addon.
-
-### 4.2 Event & state-key catalog
-- Reference doc for `constants.events` (Constants.lua) and state-key conventions
-  (`buildUIStateKey`, `buildSelectionKey`, `buildSettingsKey`), mapping each to payload schema
-  and producers/consumers.
-
-### 4.3 Fix event schema definitions
-- `EventManager` schema `required` arrays are never enforced (documentation-only), and the
-  `AddonStartup` schema claims `{version, timestamp}` while the real payload is `{}`.
-  Either enforce or align the declarations.
-
-### 4.4 (new) Refresh stale analysis docs
-- `docs/analysis/global-integration-review.md` flags a manifest bug already fixed in
-  `Core/Data.lua:80`; `docs/analysis/db-registration-system.md` still references the removed
-  `ChroniclesPluginData.Register()` path.
+- 4.1 `PLUGINS.md` (repo root, tracked): manifest + `RegisterPluginDB` API, data shapes,
+  a minimal working plugin, rules/gotchas. Linked from `Readme.md`.
+- 4.2 `docs/event-state-catalog.md`: every event's payload/producers/consumers, the state-key
+  builders, and the AceDB persistence buckets.
+- 4.3 `EventManager.Validator` now enforces `required` generically (fail-fast on missing/non-table
+  payload); removed the bogus `required={version,timestamp}` from AddonStartup/AddonShutdown and
+  the duplicated comment block. Covered by `Tests/specs/EventManager_spec.lua`.
+- 4.4 Annotated the two stale `docs/analysis` files with 2026-07-08 update notes.
 
 ---
 
@@ -91,6 +68,18 @@ Nothing has been started here. Do this before larger refactors.
    now that all UI strings route through `Locale[...]`.
 
 ---
+
+## Completed — Phase 2 testability (branch `cleanup/step1-hygiene`, 2026-07-08)
+
+- 2.1 Standalone Lua test harness in `Tests/`: vararg-bootstrap module loader,
+  WoW-global stubs, minimal describe/it framework, deterministic runner.
+  Run with `lua Tests/run_tests.lua` (local Lua 5.1 at `C:\Program Files (x86)\Lua\5.1\`).
+- 2.1/2.2 Specs: MathUtils, TableUtils, StringUtils (main paths + nil/empty edges) and
+  TimelineBusiness (calculateTimelineConfig with boundary years -150000/-999999/999999,
+  consolidateTimelinePeriods, getStepValueIndex, calculateTimelinePagination). 36 tests, green.
+- 2.3 GitHub Actions workflow `.github/workflows/ci.yml`: `luac -p` syntax gate over all
+  addon Lua + test run on push/PR. Required a `.gitignore` tweak to track `.github/workflows`
+  only (rest of `.github` stays local). NOTE: not yet verified green on GitHub — needs a push.
 
 ## Completed — Phase 1 cleanup (branch `cleanup/step1-hygiene`, 2026-07-03)
 

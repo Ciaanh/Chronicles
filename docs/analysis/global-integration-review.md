@@ -1,5 +1,27 @@
 # Global Integration Review
 
+> **Update 2026-07-08 (re-verified):** Most findings here are now RESOLVED; this
+> doc is retained as history.
+> - #1 Tauri generator contract — **RESOLVED.** The generator at
+>   `D:\Dev\WoW\_Workspace\code_Chronicles-tauri` (branch `feat/edition`, commit
+>   `32aa2d1`) already emits the new contract: `dbService.ts` produces a
+>   `ChroniclesPlugins` manifest in External mode and `private.registerInternalDBs()`
+>   in Embedded mode; content-file header is the new `local FOLDER_NAME, private = ...`
+>   style. The legacy `Chronicles.DB.Modules` text survives ONLY in a stale
+>   git-tracked `coverage/…/dbService.ts.html` report (26 tracked files, not
+>   gitignored) — deleting/untracking `coverage/` in that repo removes the false
+>   grep signal. Not done here: that repo has unrelated uncommitted WIP, so its
+>   index was left untouched.
+> - #2 Generator tests — **RESOLVED.** `dbService.test.ts` already asserts the new
+>   contract (`ChroniclesPlugins`, `registerInternalDBs`); no legacy-marker asserts.
+> - #3 Manifest `registered = true` unconditional — **FIXED** (`Core/Data.lua:80`).
+> - #6 Tauri README filenames — **RESOLVED** (README lists `DB/DB.lua`, `DB/DB.xml`,
+>   `DB/Locales/*.lua`).
+> - Still open: #4 LoD-after-login policy (`docs/improvement-plan.md` item 3.x);
+>   #5 `refs/` git-ignored; and separate export-sanitization correctness bugs tracked
+>   in the Tauri repo's `REVIEW_FIXES_PLAN.md` (raw collection names as Lua
+>   identifiers, manifest key casing, locale-index backslash separator).
+
 Date: 2026-04-17
 Scope:
 - Chronicles addon repository
