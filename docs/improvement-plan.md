@@ -55,17 +55,28 @@ See memory `fail-fast-debugging`.
 
 ## New items adopted from ANALYSIS.md / docs/analysis (not in original plan)
 
-1. **Blizzard Settings API integration** (compliance grade F in ANALYSIS.md):
-   `Settings.RegisterAddOnCategory()` is absent and `Settings.xml:7` inherits the deprecated
-   `InterfaceOptionsCheckButtonTemplate`.
-2. **UI text-overflow fix plan** (`docs/analysis/ui-text-overflow.md`, status: analyzed, pending
-   implementation) — includes the empty-string `author` bug in `BookUtils.lua` ("by " with no name).
-3. **Cross-repo contract mismatch**: the Tauri generator still emits the legacy
-   `Chronicles.DB.Modules` contract while the addon expects `ChroniclesPlugins` manifests
-   (see `docs/analysis/global-integration-review.md`). Highest-risk open item for the data pipeline.
-4. **Full-screen overlay UX** — replace with a standard movable frame (top UX recommendation).
-5. Only `enUS` locales exist despite full AceLocale scaffolding — translations are unblocked
-   now that all UI strings route through `Locale[...]`.
+1. **Blizzard Settings API integration** — DONE (2026-07-08). Registered a canvas category
+   (Escape > Options > AddOns) with an "Open Chronicles" button; replaced the removed
+   `InterfaceOptionsCheckButtonTemplate` with `UICheckButtonTemplate` (+ explicit `.Text`).
+2. **UI text-overflow** — DONE. The 3-phase fix plan was already implemented in commit 28d170e;
+   the remaining `EventListTitleTemplate` BlackBG color bug (0/125/0 → 0/0/0) is now fixed.
+3. **Cross-repo contract mismatch** — RESOLVED. Re-verification found the Tauri generator already
+   emits the `ChroniclesPlugins` manifest / `registerInternalDBs` contract (commit 32aa2d1) with
+   matching tests + README; only a stale tracked `coverage/` report in that repo still shows the
+   old text. Left that repo's index untouched (it has unrelated WIP) — recommend untracking
+   `coverage/` there. See `docs/analysis/global-integration-review.md`.
+4. **Full-screen overlay → movable window** — DONE (2026-07-08). Bounded, draggable, screen-clamped,
+   Escape-closable; no longer a full-screen modal.
+5. Only `enUS` locales exist despite full AceLocale scaffolding — STILL OPEN; translations are
+   unblocked now that all UI strings route through `Locale[...]`.
+6. **make-release.ps1** (user request, not from ANALYSIS.md) — DONE. Ports XPBarEnhanced's
+   packaging pattern; builds `.build/Chronicles-<version>.zip`.
+
+### Still open
+- Item 5 above (translations).
+- LoD-after-login plugin policy (item 3.x).
+- Optional: verify branch CI on GitHub (never pushed); Tauri repo `coverage/` untrack + export
+  sanitization bugs (in that repo's `REVIEW_FIXES_PLAN.md`).
 
 ---
 
