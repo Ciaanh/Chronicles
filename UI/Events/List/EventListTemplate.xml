@@ -12,7 +12,7 @@
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="125.0" b="0.0"/>
+                    <Color r="0.0" g="0.0" b="0.0"/>
                 </Texture>
             </Layer>
             <Layer level="ARTWORK">
