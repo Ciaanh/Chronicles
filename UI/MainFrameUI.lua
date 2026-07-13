@@ -60,12 +60,13 @@ private.Chronicles.UI = {}
         Chronicles.UI.DisplayWindow() -- Toggles window visibility
 ]]
 function private.Chronicles.UI.DisplayWindow()
-	local alreadyShowing = MainFrameUI:IsShown()
-
-	if alreadyShowing then
-		HideUIPanel(MainFrameUI)
+	-- Standard movable window: plain Show/Hide (not ShowUIPanel/HideUIPanel,
+	-- which would hand positioning to the game's UIPanel manager and fight the
+	-- draggable frame).
+	if MainFrameUI:IsShown() then
+		MainFrameUI:Hide()
 	else
-		ShowUIPanel(MainFrameUI)
+		MainFrameUI:Show()
 	end
 end
 
@@ -81,6 +82,20 @@ MainFrameUIMixin = {}
     and prepares the frame for display.
 ]]
 function MainFrameUIMixin:OnLoad()
+	-- =============================================================================================
+	-- MOVABLE WINDOW SETUP
+	-- =============================================================================================
+	-- Standard draggable, screen-clamped window (replaces the old full-screen
+	-- modal overlay). Escape closes it via UISpecialFrames.
+	self:SetClampedToScreen(true)
+	self:SetFrameStrata("HIGH")
+	self:RegisterForDrag("LeftButton")
+	tinsert(UISpecialFrames, self:GetName())
+
+	if self.Title then
+		self.Title:SetText(Locale["Chronicles"])
+	end
+
 	-- =============================================================================================
 	-- STATE-BASED BOOK CONTENT SUBSCRIPTION
 	-- =============================================================================================
@@ -131,6 +146,17 @@ end
     2. Set global UI state to indicate frame is open
     3. Play appropriate UI sound for user feedback
 ]]
+--[[
+    Drag handlers for the movable window.
+]]
+function MainFrameUIMixin:OnDragStart()
+	self:StartMoving()
+end
+
+function MainFrameUIMixin:OnDragStop()
+	self:StopMovingOrSizing()
+end
+
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
