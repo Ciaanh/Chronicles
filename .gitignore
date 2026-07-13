@@ -4,3 +4,7 @@
 /.claude
 
 refs
+
+# Release packaging output (make-release.ps1) and its transient staging folder
+/.build
+/Chronicles/
