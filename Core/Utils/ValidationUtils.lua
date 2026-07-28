@@ -86,7 +86,54 @@ end
     @return [boolean] True if value is a valid non-empty table
 ]]
 function ValidationUtils.IsValidTable(value)
-    return type(value) == "table" and next(value) ~= nil
+    return ValidationUtils.ValidateTable(value, false)
+end
+
+--[[
+    Generic table validator with optional empty allowance
+    @param value [any] Value to check
+    @param allowEmpty [boolean|table] When true (or {allowEmpty=true}), consider empty tables valid
+    @return [boolean] True if value satisfies table requirements
+]]
+function ValidationUtils.ValidateTable(value, allowEmpty)
+    local allowEmptyTable = false
+    if type(allowEmpty) == "table" then
+        allowEmptyTable = allowEmpty.allowEmpty == true
+    else
+        allowEmptyTable = allowEmpty and true or false
+    end
+
+    if type(value) ~= "table" then
+        return false
+    end
+
+    if not allowEmptyTable and next(value) == nil then
+        return false
+    end
+
+    return true
+end
+
+--[[
+    Validate an events collection
+    @param events [table] Events array/table
+    @param allowEmpty [boolean] Allow empty tables (default true)
+    @return [boolean] True when collection is valid
+]]
+function ValidationUtils.IsValidEventList(events, allowEmpty)
+    local allowEmptyList = allowEmpty ~= false
+
+    if not ValidationUtils.ValidateTable(events, allowEmptyList) then
+        return false
+    end
+
+    for _, event in pairs(events) do
+        if not ValidationUtils.IsValidEvent(event) then
+            return false
+        end
+    end
+
+    return true
 end
 
 --[[

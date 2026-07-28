@@ -6,6 +6,104 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 -- -------------------------
 TimelineMixin = {}
 
+function TimelineMixin:SetupEventCallbacks()
+    if self._eventCallbacksActive then
+        return
+    end
+
+    if not self._eventCallbackDefinitions then
+        self._eventCallbackDefinitions = {
+            {event = private.constants.events.TimelineInit, handler = self.OnTimelineInit},
+            {event = private.constants.events.TimelinePreviousButtonVisible, handler = self.OnTimelinePreviousButtonVisible},
+            {event = private.constants.events.TimelineNextButtonVisible, handler = self.OnTimelineNextButtonVisible},
+            {event = private.constants.events.DisplayEventsForYear, handler = self.OnDisplayEventsForYear}
+        }
+    end
+
+    for _, definition in ipairs(self._eventCallbackDefinitions) do
+        private.Core.registerCallback(definition.event, definition.handler, self)
+    end
+
+    self._eventCallbacksActive = true
+end
+
+function TimelineMixin:ShutdownEventCallbacks()
+    if not self._eventCallbacksActive or not self._eventCallbackDefinitions then
+        return
+    end
+
+    if private.Core.unregisterCallback then
+        for _, definition in ipairs(self._eventCallbackDefinitions) do
+            private.Core.unregisterCallback(definition.event, self)
+        end
+    end
+
+    self._eventCallbacksActive = false
+end
+
+function TimelineMixin:InitializeStateSubscriptions()
+    if not private.Core.StateManager then
+        return
+    end
+
+    if not self._stateSubscriptionDefs then
+        local timelineKey = private.Core.StateManager.buildTimelineKey("currentStep")
+        local subscriptionId = (self:GetName() or "TimelineMixin") .. "_CurrentStep"
+        self._stateSubscriptionDefs = {
+            {
+                key = timelineKey,
+                id = subscriptionId,
+                callback = function(newStep)
+                    self:UpdateZoomLevelIndicator(newStep)
+                end
+            }
+        }
+    end
+end
+
+function TimelineMixin:EnableStateSubscriptions()
+    if self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+        return
+    end
+
+    for _, definition in ipairs(self._stateSubscriptionDefs) do
+        private.Core.StateManager.subscribe(definition.key, definition.callback, definition.id)
+    end
+
+    self._stateSubscriptionsActive = true
+end
+
+function TimelineMixin:DisableStateSubscriptions()
+    if not self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+        return
+    end
+
+    for _, definition in ipairs(self._stateSubscriptionDefs) do
+        private.Core.StateManager.unsubscribe(definition.key, definition.id)
+    end
+
+    self._stateSubscriptionsActive = false
+end
+
+function TimelineMixin:ConfigureNavigationButtons()
+    if not self.Next then
+        return
+    end
+
+    local textures = {
+        self.Next:GetNormalTexture(),
+        self.Next:GetHighlightTexture(),
+        self.Next:GetPushedTexture(),
+        self.Next:GetDisabledTexture()
+    }
+
+    for _, texture in ipairs(textures) do
+        if texture then
+            texture:SetTexCoord(1, 0, 0, 1)
+        end
+    end
+end
+
 -- arrow CovenantSanctum-Renown-Arrow-Depressed
 -- CovenantSanctum-Renown-DoubleArrow
 -- cyphersetupgrade-arrow-full
@@ -33,18 +131,9 @@ function TimelineMixin:OnLoad()
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
 
-    -- Use safe event registration for events that don't have state equivalents
-    private.Core.registerCallback(private.constants.events.TimelineInit, self.OnTimelineInit, self)
-    private.Core.registerCallback(
-        private.constants.events.TimelinePreviousButtonVisible,
-        self.OnTimelinePreviousButtonVisible,
-        self
-    )
-    private.Core.registerCallback(
-        private.constants.events.TimelineNextButtonVisible,
-        self.OnTimelineNextButtonVisible,
-        self
-    )
+    self:ConfigureNavigationButtons()
+
+    self:InitializeStateSubscriptions()
 
     -- Immediately initialize the timeline when UI is loaded
     -- This ensures timeline is populated even if TimelineInit event hasn't been triggered
@@ -55,27 +144,34 @@ function TimelineMixin:OnLoad()
         end
     )
 
-    -- Use state-based subscription for timeline step changes
-    -- This provides a single source of truth for the current timeline step
+    -- Initialize zoom level indicator
+    local initialStepValue
     if private.Core.StateManager then
-        private.Core.StateManager.subscribe(
-            private.Core.StateManager.buildTimelineKey("currentStep"),
-            function(newStep, oldStep)
-                self:UpdateZoomLevelIndicator(newStep)
-            end,
-            "TimelineMixin"
-        )
-    end -- Initialize zoom level indicator
-    self:UpdateZoomLevelIndicator(
-        private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep")) or
-            private.constants.config.stepValues[1]
-    )
+        initialStepValue =
+            private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
+    end
+    self:UpdateZoomLevelIndicator(initialStepValue or private.constants.config.stepValues[1])
 
     -- Initialize date search
     self:InitializeDateSearch()
+end
 
-    -- Register for year-specific event display
-    private.Core.registerCallback(private.constants.events.DisplayEventsForYear, self.OnDisplayEventsForYear, self)
+function TimelineMixin:OnShow()
+    self:SetupEventCallbacks()
+    self:InitializeStateSubscriptions()
+    self:EnableStateSubscriptions()
+
+    if private.Core.StateManager then
+        local currentStep = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
+        if currentStep then
+            self:UpdateZoomLevelIndicator(currentStep)
+        end
+    end
+end
+
+function TimelineMixin:OnHide()
+    self:DisableStateSubscriptions()
+    self:ShutdownEventCallbacks()
 end
 
 -- -------------------------
@@ -120,11 +216,48 @@ function TimelineMixin:InitializeDateSearch()
             self.DateSearchInput.PlaceholderText:SetText(Locale["Enter year..."] or "Enter year...")
         end
         self:UpdateDateSearchPlaceholder()
+
+        self.DateSearchInput:SetScript(
+            "OnEditFocusGained",
+            function()
+                self:OnDateSearchFocusGained()
+            end
+        )
+        self.DateSearchInput:SetScript(
+            "OnEditFocusLost",
+            function()
+                self:OnDateSearchFocusLost()
+            end
+        )
+        self.DateSearchInput:SetScript(
+            "OnEnterPressed",
+            function()
+                self:OnDateSearchEnterPressed()
+            end
+        )
+        self.DateSearchInput:SetScript(
+            "OnEscapePressed",
+            function()
+                self:OnDateSearchEscapePressed()
+            end
+        )
+        self.DateSearchInput:SetScript(
+            "OnTextChanged",
+            function()
+                self:OnDateSearchTextChanged()
+            end
+        )
     end
 
     -- Set localized button text
     if self.DateSearchButton then
         self.DateSearchButton:SetText(Locale["Go"] or "Go")
+        self.DateSearchButton:SetScript(
+            "OnClick",
+            function()
+                self:OnDateSearchButtonClick()
+            end
+        )
     end
 end
 
@@ -187,7 +320,7 @@ function TimelineMixin:PerformDateSearch()
         local errorMsg =
             Locale["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] or
             "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
-        private.Chronicles:Print(errorMsg)
+        -- print(errorMsg)
         return
     end
 
@@ -202,11 +335,12 @@ function TimelineMixin:PerformDateSearch()
             minYear,
             maxYear
         )
-        private.Chronicles:Print(errorMsg)
+        -- print(errorMsg)
         return
     end
 
     self:NavigateToYear(year)
+    self:DisplayEventsForYear(year)
     self.DateSearchInput:ClearFocus()
 end
 
@@ -223,6 +357,53 @@ function TimelineMixin:NavigateToYear(year)
         -- Fallback implementation
         self:FallbackNavigateToYear(year)
     end
+end
+
+function TimelineMixin:DisplayEventsForYear(year)
+    if not year or not private.Core then
+        return
+    end
+
+    local triggerEvent = private.Core.triggerEvent
+    if not triggerEvent or not private.constants or not private.constants.events then
+        return
+    end
+
+    local eventsProvider = private.Core.Cache and private.Core.Cache.getSearchEvents and private.Core.Cache.getSearchEvents(year, year) or {}
+
+    local filteredEvents = eventsProvider
+    if private.Core.Events and private.Core.Events.FilterEvents then
+        filteredEvents = private.Core.Events.FilterEvents(eventsProvider)
+    end
+
+    local stateManager = private.Core.StateManager
+    if stateManager then
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificMode"),
+            true,
+            "Year-specific search activated",
+            {skipIfUnchanged = true}
+        )
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificTarget"),
+            year,
+            "Year-specific search target"
+        )
+        stateManager.setState(
+            stateManager.buildTimelineKey("yearSpecificEvents"),
+            filteredEvents,
+            "Year-specific events cached"
+        )
+    end
+
+    triggerEvent(
+        private.constants.events.DisplayEventsForYear,
+        {
+            year = year,
+            events = filteredEvents
+        },
+        "TimelineMixin:DisplayEventsForYear"
+    )
 end
 
 function TimelineMixin:FallbackNavigateToYear(year)
@@ -382,7 +563,8 @@ function TimelinePeriodMixin:OnClick()
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("yearSpecificMode"),
             false,
-            "Year-specific mode cleared due to period selection"
+            "Year-specific mode cleared due to period selection",
+            {skipIfUnchanged = true}
         )
     end
 
@@ -399,7 +581,18 @@ function TimelinePeriodMixin:OnClick()
     -- Update state instead of triggering event - provides single source of truth
     if private.Core.StateManager then
         local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
-        private.Core.StateManager.setState(selectedPeriodKey, periodData, "Timeline period selected")
+        local currentSelection = private.Core.StateManager.getState(selectedPeriodKey)
+
+        if currentSelection and currentSelection.lower == periodData.lower and currentSelection.upper == periodData.upper then
+            return
+        end
+
+        private.Core.StateManager.setState(
+            selectedPeriodKey,
+            periodData,
+            "Timeline period selected",
+            {skipIfUnchanged = true}
+        )
     end
 
     self:ResetAllPeriodTextures()

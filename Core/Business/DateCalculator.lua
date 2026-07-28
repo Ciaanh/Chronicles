@@ -4,7 +4,7 @@ local FOLDER_NAME, private = ...
 =================================================================================
 Module: DateCalculator
 Purpose: Business logic for date and time calculations in Chronicles timeline
-Dependencies: ValidationUtils (accessed globally)
+Dependencies: Core.Utils.ValidationUtils (via private namespace)
 Author: Chronicles Team
 =================================================================================
 

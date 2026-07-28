@@ -125,4 +125,20 @@ if L then
     L["Zoom In"] = "+"
     L["EventTypesDescription"] = "Configure which types of events to display in the timeline and event lists."
     L["CollectionsDescription"] = "Enable or disable event collections to customize which content is available."
+
+    -- Book / HTMLBuilder localization
+    -- Title and structure
+    L["BOOK_CONTENTS_TITLE"] = "Contents"
+    L["BOOK_CHAPTER_N"] = "Chapter %d"
+    L["BOOK_CHAPTER_HEADER"] = "Chapter %d: %s"
+    L["BOOK_UNTITLED"] = "Untitled"
+    -- Errors
+    L["BOOK_ERROR_TITLE"] = "Error"
+    L["BOOK_ERROR_NO_ENTITY"] = "No entity data provided"
+    L["BOOK_NO_CONTENT"] = "No content available."
+    -- Dates
+    L["BOOK_DATE_YEAR"] = "Year %d"
+    L["BOOK_DATE_YEARS_RANGE"] = "Years %d - %d"
+    L["BOOK_DATE_FROM_YEAR"] = "From Year %d"
+    L["BOOK_DATE_UNTIL_YEAR"] = "Until Year %d"
 end
