@@ -47,7 +47,8 @@ Dependencies:
 ]]
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-private.Chronicles.UI = {}
+local Chronicles = private.Chronicles
+Chronicles.UI = {}
 
 --[[
     Toggle the main Chronicles interface window
@@ -59,7 +60,7 @@ private.Chronicles.UI = {}
     @example
         Chronicles.UI.DisplayWindow() -- Toggles window visibility
 ]]
-function private.Chronicles.UI.DisplayWindow()
+function Chronicles.UI.DisplayWindow()
 	local alreadyShowing = MainFrameUI:IsShown()
 
 	if alreadyShowing then
@@ -74,6 +75,70 @@ end
 -- -------------------------
 MainFrameUIMixin = {}
 
+function MainFrameUIMixin:SetupStateSubscriptions()
+	if not private.Core.StateManager then
+		return
+	end
+
+	if not self._stateSubscriptionDefs then
+		local frameName = self:GetName() or "MainFrameUI"
+		self._stateSubscriptionDefs = {
+			{
+				key = private.Core.StateManager.buildSelectionKey("event"),
+				id = frameName .. "_EventBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateEventBookContent(newSelection)
+				end
+			},
+			{
+				key = private.Core.StateManager.buildSelectionKey("character"),
+				id = frameName .. "_CharacterBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateCharacterBookContent(newSelection)
+				end
+			},
+			{
+				key = private.Core.StateManager.buildSelectionKey("faction"),
+				id = frameName .. "_FactionBook",
+				callback = function(newSelection, oldSelection)
+					self:UpdateFactionBookContent(newSelection)
+				end
+			}
+		}
+	end
+end
+
+function MainFrameUIMixin:EnableStateSubscriptions()
+	if self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+		return
+	end
+
+	for _, definition in ipairs(self._stateSubscriptionDefs) do
+		private.Core.StateManager.subscribe(definition.key, definition.callback, definition.id)
+
+		if definition.callback then
+			local success, currentValue = pcall(private.Core.StateManager.getState, definition.key)
+			if success then
+				local ok, _ = pcall(definition.callback, currentValue, nil)
+			end
+		end
+	end
+
+	self._stateSubscriptionsActive = true
+end
+
+function MainFrameUIMixin:DisableStateSubscriptions()
+	if not self._stateSubscriptionsActive or not self._stateSubscriptionDefs then
+		return
+	end
+
+	for _, definition in ipairs(self._stateSubscriptionDefs) do
+		private.Core.StateManager.unsubscribe(definition.key, definition.id)
+	end
+
+	self._stateSubscriptionsActive = false
+end
+
 --[[
     Initialize the main frame UI component
     
@@ -85,39 +150,9 @@ function MainFrameUIMixin:OnLoad()
 	-- STATE-BASED BOOK CONTENT SUBSCRIPTION
 	-- =============================================================================================
 	-- Subscribe to selection state changes and update book content accordingly.
-	-- This ensures that SharedBookTemplate always receives already-transformed content.
+	-- This ensures that BookContainerTemplate always receives already-transformed content.
 
-	if private.Core.StateManager then
-		-- Event selection subscriber
-		local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
-		private.Core.StateManager.subscribe(
-			eventSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateEventBookContent(newSelection)
-			end,
-			"MainFrameUI_EventBook"
-		)
-
-		-- Character selection subscriber
-		local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
-		private.Core.StateManager.subscribe(
-			characterSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateCharacterBookContent(newSelection)
-			end,
-			"MainFrameUI_CharacterBook"
-		)
-
-		-- Faction selection subscriber
-		local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
-		private.Core.StateManager.subscribe(
-			factionSelectionKey,
-			function(newSelection, oldSelection, key)
-				self:UpdateFactionBookContent(newSelection)
-			end,
-			"MainFrameUI_FactionBook"
-		)
-	end
+	self:SetupStateSubscriptions()
 end
 
 --[[
@@ -128,14 +163,16 @@ end
     
     Event Flow:
     1. Update tab system to reflect current state
-    2. Set global UI state to indicate frame is open
+    2. Set UI state to indicate frame is open
     3. Play appropriate UI sound for user feedback
 ]]
 function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
+	self:SetupStateSubscriptions()
+	self:EnableStateSubscriptions()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
+		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened", {skipIfUnchanged = true})
 	end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
@@ -148,20 +185,21 @@ end
     
     Event Flow:
     1. Play appropriate UI sound for user feedback
-    2. Update global UI state to indicate frame is closed
+    2. Update UI state to indicate frame is closed
 ]]
 function MainFrameUIMixin:OnHide()
+	self:DisableStateSubscriptions()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed")
+		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed", {skipIfUnchanged = true})
 	end
 end
 
 -- =============================================================================================
 -- BOOK CONTENT UPDATE METHODS
 -- =============================================================================================
--- These methods handle the transformation and display of content in SharedBookTemplate instances.
+-- These methods handle the transformation and display of content in BookContainerTemplate instances.
 -- They ensure that content is always transformed before being passed to OnContentReceived.
 
 function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
@@ -293,3 +331,5 @@ end
 function TabUIMixin:IsTabAvailable(tabID)
 	return true
 end
+
+-- =============================================================================================

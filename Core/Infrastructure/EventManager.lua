@@ -5,11 +5,6 @@ private.Core.EventManager = {}
 --[[
 Chronicles Event Management System
 
-ARCHITECTURE OVERVIEW:
-This addon has migrated from a pure event-driven architecture to a hybrid
-state-based + event-driven architecture for better maintainability and
-single source of truth patterns.
-
 CURRENT EVENT USAGE:
 ✅ ACTIVELY TRIGGERED EVENTS (All with validation schemas):
 - AddonStartup, AddonShutdown: Application lifecycle
@@ -28,7 +23,6 @@ MIGRATION NOTES:
 - Selection events (Event/Character/Faction) moved to StateManager.setState()
 - UI components subscribe to state changes instead of listening for events
 - This provides single source of truth and better state synchronization
-- Legacy event schemas remain for potential future use or plugin compatibility
 --]]
 -- -------------------------
 -- Global Utility Functions
@@ -48,6 +42,14 @@ function private.Core.registerCallback(eventName, callback, owner)
         private.Core.EventManager.safeRegisterCallback(eventName, callback, owner)
     else
         EventRegistry:RegisterCallback(eventName, callback, owner)
+    end
+end
+
+function private.Core.unregisterCallback(eventName, owner)
+    if private.Core.EventManager and private.Core.EventManager.safeUnregisterCallback then
+        private.Core.EventManager.safeUnregisterCallback(eventName, owner)
+    else
+        EventRegistry:UnregisterCallback(eventName, owner)
     end
 end
 
@@ -208,6 +210,11 @@ local eventSchemas = {
     }
 }
 
+private.constants.eventPayloadSchemas = private.constants.eventPayloadSchemas or {}
+for eventName, schema in pairs(eventSchemas) do
+    private.constants.eventPayloadSchemas[eventName] = schema
+end
+
 -- -------------------------
 -- Event Validator
 -- -------------------------
@@ -254,6 +261,17 @@ private.Core.EventManager.Validator = {
     end,
     addSchema = function(self, eventName, schema)
         eventSchemas[eventName] = schema
+        if private.constants then
+            private.constants.eventPayloadSchemas = private.constants.eventPayloadSchemas or {}
+            private.constants.eventPayloadSchemas[eventName] = schema
+        end
+    end,
+    getAllSchemas = function(self)
+        local copy = {}
+        for name, schema in pairs(eventSchemas) do
+            copy[name] = schema
+        end
+        return copy
     end
 }
 
@@ -301,6 +319,10 @@ private.Core.EventManager.safeRegisterCallback = function(eventName, callback, o
     end
 
     EventRegistry:RegisterCallback(eventName, wrappedCallback, owner)
+end
+
+private.Core.EventManager.safeUnregisterCallback = function(eventName, owner)
+    EventRegistry:UnregisterCallback(eventName, owner)
 end
 
 -- -------------------------

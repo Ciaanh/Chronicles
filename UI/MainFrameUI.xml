@@ -17,7 +17,7 @@
                             <Anchor point="TOP" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                    <Frame parentKey="Book" inherits="BookContainerTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />
@@ -44,7 +44,7 @@
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                    <Frame parentKey="Book" inherits="BookContainerTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />
@@ -65,7 +65,7 @@
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="SharedBookTemplate">
+                    <Frame parentKey="Book" inherits="BookContainerTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOM" />
@@ -97,31 +97,40 @@
         </Scripts>
     </Frame>
 
-    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" enableMouse="true" hidden="true">
-        <!-- <Size x="1480" y="835"/> -->
+    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" frameStrata="DIALOG" enableMouse="true" hidden="true">
+        <Size x="1525" y="875"/>
+        <Anchors>
+            <Anchor point="CENTER" y="50" />
+        </Anchors>
         <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="1000">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="0.0" b="0.0"/>
+            <Layer level="BACKGROUND" textureSubLevel="-5">
+                <Texture parentKey="Bg">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="7" y="-7"/>
+                        <Anchor point="BOTTOMRIGHT" x="-7" y="7"/>
+                    </Anchors>
+                    <Color r="0.1" g="0.1" b="0.1" a="0.5"/>
                 </Texture>
             </Layer>
         </Layers>
-        <Anchors>
-            <!-- <Anchor point="CENTER" y="50" /> -->
-            <Anchor point="TOPLEFT" />
-            <Anchor point="BOTTOMRIGHT" />
-        </Anchors>
         <Frames>
+            <Frame parentKey="Border" inherits="DialogBorderNoCenterTemplate" frameLevel="20">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="0" y="0"/>
+                    <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+                </Anchors>
+            </Frame>
+
             <Frame name="TabContainer" parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
                 <Size x="1480" y="825"/>
                 <Anchors>
-                    <Anchor point="CENTER" y="50" />
+                    <Anchor point="CENTER" y="30" />
                 </Anchors>
             </Frame>
 
             <Button name="CloseButton" inherits="UIPanelCloseButton">
                 <Anchors>
-                    <Anchor point="CENTER" relativePoint="TOPRIGHT" relativeTo="TabContainer" x="-140" y="-175"/>
+                    <Anchor point="CENTER" relativePoint="TOPRIGHT" x="-10" y="-10"/>
                 </Anchors>
             </Button>
         </Frames>

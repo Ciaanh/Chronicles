@@ -67,13 +67,15 @@ constants.events = {
 	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
 }
 
+constants.eventPayloadSchemas = constants.eventPayloadSchemas or {}
+
 constants.templateKeys = {
 	EVENTLIST_TITLE = "EVENTLIST_TITLE",
 	EVENT_DESCRIPTION = "EVENT_DESCRIPTION",
 	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM" -- For the shared vertical list template
 }
 
--- Book-specific template keys used in the SharedBookTemplate system
+-- Book-specific template keys used in the BookContainerTemplate system
 constants.bookTemplateKeys = {
 	-- Title templates for different content types
 	EVENT_TITLE = "EVENT_TITLE", -- Complex title with date ranges
@@ -81,8 +83,11 @@ constants.bookTemplateKeys = {
 	-- Cover page template
 	COVER_PAGE = "COVER_PAGE", -- Cover page with name only
 	COVER_IMAGE = "COVER_IMAGE", -- Cover page image element
-	COVER_DESCRIPTION = "COVER_DESCRIPTION", -- Cover page description element
-	-- Content structure templates
+	-- Unified content keys - primary templates
+	UNIFIED_CONTENT = "UNIFIED_CONTENT", -- Unified HTML content template
+	COVER_WITH_CONTENT = "COVER_WITH_CONTENT", -- Cover page with integrated content
+	PAGE_BREAK = "PAGE_BREAK", -- For pagination
+	-- Content structure templates (needed for old format compatibility)
 	EMPTY = "EMPTY",
 	AUTHOR = "AUTHOR",
 	CHAPTER_HEADER = "CHAPTER_HEADER", -- For chapter headers

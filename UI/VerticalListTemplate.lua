@@ -30,16 +30,141 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
     - dataSourceMethod: Method name for retrieving data
     - templateKey: Template key for item rendering
     
-    USAGE EXAMPLES:
-    - VerticalCharacterListSharedTemplate: Pre-configured for characters
-    - VerticalFactionListSharedTemplate: Pre-configured for factions
-    - Custom implementations can inherit from VerticalListTemplate directly
+    IMPORTANT: State Management Protection
     
-    RECENT CHANGES:
-    - Refactored to pass stateManagerKey directly to each item during initialization
-    - Eliminated parent traversal in OnClick handler for better performance and reliability
-    - Each list item now stores its own stateManagerKey for direct access
+    The template includes protection against invalid stateManagerKey values.
+    All state management operations (item clicks, state subscriptions, 
+    selection synchronization) will only execute when the stateManagerKey
+    is properly configured (not "generic"). This prevents runtime errors
+    during initialization and ensures robust operation.
 --]]
+--[[
+    EXAMPLE 1: Using Pre-configured Character List
+    
+    In your XML:
+    <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
+        <Size x="150" y="650"/>
+        <Anchors>
+            <Anchor point="BOTTOMLEFT" x="0" y="0" />
+        </Anchors>
+    </Frame>
+    
+    The VerticalCharacterListSharedTemplate is pre-configured with:
+    - itemType = "character"
+    - searchPlaceholder = "Search Characters..."    - countLabelFormat = "%d Characters"
+    - stateManagerKey = "character"
+    - dataSourceMethod = "getAllCharacters"
+    - templateKey = "GENERIC_LIST_ITEM"
+--]]
+--[[
+    EXAMPLE 2: Using Pre-configured Faction List
+    
+    In your XML:
+    <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
+        <Size x="150" y="650"/>
+        <Anchors>
+            <Anchor point="BOTTOMLEFT" x="0" y="0" />
+        </Anchors>
+    </Frame>
+    
+    The VerticalFactionListSharedTemplate is pre-configured with:
+    - itemType = "faction"
+    - searchPlaceholder = "Search Factions..."
+    - countLabelFormat = "%d Factions"
+    - stateManagerKey = "faction"
+    - dataSourceMethod = "SearchFactions"
+    - templateKey = "GENERIC_LIST_ITEM"
+--]]
+--[[
+    EXAMPLE 3: Custom Configuration
+    
+    You can create your own specialized template by inheriting from VerticalListTemplate
+    and setting custom KeyValues:
+    
+    <Frame name="MyCustomVerticalListTemplate" inherits="VerticalListTemplate" virtual="true">
+        <KeyValues>
+            <KeyValue key="itemType" value="event" type="string" />
+            <KeyValue key="searchPlaceholder" value="Search Events..." type="string" />
+            <KeyValue key="countLabelFormat" value="%d Events Found" type="string" />
+            <KeyValue key="stateManagerKey" value="event" type="string" />
+            <KeyValue key="dataSourceMethod" value="getAllEvents" type="string" />
+            <KeyValue key="templateKey" value="EVENT_LIST_ITEM" type="string" />
+        </KeyValues>
+    </Frame>
+--]]
+--[[
+    EXAMPLE 4: Runtime Configuration
+    
+    You can also configure the template at runtime:
+    
+    function ConfigureMyList(listFrame)
+        listFrame:ConfigureForCharacters()  -- Built-in character configuration
+        -- or
+        listFrame:ConfigureForFactions()    -- Built-in faction configuration
+        -- or custom configuration:
+        listFrame.itemType = "myCustomType"
+        listFrame.searchPlaceholder = "Search My Items..."
+        listFrame.countLabelFormat = "%d My Items"
+        listFrame.stateManagerKey = "myCustom"
+        listFrame.dataSourceMethod = "getAllMyItems"
+        listFrame.templateKey = "MY_CUSTOM_LIST_ITEM"
+        listFrame:RefreshItemList()
+    end
+--]]
+--[[
+    IMPLEMENTATION NOTES:
+    
+    The shared template avoids the GetKeyValue error by using a different approach:
+    
+    1. The base VerticalListMixin sets defaults in OnLoad()
+    2. Specialized mixins (VerticalCharacterListSharedMixin, VerticalFactionListSharedMixin) 
+       override these defaults using configuration methods
+    3. Configuration can also be done at runtime using the provided methods
+    4. This approach is more compatible with WoW's addon framework
+    
+    Error that was fixed:
+    - GetKeyValue is not a standard WoW API method
+    - KeyValues in XML are not accessible via GetKeyValue()
+    - The solution uses mixin inheritance and configuration methods instead
+--]]
+--[[
+    EXAMPLE 5: Integration with Existing Code
+    
+    The new template can be used alongside existing templates without modification:
+    
+    -- In MainFrameUI.xml, you could add:
+    <Frame parentKey="Characters" frameLevel="100" hidden="true">
+        <Frames>
+            <!-- shared template for factions in character tab -->
+            <Frame parentKey="RelatedFactions" inherits="VerticalFactionListSharedTemplate">
+                <Size x="150" y="300"/>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" x="-10" y="0" />
+                </Anchors>
+            </Frame>
+            
+            <Frame parentKey="Book" inherits="CharacterBookTemplate">
+                <Size x="1200" y="650"/>
+                <Anchors>
+                    <Anchor point="BOTTOM" />
+                </Anchors>
+            </Frame>
+        </Frames>
+    </Frame>
+--]]
+--[[
+    BENEFITS OF THE SHARED TEMPLATE:
+    
+    1. CONSISTENCY: All vertical lists use the same bookmark visual style
+    2. MAINTAINABILITY: Single template to update for visual changes
+    3. FLEXIBILITY: Configuration-driven approach for different item types
+    4. REUSABILITY: Can be used for any item type with minimal setup
+    5. STATE MANAGEMENT: Integrated with Chronicles state management system
+    6. SEARCH: Built-in search functionality with customizable placeholders
+    7. PERFORMANCE: Optimized data handling and rendering
+    8. ACCESSIBILITY: Consistent tooltip and interaction patterns
+--]]
+
 -- -------------------------
 -- Shared Vertical List Item Mixin
 -- -------------------------
@@ -175,7 +300,7 @@ VerticalListMixin = {}
 function VerticalListMixin:OnLoad()
     -- Initialize configuration with defaults (KeyValues are applied via template inheritance)
     self.itemType = "generic"
-    self.searchPlaceholder = "Search..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d items"
     self.enableSearch = true
     self.enableCount = true
@@ -238,7 +363,7 @@ end
 -- Built-in configuration for character lists
 function VerticalListMixin:ConfigureForCharacters()
     self.itemType = "character"
-    self.searchPlaceholder = "Search Characters..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d Characters"
     self.stateManagerKey = "character"
     self.dataSourceMethod = "getAllCharacters"
@@ -256,7 +381,7 @@ end
 -- Built-in configuration for faction lists
 function VerticalListMixin:ConfigureForFactions()
     self.itemType = "faction"
-    self.searchPlaceholder = "Search Factions..."
+    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
     self.countLabelFormat = "%d Factions"
     self.stateManagerKey = "faction"
     self.dataSourceMethod = "SearchFactions"
@@ -433,13 +558,72 @@ function VerticalListMixin:OnSelectionStateChanged(newValue, oldValue, context)
 end
 
 function VerticalListMixin:SyncWithCurrentSelection()
-    -- Selection state is handled by individual items through state management
-    -- This method provides a hook for future enhancements
-    if private.Core.StateManager and self.stateManagerKey and self.stateManagerKey ~= "generic" then
-        local selectedItemKey = private.Core.StateManager.buildSelectionKey(self.stateManagerKey)
-        local currentSelection = private.Core.StateManager.getState(selectedItemKey)
+    -- Synchronize visual selection state with the stored state
+    if not private.Core.StateManager or not self.stateManagerKey or self.stateManagerKey == "generic" then
+        return
+    end
+    
+    if not self.PagedItemList then
+        return
+    end
 
-    -- Individual list items will handle their own selection state
-    -- based on this shared state information
+    local selectedItemKey = private.Core.StateManager.buildSelectionKey(self.stateManagerKey)
+    local currentSelection = private.Core.StateManager.getState(selectedItemKey)
+    
+    if not currentSelection then
+        -- Clear all selections if nothing is selected
+        self:ClearAllSelections()
+        return
+    end
+
+    -- Get the selected item ID based on the state manager key
+    local selectedId = nil
+    if self.stateManagerKey == "character" then
+        selectedId = currentSelection.characterId
+    elseif self.stateManagerKey == "faction" then
+        selectedId = currentSelection.factionId
+    else
+        selectedId = currentSelection.itemId
+    end
+
+    if not selectedId then
+        self:ClearAllSelections()
+        return
+    end
+
+    -- Update visual selection for all visible items
+    self:UpdateVisualSelection(selectedId)
+end
+
+function VerticalListMixin:ClearAllSelections()
+    -- Clear visual selection from all visible list items
+    if not self.PagedItemList then
+        return
+    end
+    
+    local frames = self.PagedItemList:GetFrames()
+    if frames then
+        for _, frame in pairs(frames) do
+            if frame.SetSelected then
+                frame:SetSelected(false)
+            end
+        end
+    end
+end
+
+function VerticalListMixin:UpdateVisualSelection(selectedId)
+    -- Update visual selection to match the selected item ID
+    if not self.PagedItemList or not selectedId then
+        return
+    end
+    
+    local frames = self.PagedItemList:GetFrames()
+    if frames then
+        for _, frame in pairs(frames) do
+            if frame.Item and frame.Item.id and frame.SetSelected then
+                local isSelected = (frame.Item.id == selectedId)
+                frame:SetSelected(isSelected)
+            end
+        end
     end
 end

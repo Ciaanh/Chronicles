@@ -7,5 +7,4 @@
     <Script file="MathUtils.lua"/>
     <Script file="ValidationUtils.lua"/>
     <Script file="UIUtils.lua"/>
-    <Script file="BookUtils.lua"/>
 </Ui>

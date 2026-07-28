@@ -179,8 +179,6 @@ function TimelineBusiness.getDateCurrentStepIndex(date)
         return dateProfile.mod50 or 0
     elseif (currentStepValue == 10) then
         return dateProfile.mod10 or 0
-    elseif (currentStepValue == 1) then
-        return 0
     else
         return 0
     end
@@ -215,8 +213,6 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
         return eventDates.mod50 or {}
     elseif (currentStepValue == 10) then
         return eventDates.mod10 or {}
-    elseif (currentStepValue == 1) then
-        return {}
     else
         return {}
     end
