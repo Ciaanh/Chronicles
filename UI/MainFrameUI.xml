@@ -81,15 +81,17 @@
                 </Anchors>
             </Frame>
 
+            <!--
+                Declared here so parentKey resolution keeps working for TabSystemOwnerMixin,
+                but re-parented and re-anchored into the panel's DragStrip by TabUIMixin:OnLoad.
+                Anchors are set there, not here.
+            -->
             <Frame parentKey="TabSystem" inherits="TabSystemTemplate">
                 <KeyValues>
                     <KeyValue key="minTabWidth" value="100" type="number"/>
                     <KeyValue key="maxTabWidth" value="150" type="number"/>
                     <KeyValue key="tabSelectSound" value="SOUNDKIT.UI_CLASS_TALENT_TAB" type="global"/>
                 </KeyValues>
-                <Anchors>
-                    <Anchor point="BOTTOM" x="0" y="-30"/>
-                </Anchors>
             </Frame>
         </Frames>
         <Scripts>
@@ -97,7 +99,7 @@
         </Scripts>
     </Frame>
 
-    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" frameStrata="DIALOG" enableMouse="true" hidden="true">
+    <Frame name="MainFrameUI" mixin="MainFrameUIMixin" parent="UIParent" toplevel="true" frameStrata="DIALOG" enableMouse="true" movable="true" hidden="true">
         <Size x="1525" y="875"/>
         <Anchors>
             <Anchor point="CENTER" y="50" />
@@ -121,16 +123,39 @@
                 </Anchors>
             </Frame>
 
-            <Frame name="TabContainer" parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
+            <!--
+                Drag surface. DialogBorderNoCenterTemplate has no title bar to grab, so the
+                panel gets an explicit strip. Declared before TabUI on purpose: TabUIMixin:OnLoad
+                re-parents its TabSystem in here, and XML children are created in document order.
+                Inset 7 to sit inside the border art, matching the Bg texture above.
+            -->
+            <Frame parentKey="DragStrip" frameLevel="30" enableMouse="true">
+                <Size y="40"/> <!-- Spacing.xxl -->
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="7" y="-7"/>
+                    <Anchor point="TOPRIGHT" x="-7" y="-7"/>
+                </Anchors>
+                <Scripts>
+                    <OnDragStart>
+                        self:GetParent():StartDragging()
+                    </OnDragStart>
+                    <OnDragStop>
+                        self:GetParent():StopDragging()
+                    </OnDragStop>
+                </Scripts>
+            </Frame>
+
+            <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
                 <Size x="1480" y="825"/>
                 <Anchors>
-                    <Anchor point="CENTER" y="30" />
+                    <Anchor point="TOP" relativeKey="$parent.DragStrip" relativePoint="BOTTOM" />
                 </Anchors>
             </Frame>
 
-            <Button name="CloseButton" inherits="UIPanelCloseButton">
+            <!-- frameLevel above DragStrip (30) so the strip cannot swallow its clicks -->
+            <Button parentKey="CloseButton" inherits="UIPanelCloseButton" frameLevel="40">
                 <Anchors>
-                    <Anchor point="CENTER" relativePoint="TOPRIGHT" x="-10" y="-10"/>
+                    <Anchor point="CENTER" relativePoint="TOPRIGHT" x="-8" y="-8"/> <!-- -Spacing.sm -->
                 </Anchors>
             </Button>
         </Frames>

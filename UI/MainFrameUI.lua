@@ -50,6 +50,8 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Chronicles = private.Chronicles
 Chronicles.UI = {}
 
+local Spacing = private.Core.Utils.Spacing
+
 --[[
     Toggle the main Chronicles interface window
     
@@ -153,6 +155,80 @@ function MainFrameUIMixin:OnLoad()
 	-- This ensures that BookContainerTemplate always receives already-transformed content.
 
 	self:SetupStateSubscriptions()
+
+	self:SetClampedToScreen(true)
+	if self.DragStrip then
+		self.DragStrip:RegisterForDrag("LeftButton")
+	end
+end
+
+-- =============================================================================================
+-- WINDOW DRAGGING AND POSITION PERSISTENCE
+-- =============================================================================================
+-- The panel has no title bar (DialogBorderNoCenterTemplate draws no center), so DragStrip is an
+-- explicit drag surface anchored across the top. Its OnDragStart/OnDragStop forward here.
+-- Position is persisted through StateManager under the ui.* namespace, so it survives /reload.
+
+--[[
+    Build the state key holding the panel's saved screen position
+    @return [string] State key, or nil if StateManager is unavailable
+]]
+local function getWindowPositionKey()
+	if not private.Core.StateManager then
+		return nil
+	end
+	return private.Core.StateManager.buildUIStateKey("windowPosition")
+end
+
+function MainFrameUIMixin:StartDragging()
+	self:StartMoving()
+end
+
+function MainFrameUIMixin:StopDragging()
+	self:StopMovingOrSizing()
+	self:SaveFramePosition()
+end
+
+--[[
+    Persist the panel's current anchor so the next OnShow can restore it
+
+    relativePoint is stored alongside point because StartMoving rewrites the frame's anchor to
+    whatever corner it settled on; restoring against the wrong relative point misplaces the panel.
+]]
+function MainFrameUIMixin:SaveFramePosition()
+	local positionKey = getWindowPositionKey()
+	if not positionKey then
+		return
+	end
+
+	local point, _, relativePoint, xOffset, yOffset = self:GetPoint(1)
+	if not point then
+		return
+	end
+
+	private.Core.StateManager.setState(
+		positionKey,
+		{point = point, relativePoint = relativePoint, x = xOffset, y = yOffset},
+		"Main frame moved"
+	)
+end
+
+--[[
+    Restore the panel to its saved position, leaving the XML default in place when none was saved
+]]
+function MainFrameUIMixin:RestoreFramePosition()
+	local positionKey = getWindowPositionKey()
+	if not positionKey then
+		return
+	end
+
+	local position = private.Core.StateManager.getState(positionKey)
+	if type(position) ~= "table" or type(position.point) ~= "string" then
+		return
+	end
+
+	self:ClearAllPoints()
+	self:SetPoint(position.point, UIParent, position.relativePoint or position.point, position.x or 0, position.y or 0)
 end
 
 --[[
@@ -167,6 +243,7 @@ end
     3. Play appropriate UI sound for user feedback
 ]]
 function MainFrameUIMixin:OnShow()
+	self:RestoreFramePosition()
 	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
 	self:SetupStateSubscriptions()
 	self:EnableStateSubscriptions()
@@ -292,6 +369,7 @@ TabUIMixin.FrameTabs = {
 function TabUIMixin:OnLoad()
 	TabSystemOwnerMixin.OnLoad(self)
 	self:SetTabSystem(self.TabSystem)
+	self:MoveTabSystemToDragStrip()
 
 	self.EventsTabID = self:AddNamedTab("Events", self.Events)
 	self.CharactersTabID = self:AddNamedTab("Characters", self.Characters)
@@ -305,6 +383,28 @@ function TabUIMixin:OnLoad()
 		[TabUIMixin.FrameTabs.Factions] = self.FactionsTabID,
 		[TabUIMixin.FrameTabs.Settings] = self.SettingsTabID
 	}
+end
+
+--[[
+    Re-parent the tab strip from this container into the panel's DragStrip
+
+    The TabSystem frame is declared inside TabUITemplate so parentKey resolution keeps working for
+    TabSystemOwnerMixin, but a window's tabs belong at the top of the window, not at the bottom of
+    its content area. Re-parenting (rather than anchoring across the two frame trees) keeps frame
+    levels and mouse handling coherent: the tabs sit above the strip and eat their own clicks,
+    while the strip stays draggable everywhere the tabs do not cover.
+]]
+function TabUIMixin:MoveTabSystemToDragStrip()
+	local panel = self:GetParent()
+	local dragStrip = panel and panel.DragStrip
+	if not dragStrip or not self.TabSystem then
+		return
+	end
+
+	self.TabSystem:SetParent(dragStrip)
+	self.TabSystem:SetFrameLevel(dragStrip:GetFrameLevel() + 10)
+	self.TabSystem:ClearAllPoints()
+	self.TabSystem:SetPoint("LEFT", dragStrip, "LEFT", Spacing.md, 0)
 end
 
 function TabUIMixin:UpdateTabs()
