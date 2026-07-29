@@ -17,7 +17,6 @@ The Chronicles addon uses a templating system to display lore content. As of v2.
 | Template Key        | XML Template             | Lua Mixin             | Purpose                              | Status |
 | ------------------- | ------------------------ | --------------------- | ------------------------------------ | ------ |
 | `GENERIC_LIST_ITEM` | VerticalListItemTemplate | VerticalListItemMixin | Generic list item for vertical lists | Active |
-| `EVENTLIST_TITLE`   | EventListTitleTemplate   | EventListTitleMixin   | Event list section titles            | Active |
 | `EVENT_DESCRIPTION` | EventListItemTemplate    | EventListItemMixin    | Event list item content              | Active |
 
 Architecture note: `HTML_CONTENT` is the single source of truth for book display.
@@ -68,7 +67,6 @@ Templates are registered in `UI/PageTemplatesRegistration.lua`:
 private.constants.templates = {
   [private.constants.bookTemplateKeys.HTML_CONTENT] = { template = "HTMLContentTemplate", initFunc = HTMLContentMixin.Init },
   [private.constants.templateKeys.GENERIC_LIST_ITEM] = { template = "VerticalListItemTemplate", initFunc = VerticalListItemMixin.Init },
-  [private.constants.templateKeys.EVENTLIST_TITLE] = { template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init },
   [private.constants.templateKeys.EVENT_DESCRIPTION] = { template = "EventListItemTemplate", initFunc = EventListItemMixin.Init },
 }
 ```
@@ -96,10 +94,10 @@ private.constants.templates = {
 -   Mixin: `VerticalListItemMixin`
 -   Files: `UI/VerticalListTemplate.xml`, `UI/VerticalListTemplate.lua`
 
-### EventListTitleTemplate / EventListItemTemplate
+### EventListItemTemplate
 
--   Purpose: Specialized event list components
--   Mixins: `EventListTitleMixin` / `EventListItemMixin`
+-   Purpose: Specialized event list item
+-   Mixin: `EventListItemMixin`
 -   Files: `UI/Events/EventListTemplate.xml`, `UI/Events/EventListTemplate.lua`
 
 ## Best Practices

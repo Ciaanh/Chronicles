@@ -1,7 +1,6 @@
 local FOLDER_NAME, private = ...
 
 private.constants.templates = {
-	[private.constants.templateKeys.EVENTLIST_TITLE] = {template = "EventListTitleTemplate", initFunc = EventListTitleMixin.Init},
 	[private.constants.templateKeys.EVENT_DESCRIPTION] = {template = "EventListItemTemplate", initFunc = EventListItemMixin.Init},
 	
 	-- Generic shared template for the new VerticalListTemplate
