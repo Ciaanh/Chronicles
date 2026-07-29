@@ -1,5 +1,50 @@
 # Chronicles Addon Changelog
 
+## v2.1.0 (unreleased)
+### Breaking Changes
+- Plugin registration moved to a per-plugin manifest table. External data addons now declare
+  `ChroniclesPlugins["Name"] = {events = ..., characters = ..., factions = ...}` (any subset), which
+  Chronicles scans at load and again as later addons load. `Chronicles:RegisterPluginDB(name, manifest)`
+  takes the same manifest shape for callers that prefer a function call.
+- Removed the `ChroniclesPluginData.Register()` hook. It was a single shared global with one Register
+  function, so a plugin and Chronicles' own data layer overwrote each other — only one could ever be
+  registered. Addons still using it load no data and report no error. Chronicles-Sample v1.0.1 is
+  affected; its main branch already uses the manifest form. Exports from Chronicles-tauri still emit
+  the old hook and need regenerating once that tool is updated.
+
+### Book
+- Replaced the paged book layer with HTML content rendering (BookContainerTemplate). SharedBookTemplate,
+  BookPages and BookUtils are gone.
+- A UI refresh now keeps your place in the book; opening a different entity starts at its beginning.
+
+### Timeline
+- Rebuilt the period grid on frame pools sized from the configured page size, replacing nine labels and
+  eight periods hand-chained in XML. Seventeen frame globals removed.
+- Search, zoom and paging controls collected into one toolbar row, with a readout of the span on screen.
+- Paging arrows now match the surrounding buttons instead of a borrowed covenant-sanctum atlas.
+
+### Lists
+- Character, faction and event rails scroll instead of paging, and are single-column. The hand-rolled
+  paging control is gone.
+- Rails widened to sit beside the book rather than overlapping it.
+
+### Window
+- The main panel is movable by a drag strip along its top, and remembers where you left it.
+- The tab strip moved into that drag strip, which also fixes the tabs overflowing the frame's top edge.
+
+### Code Quality & Architecture
+- Data collections no longer publish globals. The 41 generated files under DB/ declared their table
+  bare (`ExpansionsEventsDB = {`), which in Lua means a global, and DB/DB.lua read them back by
+  global name; both sides now use `private.DB`. Chronicles-tauri's exporter was changed to match, so
+  regenerated content keeps the same shape. `ChroniclesPlugins` stays global by design — it is the
+  cross-addon contract.
+- Removed the dependency container; load order is resolved by the include chain and lazy lookups.
+- Added a shared spacing scale and applied it to the reworked UI.
+- Deleted the unreachable event-list title template and two unused font families.
+- Added a test suite over EventManager, StateManager, MathUtils, StringUtils, TableUtils and
+  TimelineBusiness (Tests/, needs a Lua 5.1 interpreter to run).
+- Replaced the sample database with real expansion data across fifteen collections.
+
 ## v2.0.1 (February 9, 2026)
 ### Critical Bug Fixes
 - Fixed TableUtils.Filter producing sparse tables causing incorrect array counts and pagination issues
