@@ -5,9 +5,10 @@
     FONT FAMILIES (Base Definitions)
     ============================================================================================= -->
 
+    <!-- Meta (11px base; CJK members stay 13 - deliberately larger at small sizes) -->
     <FontFamily name="ChroniclesFontFamily_Text_Shadow_Small" virtual="true">
         <Member alphabet="roman">
-            <Font font="Fonts\FRIZQT__.TTF" height="12">
+            <Font font="Fonts\FRIZQT__.TTF" height="11">
                 <Shadow x="1" y="-1">
                     <Color r="0" g="0" b="0"/>
                 </Shadow>
@@ -35,7 +36,7 @@
             </Font>
         </Member>
         <Member alphabet="russian">
-            <Font font="Fonts\FRIZQT___CYR.TTF" height="12">
+            <Font font="Fonts\FRIZQT___CYR.TTF" height="11">
                 <Shadow x="1" y="-1">
                     <Color r="0" g="0" b="0"/>
                 </Shadow>
@@ -61,47 +62,26 @@
         </Member>
     </FontFamily>
 
+    <!-- Title (22px base) -->
     <FontFamily name="ChroniclesFontFamily_Text_Huge" virtual="true">
         <Member alphabet="roman">
-            <Font font="Fonts\FRIZQT__.TTF" height="27"/>
+            <Font font="Fonts\FRIZQT__.TTF" height="22"/>
         </Member>
         <Member alphabet="korean">
-            <Font font="Fonts\2002.TTF" height="27"/>
+            <Font font="Fonts\2002.TTF" height="22"/>
         </Member>
         <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="27"/>
+            <Font font="Fonts\ARKai_T.ttf" height="22"/>
         </Member>
         <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.TTF" height="27"/>
+            <Font font="Fonts\blei00d.TTF" height="22"/>
         </Member>
         <Member alphabet="russian">
-            <Font font="Fonts\FRIZQT___CYR.TTF" height="27"/>
+            <Font font="Fonts\FRIZQT___CYR.TTF" height="22"/>
         </Member>
     </FontFamily>
 
-
-
-
-    <!-- Chronicles Large Font Family (16px base) -->
-    <FontFamily name="ChroniclesFontFamily_Large" virtual="true">
-        <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="16" outline="NORMAL"/>
-        </Member>
-        <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="15"/>
-        </Member>
-        <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="15" outline="NORMAL"/>
-        </Member>
-        <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="15" outline="NORMAL"/>
-        </Member>
-        <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="16" outline="NORMAL"/>
-        </Member>
-    </FontFamily>
-
-    <!-- Chronicles Medium Font Family (12px base) -->
+    <!-- Chronicles Medium Font Family (12px base) - base of ChroniclesFontFamily_Shadow_Medium -->
     <FontFamily name="ChroniclesFontFamily_Medium" virtual="true">
         <Member alphabet="roman">
             <Font font="Fonts\MORPHEUS.ttf" height="12"/>
@@ -132,24 +112,5 @@
     </Font>
 
 
-
-    <!-- Timeline Font Family (14px base) -->
-    <FontFamily name="TimelineFontFamily_Medium" virtual="true">
-        <Member alphabet="roman">
-            <Font font="Fonts\MORPHEUS.ttf" height="14"/>
-        </Member>
-        <Member alphabet="korean">
-            <Font font="Fonts\K_Pagetext.ttf" height="14" spacing="8"/>
-        </Member>
-        <Member alphabet="simplifiedchinese">
-            <Font font="Fonts\ARKai_T.ttf" height="14"/>
-        </Member>
-        <Member alphabet="traditionalchinese">
-            <Font font="Fonts\blei00d.ttf" height="14"/>
-        </Member>
-        <Member alphabet="russian">
-            <Font font="Fonts\MORPHEUS_CYR.TTF" height="14"/>
-        </Member>
-    </FontFamily>
 
 </Ui>
