@@ -2,24 +2,15 @@ local T = _G.T
 local H = _G.H
 local assert_ = T.assert
 
--- EventManager builds its schema table from private.constants.events at load,
--- so the events catalog must be present. Mirror Constants.lua.
+-- EventManager builds its schema table from private.constants.events at load, so the events catalog
+-- must be present. Load the real Constants.lua rather than mirroring it: a hand-copied catalog
+-- drifts silently whenever an event is added, renamed or retired, leaving these tests asserting
+-- against a schema table production no longer builds.
 local function buildPrivate()
     local private = H.newPrivate()
-    private.constants.events = {
-        AddonStartup = "Addon.STARTUP",
-        AddonShutdown = "Addon.SHUTDOWN",
-        TimelineInit = "Timeline.INIT",
-        UIRefresh = "Timeline.CLEAN",
-        TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
-        TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
-        DisplayTimelineLabel = "Timeline.DisplayLabel",
-        DisplayTimelinePeriod = "Timeline.DisplayPeriod",
-        DisplayEventsForYear = "Timeline.DisplayEventsForYear",
-        TabUITabSet = "TabUI.TabSet",
-        SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
-        SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
-    }
+    H.loadModule("Constants.lua", private)
+    -- Constants.lua assigns a fresh private.Core, so restore the skeleton newPrivate() provides.
+    private.Core.Utils = private.Core.Utils or {}
     H.loadModule("Core/Infrastructure/EventManager.lua", private)
     return private, private.Core.EventManager.Validator, private.constants.events
 end
@@ -41,7 +32,7 @@ T.describe("EventManager.Validator required-field enforcement", function()
 
     T.it("rejects a non-table payload when fields are required", function()
         local _, V, events = buildPrivate()
-        local ok = V:validate(events.TabUITabSet, "not a table")
+        local ok = V:validate(events.SettingsCollectionChecked, "not a table")
         assert_.isFalse(ok)
     end)
 
@@ -53,9 +44,10 @@ T.describe("EventManager.Validator required-field enforcement", function()
         assert_.isTrue(ok)
     end)
 
-    T.it("AddonShutdown accepts a nil payload", function()
+    T.it("TimelineInit accepts a nil payload", function()
+        -- Core/Data.lua triggers TimelineInit with no payload at all, so a nil must validate.
         local _, V, events = buildPrivate()
-        local ok = V:validate(events.AddonShutdown, nil)
+        local ok = V:validate(events.TimelineInit, nil)
         assert_.isTrue(ok)
     end)
 

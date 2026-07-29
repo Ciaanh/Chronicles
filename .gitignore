@@ -5,3 +5,11 @@
 /.claude
 
 refs
+
+# Build output
+.build
+
+# OS / editor artefacts
+*.bak
+.DS_Store
+.idea/

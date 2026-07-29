@@ -1,161 +1,100 @@
-# DB Registration System Analysis
+# DB Registration System
 
-## Summary
+Rewritten 2026-07-29 against the working branch. The previous version of this document described the
+`ChroniclesPluginData.Register()` global and the `DB/01_Sample` collection; both were deleted, and the
+redesign it recommended (Option C, a declarative manifest) is what shipped. What follows is the
+system as it exists, plus the issues that are still open.
 
-The current registration system mixes internal (sample) DB loading with external plugin registration through a single `ChroniclesPluginData.Register()` global function. This creates coupling, limits extensibility, and makes the external plugin pattern fragile.
+## Two doors, deliberately separate
 
-## Current Architecture
-
-### Registration Flow
+Internal (bundled) data and external (plugin) data no longer share a registration path. That
+separation was the point of the redesign.
 
 ```
-File Load Phase:
-  DB/01_Sample/*.lua → create globals (SampleEventsDB, etc.)
-  DB/DB.lua → define ChroniclesPluginData.Register()
+File load phase
+  DB/NN_<Expansion>/*.lua   assign into private.DB.<Name>DB  (41 files, no globals)
+  DB/DB.lua                 define private.registerInternalDBs()
+  <plugin addon>/*.lua      assign into the ChroniclesPlugins global
 
-Runtime (OnInitialize):
-  Chronicles.Data:Load()
-    → ChroniclesPluginData.Register()
-      → DataRegistry:RegisterEventDB("Sample", SampleEventsDB)
-      → DataRegistry:RegisterFactionDB("Sample", SampleFactionsDB)
-      → DataRegistry:RegisterCharacterDB("Sample", SampleCharactersDB)
+Runtime — Chronicles.Data:Load()   (Core/Data.lua:69)
+  seedEventTypeDefaults()                 persist a default status per configured event type
+  private.registerInternalDBs()           15 bundled collections  (DB/DB.lua:3)
+  Chronicles.Data:LoadPluginManifests()   plugins already present  (Core/Data.lua:116)
+  RegisterEvent("ADDON_LOADED")           re-scan for later addons
+  RegisterEvent("PLAYER_LOGIN")           stop scanning
+  private.Core.Cache.init()
 ```
 
-### External Plugin Pattern (current)
+`DB/DB.xml` lists every collection file *before* `DB.lua`, which is what lets `DB.lua` bind
+`local DB = private.DB or {}` and read the tables back without a load-order guess.
+
+### Internal: `private.registerInternalDBs()`
+
+One explicit, guarded call per collection and record type:
 
 ```lua
--- Option 1: Override ChroniclesPluginData.Register (only supports ONE plugin)
-function ChroniclesPluginData.Register()
-    DataRegistry:RegisterEventDB("MyPlugin", myData)
-end
-
--- Option 2: Use public API (must run AFTER Chronicles loads)
-Chronicles:RegisterPluginDB("PluginName", pluginDatabase)
+if DB.GreatwarsEventsDB then Data:RegisterEventDB("Greatwars", DB.GreatwarsEventsDB) end
+if DB.GreatwarsFactionsDB then Data:RegisterFactionDB("Greatwars", DB.GreatwarsFactionsDB) end
+if DB.GreatwarsCharactersDB then Data:RegisterCharacterDB("Greatwars", DB.GreatwarsCharactersDB) end
 ```
 
-## Issues
+The file is verbose on purpose. It is machine-written by the Chronicles-tauri authoring tool, and
+naming each collection explicitly means the collection name cannot be mis-derived from the table
+identifier. **Change the shape of these files in that generator first**
+(`src/app/addon/services/dbService.ts`), then mirror the result here — editing only the checked-in
+files means the next export reverts you.
 
-### 1. Internal/External DB Loading Mixed in DB.lua
+### External: the `ChroniclesPlugins` manifest
 
-`DB.lua` serves two purposes:
-- Defines the global `ChroniclesPluginData` registration hook
-- Registers the bundled Sample databases
-
-These should be separated. Internal (bundled) data should be loaded by `Core/Data.lua` directly. The plugin hook should only serve external addons.
-
-### 2. Single-Slot Plugin Hook
-
-`ChroniclesPluginData.Register()` is a single function — if two external plugins both set it, the second overwrites the first. Only one external plugin can use this pattern.
-
-### 3. No Plugin Discovery
-
-Chronicles has no way to discover plugins. External addons must:
-- Know the exact API name
-- Check `_G.Chronicles` existence
-- Handle timing (must load after Chronicles)
-- Get no feedback on success/failure
-
-### 4. Silent Failures
-
-All `DataRegistry.registerEventDB()` failures return `false` with no error message:
-- Missing Chronicles reference → silent fail
-- Invalid collection name → silent fail  
-- Duplicate collection name → silent fail
-
-### 5. API Naming Inconsistency
-
-| Layer | Method | Case |
-|-------|--------|------|
-| DataRegistry (internal) | `registerEventDB()` | camelCase |
-| Chronicles.Data (proxy) | `RegisterEventDB()` | PascalCase |
-| Chronicles (public) | `RegisterPluginDB()` | PascalCase |
-
-### 6. RegisterPluginDB Only Supports Events
+`ChroniclesPlugins` is the one global the data layer keeps, because it is the cross-addon contract:
 
 ```lua
-function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.Data:RegisterEventDB(pluginName, db)  -- events only!
-end
-```
-
-External plugins cannot register Characters or Factions through the public API.
-
-## Design Directions
-
-### Option A: Callback Queue Pattern
-
-```lua
--- Chronicles exposes a registration queue
-Chronicles.RegisterPlugin = function(pluginName, pluginData)
-    -- pluginData = { events = {}, characters = {}, factions = {} }
-    -- Registers all three data types at once
-    -- Returns success/failure with reason
-end
-```
-
-### Option B: Event-Driven Registration
-
-```lua
--- Chronicles fires an event when ready for plugin registration
--- Plugins listen and register when called
-private.Core.triggerEvent("CHRONICLES_READY")
-
--- External plugins register a callback
-Chronicles:OnReady(function()
-    Chronicles:RegisterPlugin("MyPlugin", { events = myEvents })
-end)
-```
-
-### Option C: Declarative Plugin Manifest
-
-```lua
--- Plugin defines a manifest table; Chronicles discovers and loads it
 ChroniclesPlugins = ChroniclesPlugins or {}
 ChroniclesPlugins["MyPlugin"] = {
-    events = myEventsDB,
+    events     = myEventsDB,      -- all three optional, at least one required
     characters = myCharactersDB,
-    factions = myFactionsDB,
+    factions   = myFactionsDB,
 }
--- Chronicles iterates ChroniclesPlugins during Load()
 ```
 
-### Recommendation
+`LoadPluginManifests` iterates it, tracks processed names in a module-local `processedPlugins` table
+so repeat scans are idempotent, refuses a collection name already present in any of the three
+registries, and returns whether anything new registered — the caller fires `TimelineInit` only when
+it did.
 
-Option C (declarative manifest) is simplest and most robust:
-- Supports multiple plugins naturally (table keys)
-- No timing issues (table populated during file load)  
-- No function overwriting
-- Chronicles controls when/how to process registrations
-- Easy to validate and report errors
+The runtime equivalent is `Chronicles:RegisterPluginDB(name, manifest)` (`Chronicles.lua:263`). It
+takes the same manifest shape, validates the name, requires at least one of the three keys, checks
+the same collection-name conflict, and warns if no registrar succeeded. `PLUGINS.md` is the
+authoring-facing version of all this.
 
-Combined with separating internal DB loading from the plugin system.
+## What the redesign fixed
 
-## Implemented Design
+| Old issue | Now |
+| --- | --- |
+| Internal and external loading mixed in `DB.lua` | Separate: `registerInternalDBs` vs `LoadPluginManifests` |
+| Single-slot `ChroniclesPluginData.Register()` — one plugin only | Table keyed by plugin name; any number |
+| No discovery; plugins had to load after Chronicles | `ChroniclesPlugins` is scanned at load and on `ADDON_LOADED`, so order does not matter |
+| Silent registration failures | Every rejection prints a coloured reason naming the collection |
+| `RegisterPluginDB` supported events only | Manifest covers events, characters and factions |
 
-**Status**: Implemented
+Registration failures are now reported in three places: a non-string or empty collection name, a
+payload that is not a table (added 2026-07-29 — `pairs()` over a non-table would otherwise have
+failed much later, inside the asynchronous cache warm), and a duplicate collection name.
 
-The following changes were made:
+## Still open
 
-1. **`DB/DB.lua`** — Now internal-only. Defines `private.registerInternalDBs()` to register bundled Sample databases. No longer creates `ChroniclesPluginData` global.
-
-2. **`Core/Data.lua:Load()`** — Multi-phase loading:
-   - Calls `private.registerInternalDBs()` for bundled data
-   - Calls `Chronicles.Data:LoadPluginManifests()` to process any early `ChroniclesPlugins` entries
-   - Legacy compat: still calls `ChroniclesPluginData.Register()` if it exists (deprecated)
-   - Registers `ADDON_LOADED` listener to re-scan `ChroniclesPlugins` when later addons load
-
-3. **`Chronicles:RegisterPluginDB()`** — Now supports manifest-style registration:
-   - `{ events = {...}, characters = {...}, factions = {...} }` — registers all data types
-   - Raw events table still works for backward compatibility
-
-4. **`ChroniclesPlugins` global table** — Declarative external plugin pattern:
-   ```lua
-   ChroniclesPlugins = ChroniclesPlugins or {}
-   ChroniclesPlugins["MyPlugin"] = {
-       events     = myEventsDB,
-       characters = myCharactersDB,
-       factions   = myFactionsDB,
-   }
-   ```
-   Safe regardless of load order: Chronicles re-scans the table on each `ADDON_LOADED` event.
-   Already-registered collections are skipped (idempotent).
+1. **Case asymmetry across the three layers is unchanged**, and is a navigation trap rather than a
+   bug: `DataRegistry.registerEventDB` (camelCase, dot-called) ← `Chronicles.Data.RegisterEventDB`
+   (PascalCase proxy, colon-called) ← `Chronicles:RegisterPluginDB`. A call site written as
+   `Chronicles.Data:RegisterEventDB(...)` will not grep to its implementation; search for the
+   camelCase name in `Core/Data/DataRegistry.lua`.
+2. **Load-on-demand plugins after login.** `Core/Data.lua:89-92` unregisters `ADDON_LOADED` at
+   `PLAYER_LOGIN`, so an addon loaded on demand later must call `Chronicles:RegisterPluginDB`
+   itself. This is now documented as the contract in `PLUGINS.md` § 5 rather than treated as a gap,
+   but it is still a real asymmetry between the two doors.
+3. **No backwards-compatibility shim.** The old events-only signature
+   (`RegisterPluginDB(name, eventsTable)`) is rejected by the "requires events, characters, or
+   factions" guard. `CHANGELOG.txt` documents the break; nothing restores it.
+4. **`PLUGINS.md` does not yet mention the payload type check.** A manifest whose every payload is
+   rejected registers nothing and fires no `TimelineInit`; the authoring guide's rules section
+   should say so.

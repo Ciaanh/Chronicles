@@ -171,12 +171,8 @@ function TimelineBusiness.getDateCurrentStepIndex(date)
         return dateProfile.mod1000 or 0
     elseif (currentStepValue == 500) then
         return dateProfile.mod500 or 0
-    elseif (currentStepValue == 250) then
-        return dateProfile.mod250 or 0
     elseif (currentStepValue == 100) then
         return dateProfile.mod100 or 0
-    elseif (currentStepValue == 50) then
-        return dateProfile.mod50 or 0
     elseif (currentStepValue == 10) then
         return dateProfile.mod10 or 0
     else
@@ -205,12 +201,8 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
         return eventDates.mod1000 or {}
     elseif (currentStepValue == 500) then
         return eventDates.mod500 or {}
-    elseif (currentStepValue == 250) then
-        return eventDates.mod250 or {}
     elseif (currentStepValue == 100) then
         return eventDates.mod100 or {}
-    elseif (currentStepValue == 50) then
-        return eventDates.mod50 or {}
     elseif (currentStepValue == 10) then
         return eventDates.mod10 or {}
     else
@@ -281,27 +273,25 @@ function TimelineBusiness.countEventsInPeriod(block)
             return eventCount
         end
 
+        local lastDateIndex = upperDateIndex
         if (lowerDateIndex < upperDateIndex) then
-            for i = lowerDateIndex, upperDateIndex - 1, 1 do
-                local periodEvents = periodsFilling[i]
-                if (periodEvents ~= nil) then
-                    -- Count hash-set entries (eventId as keys)
-                    local periodsCount = 0
-                    for _ in pairs(periodEvents) do
-                        periodsCount = periodsCount + 1
-                    end
-                    eventCount = eventCount + periodsCount
-                end
-            end
-        elseif lowerDateIndex == upperDateIndex then
-            local periodEvents = periodsFilling[lowerDateIndex]
+            lastDateIndex = upperDateIndex - 1
+        elseif (lowerDateIndex > upperDateIndex) then
+            return eventCount
+        end
+
+        -- An event spanning several buckets is listed in every one of them, so
+        -- the ids are collected into a set before being counted.
+        local countedEventIds = {}
+        for dateIndex = lowerDateIndex, lastDateIndex, 1 do
+            local periodEvents = periodsFilling[dateIndex]
             if (periodEvents ~= nil) then
-                -- Count hash-set entries (eventId as keys)
-                local periodsCount = 0
-                for _ in pairs(periodEvents) do
-                    periodsCount = periodsCount + 1
+                for _, eventId in ipairs(periodEvents) do
+                    if not countedEventIds[eventId] then
+                        countedEventIds[eventId] = true
+                        eventCount = eventCount + 1
+                    end
                 end
-                eventCount = periodsCount
             end
         end
     end
@@ -319,13 +309,15 @@ end
     @return [table] Array of timeline periods with bounds and event data
 ]]
 function TimelineBusiness.generateTimelinePeriods(stepValue)
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data or not chronicles.Data.MinEventYear or not chronicles.Data.MaxEventYear then
+    local cache = private.Core.Cache
+    if not cache or not cache.getMinEventYear or not cache.getMaxEventYear then
         return TimelineBusiness.generateDefaultPeriods(stepValue)
     end
 
-    local minYear = chronicles.Data:MinEventYear()
-    local maxYear = chronicles.Data:MaxEventYear()
+    -- Both bounds are nil when no enabled collection holds an event; the
+    -- default periods keep an empty timeline navigable.
+    local minYear = cache.getMinEventYear()
+    local maxYear = cache.getMaxEventYear()
 
     if not minYear or not maxYear or minYear > maxYear then
         return TimelineBusiness.generateDefaultPeriods(stepValue)
@@ -569,7 +561,9 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
     end
 
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
-        firstIndex = numberOfCells - (pageSize - 1)
+        -- Fewer periods than a full page would otherwise yield a negative index,
+        -- which the period and label distribution then reads past the array.
+        firstIndex = math.max(1, numberOfCells - (pageSize - 1))
         currentPage = maxPageValue
     end
 
@@ -704,7 +698,10 @@ end
 ]]
 function TimelineBusiness.computeTimelinePeriods()
     local stepValue = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
-    if (stepValue == nil) then
+
+    -- A step saved before its value was retired from stepValues has no index,
+    -- which would leave the zoom buttons doing arithmetic on nil.
+    if (stepValue == nil or TimelineBusiness.getStepValueIndex(stepValue) == nil) then
         stepValue = private.constants.config.stepValues[1]
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("currentStep"),

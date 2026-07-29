@@ -241,8 +241,16 @@ Chronicles has initialized.
   collection) are skipped with a chat warning.
 - **At least one data type.** A manifest with none of events/characters/factions
   is rejected.
-- **Timeline refresh is automatic.** Both registration paths re-fire the
-  timeline init so your data appears without extra work.
+- **Each payload must be a table.** `events`, `characters` and `factions` are
+  type-checked as they are registered. A non-table value (a string, a function,
+  the result of a failed lookup) is refused with an error in chat naming your
+  collection, rather than being stored and blowing up later inside the timeline
+  scan where the cause is no longer visible.
+- **Timeline refresh is automatic — unless nothing registered.** Both paths
+  re-fire the timeline init so your data appears without extra work, but a
+  manifest whose every payload was rejected registers nothing and does *not*
+  refresh. If your content is absent and the timeline looks untouched, check chat
+  for the rejection message.
 - **Load-on-demand after login.** Chronicles stops auto-scanning the
   `ChroniclesPlugins` table after `PLAYER_LOGIN`. If your addon is loaded on
   demand *after* the player logs in, it must call

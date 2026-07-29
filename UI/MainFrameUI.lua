@@ -121,7 +121,10 @@ function MainFrameUIMixin:EnableStateSubscriptions()
 		if definition.callback then
 			local success, currentValue = pcall(private.Core.StateManager.getState, definition.key)
 			if success then
-				local ok, _ = pcall(definition.callback, currentValue, nil)
+				local ok, err = pcall(definition.callback, currentValue, nil)
+				if not ok then
+					geterrorhandler()(err)
+				end
 			end
 		end
 	end
@@ -155,6 +158,11 @@ function MainFrameUIMixin:OnLoad()
 	-- This ensures that BookContainerTemplate always receives already-transformed content.
 
 	self:SetupStateSubscriptions()
+
+	-- A data refresh (collection or event-type toggled) has to re-derive each book from the current
+	-- selection. This lives here rather than in BookContainerTemplate because this mixin is what owns
+	-- the selection-to-book mapping; the book frame itself cannot know what is selected.
+	private.Core.registerCallback(private.constants.events.UIRefresh, self.RefreshBookContent, self)
 
 	self:SetClampedToScreen(true)
 	if self.DragStrip then
@@ -249,7 +257,7 @@ function MainFrameUIMixin:OnShow()
 	self:EnableStateSubscriptions()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened", {skipIfUnchanged = true})
+		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
 	end
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_OPEN_WINDOW)
 end
@@ -269,7 +277,7 @@ function MainFrameUIMixin:OnHide()
 	PlaySound(SOUNDKIT.UI_CLASS_TALENT_CLOSE_WINDOW) -- Update state instead of triggering event - provides single source of truth
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
-		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed", {skipIfUnchanged = true})
+		private.Core.StateManager.setState(frameStateKey, false, "Main frame closed")
 	end
 end
 
@@ -298,7 +306,7 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 		end
 	end
 
-	eventBook:ShowEmptyBook()
+	eventBook:ShowEmptyBook(Locale["BookEmptyPromptEvent"])
 end
 
 function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
@@ -310,7 +318,7 @@ function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
 	if characterSelection and characterSelection.characterId and characterSelection.collectionName then
 		-- Check if Chronicles.Data is available
 		if not Chronicles.Data then
-			characterBook:ShowEmptyBook()
+			characterBook:ShowEmptyBook(Locale["BookEmptyPromptCharacter"])
 			return
 		end
 
@@ -327,7 +335,7 @@ function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
 		end
 	end
 
-	characterBook:ShowEmptyBook()
+	characterBook:ShowEmptyBook(Locale["BookEmptyPromptCharacter"])
 end
 
 function MainFrameUIMixin:UpdateFactionBookContent(factionSelection)
@@ -350,7 +358,27 @@ function MainFrameUIMixin:UpdateFactionBookContent(factionSelection)
 		end
 	end
 
-	factionBook:ShowEmptyBook()
+	factionBook:ShowEmptyBook(Locale["BookEmptyPromptFaction"])
+end
+
+--[[
+    Re-render every book from the current selection state.
+
+    Called on UIRefresh. Where a selection is still valid the reader keeps their page, because
+    ContentUtils returns the cached content table for an unchanged entity and OnContentReceived
+    retains the scroll position when the table is identical.
+]]
+function MainFrameUIMixin:RefreshBookContent()
+	if not private.Core.StateManager then
+		return
+	end
+
+	local getState = private.Core.StateManager.getState
+	local buildSelectionKey = private.Core.StateManager.buildSelectionKey
+
+	self:UpdateEventBookContent(getState(buildSelectionKey("event")))
+	self:UpdateCharacterBookContent(getState(buildSelectionKey("character")))
+	self:UpdateFactionBookContent(getState(buildSelectionKey("faction")))
 end
 
 -- -------------------------
@@ -408,28 +436,15 @@ function TabUIMixin:MoveTabSystemToDragStrip()
 end
 
 function TabUIMixin:UpdateTabs()
-	local isEventsTabAvailable = self:IsTabAvailable(self.EventsTabID)
-	local isSettingsTabAvailable = self:IsTabAvailable(self.SettingsTabID)
-
-	self.TabSystem:SetTabShown(self.EventsTabID, isEventsTabAvailable)
-	self.TabSystem:SetTabShown(self.SettingsTabID, isSettingsTabAvailable)
-
-	local currentTab = self:GetTab()
-	if not currentTab or not self:IsTabAvailable(currentTab) then
+	if not self:GetTab() then
 		self:SetTab(self.EventsTabID)
 	end
 end
 
 function TabUIMixin:SetTab(tabID)
 	TabSystemOwnerMixin.SetTab(self, tabID)
-	-- Use safe event triggering with fallback
-	private.Core.triggerEvent(private.constants.events.TabUITabSet, {frame = self, tabID = tabID}, "MainFrameUI:SetTab")
 
 	return true -- Don't show the tab as selected yet.
-end
-
-function TabUIMixin:IsTabAvailable(tabID)
-	return true
 end
 
 -- =============================================================================================

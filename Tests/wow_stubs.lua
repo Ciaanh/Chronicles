@@ -3,8 +3,8 @@
     load time or in the code paths under test. Only what the tested modules
     actually reference is stubbed — this is intentionally not a full WoW API.
 
-    dofile this before loading any addon module that needs the client API
-    (e.g. StringUtils creates a measurement frame at load time).
+    dofile this before loading any addon module that needs the client API,
+    whether at load time or inside a code path under test.
 ]]
 
 local function makeFontString()

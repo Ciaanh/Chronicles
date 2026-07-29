@@ -17,7 +17,7 @@ local FOLDER_NAME = "Chronicles"
 
 --[[
     Load an addon module by its repo-relative path (forward slashes).
-    @param relpath [string] e.g. "Core/Utils/MathUtils.lua"
+    @param relpath [string] e.g. "Core/Utils/TableUtils.lua"
     @param private [table] the shared addon `private` table (mutated in place)
     @return the module's return value (if any), and the private table
 ]]

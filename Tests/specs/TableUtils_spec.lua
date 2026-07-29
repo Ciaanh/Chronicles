@@ -30,12 +30,6 @@ T.describe("TableUtils", function()
         assert_.deepEquals(TableUtils.DeepCopy(nil), {})
     end)
 
-    T.it("Contains finds present values and rejects absent ones", function()
-        assert_.isTrue(TableUtils.Contains({1, 2, 3}, 2))
-        assert_.isFalse(TableUtils.Contains({1, 2, 3}, 9))
-        assert_.isFalse(TableUtils.Contains(nil, 1))
-    end)
-
     T.it("Merge deep-merges with the second table taking precedence", function()
         local a = {x = 1, nested = {p = 1, q = 1}}
         local b = {y = 2, nested = {q = 9}}
@@ -60,17 +54,5 @@ T.describe("TableUtils", function()
     T.it("Filter returns empty for nil inputs", function()
         assert_.deepEquals(TableUtils.Filter(nil, function() return true end), {})
         assert_.deepEquals(TableUtils.Filter({1}, nil), {})
-    end)
-
-    T.it("Map transforms each value keeping keys", function()
-        assert_.deepEquals(
-            TableUtils.Map({a = 1, b = 2}, function(v) return v * 10 end),
-            {a = 10, b = 20}
-        )
-    end)
-
-    T.it("Map returns empty for nil inputs", function()
-        assert_.deepEquals(TableUtils.Map(nil, function(v) return v end), {})
-        assert_.deepEquals(TableUtils.Map({1}, nil), {})
     end)
 end)

@@ -45,6 +45,16 @@ function DataRegistry.registerEventDB(collectionName, db)
         return false
     end
 
+    -- The payload is walked with pairs() by the timeline scans, so a non-table
+    -- would only fail much later, inside the asynchronous cache warm.
+    if type(db) ~= "table" then
+        print(
+            "|cffff0000Error:|r Chronicles rejected events for collection '" ..
+            collectionName .. "': expected a table, got " .. type(db)
+        )
+        return false
+    end
+
     local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
     local isActive = private.Core.StateManager.getState(collectionKey)
 
@@ -60,15 +70,11 @@ function DataRegistry.registerEventDB(collectionName, db)
     end
 
     chronicles.Data.Events[collectionName] = {
-        data = db or {},
+        data = db,
         name = collectionName
     }
 
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MIN_EVENT_YEAR)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.MAX_EVENT_YEAR)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.COLLECTIONS_NAMES)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
+    private.Core.Cache.invalidateForDataChange("events")
 
     return true
 end
@@ -93,6 +99,14 @@ function DataRegistry.registerFactionDB(collectionName, db)
         return false
     end
 
+    if type(db) ~= "table" then
+        print(
+            "|cffff0000Error:|r Chronicles rejected factions for collection '" ..
+            collectionName .. "': expected a table, got " .. type(db)
+        )
+        return false
+    end
+
     local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
     local isActive = private.Core.StateManager.getState(collectionKey)
     -- If the collection status is already set (either from saved state or previous registration), don't overwrite it
@@ -109,6 +123,8 @@ function DataRegistry.registerFactionDB(collectionName, db)
         data = db,
         name = collectionName
     }
+
+    private.Core.Cache.invalidateForDataChange("factions")
 
     return true
 end
@@ -132,6 +148,14 @@ function DataRegistry.registerCharacterDB(collectionName, db)
         return false
     end
 
+    if type(db) ~= "table" then
+        print(
+            "|cffff0000Error:|r Chronicles rejected characters for collection '" ..
+            collectionName .. "': expected a table, got " .. type(db)
+        )
+        return false
+    end
+
     local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
     local isActive = private.Core.StateManager.getState(collectionKey)
 
@@ -150,6 +174,8 @@ function DataRegistry.registerCharacterDB(collectionName, db)
         data = db,
         name = collectionName
     }
+
+    private.Core.Cache.invalidateForDataChange("characters")
 
     return true
 end

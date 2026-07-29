@@ -92,7 +92,7 @@
 
         <Layers>
             <Layer level="BACKGROUND" textureSubLevel="-8">
-                <Texture name="$parentBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
+                <Texture file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
                     <Anchors>
                         <Anchor point="TOPLEFT" x="2" y="-21"/>
                         <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>

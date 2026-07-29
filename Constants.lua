@@ -6,9 +6,8 @@ private.Core = {}
 local constants = {}
 private.constants = constants
 
-constants.defaultIcon = "Interface\\ICONS\\SPELL_HOLY_BORROWEDTIME"
-
-constants.viewWidth = 425
+-- Minimap button / DataBroker launcher icon.
+constants.minimapIcon = "Interface\\ICONS\\Inv_scroll_04"
 
 constants.eventType = {
 	[0] = "undefined",
@@ -21,6 +20,8 @@ constants.eventType = {
 	[7] = "other"
 }
 
+-- Encoding of the `timeline` field carried by every event record. No Lua reads it today; it is the
+-- documented contract for the value external data addons write, per PLUGINS.md.
 constants.timelines = {
 	[0] = "undefined",
 	[1] = "main",
@@ -49,20 +50,16 @@ constants.config = {
 	stepValues = {1000, 500, 100, 10}
 }
 
-constants.configurationName = {}
-
 constants.events = {
 	-- Application lifecycle events
 	AddonStartup = "Addon.STARTUP",
-	AddonShutdown = "Addon.SHUTDOWN",
 	TimelineInit = "Timeline.INIT",
-	UIRefresh = "Timeline.CLEAN",
+	UIRefresh = "UI.REFRESH",
 	TimelinePreviousButtonVisible = "Timeline.PREVIOUS_VISIBLE",
 	TimelineNextButtonVisible = "Timeline.NEXT_VISIBLE",
 	DisplayTimelineLabel = "Timeline.DisplayLabel",
 	DisplayTimelinePeriod = "Timeline.DisplayPeriod",
 	DisplayEventsForYear = "Timeline.DisplayEventsForYear",
-	TabUITabSet = "TabUI.TabSet",
 	SettingsEventTypeChecked = "Settings.EVENT_TYPE_CHECKED",
 	SettingsCollectionChecked = "Settings.COLLECTION_CHECKED"
 }
@@ -74,24 +71,11 @@ constants.templateKeys = {
 	GENERIC_LIST_ITEM = "GENERIC_LIST_ITEM" -- For the shared vertical list template
 }
 
--- Book-specific template keys used in the BookContainerTemplate system
+-- Book content template keys. A key here must have a template registered against it in
+-- UI/PageTemplatesRegistration.lua and a producer that sets it on an element, or it renders nothing
+-- while looking wired up. The book renders one HTML document per page, so there is one key.
 constants.bookTemplateKeys = {
-	-- Title templates for different content types
-	EVENT_TITLE = "EVENT_TITLE", -- Complex title with date ranges
-	SIMPLE_TITLE = "SIMPLE_TITLE", -- Simple title for characters and factions
-	-- Cover page template
-	COVER_PAGE = "COVER_PAGE", -- Cover page with name only
-	COVER_IMAGE = "COVER_IMAGE", -- Cover page image element
-	-- Unified content keys - primary templates
-	UNIFIED_CONTENT = "UNIFIED_CONTENT", -- Unified HTML content template
-	COVER_WITH_CONTENT = "COVER_WITH_CONTENT", -- Cover page with integrated content
-	PAGE_BREAK = "PAGE_BREAK", -- For pagination
-	-- Content structure templates (needed for old format compatibility)
-	EMPTY = "EMPTY",
-	AUTHOR = "AUTHOR",
-	CHAPTER_HEADER = "CHAPTER_HEADER", -- For chapter headers
-	TEXT_CONTENT = "TEXT_CONTENT", -- For regular text lines
-	HTML_CONTENT = "HTML_CONTENT" -- For HTML formatted content
+	HTML_CONTENT = "HTML_CONTENT"
 }
 
 constants.colors = {

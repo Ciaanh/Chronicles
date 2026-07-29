@@ -377,29 +377,23 @@ function TimelineMixin:PerformDateSearch()
     if not searchText or searchText == "" then
         return
     end
-    -- Parse the year from input
+    -- Rejections are reported to chat, the same channel the data layer uses for user-facing errors.
+    -- Silently returning leaves the box looking broken: the text stays, nothing moves.
+    local function reportRejection(message)
+        print(private.constants.colors.red .. message .. "|r")
+    end
+
     local year = tonumber(searchText)
     if not year then
-        -- Show error message for invalid input
-        local errorMsg =
-            Locale["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] or
-            "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
-        -- print(errorMsg)
+        reportRejection(Locale["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"])
         return
     end
 
-    -- Validate year range
     local minYear = private.constants.config.historyStartYear
     local maxYear = private.constants.config.futur
 
     if year < minYear or year > maxYear then
-        local errorMsg =
-            string.format(
-            Locale["Year must be between %d and %d"] or "Year must be between %d and %d",
-            minYear,
-            maxYear
-        )
-        -- print(errorMsg)
+        reportRejection(string.format(Locale["Year must be between %d and %d"], minYear, maxYear))
         return
     end
 
@@ -440,25 +434,30 @@ function TimelineMixin:DisplayEventsForYear(year)
         filteredEvents = private.Core.Events.FilterEvents(eventsProvider)
     end
 
+    -- A valid year that simply holds nothing would otherwise look identical to a failed search.
+    if #filteredEvents > 0 then
+        print(string.format(Locale["Found %d events for year %d"], #filteredEvents, year))
+    else
+        print(string.format(Locale["No events found for year %d"], year))
+    end
+
     local stateManager = private.Core.StateManager
     if stateManager then
         stateManager.setState(
             stateManager.buildTimelineKey("yearSpecificMode"),
             true,
-            "Year-specific search activated",
-            {skipIfUnchanged = true}
+            "Year-specific search activated"
         )
         stateManager.setState(
             stateManager.buildTimelineKey("yearSpecificTarget"),
             year,
             "Year-specific search target"
         )
-        stateManager.setState(
-            stateManager.buildTimelineKey("yearSpecificEvents"),
-            filteredEvents,
-            "Year-specific events cached"
-        )
     end
+
+    -- The event payload below carries the events themselves. They are deliberately not written to
+    -- state: timeline.* persists to SavedVariables, so storing whole event records (labels, HTML
+    -- chapters) would write the content of every year searched to disk for nobody to read back.
 
     triggerEvent(
         private.constants.events.DisplayEventsForYear,
@@ -499,8 +498,8 @@ function TimelineMixin:TimelinePrevious()
     private.Core.Timeline.ChangePage(-1)
 end
 
-function TimelineMixin:OnTimelinePreviousButtonVisible(isVisible)
-    if isVisible then
+function TimelineMixin:OnTimelinePreviousButtonVisible(eventData)
+    if eventData and eventData.visible then
         self.Previous:Enable()
     else
         self.Previous:Disable()
@@ -511,8 +510,8 @@ function TimelineMixin:TimelineNext()
     private.Core.Timeline.ChangePage(1)
 end
 
-function TimelineMixin:OnTimelineNextButtonVisible(isVisible)
-    if isVisible then
+function TimelineMixin:OnTimelineNextButtonVisible(eventData)
+    if eventData and eventData.visible then
         self.Next:Enable()
     else
         self.Next:Disable()
@@ -685,8 +684,7 @@ function TimelinePeriodMixin:OnClick()
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("yearSpecificMode"),
             false,
-            "Year-specific mode cleared due to period selection",
-            {skipIfUnchanged = true}
+            "Year-specific mode cleared due to period selection"
         )
     end
 
@@ -712,8 +710,7 @@ function TimelinePeriodMixin:OnClick()
         private.Core.StateManager.setState(
             selectedPeriodKey,
             periodData,
-            "Timeline period selected",
-            {skipIfUnchanged = true}
+            "Timeline period selected"
         )
     end
 

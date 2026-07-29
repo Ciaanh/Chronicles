@@ -103,6 +103,7 @@ local function processWarmQueue()
     local ok, err = pcall(task)
     if not ok then
         Cache._lastWarmError = err
+        geterrorhandler()(err)
     end
 
     if #warmQueue > 0 then
@@ -227,6 +228,57 @@ function private.Core.Cache.invalidate(cacheType)
     end
 end
 
+-- The complete set of derived caches that each kind of data change makes stale.
+-- COLLECTIONS_NAMES and BOOK_CONTENT are listed under all three kinds because
+-- registering any collection adds a name, and any record can appear in a book.
+local DATA_CHANGE_KEYS = {
+    events = {
+        CACHE_KEYS.PERIODS_FILLING,
+        CACHE_KEYS.MIN_EVENT_YEAR,
+        CACHE_KEYS.MAX_EVENT_YEAR,
+        CACHE_KEYS.FILTERED_EVENTS,
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    },
+    characters = {
+        CACHE_KEYS.ALL_CHARACTERS,
+        CACHE_KEYS.FILTERED_CHARACTERS,
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    },
+    factions = {
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    }
+}
+
+--[[
+    Invalidate every cache derived from one kind of data change.
+
+    This is the only supported way to invalidate after a mutation or a toggle:
+    the character caches embed the active collection set at build time, so a
+    call site that hand-picks keys leaves rails rendering disabled collections.
+
+    @param kind [string] "events", "characters", "factions", or "all" for a
+                         change that crosses all three (collection enable
+                         /disable)
+]]
+function private.Core.Cache.invalidateForDataChange(kind)
+    if kind == "all" then
+        private.Core.Cache.invalidate()
+        return
+    end
+
+    local keys = DATA_CHANGE_KEYS[kind]
+    if not keys then
+        error("Cache.invalidateForDataChange: unknown data change kind: " .. tostring(kind))
+    end
+
+    for _, cacheType in ipairs(keys) do
+        private.Core.Cache.invalidate(cacheType)
+    end
+end
+
 function private.Core.Cache.isValid(cacheType, cacheKey)
     if cacheType == CACHE_KEYS.FILTERED_EVENTS then
         return not Cache._dirty[CACHE_KEYS.FILTERED_EVENTS] and Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey] ~= nil
@@ -298,7 +350,7 @@ end
 
 function private.Core.Cache.getPeriodsFillingBySteps()
     local cached = private.Core.Cache.get(CACHE_KEYS.PERIODS_FILLING)
-    if cached then
+    if cached ~= nil then
         return cached
     end
     local result = Chronicles.Data:GetPeriodsFillingBySteps()
@@ -308,9 +360,14 @@ end
 
 function private.Core.Cache.getMinEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MIN_EVENT_YEAR)
-    if cached then
+    if cached ~= nil then
         return cached
     end
+
+    if not Chronicles or not Chronicles.Data or not Chronicles.Data.MinEventYear then
+        return nil
+    end
+
     local result = Chronicles.Data:MinEventYear()
     private.Core.Cache.set(CACHE_KEYS.MIN_EVENT_YEAR, result)
     return result
@@ -318,9 +375,14 @@ end
 
 function private.Core.Cache.getMaxEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MAX_EVENT_YEAR)
-    if cached then
+    if cached ~= nil then
         return cached
     end
+
+    if not Chronicles or not Chronicles.Data or not Chronicles.Data.MaxEventYear then
+        return nil
+    end
+
     local result = Chronicles.Data:MaxEventYear()
     private.Core.Cache.set(CACHE_KEYS.MAX_EVENT_YEAR, result)
     return result
@@ -328,7 +390,7 @@ end
 
 function private.Core.Cache.getCollectionsNames()
     local cached = private.Core.Cache.get(CACHE_KEYS.COLLECTIONS_NAMES)
-    if cached then
+    if cached ~= nil then
         return cached
     end
     local result = Chronicles.Data:GetCollectionsNames()
@@ -342,7 +404,7 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
     end
     local cacheKey = yearStart .. "_" .. yearEnd
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_EVENTS, cacheKey)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -353,7 +415,7 @@ end
 
 function private.Core.Cache.getAllCharacters()
     local cached = private.Core.Cache.get(CACHE_KEYS.ALL_CHARACTERS)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -373,7 +435,7 @@ function private.Core.Cache.getSearchCharacters(searchTerm)
 
     local cacheKey = string.lower(searchTerm)
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_CHARACTERS, cacheKey)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -498,4 +560,8 @@ end
 -- Export Cache Interface
 -- -------------------------
 
+-- This publishes the *whole* module on the public facade, so every function above is reachable by
+-- external addons even when nothing in Chronicles calls it. `cleanup`, `rebuildAll` and
+-- `getSearchCharacters` currently have no internal callers for exactly that reason -- they are API,
+-- not dead code. Removing one is a breaking change; check consumers before pruning here.
 Chronicles.Cache = private.Core.Cache

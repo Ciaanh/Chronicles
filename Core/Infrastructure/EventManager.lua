@@ -5,24 +5,32 @@ private.Core.EventManager = {}
 --[[
 Chronicles Event Management System
 
-CURRENT EVENT USAGE:
-✅ ACTIVELY TRIGGERED EVENTS (All with validation schemas):
-- AddonStartup, AddonShutdown: Application lifecycle
-- TimelineInit: Timeline initialization
-- UIRefresh: UI component refresh requests
-- TabUITabSet: Tab selection in main UI
-- SettingsEventTypeChecked, SettingsCollectionChecked: Settings changes
-- TimelinePreviousButtonVisible, TimelineNextButtonVisible: Navigation buttons
-- DisplayTimelineLabel, DisplayTimelinePeriod: Dynamic timeline display (with suffix validation)
+CONSUMER CONTRACT
+    private.Core.registerCallback(eventName, callback, owner) hands the callback to
+    EventRegistry, which invokes it as callback(owner, payload): the owner first,
+    then the single payload table that triggerEvent was given. A handler declared
+    with `:` therefore receives the whole payload table as its first parameter, and
+    must read the field it needs off that table -- the table itself is always truthy:
 
-❌ LEGACY EVENTS (State-based now):
-- EventSelected, CharacterSelected, FactionSelected: Now handled via StateManager
-- TimelinePeriodSelected: Now handled via StateManager
+        function TimelineMixin:OnTimelineNextButtonVisible(payload)
+            -- payload is {visible = <boolean>}; `if payload then` is always true
+            if payload.visible then
+                self.Next:Enable()
+            else
+                self.Next:Disable()
+            end
+        end
 
-MIGRATION NOTES:
-- Selection events (Event/Character/Faction) moved to StateManager.setState()
-- UI components subscribe to state changes instead of listening for events
-- This provides single source of truth and better state synchronization
+    Payloads are never unpacked into separate arguments. The schemas below constrain
+    producers only; nothing validates a consumer's signature, so a handler that
+    expects a bare value fails silently.
+
+    The schema table below is the event inventory -- do not restate it here.
+
+SELECTION STATE
+    Event / character / faction selection and timeline period selection are not
+    events; they live in StateManager. Prefer a state subscription over a new event
+    for anything that is really "a value changed".
 --]]
 -- -------------------------
 -- Global Utility Functions
@@ -68,13 +76,6 @@ local eventSchemas = {
             return true, nil
         end
     },
-    [private.constants.events.AddonShutdown] = {
-        description = "Fired when the addon is shutting down",
-        optional = {"profile"},
-        validate = function(data)
-            return true, nil
-        end
-    },
     [private.constants.events.TimelineInit] = {
         description = "Fired when the timeline is initialized",
         optional = {"data"},
@@ -86,22 +87,6 @@ local eventSchemas = {
         description = "Fired when UI components need to refresh their data",
         optional = {"source", "data"},
         validate = function(data)
-            return true, nil
-        end
-    },
-    [private.constants.events.TabUITabSet] = {
-        description = "Fired when a tab is selected in the main UI",
-        required = {"frame", "tabID"},
-        validate = function(data)
-            if not data then
-                return false, "Tab data is nil"
-            end
-            if not data.frame then
-                return false, "Tab frame is required"
-            end
-            if type(data.tabID) ~= "number" then
-                return false, "Tab ID must be a number"
-            end
             return true, nil
         end
     },
@@ -219,17 +204,31 @@ end
 -- Event Validator
 -- -------------------------
 
+--[[
+    Escape Lua pattern metacharacters so a literal string can be embedded in a pattern
+
+    @param text [string] Literal text
+    @return [string] Text safe to concatenate into a Lua pattern
+]]
+local function escapePattern(text)
+    return (string.gsub(text, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1"))
+end
+
+-- Dynamic display events carry an index suffix ("Timeline.DisplayLabel1"). The event
+-- name constants are literals containing pattern metacharacters (a dot at minimum),
+-- so they must be escaped or the match silently degrades to "any character".
+local dynamicLabelPattern = "^" .. escapePattern(private.constants.events.DisplayTimelineLabel) .. "%d+$"
+local dynamicPeriodPattern = "^" .. escapePattern(private.constants.events.DisplayTimelinePeriod) .. "%d+$"
+
 private.Core.EventManager.Validator = {
     validate = function(self, eventName, data)
         local schema = eventSchemas[eventName]
 
         -- If no direct match, check for dynamic events with suffixes
         if not schema then
-            -- Check for DisplayTimelineLabel events (e.g., "Timeline.DisplayLabel1")
-            if string.find(eventName, "^" .. private.constants.events.DisplayTimelineLabel .. "%d+$") then
-                -- Check for DisplayTimelinePeriod events (e.g., "Timeline.DisplayPeriod1")
+            if string.find(eventName, dynamicLabelPattern) then
                 schema = eventSchemas[private.constants.events.DisplayTimelineLabel]
-            elseif string.find(eventName, "^" .. private.constants.events.DisplayTimelinePeriod .. "%d+$") then
+            elseif string.find(eventName, dynamicPeriodPattern) then
                 schema = eventSchemas[private.constants.events.DisplayTimelinePeriod]
             end
         end
@@ -279,11 +278,41 @@ private.Core.EventManager.Validator = {
 -- Safe Event Triggering
 -- -------------------------
 
-private.Core.EventManager.safeTrigger = function(eventName, data, source)
-    source = source or debug.getinfo(2, "S").source
+--[[
+    Describe the caller of safeTrigger for a diagnostic message
 
-    local isValid, error = private.Core.EventManager.Validator:validate(eventName, data)
+    Only reached on the failure path: safeTrigger runs 17+ times per timeline
+    redraw, and walking the stack on every trigger is not free.
+
+    @param source [string] Explicit source passed by the producer, if any
+    @return [string] Caller description
+]]
+local function describeTriggerSource(source)
+    if source then
+        return tostring(source)
+    end
+
+    local info = debug and debug.getinfo and debug.getinfo(3, "Sl")
+    if info then
+        return tostring(info.short_src or info.source) .. ":" .. tostring(info.currentline)
+    end
+
+    return "unknown"
+end
+
+private.Core.EventManager.safeTrigger = function(eventName, data, source)
+    local isValid, validationError = private.Core.EventManager.Validator:validate(eventName, data)
     if not isValid then
+        -- A schema rejection means a producer is malformed. Surface it the same way
+        -- callback errors are surfaced, so it cannot become an invisible no-op.
+        geterrorhandler()(
+            string.format(
+                "Chronicles: event '%s' triggered from %s with an invalid payload: %s",
+                tostring(eventName),
+                describeTriggerSource(source),
+                tostring(validationError)
+            )
+        )
         return false
     end
 
@@ -324,37 +353,3 @@ end
 private.Core.EventManager.safeUnregisterCallback = function(eventName, owner)
     EventRegistry:UnregisterCallback(eventName, owner)
 end
-
--- -------------------------
--- Plugin Event System
--- -------------------------
-
-private.Core.EventManager.PluginEvents = {
-    registeredEvents = {},
-    registerPluginEvent = function(self, pluginName, eventName, schema)
-        local fullEventName = "Plugin." .. pluginName .. "." .. eventName
-        if self.registeredEvents[fullEventName] then
-            return false
-        end
-
-        self.registeredEvents[fullEventName] = {
-            pluginName = pluginName,
-            eventName = eventName,
-            schema = schema
-        }
-
-        if schema then
-            private.Core.EventManager.Validator:addSchema(fullEventName, schema)
-        end
-
-        return true
-    end,
-    triggerPluginEvent = function(self, pluginName, eventName, data, source)
-        local fullEventName = "Plugin." .. pluginName .. "." .. eventName
-        if not self.registeredEvents[fullEventName] then
-            return false
-        end
-
-        return private.Core.EventManager.safeTrigger(fullEventName, data, source)
-    end
-}

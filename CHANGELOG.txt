@@ -1,6 +1,86 @@
 # Chronicles Addon Changelog
 
-## v2.1.0 (unreleased)
+## v2.2.0 (unreleased)
+### Breaking Changes
+- Removed the roleplay integration. Chronicles no longer reads your character's age and name from
+  totalRP3 or MyRolePlay to add a birth event, and the empty "Roleplay" collection it created no
+  longer appears in Settings. `Chronicles.Data:AddRPEvent`, `Chronicles.Data:LoadRolePlayProfile`
+  and the whole `Chronicles.Data.RP` table went with it.
+- Trimmed the unused half of the `Chronicles.Data` facade: SearchEventsInDB, IsInRange,
+  CleanEventObject, FindFactions, CleanFactionObject, FindCharacters, CleanCharacterObject,
+  HasEvents, HasEventsInDB, RefreshPeriods and AvailableDbId. Nothing inside Chronicles called any
+  of them; a plugin that did will now find a nil field.
+- Removed `private.Core.EventManager.PluginEvents`. It declared a plugin-facing event catalogue that
+  nothing ever triggered and nothing ever listened to.
+- Plugin data is now type-checked. Each of `events`, `characters` and `factions` in a manifest must
+  be a table; a bad payload is refused with an error in chat naming the collection, instead of
+  failing later and less legibly inside the timeline scan. A manifest whose every payload is
+  rejected registers nothing and does not refresh the timeline.
+
+### Timeline
+- The previous/next page arrows enable and disable correctly. They were reading the wrong shape of
+  event payload, so both stayed disabled on every page.
+- Period event counts no longer double-count. An event spanning several buckets was counted once per
+  bucket, so a war lasting three centuries inflated the count shown at the 100-year zoom.
+- The timeline no longer stretches back to year 0 for data that does not reach it. The earliest and
+  latest years now come from the events themselves rather than being seeded at 0.
+- The last page of periods no longer reads past the end of the list when there are fewer periods
+  than fit on one page.
+- A zoom level saved by an older version that no longer offers it falls back to the widest step
+  instead of leaving the zoom buttons unusable.
+- Dropped the 250- and 50-year period buckets. No zoom level has used them since v2.0.0, so they
+  were being built and held on every timeline rebuild for nothing.
+
+### Book
+- The table of contents is clickable again. Chapter links went nowhere because the chapter-to-page
+  mapping they need was dropped between the HTML builder and the book frame.
+- Toggling a collection or an event type no longer blanks an open book. Each book is re-derived from
+  what you had selected, and you keep your page wherever that selection still exists.
+- An empty book now tells you what to do — "Select an event from the timeline or the list to read
+  its chronicle." — instead of showing placeholder test content.
+- Book error messages are localized rather than hardcoded English.
+- Cross-entity links (`chronicles:event:<id>` and its character/faction siblings) are no longer
+  handled. Nothing ever generated them, and the handlers wrote a bare id where every consumer
+  expects a collection-qualified selection, so such a link would have selected nothing anyway.
+
+### Lists
+- The character and faction rails have their own search placeholder text and show how many entries
+  they hold.
+
+### Settings
+- Enabling or disabling a collection or an event type refreshes everything derived from it. The
+  character rail in particular kept listing entries from a collection you had just switched off.
+
+### Code Quality & Architecture
+- Cache invalidation goes through one function, `Cache.invalidateForDataChange(kind)`, which owns
+  the full set of caches each kind of data change makes stale. Call sites used to hand-pick keys,
+  and each picked a different, incomplete set.
+- A failure inside the asynchronous cache warm-up is reported to the error handler instead of being
+  filed in a field nobody reads.
+- Startup state restoration is one path instead of two. Two handlers restored the same five keys by
+  different means; the survivor uses StateManager.rehydrate.
+- An error raised by a state subscriber during the initial replay now surfaces instead of being
+  swallowed.
+- Deleted the Business layer (FilterEngine, DateCalculator), Core/Domain/Settings.lua,
+  Core/Utils/MathUtils.lua, and unused functions across StringUtils, TableUtils, UIUtils,
+  ValidationUtils, SearchEngine and VerticalListTemplate — about 2,100 lines net.
+- Eleven of the twelve book template keys had no template and no producer. The book renders one HTML
+  document per page, so one key remains.
+- ScrollFrameMixin.lua and PageTemplatesRegistration.lua were registered with `<Include>` instead of
+  `<Script>`. Both are Lua files.
+- Dropped the unread `constants.viewWidth` and `constants.configurationName`.
+- Renamed the `ui.activeTab` state key to `ui.settingsCategory`, which is what it always held -- the
+  Settings panel's own category, never the main tab strip, which is not persisted at all. The
+  Settings panel opens on its first category once after upgrading, and the retired key is dropped
+  from your saved variables rather than being reloaded every login.
+- Renamed the `UIRefresh` event's string from `Timeline.CLEAN` to `UI.REFRESH`. It was never
+  timeline-scoped: Settings raises it and the event list, the book and the character/faction rails
+  answer it.
+- Deleted the `AddonShutdown` and `TabUITabSet` events. Each had a constant and a validation schema,
+  neither had a listener, and only one of them had a producer.
+- Test suite extended to ValidationUtils and pruned where the functions under test were deleted.
+
+## v2.1.0 (July 29, 2026)
 ### Breaking Changes
 - Plugin registration moved to a per-plugin manifest table. External data addons now declare
   `ChroniclesPlugins["Name"] = {events = ..., characters = ..., factions = ...}` (any subset), which
@@ -9,8 +89,11 @@
 - Removed the `ChroniclesPluginData.Register()` hook. It was a single shared global with one Register
   function, so a plugin and Chronicles' own data layer overwrote each other — only one could ever be
   registered. Addons still using it load no data and report no error. Chronicles-Sample v1.0.1 is
-  affected; its main branch already uses the manifest form. Exports from Chronicles-tauri still emit
-  the old hook and need regenerating once that tool is updated.
+  affected; its main branch already uses the manifest form.
+  [Corrected 2026-07-29: this entry originally said exports from Chronicles-tauri still emitted the
+  old hook and needed regenerating. That was wrong at the time of writing -- dbService.ts on
+  feat/edition already emitted `ChroniclesPlugins["Name"] = {...}` manifests. No regeneration is
+  needed for this reason.]
 
 ### Book
 - Replaced the paged book layer with HTML content rendering (BookContainerTemplate). SharedBookTemplate,

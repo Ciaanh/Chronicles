@@ -12,7 +12,7 @@ local defaults = {
             selectedCharacter = nil,
             selectedFaction = nil,
             selectedPeriod = nil,
-            activeTab = nil,
+            settingsCategory = nil,
             isMainFrameOpen = false,
             windowPosition = nil
         },
@@ -51,8 +51,30 @@ local function buildLifecyclePayload(source)
     }
 end
 
+-- Keys this addon persisted in an earlier version and no longer reads. AceDB keeps whatever is in
+-- the file and StateManager.init() copies every timelineState/uiState key straight into memory, so a
+-- retired key is reloaded on every login unless it is dropped explicitly. `yearSpecificEvents` held
+-- whole event records -- labels and HTML chapters for every year the user had ever searched -- so
+-- upgrading without this would carry that payload in SavedVariables permanently.
+local retiredState = {
+    timelineState = {"yearSpecificEvents"},
+    uiState = {"activeTab"}
+}
+
+local function dropRetiredState(global)
+    for section, keys in pairs(retiredState) do
+        local stored = global[section]
+        if stored then
+            for _, key in ipairs(keys) do
+                stored[key] = nil
+            end
+        end
+    end
+end
+
 local function initializeSavedVariables(addonInstance)
     local db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+    dropRetiredState(db.global)
     private.Chronicles.db = db
     addonInstance.db = db
     return db.global.options.minimap
@@ -64,7 +86,7 @@ local function createLauncher(locale, toggleCallback, tooltipCallback)
         {
             type = "launcher",
             text = locale["Chronicles"],
-            icon = "Interface\\ICONS\\Inv_scroll_04",
+            icon = private.constants.minimapIcon,
             OnClick = function()
                 toggleCallback()
             end,
@@ -73,6 +95,18 @@ local function createLauncher(locale, toggleCallback, tooltipCallback)
             end
         }
     )
+end
+
+local function runReadyCallback(callback, context)
+    local success, err = pcall(callback)
+    if success then
+        return
+    end
+
+    local handler = geterrorhandler()
+    if handler then
+        handler(string.format("Chronicles:ExecuteWhenReady callback failed [%s]: %s", context or "unknown", err))
+    end
 end
 
 local function registerSlashCommand(addonInstance)
@@ -96,11 +130,8 @@ Chronicles.locale = Locale
 
 Chronicles.lifecycle = {
     pendingReadyCallbacks = {},
-    isBootstrapComplete = false,
-    isStartupComplete = false
+    isBootstrapComplete = false
 }
-
-private.constants = private.constants
 
 function Chronicles:OnInitialize()
     local minimapConfig = initializeSavedVariables(self)
@@ -127,80 +158,29 @@ end
 
 --[[
     Restore saved state at startup after core systems finish loading
+
+    This is the single startup restore path. Subscribers register during UI load, so
+    the values StateManager.init() read back from SavedVariables have to be re-emitted
+    for anything to react to them. rehydrate re-notifies without mutating or
+    re-persisting the value, and is a no-op for keys with no saved value.
 ]]
 function Chronicles:RestoreStartupState()
     local stateManager = private.Core.StateManager
-
-    if stateManager then
-        private.Core.triggerEvent(
-            private.constants.events.TimelineInit,
-            {source = "Chronicles:RestoreStartupState"},
-            "Chronicles:OnInitialize"
-        )
-
-        local selectedPeriodKey = stateManager.buildUIStateKey("selectedPeriod")
-        local existingPeriod = stateManager.getState(selectedPeriodKey)
-        if existingPeriod then
-            stateManager.setState(
-                selectedPeriodKey,
-                existingPeriod,
-                "Startup state restoration",
-                {forceNotify = true, skipIfUnchanged = true}
-            )
-        end
-
-        local eventSelectionKey = stateManager.buildSelectionKey("event")
-        local existingEventSelection = stateManager.getState(eventSelectionKey)
-        if existingEventSelection and type(existingEventSelection) == "table" then
-            stateManager.setState(
-                eventSelectionKey,
-                existingEventSelection,
-                "Startup state restoration",
-                {forceNotify = true, skipIfUnchanged = true}
-            )
-        end
-
-        local characterSelectionKey = stateManager.buildSelectionKey("character")
-        local existingCharacterSelection = stateManager.getState(characterSelectionKey)
-        if existingCharacterSelection and type(existingCharacterSelection) == "table" then
-            stateManager.setState(
-                characterSelectionKey,
-                existingCharacterSelection,
-                "Startup state restoration",
-                {forceNotify = true, skipIfUnchanged = true}
-            )
-        end
-
-        local factionSelectionKey = stateManager.buildSelectionKey("faction")
-        local existingFactionSelection = stateManager.getState(factionSelectionKey)
-        if existingFactionSelection and type(existingFactionSelection) == "table" then
-            stateManager.setState(
-                factionSelectionKey,
-                existingFactionSelection,
-                "Startup state restoration",
-                {forceNotify = true, skipIfUnchanged = true}
-            )
-        end
-
-        local activeTabKey = stateManager.buildUIStateKey("activeTab")
-        local existingActiveTab = stateManager.getState(activeTabKey)
-        if existingActiveTab then
-            stateManager.setState(
-                activeTabKey,
-                existingActiveTab,
-                "Startup state restoration",
-                {forceNotify = true, skipIfUnchanged = true}
-            )
-        end
+    if not stateManager then
+        return
     end
-end
 
-function Chronicles:OnDisable()
     private.Core.triggerEvent(
-        private.constants.events.AddonShutdown,
-        buildLifecyclePayload("Chronicles:OnDisable"),
-        "Chronicles:OnDisable"
+        private.constants.events.TimelineInit,
+        {source = "Chronicles:RestoreStartupState"},
+        "Chronicles:RestoreStartupState"
     )
+
+    stateManager.rehydrate(stateManager.buildUIStateKey("selectedPeriod"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("event"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("character"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("faction"))
+    stateManager.rehydrate(stateManager.buildUIStateKey("settingsCategory"))
 end
 
 -- -------------------------
@@ -233,64 +213,26 @@ function Chronicles:CompleteBootstrap(source)
 
     self:RestoreStartupState()
 
-    if not self.lifecycle.isStartupComplete then
-        self.lifecycle.isStartupComplete = true
-    end
-
     self:FlushReadyCallbacks()
 end
 
 --[[
-    AddonStartup event handler - checks for existing saved state and restores it
-    
-    This centralizes all state checking logic that was previously done in individual
-    UI component OnLoad methods. By handling this during AddonStartup, we ensure
-    all core systems are fully initialized before checking saved state.
+    Run a callback that needs Chronicles' core systems in place
+
+    Callbacks arriving before CompleteBootstrap are queued and flushed by it, in
+    arrival order; everything after it runs immediately.
+
+    @param callback [function] Work to run
+    @param context [string] Caller name, reported if the callback errors
 ]]
-function Chronicles:OnAddonStartup(eventData)
-    local StateManager = private.Core.StateManager
-    if not StateManager then
-        return
-    end
-
-    private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
-
-    -- Re-notify subscribers of state restored from SavedVariables during
-    -- StateManager.init(). rehydrate re-emits the stored value without changing
-    -- or re-persisting it (no set-value-to-itself round-trip). rehydrate is a
-    -- no-op for keys with no saved value.
-    StateManager.rehydrate(StateManager.buildUIStateKey("selectedPeriod"))
-    StateManager.rehydrate(StateManager.buildSelectionKey("event"))
-    StateManager.rehydrate(StateManager.buildSelectionKey("character"))
-    StateManager.rehydrate(StateManager.buildSelectionKey("faction"))
-    StateManager.rehydrate(StateManager.buildUIStateKey("activeTab"))
-end
-
 function Chronicles:ExecuteWhenReady(callback, context)
     if type(callback) ~= "function" then
         return
     end
 
-    if not self.lifecycle.isStartupComplete and self.lifecycle.isBootstrapComplete then
-        self.lifecycle.isStartupComplete = true
-        if self.lifecycle.pendingReadyCallbacks and #self.lifecycle.pendingReadyCallbacks > 0 then
-            self:FlushReadyCallbacks()
-        end
-    end
-
-    if self.lifecycle.isStartupComplete then
-        local success, err = pcall(callback)
-        if not success then
-            local handler = geterrorhandler()
-            if handler then
-                handler(string.format("Chronicles:ExecuteWhenReady immediate callback failed [%s]: %s", context or "unknown", err))
-            end
-        end
+    if self.lifecycle.isBootstrapComplete then
+        runReadyCallback(callback, context)
         return
-    end
-
-    if not self.lifecycle.pendingReadyCallbacks then
-        self.lifecycle.pendingReadyCallbacks = {}
     end
 
     table.insert(self.lifecycle.pendingReadyCallbacks, {callback = callback, context = context})
@@ -298,22 +240,14 @@ end
 
 function Chronicles:FlushReadyCallbacks()
     local pending = self.lifecycle.pendingReadyCallbacks
-    if not pending or #pending == 0 then
+    if #pending == 0 then
         return
     end
-
-    self.lifecycle.isStartupComplete = true
 
     for index = 1, #pending do
         local entry = pending[index]
         if entry and type(entry.callback) == "function" then
-            local success, err = pcall(entry.callback)
-            if not success then
-                local handler = geterrorhandler()
-                if handler then
-                    handler(string.format("Chronicles:ExecuteWhenReady deferred callback failed [%s]: %s", entry.context or "unknown", err))
-                end
-            end
+            runReadyCallback(entry.callback, entry.context)
         end
     end
 
@@ -333,6 +267,10 @@ function Chronicles:RegisterPluginDB(pluginName, pluginData)
     end
 
     if type(pluginData) ~= "table" then
+        print(
+            "|cffff0000Error:|r Chronicles:RegisterPluginDB called with invalid pluginData for collection: " ..
+                tostring(pluginName)
+        )
         return
     end
 

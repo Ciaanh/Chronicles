@@ -2,7 +2,7 @@
 
 ## Overview
 
-Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon is compatible with World of Warcraft interface version 11.2.0 (The War Within expansion) and features a sophisticated state management system with event-driven architecture.
+Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon targets World of Warcraft Retail interface version 120001 (Midnight) and features a sophisticated state management system with event-driven architecture.
 
 > Contributor quick rules: see .github/copilot-instructions.md for enforceable architecture and coding standards (state, events, UI patterns, localization).
 
@@ -26,8 +26,7 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 ### Advanced Features
 
 1. **Custom Data Support**: Plugin-compatible architecture for custom events, characters, and factions
-2. **External Integration**: Optional integration with roleplay addons (totalRP3, MyRolePlay) for enhanced character information
-3. **Localization Ready**: Full localization support with comprehensive string externalization
+2. **Localization Ready**: Full localization support with comprehensive string externalization
 
 ## Technical Architecture
 
@@ -53,13 +52,13 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
    - Modular database architecture with plugin support
    - Data cleaning and localization processing pipeline
    - Search engine with multi-criteria filtering capabilities
-   - User content management with versioning and metadata
+   - Derived results (period filling, year bounds, filtered lists, book content) held in a bounded cache
 
 5. **Modern UI Framework**:
    - XML-based UI with Mixin patterns for code organization
-   - Book-style content display with chapter/page navigation
+   - Book-style content display rendered as HTML documents, one per page
    - Shared template system for consistent UI components
-   - Tab system with lazy loading and state persistence
+   - Tab system with lazy loading
 
 ### Libraries & Dependencies
 
@@ -80,9 +79,22 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 
 ### Project Structure
 
+`Chronicles.toc` lists exactly one file, `Chronicles.xml`, which pulls in everything else through a
+chain of per-directory `_Includes.xml` files. There is no globbing: **a new file has to be registered
+in the `_Includes.xml` of its own directory**, and the order matters — locales load before the DB
+files that resolve `Locale[...]` at load time.
+
+```
+Chronicles.xml            Constants.lua -> Libs -> Locales + DB/Locales -> Chronicles.lua
+Core/_Includes.xml        Infrastructure (StateManager, EventManager, Cache) -> Utils -> Data
+                          -> Data.lua -> Domain
+DB/DB.xml                 DB.lua plus one NN_<Expansion>/ directory per expansion
+UI/_Includes.xml          ScrollFrameMixin -> Fonts -> VerticalListTemplate -> Book
+                          -> Events -> Settings -> PageTemplatesRegistration -> MainFrameUI
+```
+
 ## Integration Features
 
-- **Optional dependencies** on roleplay addons (totalRP3, MyRolePlay)
 - **Minimap button** for quick access
 - **Saved variables** for persistent user data and preferences
 - **Plugin-compatible** architecture for custom content extensions — see [PLUGINS.md](PLUGINS.md) to author a content pack
@@ -105,7 +117,7 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 ## Customization Options
 
 - **Minimap button visibility** toggle
-- **Event filtering by type** (war, battle, death, birth, era, other)
+- **Event filtering by type** (event, era, war, battle, death, birth, other)
 - **Collection management** for enabling/disabling content sets
 - **Timeline zoom preferences** and navigation settings
 
@@ -130,16 +142,18 @@ private.Core.StateManager.subscribe("ui.selectedEvent", callback, "ModuleName")
 
 The addon uses a hybrid event-driven + state-based architecture:
 
-- **Active Events**: AddonStartup, TimelineInit, UIRefresh, TabUITabSet, Settings changes
+- **Active Events**: AddonStartup, TimelineInit, UIRefresh, DisplayEventsForYear, the timeline's own
+  label/period/paging events, and the two Settings change events
 - **Legacy Events**: Selection events now handled via StateManager for better consistency
 - **Schema Validation**: All events include validation schemas for type safety
 
 ### Performance Optimizations
 
 - **Lazy Loading**: UI components and data are loaded on-demand
-- **State Persistence**: Automatic saving to AceDB with intelligent caching
+- **State Persistence**: Automatic saving to AceDB
 - **Event Consolidation**: Timeline periods are consolidated to reduce memory usage
-- **Search Indexing**: Pre-computed search indices for fast event lookup
+- **Derived-Result Cache**: Period filling, year bounds, search results and book content are cached
+  and invalidated as a set whenever the underlying data changes
 
 ---
 
@@ -155,6 +169,8 @@ ciaanh
 
 ## Version
 
-v2.0.1 (July 7, 2025)
+v2.2.0 (unreleased) — the last released version was v2.1.0 (July 29, 2026). `CHANGELOG.txt` has the
+full history; `./tools/harness.ps1 version -Addon Chronicles` checks that this line, the TOC and the
+changelog still agree.
 
-Compatible with World of Warcraft 11.2.0 (The War Within)
+Compatible with World of Warcraft Retail, interface 120001 (Midnight)

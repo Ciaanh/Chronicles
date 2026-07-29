@@ -1,14 +1,18 @@
 # Global Integration Review
 
 Date: 2026-04-17
+Re-verified: 2026-07-29 against Chronicles `integration/2.0.1-hygiene` and Chronicles-tauri
+`feat/edition`. Findings 1, 2 and 3 are resolved; 4, 5 and 6 stand. Resolutions are recorded inline
+rather than deleted, so the reasoning stays with the finding.
+
 Scope:
 - Chronicles addon repository
 - Reference external DB addon in refs/Chronicles-Data
-- Chronicles Tauri generator in I:/Dev/WoW/_Workspace/code_Chronicles-tauri
+- Chronicles Tauri generator (now at `Chronicles-tauri/` in this workspace, branch `feat/edition`)
 
 ## Findings
 
-### 1. Critical: Tauri generator still emits legacy DB registration contract
+### 1. ~~Critical~~ RESOLVED: Tauri generator still emits legacy DB registration contract
 
 The generator output still assumes the old `Chronicles.DB.Modules` + `Chronicles.DB:Init()` registration flow, while the current Chronicles integration has moved to manifest-based registration (`ChroniclesPlugins`).
 
@@ -24,18 +28,31 @@ Impact:
 - Contract mismatch between generator output and new registration strategy.
 - Risk of runtime failures or manual patching needs when using generated addon output.
 
-### 2. High: Generator tests validate old behavior and miss migration regressions
+**Resolved 2026-07-29.** `Chronicles-tauri/src/app/addon/services/dbService.ts` on `feat/edition` has
+no `Chronicles.DB.Modules` left. It now writes collection tables into `private.DB` (`dbNamespace =
+"private.DB"`, line 60) and emits one of two `DB.lua` forms depending on export mode: embedded output
+wraps the registrations in `function private.registerInternalDBs()`, external output builds a
+`ChroniclesPlugins["<Name>"] = { ... }` entry. Both read the collections back off `private.DB`, and
+`ChroniclesPlugins` is the only global either form declares — by design, since it is the cross-addon
+contract. See the workspace `ANALYSIS.md` § A-15 for the full account.
+
+### 2. ~~High~~ RESOLVED: Generator tests validate old behavior and miss migration regressions
 
 Current tests assert legacy output markers and do not enforce manifest output.
 
 Evidence:
-- `I:/Dev/WoW/_Workspace/code_Chronicles-tauri/src/app/addon/services/dbService.test.ts`
+- `Chronicles-tauri/src/app/addon/services/dbService.test.ts`
   - Expects `Chronicles.DB.Modules` in generated `DB/DB.lua`
 
 Impact:
 - CI can pass while generated files are incompatible with the new integration pattern.
 
-### 3. High: Manifest loader reports event registration success without checking return value
+**Resolved 2026-07-29.** The generator suite now asserts the manifest contract, including a test that
+a generated collection file declares under `private.DB` and never matches a bare
+`/^\s*LoreEventsDB\s*=/m` global. `npx vitest run` passes 57 tests across 9 files. (Installing deps
+needs `npm ci --legacy-peer-deps` — pre-existing peer conflict, unrelated.)
+
+### 3. ~~High~~ RESOLVED: Manifest loader reports event registration success without checking return value
 
 In Chronicles core, manifest event registration sets `registered = true` even if `RegisterEventDB` fails.
 
@@ -46,6 +63,11 @@ Evidence:
 
 Impact:
 - False-positive success can trigger `TimelineInit` even when event registration was rejected.
+
+**Resolved.** All three branches now guard on the return value
+(`Core/Data.lua:132-140`): `if manifest.events and self:RegisterEventDB(pluginName, manifest.events)
+then registered = true end`, and the same for characters and factions. `TimelineInit` fires only when
+`registered` is true.
 
 ### 4. Medium: ADDON_LOADED auto-scan stops at PLAYER_LOGIN
 
@@ -58,6 +80,10 @@ Evidence:
 Impact:
 - Load-on-demand external plugins loaded after login will not be discovered through manifest scanning.
 - Such addons must call `Chronicles:RegisterPluginDB(...)` explicitly.
+
+**Still stands, but now decided rather than accidental** (verified 2026-07-29): `PLUGINS.md` § 5
+documents this as the contract, so recommended action 4 below has been answered in favour of "keep
+current behavior and require the runtime API for LoD plugins".
 
 ### 5. Medium: refs folder is git-ignored, reducing visibility of integration drift
 
@@ -88,16 +114,20 @@ Without synchronized changes, generated addons remain a migration bottleneck.
 
 ## Recommended Actions
 
-1. Update Tauri `DBService` to generate manifest-compatible `DB/DB.lua` (`ChroniclesPlugins` entries) and stop relying on `Chronicles.DB.Modules` in generated content headers.
-2. Update Tauri tests in `dbService.test.ts` to assert the new manifest output contract.
-3. Fix `Core/Data.lua` event-registration branch to set `registered = true` only when `RegisterEventDB` returns true.
-4. Decide policy for post-login plugin discovery:
-   - Keep current behavior and require runtime API for LoD plugins, or
-   - Keep `ADDON_LOADED` listener active longer.
-5. Align Tauri README export documentation with actual generated file structure.
-6. If refs remains a key integration target, consider tracking a reviewed snapshot outside ignored paths.
+1. ~~Update Tauri `DBService` to generate manifest-compatible `DB/DB.lua`~~ — done, see finding 1.
+2. ~~Update Tauri tests in `dbService.test.ts` to assert the new manifest output contract.~~ — done.
+3. ~~Fix `Core/Data.lua` event-registration branch~~ — done, see finding 3.
+4. ~~Decide policy for post-login plugin discovery~~ — decided: keep current behaviour, require the
+   runtime API for LoD plugins, documented in `PLUGINS.md` § 5.
+5. Align Tauri README export documentation with actual generated file structure. **Open.**
+6. If refs remains a key integration target, consider tracking a reviewed snapshot outside ignored
+   paths. **Open.**
 
 ## Assumptions / Open Questions
 
-1. Whether Tauri output is intended to fully replace external addon DB folder content or be merged with a hand-maintained wrapper.
-2. Whether long-term support for legacy `ChroniclesPluginData` compatibility path should remain or be sunset after generator migration.
+1. Whether Tauri output is intended to fully replace external addon DB folder content or be merged
+   with a hand-maintained wrapper. **Open.**
+2. ~~Whether long-term support for the legacy `ChroniclesPluginData` compatibility path should remain
+   or be sunset after generator migration.~~ **Answered: sunset.** The global no longer exists on
+   either side, and `CHANGELOG.txt` v2.1.0 records the removal as a breaking change. No shim was
+   added; a plugin still calling it loads no data and reports nothing.

@@ -46,7 +46,7 @@ function EventListItemMixin:OnClick()
 			-- No change required when clearing an already empty selection
 			return
 		end
-		private.Core.StateManager.setState(selectionKey, eventSelection, "Event selected from list", {skipIfUnchanged = true})
+		private.Core.StateManager.setState(selectionKey, eventSelection, "Event selected from list")
 	end
 end
 
@@ -128,10 +128,6 @@ end
 
 function EventListMixin:OnUIRefresh()
 	self:SetEventDataProvider({})
-end
-
-function EventListMixin:OnTimelinePeriodSelected(period)
-	self:UpdateFromSelectedPeriod(period)
 end
 
 local MAX_RETRY_ATTEMPTS = 3
