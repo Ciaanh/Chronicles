@@ -10,24 +10,33 @@
                     <Anchor point="TOPLEFT" />
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
+                <!--
+                    One anchoring pattern for all three content tabs: a 268-wide rail on the left,
+                    an md gutter, then the book filling the rest. 268 + 12 + 1200 = 1480, the tab
+                    container width, so the book keeps its existing size. Anchoring the book off the
+                    rail's edge rather than off the container keeps the gutter explicit.
+                    The rail and the book are visible at the same time - they used to be stacked on
+                    the same BOTTOM anchor, so opening a book hid the list behind it.
+                -->
                 <Frames>
-                    <Frame name="Timeline" parentKey="Timeline" inherits="TimelineTemplate">
+                    <Frame parentKey="Timeline" inherits="TimelineTemplate">
                         <Size x="1200" y="175" />
                         <Anchors>
                             <Anchor point="TOP" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="BookContainerTemplate">
-                        <Size x="1200" y="650"/>
+
+                    <Frame parentKey="EventList" inherits="EventListTemplate">
+                        <Size x="268" y="650" />
                         <Anchors>
-                            <Anchor point="BOTTOM" />
+                            <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="EventList" inherits="EventListTemplate">
-                        <Size x="1480" y="650" />
+                    <Frame parentKey="Book" inherits="BookContainerTemplate">
+                        <Size x="1200" y="650"/>
                         <Anchors>
-                            <Anchor point="BOTTOM" />
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.EventList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -39,7 +48,7 @@
                 </Anchors>
                 <Frames>
                     <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
-                        <Size x="150" y="650"/>
+                        <Size x="268" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
@@ -47,7 +56,7 @@
                     <Frame parentKey="Book" inherits="BookContainerTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
-                            <Anchor point="BOTTOM" />
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyCharacterList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -60,7 +69,7 @@
                 </Anchors>
                 <Frames>
                     <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
-                        <Size x="150" y="650"/>
+                        <Size x="268" y="650"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
@@ -68,7 +77,7 @@
                     <Frame parentKey="Book" inherits="BookContainerTemplate">
                         <Size x="1200" y="650"/>
                         <Anchors>
-                            <Anchor point="BOTTOM" />
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyFactionList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
                         </Anchors>
                     </Frame>
                 </Frames>
