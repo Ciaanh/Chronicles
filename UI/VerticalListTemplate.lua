@@ -1,6 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
+local Spacing = private.Core.Utils.Spacing
+
 --[[
     Shared Vertical List Template - Generic Implementation
     
@@ -183,13 +185,14 @@ function VerticalListItemMixin:Init(itemData)
     end
 
     self.Item = item
-    self.ItemType = self:GetParent():GetParent().itemType or "generic"
 
-    -- Store the stateManagerKey directly from the itemData to eliminate parent traversal
+    -- itemType and stateManagerKey both travel in the element data rather than being read back up
+    -- the frame chain: scroll-box rows are parented to the scroll target, so the old
+    -- GetParent():GetParent() walk no longer reaches the list frame that owns the configuration.
+    self.ItemType = itemData.itemType or "generic"
     self.stateManagerKey = itemData.stateManagerKey or "generic"
-    local contentTexture = self.Content
-    local sideTexture = self.Side
-    local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility    -- Set item name
+
+    local textElement = self.ItemName or self.CharacterName -- Support both field names for compatibility
     if textElement then
         textElement:SetText(item.name)
         textElement:SetWordWrap(true)
@@ -197,24 +200,9 @@ function VerticalListItemMixin:Init(itemData)
         textElement:SetJustifyV("MIDDLE")
     end
 
-    -- Configure bookmark textures for left orientation
-    if contentTexture then
-        contentTexture:SetTexCoord(0, 1, 0, 1)
-        contentTexture:ClearAllPoints()
-        contentTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
-    end
-
-    if sideTexture then
-        sideTexture:SetTexCoord(0, 1, 0, 1)
-        sideTexture:ClearAllPoints()
-        sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
-    end
-
-    if textElement then
-        textElement:ClearAllPoints()
-        textElement:SetPoint("TOPLEFT", contentTexture, "TOPLEFT", 10, -12)
-        textElement:SetPoint("BOTTOMRIGHT", contentTexture, "BOTTOMRIGHT", -10, 18)
-    end
+    -- Texture and text placement is entirely the template's, not re-applied per row. The old
+    -- ClearAllPoints/SetPoint pass here reproduced the XML anchors, and would now override the
+    -- Content texture's two-point stretch with a single point, collapsing it to zero width.
 
     self:SetSelected(false)
 end
@@ -306,7 +294,7 @@ function VerticalListMixin:OnLoad()
     self.enableCount = true
     self.stateManagerKey = "generic"
     self.dataSourceMethod = "getAllItems"
-    self.templateKey = "GENERIC_LIST_ITEM"
+    self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Initialize state
     self.selectedItem = nil
@@ -332,11 +320,37 @@ function VerticalListMixin:OnLoad()
     private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
     private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
 
-    -- Initialize template data for paged list
-    -- Only set template data if both PagedItemList and templates are available
-    if self.PagedItemList and private.constants and private.constants.templates then
-        self.PagedItemList:SetElementTemplateData(private.constants.templates)
+    self:InitializeItemList()
+end
+
+--[[
+    Wire the scroll box to its scroll bar with a linear, single-column view
+
+    The rail scrolls rather than pages, so there is no page to turn and no paging control. The row
+    template is still resolved through the shared template registry, keeping
+    templateKeys.GENERIC_LIST_ITEM the single source of truth for what a row looks like.
+]]
+function VerticalListMixin:InitializeItemList()
+    if not self.ItemList or not self.ItemListScrollBar then
+        return
     end
+
+    local templates = private.constants and private.constants.templates
+    local rowTemplate = templates and templates[private.constants.templateKeys.GENERIC_LIST_ITEM]
+    if not rowTemplate or not rowTemplate.template then
+        return
+    end
+
+    local view = CreateScrollBoxListLinearView()
+    view:SetElementInitializer(
+        rowTemplate.template,
+        function(row, elementData)
+            row:Init(elementData)
+        end
+    )
+    view:SetPadding(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
+
+    ScrollUtil.InitScrollBoxListWithScrollBar(self.ItemList, self.ItemListScrollBar, view)
 end
 
 -- Initialize state subscriptions after configuration
@@ -367,7 +381,7 @@ function VerticalListMixin:ConfigureForCharacters()
     self.countLabelFormat = "%d Characters"
     self.stateManagerKey = "character"
     self.dataSourceMethod = "getAllCharacters"
-    self.templateKey = "GENERIC_LIST_ITEM"
+    self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Update search placeholder if search box exists
     if self.SearchBox and self.SearchBox.PlaceholderText then
@@ -385,7 +399,7 @@ function VerticalListMixin:ConfigureForFactions()
     self.countLabelFormat = "%d Factions"
     self.stateManagerKey = "faction"
     self.dataSourceMethod = "SearchFactions"
-    self.templateKey = "GENERIC_LIST_ITEM"
+    self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Update search placeholder if search box exists
     if self.SearchBox and self.SearchBox.PlaceholderText then
@@ -416,6 +430,38 @@ function VerticalListMixin:OnAddonStartup()
     self:RefreshItemList()
 end
 
+--[[
+    Flatten a keyed item collection into a name-ordered array
+
+    The data sources hand back tables keyed by id, so pairs() order is undefined and the rail would
+    render in a different order from one refresh to the next. Sorting by name, with id as the
+    tiebreak, makes the order stable and alphabetical.
+
+    @param items [table] Item collection, keyed or sequential
+    @return [table] Sequential array of items that have a name
+]]
+local function toSortedItemArray(items)
+    local sorted = {}
+
+    for _, item in pairs(items) do
+        if item and item.name then
+            table.insert(sorted, item)
+        end
+    end
+
+    table.sort(
+        sorted,
+        function(left, right)
+            if left.name == right.name then
+                return tostring(left.id) < tostring(right.id)
+            end
+            return left.name < right.name
+        end
+    )
+
+    return sorted
+end
+
 function VerticalListMixin:RefreshItemList()
     local items = self:GetDataFromSource()
 
@@ -423,11 +469,11 @@ function VerticalListMixin:RefreshItemList()
         return
     end
 
-    -- Cache all items for search performance
-    self.allItems = items
+    -- Cache all items for search performance, in stable display order
+    self.allItems = toSortedItemArray(items)
 
     -- Apply current search filter if any
-    local filteredItems = self:FilterItemsByName(items, self.currentSearchTerm)
+    local filteredItems = self:FilterItemsByName(self.allItems, self.currentSearchTerm)
 
     self:DisplayItems(filteredItems)
 end
@@ -445,70 +491,40 @@ function VerticalListMixin:GetDataFromSource()
 end
 
 function VerticalListMixin:DisplayItems(items)
-    if not items then
-        items = {}
-    end
+    items = items or {}
 
-    local content = {
-        elements = {}
-    }
+    -- The scroll box takes one flat element per row; the previous paged grid needed the extra
+    -- {{elements = {...}}} nesting to describe a page, and there are no pages any more.
+    local elements = {}
 
-    local itemCount = 0
-
-    for _, item in pairs(items) do
-        if item and item.name then
-            local templateKey = self.templateKey
-
-            -- Fallback to generic template if the specific template key doesn't exist
-            if not templateKey then
-                templateKey = "GENERIC_LIST_ITEM"
-            end
-
-            local itemSummary = {
-                templateKey = templateKey,
-                [self.itemType] = item,
-                -- Pass the stateManagerKey to each item during initialization
+    for _, item in ipairs(items) do
+        table.insert(
+            elements,
+            {
+                templateKey = self.templateKey or private.constants.templateKeys.GENERIC_LIST_ITEM,
+                item = item,
+                -- itemType and stateManagerKey travel with each row; see VerticalListItemMixin:Init
+                itemType = self.itemType,
                 stateManagerKey = self.stateManagerKey
             }
-            table.insert(content.elements, itemSummary)
-            itemCount = itemCount + 1
-        end
+        )
     end
 
-    local data = {}
-    table.insert(data, content)
-
-    self:SetItemDataProvider(data)
-    self:UpdateItemCount(itemCount)
+    self:SetItemDataProvider(elements)
+    self:UpdateItemCount(#elements)
 
     -- Sync selection state after data update
     self:SyncWithCurrentSelection()
 end
 
-function VerticalListMixin:SetItemDataProvider(data)
-    if not self.PagedItemList then
+function VerticalListMixin:SetItemDataProvider(elements)
+    if not self.ItemList then
         return
     end
 
-    -- Ensure we have valid data structure
-    if not data or #data == 0 then
-        -- Create empty data structure to prevent errors
-        data = {{elements = {}}}
-    end
-
-    -- Verify that template data has been set
-    if not self.PagedItemList.elementTemplateData then
-        if private.constants and private.constants.templates then
-            self.PagedItemList:SetElementTemplateData(private.constants.templates)
-        else
-            -- If templates aren't available yet, defer the operation
-            return
-        end
-    end
-
-    local dataProvider = CreateDataProvider(data)
+    local dataProvider = CreateDataProvider(elements or {})
     local retainScrollPosition = true
-    self.PagedItemList:SetDataProvider(dataProvider, retainScrollPosition)
+    self.ItemList:SetDataProvider(dataProvider, retainScrollPosition)
 end
 
 function VerticalListMixin:FilterItemsByName(items, searchTerm)
@@ -519,9 +535,11 @@ function VerticalListMixin:FilterItemsByName(items, searchTerm)
     local filtered = {}
     local lowerSearchTerm = string.lower(searchTerm)
 
-    for _, item in pairs(items) do
-        if item and item.name and string.find(string.lower(item.name), lowerSearchTerm, 1, true) then
-            filtered[_] = item
+    -- Sequential in, sequential out: the caller passes an already-sorted array, and preserving the
+    -- source keys here (as the previous pairs() version did) would reintroduce undefined order.
+    for _, item in ipairs(items) do
+        if item.name and string.find(string.lower(item.name), lowerSearchTerm, 1, true) then
+            table.insert(filtered, item)
         end
     end
 
@@ -563,7 +581,7 @@ function VerticalListMixin:SyncWithCurrentSelection()
         return
     end
     
-    if not self.PagedItemList then
+    if not self.ItemList then
         return
     end
 
@@ -596,34 +614,31 @@ function VerticalListMixin:SyncWithCurrentSelection()
 end
 
 function VerticalListMixin:ClearAllSelections()
-    -- Clear visual selection from all visible list items
-    if not self.PagedItemList then
+    -- Clear visual selection from all rows the scroll box currently has realised
+    if not self.ItemList then
         return
     end
-    
-    local frames = self.PagedItemList:GetFrames()
-    if frames then
-        for _, frame in pairs(frames) do
-            if frame.SetSelected then
-                frame:SetSelected(false)
+
+    self.ItemList:ForEachFrame(
+        function(row)
+            if row.SetSelected then
+                row:SetSelected(false)
             end
         end
-    end
+    )
 end
 
 function VerticalListMixin:UpdateVisualSelection(selectedId)
     -- Update visual selection to match the selected item ID
-    if not self.PagedItemList or not selectedId then
+    if not self.ItemList or not selectedId then
         return
     end
-    
-    local frames = self.PagedItemList:GetFrames()
-    if frames then
-        for _, frame in pairs(frames) do
-            if frame.Item and frame.Item.id and frame.SetSelected then
-                local isSelected = (frame.Item.id == selectedId)
-                frame:SetSelected(isSelected)
+
+    self.ItemList:ForEachFrame(
+        function(row)
+            if row.Item and row.Item.id and row.SetSelected then
+                row:SetSelected(row.Item.id == selectedId)
             end
         end
-    end
+    )
 end

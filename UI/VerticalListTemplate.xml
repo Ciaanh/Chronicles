@@ -11,7 +11,7 @@
         </KeyValues>
         <Layers>
             <Layer level="BACKGROUND">
-                <!-- Bookmark side texture -->
+                <!-- Bookmark side texture: fixed 45x64 art, pinned to the left edge -->
                 <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
                     <Size x="45" y="64"/>
                     <Anchors>
@@ -19,10 +19,16 @@
                     </Anchors>
                 </Texture>
 
-                <!-- Bookmark content texture -->
+                <!--
+                    Bookmark content texture: spans from the side art to the row's right edge rather
+                    than carrying a fixed 105 width. A linear scroll view stretches each row to the
+                    scroll box width, so a fixed-width strip anchored RIGHT would leave a gap in the
+                    middle of the row at any rail width other than the original 150.
+                -->
                 <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
-                    <Size x="105" y="64"/>
+                    <Size y="64"/>
                     <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Side" relativePoint="RIGHT" x="0" y="0"/>
                         <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
@@ -61,9 +67,11 @@
         <Frames>
             <!-- Search box for filtering items -->
             <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
-                <Size x="120" y="20"/>
+                <Size y="20"/>
                 <Anchors>
-                    <Anchor point="TOP" x="-5" y="0"/>
+                    <!-- Spans the rail rather than a fixed 120, which no longer fits the 268 width -->
+                    <Anchor point="TOPLEFT" x="12" y="0"/>
+                    <Anchor point="TOPRIGHT" x="-12" y="0"/>
                 </Anchors>
                 <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
                 <Layers>
@@ -105,50 +113,34 @@
                 </Scripts>
             </EditBox>
 
-            <!-- Paged item list -->
-            <Frame parentKey="PagedItemList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
-                <KeyValues>
-                    <KeyValue key="viewsPerPage" value="1" type="number"/>
-                    <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
-                    <KeyValue key="xPadding" value="5" type="number"/>
-                    <KeyValue key="columnsPerRow" value="1" type="number"/>
-                    <KeyValue key="autoExpandElements" value="true" type="boolean"/>
-                </KeyValues>
-                <Size x="150" y="600"/>
+            <!--
+                Scrolling item list. Replaces the former paged grid and its hand-rolled paging
+                control: a rail of names is something you scroll, not something you page through.
+                Wired to its scroll bar in VerticalListMixin:OnLoad.
+            -->
+            <WowScrollBoxList parentKey="ItemList">
                 <Anchors>
-                    <Anchor point="BOTTOM" x="0" y="0"/>
+                    <!-- y: -(xxl + sm), clearing the search box and the count label above it -->
+                    <Anchor point="TOPLEFT" x="0" y="-48"/>
+                    <!-- x: -(lg), the xs gutter plus the scroll bar to its right -->
+                    <Anchor point="BOTTOMRIGHT" x="-16" y="0"/>
                 </Anchors>
-                <Frames>
-                    <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-                        <Size x="150" y="560"/>
-                        <Anchors>
-                            <Anchor point="TOPLEFT" />
-                        </Anchors>
-                    </Frame>
+            </WowScrollBoxList>
 
-                    <!-- Paging controls for item list -->
-                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
-                        <Anchors>
-                            <Anchor point="BOTTOM" x="-10" y="5"/>
-                        </Anchors>
-                        <KeyValues>
-                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
-                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
-                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
-                            <KeyValue key="spacing" value="8" type="number"/>
-                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
-                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
-                        </KeyValues>
-                    </Frame>
-                </Frames>
-            </Frame>
+            <EventFrame parentKey="ItemListScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.ItemList" relativePoint="TOPRIGHT" x="4" y="0"/> <!-- Spacing.xs -->
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.ItemList" relativePoint="BOTTOMRIGHT" x="4" y="0"/>
+                </Anchors>
+            </EventFrame>
         </Frames>
         <Layers>
             <Layer level="OVERLAY">
                 <!-- Item count label -->
                 <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
                     <Anchors>
-                        <Anchor point="TOP" x="-10" y="-30"/>
+                        <Anchor point="TOPLEFT" x="12" y="-24"/> <!-- Spacing.md / -Spacing.xl -->
+                        <Anchor point="TOPRIGHT" x="-12" y="-24"/>
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR"/>
                 </FontString>
