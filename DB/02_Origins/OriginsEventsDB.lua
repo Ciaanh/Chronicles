@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    OriginsEventsDB = {
+private.DB = private.DB or {}
+private.DB.OriginsEventsDB = {
         [1] = {
             id=1,
             label=Locale["1_opening_of_the_dark_portal"],

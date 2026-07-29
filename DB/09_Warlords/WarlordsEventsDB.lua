@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    WarlordsEventsDB = {
+private.DB = private.DB or {}
+private.DB.WarlordsEventsDB = {
         [160] = {
             id=160,
             label=Locale["505_dark_portal_opens_again___invasion_of_draenor"],

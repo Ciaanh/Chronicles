@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    DragonflightEventsDB = {
+private.DB = private.DB or {}
+private.DB.DragonflightEventsDB = {
         [180] = {
             id=180,
             label=Locale["615_dragon_isles_reawaken"],

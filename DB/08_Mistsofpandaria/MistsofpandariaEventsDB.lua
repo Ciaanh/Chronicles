@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    MistsofpandariaEventsDB = {
+private.DB = private.DB or {}
+private.DB.MistsofpandariaEventsDB = {
         [155] = {
             id=155,
             label=Locale["495_discovery_of_pandaria"],

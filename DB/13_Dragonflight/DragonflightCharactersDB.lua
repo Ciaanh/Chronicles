@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    DragonflightCharactersDB = {
+private.DB = private.DB or {}
+private.DB.DragonflightCharactersDB = {
         [79] = {
             id = 79,
             name = Locale["635_alexstrasza"],

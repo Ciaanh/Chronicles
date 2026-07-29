@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    FutureCharactersDB = {
+private.DB = private.DB or {}
+private.DB.FutureCharactersDB = {
         [87] = {
             id = 87,
             name = Locale["687_magni_bronzebeard__speaker"],

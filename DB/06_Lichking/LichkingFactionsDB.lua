@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    LichkingFactionsDB = {
+private.DB = private.DB or {}
+private.DB.LichkingFactionsDB = {
         [32] = {
             id = 32,
             name = Locale["461_argent_crusade"],

@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    CataclysmFactionsDB = {
+private.DB = private.DB or {}
+private.DB.CataclysmFactionsDB = {
         [35] = {
             id = 35,
             name = Locale["487_twilight's_hammer"],

@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    ShadowlandsFactionsDB = {
+private.DB = private.DB or {}
+private.DB.ShadowlandsFactionsDB = {
         [53] = {
             id = 53,
             name = Locale["645_covenants_of_death"],

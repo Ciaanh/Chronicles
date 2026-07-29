@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    WarlordsCharactersDB = {
+private.DB = private.DB or {}
+private.DB.WarlordsCharactersDB = {
         [60] = {
             id = 60,
             name = Locale["529_grommash_hellscream__alternate_timeline"],

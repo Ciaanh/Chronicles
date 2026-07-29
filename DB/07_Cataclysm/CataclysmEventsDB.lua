@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    CataclysmEventsDB = {
+private.DB = private.DB or {}
+private.DB.CataclysmEventsDB = {
         [150] = {
             id=150,
             label=Locale["467_the_shattering___return_of_deathwing"],

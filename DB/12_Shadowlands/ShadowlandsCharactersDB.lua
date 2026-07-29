@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    ShadowlandsCharactersDB = {
+private.DB = private.DB or {}
+private.DB.ShadowlandsCharactersDB = {
         [74] = {
             id = 74,
             name = Locale["625_zovaal_the_jailer"],

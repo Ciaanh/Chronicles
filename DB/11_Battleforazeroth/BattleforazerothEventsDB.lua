@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    BattleforazerothEventsDB = {
+private.DB = private.DB or {}
+private.DB.BattleforazerothEventsDB = {
         [170] = {
             id=170,
             label=Locale["559_burning_of_teldrassil"],

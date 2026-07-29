@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    BurningcrusadeEventsDB = {
+private.DB = private.DB or {}
+private.DB.BurningcrusadeEventsDB = {
         [140] = {
             id=140,
             label=Locale["413_reopening_of_the_dark_portal___arrival_in_outland"],

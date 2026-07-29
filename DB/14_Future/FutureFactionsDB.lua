@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    FutureFactionsDB = {
+private.DB = private.DB or {}
+private.DB.FutureFactionsDB = {
         [65] = {
             id = 65,
             name = Locale["691_worldsoul_accord"],
