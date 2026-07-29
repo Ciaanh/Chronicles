@@ -148,7 +148,8 @@
                 </Anchors>
             </Button>
             <Frame parentKey="RangeIndicator">
-                <Size x="120" y="25" />
+                <Size x="170" y="25" /> <!-- wide enough for "lower to upper" with both bounds shown; 120 clipped it -->
+
                 <Anchors>
                     <Anchor point="RIGHT" relativeKey="$parent.Next" relativePoint="LEFT" x="-8" y="0" />
                 </Anchors>

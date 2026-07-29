@@ -5,7 +5,7 @@
 
     <!-- Shared Vertical List Item Template -->
     <Button name="VerticalListItemTemplate" mixin="VerticalListItemMixin" virtual="true">
-        <Size x="150" y="110"/>
+        <Size x="150" y="120"/>
         <KeyValues>
             <KeyValue key="textureHeight" value="80" type="number"/>
         </KeyValues>
@@ -38,8 +38,8 @@
                 <!-- Item name text -->
                 <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="18" />
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-10" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="20" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -107,23 +107,23 @@
             </EditBox>
 
             <!--
-                Scrolling item list. Replaces the former paged grid and its hand-rolled paging
-                control: a rail of names is something you scroll, not something you page through.
-                Wired to its scroll bar in VerticalListMixin:OnLoad.
+                Scrolling item list on the modern ScrollBox: a WowScrollBoxList plus a
+                MinimalScrollBar, wired with a linear view in VerticalListMixin. Rows come from the
+                shared VerticalListItemTemplate via templateKeys.GENERIC_LIST_ITEM.
             -->
-            <WowScrollBoxList parentKey="ItemList">
+            <Frame parentKey="ItemList" inherits="WowScrollBoxList">
                 <Anchors>
-                    <!-- y: -(xxl + sm), clearing the search box and the count label above it -->
-                    <Anchor point="TOPLEFT" x="0" y="-48"/>
-                    <!-- x: -(lg), the xs gutter plus the scroll bar to its right -->
-                    <Anchor point="BOTTOMRIGHT" x="-16" y="0"/>
+                    <!-- x left inset clears the scroll bar; y clears the search box and count label -->
+                    <Anchor point="TOPLEFT" x="16" y="-44"/>
+                    <!-- right edge runs to the rail edge (under the book) so rows tuck in; y bottom-inset to the book page -->
+                    <Anchor point="BOTTOMRIGHT" x="0" y="50"/>
                 </Anchors>
-            </WowScrollBoxList>
-
+            </Frame>
+            <!-- Scroll bar on the outer (left) edge so nothing separates the list from the book -->
             <EventFrame parentKey="ItemListScrollBar" inherits="MinimalScrollBar">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.ItemList" relativePoint="TOPRIGHT" x="4" y="0"/> <!-- Spacing.xs -->
-                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.ItemList" relativePoint="BOTTOMRIGHT" x="4" y="0"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.ItemList" relativePoint="TOPLEFT" x="-4" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ItemList" relativePoint="BOTTOMLEFT" x="-4" y="2"/>
                 </Anchors>
             </EventFrame>
         </Frames>
