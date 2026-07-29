@@ -13,7 +13,8 @@ local defaults = {
             selectedFaction = nil,
             selectedPeriod = nil,
             activeTab = nil,
-            isMainFrameOpen = false
+            isMainFrameOpen = false,
+            windowPosition = nil
         },
         timelineState = {
             currentStep = nil,
