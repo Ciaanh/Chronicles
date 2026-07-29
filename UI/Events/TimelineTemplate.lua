@@ -655,6 +655,14 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
     self:ApplyEventDensityTexture(isSelected)
 
     self.Background:SetVertexColor(1, 1, 1)
+
+    -- White count everywhere. The font family's dark shadow carries the contrast over both the
+    -- dark unselected crystals and the lighter "-selected" ones. The old black-for-selected branch
+    -- assumed every "-selected" texture was light, but a low-density selected period keeps a dark
+    -- teal crystal, and black-on-teal was unreadable.
+    if self.Text and self.Text.SetTextColor then
+        self.Text:SetTextColor(1, 1, 1)
+    end
 end
 
 --[[

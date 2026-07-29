@@ -52,22 +52,26 @@
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
         <Frames>
             <!--
-                Scrolling, single-column event rail. Was a two-view paged grid (View1/View2 split
-                left/right) driving a hand-rolled paging control; at the rail's width a second
-                column has nothing to gain, and the rail scrolls now rather than paging.
-                Wired to its scroll bar in EventListMixin:OnLoad.
+                Scrolling, single-column event rail on the modern ScrollBox: a WowScrollBoxList plus
+                a MinimalScrollBar, wired with a linear view in EventListMixin. Rows come from the
+                shared EventListItemTemplate via templateKeys.EVENT_DESCRIPTION. The scroll region is
+                inset top and bottom by the book's own 50 page padding so the first row lines up with
+                the book page beside it.
             -->
-            <WowScrollBoxList parentKey="EventScrollList">
+            <Frame parentKey="EventScrollList" inherits="WowScrollBoxList">
                 <Anchors>
-                    <Anchor point="TOPLEFT" />
-                    <Anchor point="BOTTOMRIGHT" x="-12" y="0"/> <!-- -Spacing.md, room for the scroll bar -->
+                    <!-- Left inset clears the scroll bar; the right edge runs to the rail edge, which
+                         sits under the book, so the bookmark tips tuck in. Top/bottom inset by the
+                         book's own 50 page padding so row 1 lines up with the book page. -->
+                    <Anchor point="TOPLEFT" x="16" y="-50"/>
+                    <Anchor point="BOTTOMRIGHT" x="0" y="50"/>
                 </Anchors>
-            </WowScrollBoxList>
-
+            </Frame>
+            <!-- Scroll bar on the outer (left) edge so nothing separates the bookmarks from the book -->
             <EventFrame parentKey="EventScrollBar" inherits="MinimalScrollBar">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.EventScrollList" relativePoint="TOPRIGHT" x="4" y="0"/> <!-- Spacing.xs -->
-                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.EventScrollList" relativePoint="BOTTOMRIGHT" x="4" y="0"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.EventScrollList" relativePoint="TOPLEFT" x="-4" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.EventScrollList" relativePoint="BOTTOMLEFT" x="-4" y="2"/>
                 </Anchors>
             </EventFrame>
         </Frames>

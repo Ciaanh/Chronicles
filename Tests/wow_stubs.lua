@@ -72,3 +72,16 @@ _G.C_Timer = {
         end
     end
 }
+
+_G.LibStub = setmetatable(
+    {},
+    {
+        __call = function(_, libraryName)
+            return {
+                GetLocale = function()
+                    return {}
+                end
+            }
+        end
+    }
+)

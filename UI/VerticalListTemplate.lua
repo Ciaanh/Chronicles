@@ -184,7 +184,7 @@ end
     templateKeys.GENERIC_LIST_ITEM the single source of truth for what a row looks like.
 ]]
 function VerticalListMixin:InitializeItemList()
-    if not self.ItemList or not self.ItemListScrollBar then
+    if self._itemViewReady or not self.ItemList or not self.ItemListScrollBar then
         return
     end
 
@@ -194,16 +194,18 @@ function VerticalListMixin:InitializeItemList()
         return
     end
 
-    local view = CreateScrollBoxListLinearView()
+    local view = CreateScrollBoxListLinearView(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
     view:SetElementInitializer(
         rowTemplate.template,
         function(row, elementData)
             row:Init(elementData)
         end
     )
-    view:SetPadding(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
+    -- Fixed row height; skips the per-frame measurement pass that can otherwise yield a zero extent.
+    view:SetElementExtent(120)
 
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ItemList, self.ItemListScrollBar, view)
+    self._itemViewReady = true
 end
 
 -- Initialize state subscriptions after configuration
@@ -362,13 +364,14 @@ function VerticalListMixin:DisplayItems(items)
 end
 
 function VerticalListMixin:SetItemDataProvider(elements)
-    if not self.ItemList then
+    -- Ensure the view is attached before assigning a data provider
+    self:InitializeItemList()
+
+    if not self._itemViewReady or not self.ItemList.SetDataProvider then
         return
     end
 
-    local dataProvider = CreateDataProvider(elements or {})
-    local retainScrollPosition = true
-    self.ItemList:SetDataProvider(dataProvider, retainScrollPosition)
+    self.ItemList:SetDataProvider(CreateDataProvider(elements or {}), ScrollBoxConstants.RetainScrollPosition)
 end
 
 function VerticalListMixin:FilterItemsByName(items, searchTerm)
@@ -419,6 +422,16 @@ function VerticalListMixin:OnSelectionStateChanged(newValue, oldValue, context)
     self:SyncWithCurrentSelection()
 end
 
+function VerticalListMixin:ForEachRenderedRow(callback)
+    -- Guard on the view being wired: ForEachFrame on a ScrollBox with no view indexes a nil view
+    -- and errors. Selection sync can fire during login rehydration, before the first data provider.
+    if not callback or not self._itemViewReady or type(self.ItemList.ForEachFrame) ~= "function" then
+        return
+    end
+
+    self.ItemList:ForEachFrame(callback)
+end
+
 function VerticalListMixin:SyncWithCurrentSelection()
     -- Synchronize visual selection state with the stored state
     if not private.Core.StateManager or not self.stateManagerKey or self.stateManagerKey == "generic" then
@@ -463,9 +476,9 @@ function VerticalListMixin:ClearAllSelections()
         return
     end
 
-    self.ItemList:ForEachFrame(
+    self:ForEachRenderedRow(
         function(row)
-            if row.SetSelected then
+            if row and row.SetSelected then
                 row:SetSelected(false)
             end
         end
@@ -478,9 +491,9 @@ function VerticalListMixin:UpdateVisualSelection(selectedId)
         return
     end
 
-    self.ItemList:ForEachFrame(
+    self:ForEachRenderedRow(
         function(row)
-            if row.Item and row.Item.id and row.SetSelected then
+            if row and row.Item and row.Item.id and row.SetSelected then
                 row:SetSelected(row.Item.id == selectedId)
             end
         end

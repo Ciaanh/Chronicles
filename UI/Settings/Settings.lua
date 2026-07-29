@@ -272,34 +272,35 @@ function SettingsMixin:OnSettingsTabSelected(tabNameOrData)
         return
     end
 
-    self.TabUI.currentTab = tabName
-    for key, tab in pairs(self.TabUI.Tabs) do
-        if (tab.Load and tab.TabFrame) then
-            if tab.Load and not tab.IsLoaded then
-                local success, errorMsg =
-                    pcall(
-                    function()
-                        tab.Load(self, tab.TabFrame)
-                    end
-                )
+    if not self.TabUI then
+        return
+    end
 
+    self.TabUI.currentTab = tabName
+    for key, tab in pairs(self.TabUI.Tabs or {}) do
+        if tab.TabFrame then
+            if type(tab.Load) == "function" and not tab.IsLoaded then
+                local success, errorMsg = pcall(tab.Load, self, tab.TabFrame)
                 if success then
                     tab.IsLoaded = true
                 else
-                    -- Without this the category just renders blank: IsLoaded stays false, so it is
-                    -- retried on every selection and fails silently every time.
                     geterrorhandler()(errorMsg)
                 end
             end
-            local isSelected = (key == tabName)
-            tab.TabFrame:SetShown(isSelected)
 
-            if isSelected and tab.TabFrame.ScrollFrame and tab.TabFrame.ScrollFrame.Content then
+            local isSelected = (key == tabName)
+            if type(tab.TabFrame.SetShown) == "function" then
+                pcall(tab.TabFrame.SetShown, tab.TabFrame, isSelected)
+            end
+
+            if isSelected then
                 local scrollFrame = tab.TabFrame.ScrollFrame
-                local content = scrollFrame.Content
-                if content.checkboxes and #content.checkboxes > 0 then
+                local content = scrollFrame and scrollFrame.Content
+                if content and content.checkboxes and #content.checkboxes > 0 then
                     local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
-                    content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+                    if type(content.SetSize) == "function" and type(scrollFrame.GetWidth) == "function" then
+                        pcall(content.SetSize, content, scrollFrame:GetWidth() - 20, totalHeight)
+                    end
                 end
             end
         end
@@ -477,16 +478,19 @@ function SettingsMixin:LoadEventTypes(frame)
     local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
     content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
 
-    self:UpdateScrollIndicators(scrollFrame)
+    if type(self.UpdateScrollIndicators) == "function" then
+        pcall(function()
+            self:UpdateScrollIndicators(scrollFrame)
+        end)
+    end
 
-    if scrollFrame.ScrollBar then
-        scrollFrame.ScrollBar:SetMinMaxValues(0, math.max(scrollFrame:GetVerticalScrollRange(), 1))
-        scrollFrame.ScrollBar:SetValue(0)
-        if scrollFrame.scrollBarHideIfUnscrollable then
-            scrollFrame.ScrollBar:SetShown(scrollFrame:GetVerticalScrollRange() > 0)
-        else
-            scrollFrame.ScrollBar:Show()
-        end
+    -- Reset the view to the top. The bar here is the modern ScrollBox-style scroll bar created by
+    -- ScrollFrameMixin (driven by SetScrollPercentage and the OnScrollRangeChanged callback), not an
+    -- old Slider, so it has no SetMinMaxValues/SetValue. Resizing the content above already made the
+    -- ScrollFrame recompute the bar's range, and SetHideIfUnscrollable (set in the mixin's OnLoad)
+    -- hides it when there is nothing to scroll; the only thing left to do is scroll back to the top.
+    if type(scrollFrame.SetVerticalScroll) == "function" then
+        scrollFrame:SetVerticalScroll(0)
     end
 
     content:Show()

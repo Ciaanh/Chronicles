@@ -86,11 +86,14 @@ end
 --[[
     Wire the event scroll box to its scroll bar with a linear, single-column view
 
-    The row template is resolved through the shared template registry so
-    templateKeys.EVENT_DESCRIPTION stays the single source of truth for what an event row looks like.
+    EventScrollList is a WowScrollBoxList and EventScrollBar a MinimalScrollBar, both declared in
+    EventListTemplate.xml. A view must be attached before any data provider is assigned, so this
+    runs once and is idempotent. The row template is resolved through the shared template registry
+    so templateKeys.EVENT_DESCRIPTION stays the single source of truth for what an event row looks
+    like.
 ]]
 function EventListMixin:InitializeEventList()
-	if not self.EventScrollList or not self.EventScrollBar then
+	if self._eventViewReady or not self.EventScrollList or not self.EventScrollBar then
 		return
 	end
 
@@ -99,16 +102,18 @@ function EventListMixin:InitializeEventList()
 		return
 	end
 
-	local view = CreateScrollBoxListLinearView()
+	local view = CreateScrollBoxListLinearView(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
 	view:SetElementInitializer(
 		rowTemplate.template,
 		function(row, elementData)
 			row:Init(elementData)
 		end
 	)
-	view:SetPadding(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
+	-- Fixed row height; skips the per-frame measurement pass that can otherwise yield a zero extent.
+	view:SetElementExtent(110)
 
 	ScrollUtil.InitScrollBoxListWithScrollBar(self.EventScrollList, self.EventScrollBar, view)
+	self._eventViewReady = true
 end
 
 --[[
@@ -117,13 +122,13 @@ end
     @param elements [table] Sequential array of event row descriptors (may be empty)
 ]]
 function EventListMixin:SetEventDataProvider(elements)
-	if not self.EventScrollList then
+	self:InitializeEventList()
+
+	if not self._eventViewReady or not self.EventScrollList.SetDataProvider then
 		return
 	end
 
-	local dataProvider = CreateDataProvider(elements or {})
-	local retainScrollPosition = false
-	self.EventScrollList:SetDataProvider(dataProvider, retainScrollPosition)
+	self.EventScrollList:SetDataProvider(CreateDataProvider(elements or {}), ScrollBoxConstants.DiscardScrollPosition)
 end
 
 function EventListMixin:OnUIRefresh()

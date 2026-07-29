@@ -11,12 +11,12 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <!--
-                    One anchoring pattern for all three content tabs: a 268-wide rail on the left,
-                    an md gutter, then the book filling the rest. 268 + 12 + 1200 = 1480, the tab
-                    container width, so the book keeps its existing size. Anchoring the book off the
-                    rail's edge rather than off the container keeps the gutter explicit.
-                    The rail and the book are visible at the same time - they used to be stacked on
-                    the same BOTTOM anchor, so opening a book hid the list behind it.
+                    One anchoring pattern for all three content tabs: a 292-wide rail on the left
+                    whose right edge runs 12 under the book, so the bookmark rows tuck into the
+                    book's edge like page markers instead of floating detached beside it. The book
+                    keeps its 1200 width flush to the right: 292 - 12 + 1200 = 1480, the tab
+                    container width. The book is drawn above the rail (higher frameLevel) so it
+                    covers the tucked-in tips; the rail and book are visible at the same time.
                 -->
                 <Frames>
                     <Frame parentKey="Timeline" inherits="TimelineTemplate">
@@ -27,16 +27,16 @@
                     </Frame>
 
                     <Frame parentKey="EventList" inherits="EventListTemplate">
-                        <Size x="268" y="650" />
+                        <Size x="292" y="640" />
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
 
-                    <Frame parentKey="Book" inherits="BookContainerTemplate">
-                        <Size x="1200" y="650"/>
+                    <Frame parentKey="Book" inherits="BookContainerTemplate" frameLevel="110">
+                        <Size x="1200" y="640"/>
                         <Anchors>
-                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.EventList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.EventList" relativePoint="BOTTOMRIGHT" x="-12" y="0"/> <!-- overlap so bookmarks tuck under the book -->
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -48,15 +48,15 @@
                 </Anchors>
                 <Frames>
                     <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
-                        <Size x="268" y="650"/>
+                        <Size x="292" y="640"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="BookContainerTemplate">
-                        <Size x="1200" y="650"/>
+                    <Frame parentKey="Book" inherits="BookContainerTemplate" frameLevel="110">
+                        <Size x="1200" y="640"/>
                         <Anchors>
-                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyCharacterList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyCharacterList" relativePoint="BOTTOMRIGHT" x="-12" y="0"/> <!-- overlap so bookmarks tuck under the book -->
                         </Anchors>
                     </Frame>
                 </Frames>
@@ -69,22 +69,22 @@
                 </Anchors>
                 <Frames>
                     <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
-                        <Size x="268" y="650"/>
+                        <Size x="292" y="640"/>
                         <Anchors>
                             <Anchor point="BOTTOMLEFT" x="0" y="0" />
                         </Anchors>
                     </Frame>
-                    <Frame parentKey="Book" inherits="BookContainerTemplate">
-                        <Size x="1200" y="650"/>
+                    <Frame parentKey="Book" inherits="BookContainerTemplate" frameLevel="110">
+                        <Size x="1200" y="640"/>
                         <Anchors>
-                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyFactionList" relativePoint="BOTTOMRIGHT" x="12" y="0"/> <!-- Spacing.md -->
+                            <Anchor point="BOTTOMLEFT" relativeKey="$parent.MyFactionList" relativePoint="BOTTOMRIGHT" x="-12" y="0"/> <!-- overlap so bookmarks tuck under the book -->
                         </Anchors>
                     </Frame>
                 </Frames>
             </Frame>
 
             <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
-                <Size x="1200" y="650"/>
+                <Size x="1200" y="640"/>
                 <Anchors>
                     <Anchor point="BOTTOM" />
                 </Anchors>
@@ -155,7 +155,9 @@
             </Frame>
 
             <Frame parentKey="TabUI" inherits="TabUITemplate" frameLevel="100">
-                <Size x="1480" y="825"/>
+                <!-- 815, not 825: keeps the bottom of the content stack (timeline 175 + book 640)
+                     inside the dialog border art instead of overlapping the window's bottom edge -->
+                <Size x="1480" y="815"/>
                 <Anchors>
                     <Anchor point="TOP" relativeKey="$parent.DragStrip" relativePoint="BOTTOM" />
                 </Anchors>
