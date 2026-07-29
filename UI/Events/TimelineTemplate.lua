@@ -1,6 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
+local Spacing = private.Core.Utils.Spacing
+
 -- -------------------------
 -- Timeline
 -- -------------------------
@@ -85,37 +87,98 @@ function TimelineMixin:DisableStateSubscriptions()
     self._stateSubscriptionsActive = false
 end
 
-function TimelineMixin:ConfigureNavigationButtons()
-    if not self.Next then
+--[[
+    Build (or reuse) the label and period frames for a page size
+
+    The count used to be frozen in XML as nine hand-chained Label frames and eight Period frames,
+    which both restated config.timeline.pageSize and leaked seventeen frame globals. Sizing the
+    pools from the same constant the pagination uses means a different page size renders a
+    different grid with no XML change.
+
+    Periods sit above the labels, each straddling the boundary between its label and the next, so
+    there is always one more label than there are periods.
+
+    @param pageSize [number] Periods on a page; labels are the boundaries, so pageSize + 1 of them
+]]
+function TimelineMixin:RefreshTimelinePools(pageSize)
+    local UIUtils = private.Core.Utils.UIUtils
+    if not UIUtils or not pageSize or pageSize < 1 then
         return
     end
 
-    local textures = {
-        self.Next:GetNormalTexture(),
-        self.Next:GetHighlightTexture(),
-        self.Next:GetPushedTexture(),
-        self.Next:GetDisabledTexture()
-    }
+    local labelCount = pageSize + 1
 
-    for _, texture in ipairs(textures) do
-        if texture then
-            texture:SetTexCoord(1, 0, 0, 1)
+    self.labelPool = self.labelPool or {}
+    self.periodPool = self.periodPool or {}
+
+    for index = 1, labelCount do
+        local label = UIUtils.AcquirePooledFrame(self.labelPool, "TimelineLabelTemplate", self, index, "Frame")
+
+        label:ClearAllPoints()
+        if index == 1 then
+            label:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", Spacing.md, Spacing.md)
+        else
+            label:SetPoint("LEFT", self.labelPool[index - 1], "RIGHT", 0, 0)
         end
+
+        label:Initialize(index)
     end
+    UIUtils.ReleaseFramesAbove(self.labelPool, labelCount)
+
+    for index = 1, pageSize do
+        local period = UIUtils.AcquirePooledFrame(self.periodPool, "TimelinePeriodTemplate", self, index, "Button")
+
+        -- Anchoring the period's left edge to its label's TOP puts it at that label's centre line,
+        -- so the period spans from one year mark to the next. The offset is the label art's own
+        -- inset, previously a bare 5.
+        period:ClearAllPoints()
+        period:SetPoint("BOTTOMLEFT", self.labelPool[index], "TOP", Spacing.xs, 0)
+
+        period:Initialize(index)
+    end
+    UIUtils.ReleaseFramesAbove(self.periodPool, pageSize)
+
+    self.visibleLabelCount = labelCount
+    self.visiblePeriodCount = pageSize
 end
 
--- arrow CovenantSanctum-Renown-Arrow-Depressed
--- CovenantSanctum-Renown-DoubleArrow
--- cyphersetupgrade-arrow-full
--- helptip-arrow
--- wowlabs-spectatecycling-arrowleft
+--[[
+    Restate the span the visible page covers, read off the outermost year marks
 
--- ui color ideas UI-Tuskarr-Highlight-Middle
+    Derived from the labels rather than from the pagination data so it cannot disagree with what is
+    on screen, and so it needs no event of its own. Only shown labels count: a label with no year to
+    show hides itself, and quoting one of those would name a boundary the page does not have.
+]]
+function TimelineMixin:UpdateRangeIndicator()
+    if not self.RangeIndicator or not self.RangeIndicator.Text or not self.labelPool then
+        return
+    end
+
+    local lower, upper
+    for index = 1, self.visibleLabelCount or #self.labelPool do
+        local label = self.labelPool[index]
+        local text = label and label:IsShown() and label.Text and label.Text:GetText()
+
+        if text and text ~= "" then
+            lower = lower or text
+            upper = text
+        end
+    end
+
+    if not lower then
+        self.RangeIndicator.Text:SetText("")
+        return
+    end
+
+    self.RangeIndicator.Text:SetText(lower .. Locale["RangeSeparator"] .. upper)
+end
 
 function TimelineMixin:OnLoad()
     -- Set localized button text
     self.ZoomOut:SetText(Locale["Zoom Out"])
     self.ZoomIn:SetText(Locale["Zoom In"])
+    self.Previous:SetText(Locale["Previous Page"])
+    self.Next:SetText(Locale["Next Page"])
     self.ZoomOut:SetScript(
         "OnClick",
         function()
@@ -131,7 +194,8 @@ function TimelineMixin:OnLoad()
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
 
-    self:ConfigureNavigationButtons()
+    -- Before any Display* event fires: the pooled frames are what register for those events.
+    self:RefreshTimelinePools(private.constants.config.timeline.pageSize)
 
     self:InitializeStateSubscriptions()
 
@@ -424,6 +488,9 @@ function TimelineMixin:FallbackNavigateToYear(year)
 end
 
 function TimelineMixin:OnTimelineInit(eventData)
+    -- Ahead of the compute, so a changed page size has its frames before the Display* events fire
+    self:RefreshTimelinePools(private.constants.config.timeline.pageSize)
+
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
 end
@@ -479,8 +546,25 @@ end
 -- TimelineLabel
 -- -------------------------
 TimelineLabelMixin = {}
-function TimelineLabelMixin:OnLoad()
-    local eventName = private.constants.events.DisplayTimelineLabel .. tostring(self.index)
+
+--[[
+    Claim a position in the timeline and subscribe to the event that fills it
+
+    Replaces an OnLoad that read an "index" KeyValue. Pooled frames are created without one, so the
+    position arrives here instead; the DisplayTimelineLabel<index> naming that Timeline.lua fires
+    against is unchanged. Calling this again on an already-initialized frame is a no-op, so
+    re-laying-out the pool does not stack duplicate subscriptions.
+
+    @param index [number] Position in the label row, 1-based from the left
+]]
+function TimelineLabelMixin:Initialize(index)
+    if self.index then
+        return
+    end
+
+    self.index = index
+
+    local eventName = private.constants.events.DisplayTimelineLabel .. tostring(index)
     private.Core.registerCallback(eventName, self.OnDisplayTimelineLabel, self)
 end
 
@@ -491,15 +575,67 @@ function TimelineLabelMixin:OnDisplayTimelineLabel(data)
     else
         self:Hide()
     end
+
+    local timeline = self:GetParent()
+    if timeline and timeline.UpdateRangeIndicator then
+        timeline:UpdateRangeIndicator()
+    end
 end
 
 -- -------------------------
 -- TimelinePeriod
 -- -------------------------
 TimelinePeriodMixin = {}
-function TimelinePeriodMixin:OnLoad()
-    local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(self.index)
+
+local ART_PATH = "Interface\\AddOns\\Chronicles\\Art\\"
+local NO_EVENTS_TEXTURE = "no-events"
+
+-- Ordered low to high; the first tier whose ceiling the count is under wins, and anything above
+-- them all is dense. The same ladder used to be written out three times over.
+local EVENT_DENSITY_TIERS = {
+    {below = 10, texture = "low-events"},
+    {below = 25, texture = "medium-events"}
+}
+local DENSE_TEXTURE = "high-events"
+
+--[[
+    Claim a position in the timeline and subscribe to the event that fills it
+
+    @param index [number] Position in the period row, 1-based from the left
+]]
+function TimelinePeriodMixin:Initialize(index)
+    if self.index then
+        return
+    end
+
+    self.index = index
+
+    local eventName = private.constants.events.DisplayTimelinePeriod .. tostring(index)
     private.Core.registerCallback(eventName, self.OnDisplayTimelinePeriod, self)
+end
+
+--[[
+    Paint the period's background for how many events it holds
+
+    @param selected [boolean] Use the "-selected" variant of whichever density texture applies
+]]
+function TimelinePeriodMixin:ApplyEventDensityTexture(selected)
+    local data = self.data
+
+    if not data or not data.hasEvents then
+        self.Background:SetTexture(ART_PATH .. NO_EVENTS_TEXTURE)
+        return
+    end
+
+    local textureName = DENSE_TEXTURE
+    for _, tier in ipairs(EVENT_DENSITY_TIERS) do
+        if data.nbEvents < tier.below then
+            textureName = tier.texture
+            break
+        end
+    end
+
+    self.Background:SetTexture(ART_PATH .. textureName .. (selected and "-selected" or ""))
 end
 
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
@@ -513,46 +649,32 @@ function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)
 
     if (periodData ~= nil and periodData.hasEvents) then
         self.Text:SetText(periodData.nbEvents)
-        local select = isSelected and "-selected" or ""
-
-        if periodData.nbEvents < 10 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events" .. select)
-        elseif periodData.nbEvents < 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events" .. select)
-        elseif periodData.nbEvents >= 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events" .. select)
-        end
     else
         self.Text:SetText("")
-        self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\no-events")
     end
+
+    self:ApplyEventDensityTexture(isSelected)
 
     self.Background:SetVertexColor(1, 1, 1)
 end
 
-function TimelinePeriodMixin:ResetAllPeriodTextures()
-    local periods = {
-        Period1,
-        Period2,
-        Period3,
-        Period4,
-        Period5,
-        Period6,
-        Period7,
-        Period8
-    }
+--[[
+    Return every period on the page to its unselected texture
 
-    for _, period in ipairs(periods) do
-        if period.data and period.data.hasEvents then
-            if period.data.nbEvents < 10 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events")
-            elseif period.data.nbEvents < 25 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events")
-            elseif period.data.nbEvents >= 25 then
-                period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events")
-            end
-        else
-            period.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\no-events")
+    Walks the parent's pool. This used to read a literal eight-element list of Period1..Period8
+    globals, which both hardcoded the page size and depended on frames being named.
+]]
+function TimelinePeriodMixin:ResetAllPeriodTextures()
+    local timeline = self:GetParent()
+    local pool = timeline and timeline.periodPool
+    if not pool then
+        return
+    end
+
+    for index = 1, (timeline.visiblePeriodCount or #pool) do
+        local period = pool[index]
+        if period then
+            period:ApplyEventDensityTexture(false)
         end
     end
 end
@@ -598,13 +720,5 @@ function TimelinePeriodMixin:OnClick()
     self:ResetAllPeriodTextures()
 
     -- Set the selected texture for this period
-    if (periodData ~= nil and periodData.hasEvents) then
-        if periodData.nbEvents < 10 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\low-events-selected")
-        elseif periodData.nbEvents < 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\medium-events-selected")
-        elseif periodData.nbEvents >= 25 then
-            self.Background:SetTexture("Interface\\AddOns\\Chronicles\\Art\\high-events-selected")
-        end
-    end
+    self:ApplyEventDensityTexture(true)
 end
