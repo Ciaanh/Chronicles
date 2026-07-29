@@ -8,6 +8,7 @@
     Supports all template types including HTML_CONTENT for the new unified system.
 ]]
 local FOLDER_NAME, private = ...
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- =============================================================================================
 -- BOOK CONTAINER MIXIN
@@ -37,8 +38,9 @@ function BookContainerMixin:OnLoad()
     -- Set up template system
     self.PagedDetails:SetElementTemplateData(private.constants.templates)
 
-    -- Register for UI refresh events
-    private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
+    -- Deliberately no UIRefresh handler here. A refresh must not blank the page you are reading, and
+    -- this frame does not know what is selected. MainFrameUI owns the selection-to-book mapping and
+    -- re-renders each book from current state on UIRefresh instead.
 
     local onPagingButtonEnter = GenerateClosure(self.OnPagingButtonEnter, self)
     local onPagingButtonLeave = GenerateClosure(self.OnPagingButtonLeave, self)
@@ -100,30 +102,26 @@ function BookContainerMixin:OnContentReceived(bookContent)
 end
 
 --[[
-    Display empty book state
+    Display the empty book state — what the reader sees before they pick anything.
+
+    @param promptText [string] Optional invitation to select something. The caller knows which kind
+                              of entity this book shows; without it we fall back to a neutral line.
 ]]
-function BookContainerMixin:ShowEmptyBook()
-    -- Test with HTML content first
-    local testContent = {
+function BookContainerMixin:ShowEmptyBook(promptText)
+    local message = promptText or Locale["NoContentAvailable"]
+
+    local emptyContent = {
         {
             elements = {
                 {
                     templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                    htmlContent = "<html><body><h1>Test HTML Content</h1><p>This is a test to verify the HTML content template is working.</p></body></html>",
-                    title = "Test"
+                    htmlContent = string.format('<html><body><p align="center">%s</p></body></html>', message)
                 }
             }
         }
     }
 
-    local dataProvider = CreateDataProvider(testContent)
+    local dataProvider = CreateDataProvider(emptyContent)
     self.PagedDetails:SetDataProvider(dataProvider, false)
-    self.currentlyDisplayedContent = testContent
-end
-
---[[
-    Handle UI refresh events
-]]
-function BookContainerMixin:OnUIRefresh()
-    self:ShowEmptyBook()
+    self.currentlyDisplayedContent = emptyContent
 end

@@ -2,6 +2,12 @@
 
 This document outlines the areas to investigate during a comprehensive code quality audit of the Chronicles addon. Each section describes what to check, current findings from the initial survey, and reference patterns from Blizzard's FrameXML source.
 
+> **"Current state" blocks re-verified 2026-07-29.** The "What to check" and "Blizzard reference
+> patterns" sections are the durable part of this document and are unchanged. The survey snapshots
+> below were taken before the v2.1.0 book rewrite and the correctness pass that followed, so each one
+> that has moved now records what changed. Sections 1, 2, 4, 6, 7 and 8 all shifted; sections 5, 9
+> and 10 are unverified since the original survey.
+
 ---
 
 ## 1. Error Handling & Defensive Programming
@@ -13,11 +19,16 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Registration functions: provide meaningful error feedback
 - Use of `pcall`/`xpcall` around risky operations (plugin callbacks, data parsing)
 
-### Current state
-- **Minimal**: Only one `print()` error in `DB/DB.lua`
-- `DataRegistry` functions return `false` silently on failure
-- No `assert`, `pcall`, or `xpcall` usage found
-- No input validation at UI entry points
+### Current state (revised 2026-07-29)
+- `pcall` now appears in eight files, and failures are forwarded to `geterrorhandler()` rather than
+  discarded — in `Chronicles:ExecuteWhenReady`, the asynchronous cache warm queue, and the
+  StateManager subscription replay in `MainFrameUI`. No `xpcall` or `securecallfunction` yet.
+- `DataRegistry` no longer fails silently: each of `registerEventDB` / `registerCharacterDB` /
+  `registerFactionDB` rejects a non-string collection name, a non-table payload, and a duplicate
+  name with a coloured `print` naming the collection, and returns `false`.
+- `EventManager` enforces each schema's `required` fields at trigger time, so a payload/handler
+  mismatch is caught rather than silently producing nil.
+- Still open: no `assert` for programming errors, and no input validation at UI entry points.
 
 ### Blizzard reference patterns
 - Blizzard uses `assert()` for programming errors (wrong arguments)
@@ -31,14 +42,26 @@ This document outlines the areas to investigate during a comprehensive code qual
 
 ### What to check
 - All `FooMixin = {}` declarations — are they polluting `_G`?
-- Intentional globals (`Chronicles`, `ChroniclesPluginData`) — are they properly namespaced?
+- Intentional globals (`Chronicles`, `ChroniclesPlugins`) — are they properly namespaced?
 - Variables without `local` keyword in module scope
 - String constants used as identifiers without `private.constants`
 
-### Current state
-- **20+ mixin globals**: `EmptyMixin`, `AuthorMixin`, `ChapterHeaderMixin`, `CoverPageMixin`, `EventTitleMixin`, `SimpleTitleMixin`, `HtmlPageMixin`, `SharedBookMixin`, `EventListItemMixin`, `VerticalListItemMixin`, `TabUIMixin`, `TimelineMixin`, `EventListPagingMixin`, etc.
-- These are required by WoW's XML `mixin="FooMixin"` attribute (must be global)
-- No global leak detection tooling
+### Current state (revised 2026-07-29)
+- **14 mixin globals**: `MainFrameUIMixin`, `TabUIMixin`, `TimelineMixin`, `TimelineLabelMixin`,
+  `TimelinePeriodMixin`, `EventListMixin`, `EventListItemMixin`, `VerticalListMixin`,
+  `VerticalListItemMixin`, `BookContainerMixin`, `HTMLContentMixin`, `ScrollFrameMixin`,
+  `SettingsMixin`, `CategoryButtonMixin`. The book-page mixins from the old paged layer
+  (`EmptyMixin`, `AuthorMixin`, `ChapterHeaderMixin`, `CoverPageMixin`, `EventTitleMixin`,
+  `SimpleTitleMixin`, `HtmlPageMixin`, `SharedBookMixin`) and `EventListPagingMixin` are gone with
+  the templates that used them.
+- These are required by WoW's XML `mixin="FooMixin"` attribute (must be global).
+- The two remaining non-mixin globals are `Chronicles` (the public facade) and `ChroniclesPlugins`
+  (the cross-addon data contract). `ChroniclesPluginData` was removed in v2.1.0, and the 41
+  `<Name>DB` globals the data layer used to declare now live under `private.DB`.
+- `UI/Events/TimelineTemplate.xml` no longer leaks the 17 `Label1..9` / `Period1..8` frame globals;
+  the period grid is built from frame pools.
+- Still no global leak detection tooling. `./tools/harness.ps1 check` gates syntax, not globals; a
+  `luacheck` layer is the next step (see the workspace `ANALYSIS.md` § A-10).
 
 ### Blizzard reference patterns
 - Blizzard mixins are global by design (required for XML `mixin` attribute)
@@ -61,9 +84,14 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Subscription cleanup on frame hide/destroy
 
 ### Current state
-- **StateManager used correctly** for: selected event/character/faction, current tab, timeline step, collection toggles, event type filters
+- **StateManager used correctly** for: selected event/character/faction, Settings category
+  (`ui.settingsCategory` — note this is *not* the main tab strip, which lives in Blizzard's
+  `TabSystemOwnerMixin` and is not persisted), window position, timeline step, collection toggles,
+  event type filters
 - **Bypassed in**: `VerticalListTemplate` (`self.currentSearchTerm`, `self.selectedItem`), `Settings.lua` (`self.prefix`, `self.categories`, `self.eventTypeId`)
-- No subscription cleanup patterns observed
+- Subscription cleanup: `MainFrameUI` now enables its state subscriptions in `OnShow` and disables
+  them in `OnHide`, and `TimelineMixin` unregisters its event callbacks from a declarative list. The
+  per-item templates still have no cleanup path.
 
 ### Blizzard reference patterns
 - Blizzard uses `FramePool` pattern — frames are recycled, so state must be external
@@ -85,16 +113,23 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Placeholder text, format strings, error messages
 - XML `text=` attributes on FontStrings and Buttons
 
-### Current state
-- **Hardcoded strings found in**:
-  - `VerticalListTemplate.lua`: tooltip lines ("Available Content:", "Created by:", "Allegiance:", "Race:"), search placeholder ("Search..."), count format ("%d items")
-  - `DB/DB.lua`: error message
-- **Properly localized**: Timeline button labels, tab names, settings labels
+### Current state (revised 2026-07-29)
+- The `VerticalListTemplate.lua` strings named in the original survey are now localized:
+  `SearchPlaceholder` / `SearchCharactersPlaceholder` / `SearchFactionsPlaceholder` and
+  `ListCountItems` / `ListCountCharacters` / `ListCountFactions`. The book's error strings and empty
+  prompts moved to `BOOK_ERROR_*` / `BookEmptyPrompt*` in the same pass.
+- **Not localized, deliberately**: the registration failure messages in `Core/Data/DataRegistry.lua`
+  and `Chronicles.lua` — they are developer diagnostics for plugin authors, not player-facing text.
+- **Properly localized**: Timeline button labels, tab names, settings labels.
+- Only `Locales/enUS.lua` exists. The AceLocale scaffolding is complete, so translations are
+  unblocked; nobody has contributed one.
 
 ### Audit process
 1. `grep` for `SetText(`, `AddLine(`, `GameTooltip:`, format strings
 2. Cross-reference each with `Locales/enUS.lua` — is there a matching key?
-3. Flag any raw English string not using `Chronicles.L["KEY"]`
+3. Flag any raw English string not resolved through the file's AceLocale handle
+   (`local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)`; there is no
+   `Chronicles.L`)
 
 ---
 
@@ -107,9 +142,15 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Template reuse vs duplication
 - `$parent` references in key values
 
-### Current state
-- **Conflicting layout pattern** found in: `EventListItemTemplate`, `VerticalListItemTemplate`, `EventTitleTemplate`, `CoverPageTemplate`
-- See `docs/analysis/ui-text-overflow.md` for full details
+### Current state (revised 2026-07-29)
+- The original finding named `EventListItemTemplate`, `VerticalListItemTemplate`, `EventTitleTemplate`
+  and `CoverPageTemplate`. The last two no longer exist — the paged book layer they belonged to was
+  replaced by `UI/Book/BookContainerTemplate` rendering HTML. The first two survive and have **not**
+  been re-checked for the `setAllPoints` + explicit `<Size>` conflict.
+- The companion document `docs/analysis/ui-text-overflow.md` was deleted rather than updated: it was
+  a detailed analysis of the deleted rendering path (`SharedBookTemplate` + `BookUtils` +
+  `BookPages.xml`) and would have been read as a live bug report. Re-derive against the current
+  templates if this phase is picked up.
 
 ### Blizzard reference patterns
 - Blizzard uses two-point anchoring for width-constrained text (TOPLEFT + TOPRIGHT)
@@ -132,10 +173,22 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Callback registration/unregistration lifecycle
 - Event ordering dependencies
 
-### Current state
+### Current state (revised 2026-07-29)
 - **Consistent**: All addon events use `private.constants.events.*` constants
-- **No payload validation** at trigger points
-- Callback registration happens in `OnLoad`/`OnShow` — no corresponding cleanup in `OnHide`
+- **Payloads are now validated.** `EventManager`'s `eventSchemas` `required` arrays are enforced at
+  trigger time instead of being documentation, and the dynamic `DisplayTimelineLabel<n>` /
+  `DisplayTimelinePeriod<n>` names resolve to their base schema. This caught a real bug: the timeline
+  paging handlers took `(isVisible)` while the trigger sent `{visible = true}`, so both arrows stayed
+  permanently disabled.
+- ~~Two declared events are dead: `AddonShutdown` and `TabUITabSet` have a constant and a schema but
+  no trigger and no listener.~~ **Both deleted** — constant, schema, and `TabUITabSet`'s single
+  producer. `constants.events` (`Constants.lua:53-65`) now declares ten events, all of which are
+  triggered and consumed.
+- `events.UIRefresh` was also renamed from the string `"Timeline.CLEAN"` to `"UI.REFRESH"`. It was
+  never timeline-scoped: Settings produces it, and the event list, the book and the vertical list
+  consume it.
+- Callback registration happens in `OnLoad`/`OnShow`; `TimelineMixin` unregisters from a declarative
+  list, other mixins still have no cleanup in `OnHide`.
 
 ### Blizzard reference patterns
 - Blizzard uses `EventRegistry` with typed callbacks
@@ -153,16 +206,24 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Cache warming strategy (pre-compute on load vs lazy)
 - Memory pressure from cached data
 
-### Current state
-- **Cached**: periods filling, search events, collections names, all characters
-- **Not cached**: `getAllFactions()` (frequently called)
-- **Invalidation**: strategically placed in `Core/Data.lua` after data mutations
-- **No pre-warming**: all caches are lazy (computed on first access)
+### Current state (revised 2026-07-29)
+- **Cached**: periods filling, min/max event year, search events, collections names, all characters,
+  filtered characters, book content. Capped at 100 entries.
+- **Invalidation is centralized.** `Cache.invalidateForDataChange(kind)` owns the full key set per
+  kind of change (`"events"`, `"characters"`, `"factions"`, `"all"`) and `error()`s on an unknown
+  kind. Every registrar and both Settings toggles route through it. The previous state — each call
+  site hand-picking keys, and each picking a different incomplete set — was the bug: toggling a
+  collection off left the character rail listing its entries.
+- **Warm-up exists but is asynchronous and lazy-first**: `processWarmQueue` pre-computes in the
+  background, and a failure inside it is now reported to `geterrorhandler()` instead of being filed
+  in `Cache._lastWarmError` and forgotten.
+- `getAllFactions()` no longer exists, so the "not cached" finding is moot.
 
 ### Audit process
 1. Profile which functions are called most frequently
 2. Check if any iterate full datasets without caching
-3. Verify every `registerXDB()` path invalidates all relevant caches
+3. Verify every `registerXDB()` path calls `invalidateForDataChange` with the right kind, and that
+   `DATA_CHANGE_KEYS` still lists every cache derived from that kind
 
 ---
 
@@ -175,10 +236,15 @@ This document outlines the areas to investigate during a comprehensive code qual
 - Texture/font object reuse
 - String concatenation in loops (use `table.concat` instead)
 
-### Current state
-- **Timeline rendering**: Uses `OnUpdate` for some animation/scrolling (acceptable)
-- **Event list**: Creates frames for each visible item (should verify pooling)
-- **Search**: Full-text search over all events — check if indexed
+### Current state (revised 2026-07-29)
+- **Timeline rendering**: labels and periods now come from frame pools sized from the configured page
+  size (`TimelineMixin:RefreshTimelinePools`), replacing nine labels and eight periods hand-chained
+  in XML.
+- **Event list and rails**: both moved to `CreateScrollBoxListLinearView` +
+  `ScrollUtil.InitScrollBoxListWithScrollBar`, so only visible items have frames. The Blizzard
+  `ScrollBox`/`DataProvider` recommendation below is now adopted rather than aspirational.
+- **Search**: still a full scan over all events, with results memoized per `yearStart_yearEnd` key.
+  No index.
 
 ### Blizzard reference patterns
 - `FramePool` / `ObjectPoolMixin` for frame recycling
@@ -213,8 +279,10 @@ This document outlines the areas to investigate during a comprehensive code qual
 
 ### Current state
 - Chronicles is a lore/data addon — unlikely to use combat APIs
-- Should still verify no deprecated API calls exist
-- TOC `Interface` version should target current patch
+- Should still verify no deprecated API calls exist. One known offender: `UI/Settings/Settings.xml:7`
+  still inherits the deprecated `InterfaceOptionsCheckButtonTemplate`, and
+  `Settings.RegisterAddOnCategory()` is never called.
+- TOC `Interface` is `120001`, which matches the target patch.
 
 ### Audit process
 1. Cross-reference all WoW API calls against the 12.0.0 removed list

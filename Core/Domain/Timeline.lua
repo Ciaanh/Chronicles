@@ -33,8 +33,6 @@ local function clearYearSpecificMode(description)
     )
 
     stateManager.setState(stateManager.buildTimelineKey("yearSpecificTarget"), nil, "Year-specific target cleared")
-
-    stateManager.setState(stateManager.buildTimelineKey("yearSpecificEvents"), nil, "Year-specific events cleared")
 end
 
 -- -------------------------
@@ -44,12 +42,40 @@ local Timeline = {}
 Timeline.MaxStepIndex = #private.constants.config.stepValues
 Timeline.Periods = {}
 
-local function getCurrentStepValue()
+local function isConfiguredStepValue(stepValue)
+    for _, value in ipairs(private.constants.config.stepValues) do
+        if value == stepValue then
+            return true
+        end
+    end
+    return false
+end
+
+local function setCurrentStepValue(value, description)
     local stateManager = getStateManager()
     if not stateManager then
-        return private.constants.config.stepValues[1] -- fallback default
+        return
     end
-    return stateManager.getState(stateManager.buildTimelineKey("currentStep"))
+    stateManager.setState(stateManager.buildTimelineKey("currentStep"), value, description or "Timeline step changed")
+end
+
+local function getCurrentStepValue()
+    local defaultStep = private.constants.config.stepValues[1]
+    local stateManager = getStateManager()
+    if not stateManager then
+        return defaultStep -- fallback default
+    end
+
+    local stepValue = stateManager.getState(stateManager.buildTimelineKey("currentStep"))
+
+    -- A step saved before its value was retired from stepValues has no index,
+    -- so every zoom computation on it would operate on nil.
+    if not isConfiguredStepValue(stepValue) then
+        setCurrentStepValue(defaultStep, "Timeline step reset to a configured value")
+        return defaultStep
+    end
+
+    return stepValue
 end
 
 local function getCurrentPage()
@@ -68,14 +94,6 @@ local function getSelectedYear()
     return stateManager.getState(stateManager.buildTimelineKey("selectedYear"))
 end
 
-local function setCurrentStepValue(value, description)
-    local stateManager = getStateManager()
-    if not stateManager then
-        return
-    end
-    stateManager.setState(stateManager.buildTimelineKey("currentStep"), value, description or "Timeline step changed")
-end
-
 local function setCurrentPage(value, description)
     local stateManager = getStateManager()
     if not stateManager then
@@ -92,28 +110,14 @@ local function setSelectedYear(value, description)
     stateManager.setState(stateManager.buildTimelineKey("selectedYear"), value, description or "Timeline year changed")
 end
 
-local function GetDateCurrentStepIndex(date)
-    return getTimelineBusiness().getDateCurrentStepIndex(date)
-end
-
-local function GetCurrentStepPeriodsFilling()
-    return getTimelineBusiness().getCurrentStepPeriodsFilling()
-end
-
-local function CountEvents(block)
-    return getTimelineBusiness().countEventsInPeriod(block)
-end
-
-local function GetTimelineConfig(minYear, maxYear, stepValue)
-    return getTimelineBusiness().calculateTimelineConfig(minYear, maxYear, stepValue)
-end
-
 local function GetStepValueIndex(stepValue)
     return getTimelineBusiness().getStepValueIndex(stepValue)
 end
 
+-- Resolves against the periods already held here, so the page index and the
+-- period selected from the same array cannot disagree.
 local function GetYearPageIndex(year)
-    return getTimelineBusiness().getYearPageIndex(year, Timeline.Periods)
+    return getTimelineBusiness().getYearPageIndexWithPeriods(year, Timeline.Periods)
 end
 
 function private.Core.Timeline.ChangePage(value)
@@ -292,39 +296,11 @@ function private.Core.Timeline.MaintainSelectedYear()
     end
 end
 
--- -------------------------
--- Initialization
--- -------------------------
-
-local function onCurrentPageChanged(newPage, oldPage, description)
-    if newPage ~= oldPage and oldPage ~= nil then
-        private.Core.Timeline.DisplayTimelineWindow()
-    end
-end
-
-function private.Core.Timeline.Init()
-    local currentStep = getCurrentStepValue()
-    if not currentStep then
-        local defaultStep = private.constants.config.stepValues[1]
-        setCurrentStepValue(defaultStep, "Timeline step initialized to default")
-    end
-
-    local currentPage = getCurrentPage()
-    if not currentPage then
-        setCurrentPage(1, "Timeline page initialized to default")
-    end
-
-    private.Core.StateManager.subscribe(
-        private.Core.StateManager.buildTimelineKey("currentPage"),
-        onCurrentPageChanged,
-        "Timeline"
-    )
-
-    private.Core.Timeline.ComputeTimelinePeriods()
-    private.Core.Timeline.DisplayTimelineWindow()
-
-    SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
-end
+-- There is deliberately no Timeline.Init(). Every piece of startup work it would do already has an
+-- owner: TimelineTemplate's OnTimelineInit computes periods and renders, TimelineBusiness defaults a
+-- missing page to 1 and sanitizes a retired step value, and TimelineInit is triggered by Core/Data
+-- and by RegisterPluginDB. Its currentPage subscription would also have double-rendered, because
+-- NavigatePage already calls DisplayTimelineWindow() itself right after setCurrentPage().
 
 --[[
     Navigate to a specific year and display associated events

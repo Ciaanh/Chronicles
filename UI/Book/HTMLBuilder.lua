@@ -74,16 +74,6 @@ local HTML_ENTITIES = {
     ['"'] = "&quot;"
 }
 
--- Extended HTML entities from LibMarkdown for spacing
-local EXTENDED_ENTITIES = {
-    ["&nbsp;"] = "&nbsp;", -- Non-breaking space
-    ["&emsp;"] = "&emsp;", -- Font-size space
-    ["&ensp;"] = "&ensp;", -- Half font-size space
-    ["&em13;"] = "&em13;", -- 1/3 font-size space
-    ["&em14;"] = "&em14;", -- 1/4 font-size space
-    ["&thinsp;"] = "&thinsp;" -- 1/5 font-size space (non-breaking)
-}
-
 -- =============================================================================================
 -- UTILITY FUNCTIONS
 -- =============================================================================================
@@ -99,11 +89,13 @@ local function ApplyWoWColor(text, colorCode)
     return colorCode .. text .. WOW_COLORS.reset
 end
 
--- Minimal HTML escaping for SimpleHTML-safe text
+-- Minimal HTML escaping for SimpleHTML-safe text. One pass over a replacement table rather than
+-- chained gsubs: chaining has to escape "&" first or it re-escapes its own output into "&amp;lt;".
 local function EscapeHTML(text)
-    if not text or text == "" then return "" end
-    text = text:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;"):gsub('"', "&quot;")
-    return text
+    if not text or text == "" then
+        return ""
+    end
+    return (text:gsub('[&<>"]', HTML_ENTITIES))
 end
 
 --[[
@@ -374,6 +366,13 @@ end
     @param navigationData [table] Navigation data with page mapping
     @return [string] HTML table of contents
 ]]
+-- The id a chapter is addressed by in a "chronicles:chapter:<id>" link. Both the table of contents
+-- (which emits the link) and CreateChapterNavigationData (which builds the id -> page mapping the
+-- link is resolved against) must derive it the same way, or every TOC entry silently goes nowhere.
+local function ChapterLinkId(chapter, index)
+    return chapter.id or ("chapter_" .. index)
+end
+
 function HTMLBuilder.CreateTableOfContents(entity, navigationData)
     if not entity or not entity.chapters then
         return ""
@@ -387,7 +386,7 @@ function HTMLBuilder.CreateTableOfContents(entity, navigationData)
         local chapterNumber = (Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or string.format("Chapter %d", i)
 
         -- Create clickable link to navigate to the chapter
-        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", chapter.id or ("chapter_" .. i))
+        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", ChapterLinkId(chapter, i))
 
         -- Format: "Chapter 1: Chapter Title"
         local tocEntry = string.format("%s: %s", chapterNumber, chapterLink)
@@ -427,7 +426,7 @@ function HTMLBuilder.CreateChapterNavigationData(entity)
 
     -- Chapter pages
     for i, chapter in ipairs(entity.chapters) do
-        local chapterId = chapter.id or ("chapter_" .. i)
+        local chapterId = ChapterLinkId(chapter, i)
 
         navigationData.chapters[i] = {
             id = chapterId,
@@ -463,115 +462,6 @@ function HTMLBuilder.CreatePageHeader(chapter, navigationData)
 
     return headerContent .. HTMLBuilder.CreateDivider()
 end
-
---[[
-    HYPERLINK USAGE EXAMPLE:
-    
-    To use hyperlinks in Chronicles, you need to set up a hyperlink handler on your SimpleHTML frame:
-    
-    -- Enable hyperlinks on your frame
-    frame:SetHyperlinksEnabled(true)
-    
-    -- Set up the hyperlink click handler
-    frame:SetScript("OnHyperlinkClick", function(self, link, text, button)
-        local linkType, linkData = link:match("([^:]+):(.+)")
-        
-        if linkType == "chapter" then
-            -- Navigate to specific chapter using BookContainerTemplate
-            if self.BookContainer then
-                self.BookContainer:NavigateToChapter(linkData)
-                PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
-            end
-        elseif linkType == "toc" then
-            -- Navigate to table of contents
-            if self.BookContainer then
-                self.BookContainer:NavigateToChapter("toc")
-            end
-        elseif linkType == "cover" then
-            -- Navigate to cover page
-            if self.BookContainer then
-                self.BookContainer:NavigateToChapter("cover")
-            end
-        elseif linkType == "event" then
-            local eventId = tonumber(linkData)
-            if eventId and private.Core.StateManager then
-                private.Core.StateManager.setState("selection.event", eventId, "Hyperlink navigation")
-            end
-        elseif linkType == "character" then
-            if private.Core.StateManager then
-                private.Core.StateManager.setState("selection.character", linkData, "Hyperlink navigation")
-            end
-        elseif linkType == "faction" then
-            if private.Core.StateManager then
-                private.Core.StateManager.setState("selection.faction", linkData, "Hyperlink navigation")
-            end
-        elseif linkType == "external" then
-            -- Copy external URLs to clipboard (WoW can't open external browsers)
-            if linkData and linkData ~= "" then
-                -- Note: You'd need to implement clipboard functionality
-                print("External link: " .. linkData)
-            end
-        end
-    end)
-    
-    -- INTEGRATION WITH BOOKCONTAINERTEMPLATE:
-    
-    -- In BookContainerMixin or related module, add these functions:
-    function BookContainerMixin:SetupChapterNavigation(navigationData)
-        self.chapterNavigationData = navigationData
-        if self.PagedDetails then
-            self.PagedDetails.chapterNavigationData = navigationData
-        end
-    end
-
-    function BookContainerMixin:NavigateToChapter(chapterId)
-        if not self.chapterNavigationData then return false end
-        
-        local pageIndex = self.chapterNavigationData.pageMapping[chapterId]
-        if pageIndex then
-            if self.PagedDetails and self.PagedDetails.PagingControls then
-                self.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
-                return true
-            end
-        end
-        return false
-    end
-    
-    -- Example usage in HTML generation:
-    local bookData = HTMLBuilder.CreateEntityHTML(entity)
-    
-    -- Set up the book container with navigation
-    if self.BookContainer then
-        self.BookContainer:SetupChapterNavigation(bookData.navigationData)
-        self.BookContainer.PagedDetails:SetContent(bookData.documents)
-        
-        -- Enable hyperlinks on view frames
-        for _, viewFrame in ipairs(self.BookContainer.PagedDetails.ViewFrames) do
-            if viewFrame.ScrollFrame and viewFrame.ScrollFrame.Child then
-                viewFrame.ScrollFrame.Child:SetHyperlinksEnabled(true)
-            end
-        end
-    end
---]]
--- =============================================================================================
--- NAVIGATION UTILITY FUNCTIONS
--- =============================================================================================
-
--- --[[
---     Create back to table of contents link
---     @return [string] HTML link to TOC
--- ]]
--- function HTMLBuilder.CreateBackToTOCLink()
---     return HTMLBuilder.CreateLink("← Back to Contents", "toc", "main")
--- end
-
--- --[[
---     Create back to cover page link
---     @return [string] HTML link to cover
--- ]]
--- function HTMLBuilder.CreateBackToCoverLink()
---     return HTMLBuilder.CreateLink("← Back to Cover", "cover", "main")
--- end
 
 -- =============================================================================================
 -- ENTITY CONTENT GENERATION
@@ -697,14 +587,6 @@ function HTMLBuilder.CreateEntityHTML(entity)
                 end
             end
 
-            -- -- Add navigation footer if we have chapter data
-            -- if chapterData then
-            --     local navigation = HTMLBuilder.CreateChapterNavigationBar(chapterData, navigationData)
-            --     chapterContent = chapterContent .. HTMLBuilder.CreateDivider() .. navigation
-            -- end
-
-            -- print(HTMLBuilder.CreateDecorativeDivider())
-
             -- Add chapter content as a document if it has content
             if chapterContent ~= "" then
                 table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(chapterContent))
@@ -731,71 +613,3 @@ function HTMLBuilder.CreateEntityHTML(entity)
     }
 end
 
--- --[[
---     Create an enhanced cover page with better formatting
---     @param entity [table] Entity data
---     @return [string] Complete HTML document for cover page
--- ]]
--- function HTMLBuilder.CreateEnhancedCoverPage(entity)
---     local coverContent = ""
-
---     -- Add title with fancy formatting
---     local title = entity.name or entity.label or "Untitled"
---     coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
-
---     -- Add image centered if it's a cover image
---     if entity.coverImage then
---         coverContent =
---             coverContent ..
---             HTMLBuilder.CreatePortrait(entity.coverImage, {width = "300", height = "300", align = "center"})
---     elseif entity.image then
---         coverContent = coverContent .. HTMLBuilder.CreatePortrait(entity.image)
---     end
-
---     -- Add author with special formatting
---     if entity.author then
---         coverContent = coverContent .. HTMLBuilder.CreateAuthor(WOW_COLORS.author .. entity.author .. WOW_COLORS.reset)
---     end
-
---     -- Add short summary/preview if available
---     if entity.summary then
---         coverContent = coverContent .. HTMLBuilder.CreateParagraph(entity.summary, {align = "center"})
---     end
-
---     -- Add date range for events on cover page
---     if entity.yearStart or entity.yearEnd then
---         coverContent = coverContent .. HTMLBuilder.CreateDateRange(entity.yearStart, entity.yearEnd)
---     end
-
---     return HTMLBuilder.CreateHTMLDocument(coverContent)
--- end
-
--- =============================================================================================
--- VALIDATION AND DEBUG FUNCTIONS
--- =============================================================================================
-
--- --[[
---     Validate that an HTML string is compatible with SimpleHTML
---     @param htmlString [string] HTML content to validate
---     @return [boolean, string] isValid, errorMessage
--- ]]
--- function HTMLBuilder.ValidateSimpleHTML(htmlString)
---     if not htmlString or htmlString == "" then
---         return false, "Empty HTML content"
---     end
-
---     -- Check for unsupported tags
---     local unsupportedTags = {"<div", "<span", "<style", "<script", "<ul", "<ol", "<li", "<table"}
---     for _, tag in ipairs(unsupportedTags) do
---         if string.find(htmlString:lower(), tag) then
---             return false, "Unsupported HTML tag found: " .. tag
---         end
---     end
-
---     -- Check for required structure
---     if not string.find(htmlString, "<html>") or not string.find(htmlString, "<body>") then
---         return false, "Missing required <html> or <body> tags"
---     end
-
---     return true, "Valid SimpleHTML"
--- end

@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
 
-	<Include file="ScrollFrameMixin.lua" />
-	
+	<Script file="ScrollFrameMixin.lua" />
+
 	<Include file="Fonts.xml" />
 	<Include file="VerticalListTemplate.xml" />
 	
@@ -14,7 +14,7 @@
 
 	<Include file="Settings\Settings.xml" />
 
-	<Include file="PageTemplatesRegistration.lua" />
+	<Script file="PageTemplatesRegistration.lua" />
 
 	<Include file="MainFrameUI.xml" />
 

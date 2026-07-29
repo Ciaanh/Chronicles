@@ -8,6 +8,7 @@
     that can display any type of content through HTML.
 ]]
 local FOLDER_NAME, private = ...
+local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 -- =============================================================================================
 -- HTML CONTENT MIXIN
@@ -25,7 +26,7 @@ HTMLContentMixin = {}
 ]]
 function HTMLContentMixin:Init(elementData)
     if not elementData then
-        self:ShowError("No content data provided")
+        self:ShowError(Locale["BOOK_ERROR_NO_CONTENT_DATA"])
         return
     end
 
@@ -33,7 +34,7 @@ function HTMLContentMixin:Init(elementData)
     local htmlContent = elementData.htmlContent
 
     if not htmlContent or htmlContent == "" then
-        self:ShowError("No HTML content provided")
+        self:ShowError(Locale["BOOK_ERROR_NO_HTML"])
         return
     end
 
@@ -60,37 +61,7 @@ function HTMLContentMixin:Init(elementData)
         htmlContainer:Show()
         self:Show()
     else
-        self:ShowError("HTML display component not found")
-    end
-end
-
---[[
-    Update the height of the content based on HTML content
-]]
-function HTMLContentMixin:UpdateHeight()
-    if not self.ScrollFrame or not self.ScrollFrame.HTML then
-        return
-    end
-
-    -- Try to get content height from HTML component
-    local contentHeight = 550 -- Default height
-
-    if self.ScrollFrame.HTML.GetContentHeight then
-        local htmlHeight = self.ScrollFrame.HTML:GetContentHeight()
-        if htmlHeight and htmlHeight > 0 then
-            contentHeight = math.min(htmlHeight + 20, 800) -- Add padding, cap at 800
-        end
-    end
-
-    -- Set dynamic height with reasonable bounds
-    contentHeight = math.max(contentHeight, 200) -- Minimum height
-    contentHeight = math.min(contentHeight, 800) -- Maximum height
-
-    self:SetHeight(contentHeight)
-
-    -- Update scroll frame size
-    if self.ScrollFrame then
-        self.ScrollFrame:SetHeight(contentHeight - 10)
+        self:ShowError(Locale["BOOK_ERROR_NO_DISPLAY"])
     end
 end
 
@@ -99,18 +70,25 @@ end
     @param errorMessage [string] Error description
 ]]
 function HTMLContentMixin:ShowError(errorMessage)
-    errorMessage = errorMessage or "Unknown error occurred"
+    errorMessage = errorMessage or Locale["BOOK_ERROR_UNKNOWN"]
 
     -- Create simple HTML error message compatible with SimpleHTML
-    local errorHTML = string.format([[<html><body><h1>Error</h1><p>%s</p></body></html>]], errorMessage)
+    local errorHTML =
+        string.format([[<html><body><h1>%s</h1><p>%s</p></body></html>]], Locale["BOOK_ERROR_TITLE"], errorMessage)
 
     if self.ScrollFrame and self.ScrollFrame.HTML then
-        local success, err =
+        -- SetText can reject malformed markup. Failing here means the error notice itself cannot be
+        -- drawn, which would otherwise leave a blank frame and no clue -- so report rather than
+        -- swallow. geterrorhandler does not route back through this mixin, so there is no cascade.
+        local ok, err =
             pcall(
             function()
                 self.ScrollFrame.HTML:SetText(errorHTML)
             end
         )
+        if not ok then
+            geterrorhandler()(err)
+        end
 
         self:SetHeight(150)
         self:Show()
@@ -126,28 +104,22 @@ end
     @param button [string] The mouse button used
 ]]
 function HTMLContentMixin:OnHyperlinkClick(link, text, button)
-    -- Parse Chronicles links
-    if link:match("^chronicles:") then
-        local linkType, linkData = link:match("^chronicles:([^:]+):(.+)$")
+    -- Parse Chronicles links.
+    --
+    -- Only "chapter" is handled, because only chapter links are ever generated — the table of
+    -- contents builds them in HTMLBuilder.CreateTableOfContents. Cross-entity links
+    -- (chronicles:event:<id> and friends) are not produced anywhere, and the handlers that once
+    -- existed for them were wrong: they wrote a bare id into the selection state where every
+    -- consumer expects a {<kind>Id, collectionName} table. Re-adding entity navigation means
+    -- teaching HTMLBuilder.CreateLink to emit collection-qualified link data first, since an id
+    -- alone cannot identify a record across collections.
+    if not link:match("^chronicles:") then
+        return
+    end
 
-        if linkType == "chapter" then
-            -- Navigate to chapter
-            self:NavigateToChapter(linkData)
-        elseif linkType == "event" then
-            -- Navigate to event
-            self:NavigateToEvent(linkData)
-        elseif linkType == "character" then
-            -- Navigate to character
-            self:NavigateToCharacter(linkData)
-        elseif linkType == "faction" then
-            -- Navigate to faction
-            self:NavigateToFaction(linkData)
-        else
-            print("Chronicles: Unknown link type: " .. tostring(linkType))
-        end
-    else
-        -- Handle regular links
-    -- Optionally, route to SetItemRef for default handling or ignore
+    local linkType, linkData = link:match("^chronicles:([^:]+):(.+)$")
+    if linkType == "chapter" then
+        self:NavigateToChapter(linkData)
     end
 end
 
@@ -162,55 +134,19 @@ function HTMLContentMixin:NavigateToChapter(chapterData)
         bookContainer = bookContainer:GetParent()
     end
 
-    if bookContainer and bookContainer.navigationData then
-        -- navigationData.pageMapping holds id -> page index
-        local pageIndex = bookContainer.navigationData.pageMapping[chapterData]
-        if pageIndex then
-            if bookContainer.PagedDetails and bookContainer.PagedDetails.SetCurrentPage then
-                bookContainer.PagedDetails:SetCurrentPage(pageIndex)
-            elseif bookContainer.PagedDetails and bookContainer.PagedDetails.PagingControls and bookContainer.PagedDetails.PagingControls.SetCurrentPage then
-                bookContainer.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
-            end
-        else
-            print("Chronicles: Chapter not found: " .. tostring(chapterData))
-        end
-    else
-        print("Chronicles: Navigation data not available")
+    if not bookContainer or not bookContainer.navigationData then
+        return
     end
-end
 
---[[
-    Navigate to a specific event
-    @param eventId [string] Event ID
-]]
-function HTMLContentMixin:NavigateToEvent(eventId)
-    -- Use StateManager to update event selection
-    if private.Core.StateManager then
-    local key = private.Core.StateManager.buildSelectionKey("event")
-    private.Core.StateManager.setState(key, tonumber(eventId) or eventId, "Hyperlink navigation")
+    -- navigationData.pageMapping holds chapter id -> page index
+    local pageIndex = bookContainer.navigationData.pageMapping[chapterData]
+    if not pageIndex then
+        return
     end
-end
 
---[[
-    Navigate to a specific character
-    @param characterId [string] Character ID
-]]
-function HTMLContentMixin:NavigateToCharacter(characterId)
-    -- Use StateManager to update character selection
-    if private.Core.StateManager then
-    local key = private.Core.StateManager.buildSelectionKey("character")
-    private.Core.StateManager.setState(key, characterId, "Hyperlink navigation")
-    end
-end
-
---[[
-    Navigate to a specific faction
-    @param factionId [string] Faction ID
-]]
-function HTMLContentMixin:NavigateToFaction(factionId)
-    -- Use StateManager to update faction selection
-    if private.Core.StateManager then
-    local key = private.Core.StateManager.buildSelectionKey("faction")
-    private.Core.StateManager.setState(key, factionId, "Hyperlink navigation")
+    if bookContainer.PagedDetails and bookContainer.PagedDetails.SetCurrentPage then
+        bookContainer.PagedDetails:SetCurrentPage(pageIndex)
+    elseif bookContainer.PagedDetails and bookContainer.PagedDetails.PagingControls and bookContainer.PagedDetails.PagingControls.SetCurrentPage then
+        bookContainer.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
     end
 end

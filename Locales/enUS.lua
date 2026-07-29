@@ -6,21 +6,8 @@ if L then
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
     L["CurrentYear"] = "Current year is "
-    L["currentstep"] = "Step: "
     L["years"] = " years"
     L["AfterDP"] = " after the Dark Portal"
-    L["start"] = "Start"
-    L["end"] = "End"
-    L["year"] = "Year"
-    L[":My Characters"] = " : my characters"
-    L[":My Factions"] = " : my factions"
-    L[":My Events"] = " : my events"
-    L["AddPage"] = "Add page"
-    L["RemovePage"] = "Remove last page"
-    L["Save"] = "Save"
-    L["Add"] = "Add"
-    L["Delete"] = "Delete"
-    L["FactionsCharacters"] = "Factions/Characters"
 
     -- Date Search Localization
     L["Enter year..."] = "Enter year..."
@@ -28,34 +15,16 @@ if L then
     L["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] =
         "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
     L["Year must be between %d and %d"] = "Year must be between %d and %d"
-    L["Found %d events for year %d (period %d-%d)"] = "Found %d events for year %d (period %d-%d)"
-    L["No events found for year %d (period %d-%d)"] = "No events found for year %d (period %d-%d)"
     L["Found %d events for year %d"] = "Found %d events for year %d"
     L["No events found for year %d"] = "No events found for year %d"
-    L["Displaying events for year %d"] = "Displaying events for year %d"
-    L["Could not find timeline period for year %d"] = "Could not find timeline period for year %d"
-    L["Successfully navigated to year %d"] = "Successfully navigated to year %d"
-
-    L["Id_Field"] = "Id"
-    L["Title_Field"] = "Title"
-    L["YearStart_Field"] = "Year start"
-    L["YearEnd_Field"] = "Year end"
-    L["Description_Field"] = "Description"
-    L["EventType_Field"] = "Event type"
-    L["Timeline_Field"] = "Timeline"
-    L["Name_Field"] = "Name"
-    L["Biography_Field"] = "Biography"
-
-    L["Factions_List"] = "Factions"
-    L["Characters_List"] = "Characters"
-
-    L["ErrorYearAsNumber"] = "A year must be a number"
-    L["ErrorYearOrder"] = "Event ends before it's started"
 
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
 
-    -- Collection display names — keys must match the names registered in DB\DB.lua
+    -- Collection display names. Resolved dynamically as Locale[collectionName]
+    -- (UI/Settings/Settings.lua), so no literal lookup exists for these keys -- a
+    -- search for unreferenced strings will wrongly flag every one of them. Keys must
+    -- match the names registered in DB\DB.lua.
     L["Expansions"] = "Expansions"
     L["Origins"] = "Origins"
     L["Greatwars"] = "The Great Wars"
@@ -71,10 +40,9 @@ if L then
     L["Dragonflight"] = "Dragonflight"
     L["Future"] = "Future"
     L["Warwithin"] = "The War Within"
-    L["RP"] = "Roleplay"
 
-    L["Author"] = "by "
-
+    -- Event type display names, likewise resolved dynamically as Locale[eventTypeName]
+    -- from private.constants.eventType. Adding a type there needs a key here.
     L["event"] = "Event"
     L["era"] = "Era"
     L["war"] = "War"
@@ -108,7 +76,15 @@ if L then
     L["SettingsHomeVersionConfigNote"] = "Settings are automatically saved and will persist between sessions."
 
     -- Search functionality
-    L["SearchCharactersPlaceholder"] = "Search..."
+    L["SearchPlaceholder"] = "Search..."
+    L["SearchCharactersPlaceholder"] = "Search Characters..."
+    L["SearchFactionsPlaceholder"] = "Search Factions..."
+
+    -- Vertical list count labels. Pluralisation is not modelled: every collection large enough to
+    -- reach a rail has more than one entry.
+    L["ListCountItems"] = "%d items"
+    L["ListCountCharacters"] = "%d Characters"
+    L["ListCountFactions"] = "%d Factions"
 
     -- List item tooltips
     L["TooltipDefaultItemName"] = "Item"
@@ -119,6 +95,9 @@ if L then
 
     -- Book view
     L["NoContentAvailable"] = "No content available"
+    L["BookEmptyPromptEvent"] = "Select an event from the timeline or the list to read its chronicle."
+    L["BookEmptyPromptCharacter"] = "Select a character from the list to read their chronicle."
+    L["BookEmptyPromptFaction"] = "Select a faction from the list to read its chronicle."
 
     -- Timeline toolbar button glyphs, and the separator in the visible-range readout
     L["Zoom Out"] = "-"
@@ -138,6 +117,10 @@ if L then
     -- Errors
     L["BOOK_ERROR_TITLE"] = "Error"
     L["BOOK_ERROR_NO_ENTITY"] = "No entity data provided"
+    L["BOOK_ERROR_UNKNOWN"] = "Unknown error occurred"
+    L["BOOK_ERROR_NO_CONTENT_DATA"] = "No content data provided"
+    L["BOOK_ERROR_NO_HTML"] = "No HTML content provided"
+    L["BOOK_ERROR_NO_DISPLAY"] = "HTML display component not found"
     L["BOOK_NO_CONTENT"] = "No content available."
     -- Dates
     L["BOOK_DATE_YEAR"] = "Year %d"

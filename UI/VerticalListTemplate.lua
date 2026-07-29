@@ -4,167 +4,19 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Spacing = private.Core.Utils.Spacing
 
 --[[
-    Shared Vertical List Template - Generic Implementation
-    
-    DESIGN PHILOSOPHY:
-    - Provides a reusable, configurable vertical list component
-    - Maintains Chronicles addon's established bookmark visual style
-    - Supports multiple item types (characters, factions, events, etc.)
-    - Uses configuration-driven approach for flexibility
-    
-    FEATURES:
-    - Configurable item types through KeyValues
-    - Consistent bookmark-style visual treatment
-    - Integrated search functionality with customizable placeholders
-    - State management integration with configurable keys
-    - Generic data provider interface
-    - Responsive tooltip system
-    - Count display with customizable formatting
-    - Reusable across different content types
-    - Direct stateManagerKey passing (no parent traversal required)
-    
-    CONFIGURATION:
-    Templates can be specialized by setting KeyValues:
-    - itemType: Type of items being displayed ("character", "faction", etc.)
-    - searchPlaceholder: Custom search box placeholder text
-    - countLabelFormat: Format string for item count display
-    - stateManagerKey: Key for state management integration
-    - dataSourceMethod: Method name for retrieving data
-    - templateKey: Template key for item rendering
-    
-    IMPORTANT: State Management Protection
-    
-    The template includes protection against invalid stateManagerKey values.
-    All state management operations (item clicks, state subscriptions, 
-    selection synchronization) will only execute when the stateManagerKey
-    is properly configured (not "generic"). This prevents runtime errors
-    during initialization and ensures robust operation.
---]]
---[[
-    EXAMPLE 1: Using Pre-configured Character List
-    
-    In your XML:
-    <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
-        <Size x="150" y="650"/>
-        <Anchors>
-            <Anchor point="BOTTOMLEFT" x="0" y="0" />
-        </Anchors>
-    </Frame>
-    
-    The VerticalCharacterListSharedTemplate is pre-configured with:
-    - itemType = "character"
-    - searchPlaceholder = "Search Characters..."    - countLabelFormat = "%d Characters"
-    - stateManagerKey = "character"
-    - dataSourceMethod = "getAllCharacters"
-    - templateKey = "GENERIC_LIST_ITEM"
---]]
---[[
-    EXAMPLE 2: Using Pre-configured Faction List
-    
-    In your XML:
-    <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
-        <Size x="150" y="650"/>
-        <Anchors>
-            <Anchor point="BOTTOMLEFT" x="0" y="0" />
-        </Anchors>
-    </Frame>
-    
-    The VerticalFactionListSharedTemplate is pre-configured with:
-    - itemType = "faction"
-    - searchPlaceholder = "Search Factions..."
-    - countLabelFormat = "%d Factions"
-    - stateManagerKey = "faction"
-    - dataSourceMethod = "SearchFactions"
-    - templateKey = "GENERIC_LIST_ITEM"
---]]
---[[
-    EXAMPLE 3: Custom Configuration
-    
-    You can create your own specialized template by inheriting from VerticalListTemplate
-    and setting custom KeyValues:
-    
-    <Frame name="MyCustomVerticalListTemplate" inherits="VerticalListTemplate" virtual="true">
-        <KeyValues>
-            <KeyValue key="itemType" value="event" type="string" />
-            <KeyValue key="searchPlaceholder" value="Search Events..." type="string" />
-            <KeyValue key="countLabelFormat" value="%d Events Found" type="string" />
-            <KeyValue key="stateManagerKey" value="event" type="string" />
-            <KeyValue key="dataSourceMethod" value="getAllEvents" type="string" />
-            <KeyValue key="templateKey" value="EVENT_LIST_ITEM" type="string" />
-        </KeyValues>
-    </Frame>
---]]
---[[
-    EXAMPLE 4: Runtime Configuration
-    
-    You can also configure the template at runtime:
-    
-    function ConfigureMyList(listFrame)
-        listFrame:ConfigureForCharacters()  -- Built-in character configuration
-        -- or
-        listFrame:ConfigureForFactions()    -- Built-in faction configuration
-        -- or custom configuration:
-        listFrame.itemType = "myCustomType"
-        listFrame.searchPlaceholder = "Search My Items..."
-        listFrame.countLabelFormat = "%d My Items"
-        listFrame.stateManagerKey = "myCustom"
-        listFrame.dataSourceMethod = "getAllMyItems"
-        listFrame.templateKey = "MY_CUSTOM_LIST_ITEM"
-        listFrame:RefreshItemList()
-    end
---]]
---[[
-    IMPLEMENTATION NOTES:
-    
-    The shared template avoids the GetKeyValue error by using a different approach:
-    
-    1. The base VerticalListMixin sets defaults in OnLoad()
-    2. Specialized mixins (VerticalCharacterListSharedMixin, VerticalFactionListSharedMixin) 
-       override these defaults using configuration methods
-    3. Configuration can also be done at runtime using the provided methods
-    4. This approach is more compatible with WoW's addon framework
-    
-    Error that was fixed:
-    - GetKeyValue is not a standard WoW API method
-    - KeyValues in XML are not accessible via GetKeyValue()
-    - The solution uses mixin inheritance and configuration methods instead
---]]
---[[
-    EXAMPLE 5: Integration with Existing Code
-    
-    The new template can be used alongside existing templates without modification:
-    
-    -- In MainFrameUI.xml, you could add:
-    <Frame parentKey="Characters" frameLevel="100" hidden="true">
-        <Frames>
-            <!-- shared template for factions in character tab -->
-            <Frame parentKey="RelatedFactions" inherits="VerticalFactionListSharedTemplate">
-                <Size x="150" y="300"/>
-                <Anchors>
-                    <Anchor point="BOTTOMRIGHT" x="-10" y="0" />
-                </Anchors>
-            </Frame>
-            
-            <Frame parentKey="Book" inherits="CharacterBookTemplate">
-                <Size x="1200" y="650"/>
-                <Anchors>
-                    <Anchor point="BOTTOM" />
-                </Anchors>
-            </Frame>
-        </Frames>
-    </Frame>
---]]
---[[
-    BENEFITS OF THE SHARED TEMPLATE:
-    
-    1. CONSISTENCY: All vertical lists use the same bookmark visual style
-    2. MAINTAINABILITY: Single template to update for visual changes
-    3. FLEXIBILITY: Configuration-driven approach for different item types
-    4. REUSABILITY: Can be used for any item type with minimal setup
-    5. STATE MANAGEMENT: Integrated with Chronicles state management system
-    6. SEARCH: Built-in search functionality with customizable placeholders
-    7. PERFORMANCE: Optimized data handling and rendering
-    8. ACCESSIBILITY: Consistent tooltip and interaction patterns
+    Shared Vertical List Template
+
+    The scrolling rail used by both the Characters and the Factions tabs: bookmark-styled rows, a
+    search box, and a count label. Two virtual templates specialise it, each calling
+    VerticalListMixin.OnLoad followed by ConfigureForCharacters or ConfigureForFactions.
+
+    Specialisation happens in Lua, not through XML KeyValues. Two constraints force that: the
+    user-visible strings must come from the locale table, which XML cannot reach, and the ConfigureFor*
+    call runs immediately after OnLoad in the same <OnLoad> block, so Lua assignments would win over
+    KeyValues regardless.
+
+    stateManagerKey doubles as a guard: while it is still "generic" the frame is unconfigured, so item
+    clicks, state subscriptions and selection sync all no-op rather than writing to a bogus state key.
 --]]
 
 -- -------------------------
@@ -286,14 +138,15 @@ end
 VerticalListMixin = {}
 
 function VerticalListMixin:OnLoad()
-    -- Initialize configuration with defaults (KeyValues are applied via template inheritance)
+    -- Configuration lives here rather than in XML KeyValues: the specialised rails call
+    -- ConfigureFor* immediately after this function, so Lua wins either way, and the user-visible
+    -- strings have to come from the locale table, which XML cannot reach.
     self.itemType = "generic"
-    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
-    self.countLabelFormat = "%d items"
+    self.searchPlaceholder = Locale["SearchPlaceholder"]
+    self.countLabelFormat = Locale["ListCountItems"]
     self.enableSearch = true
     self.enableCount = true
     self.stateManagerKey = "generic"
-    self.dataSourceMethod = "getAllItems"
     self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Initialize state
@@ -369,18 +222,12 @@ function VerticalListMixin:InitializeStateSubscriptions()
 end
 
 -- Configuration method for specialized templates
-function VerticalListMixin:ConfigureTemplate()
-    -- This method can be overridden by specialized templates
-    -- or we can detect the template type and configure accordingly
-end
-
 -- Built-in configuration for character lists
 function VerticalListMixin:ConfigureForCharacters()
     self.itemType = "character"
     self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
-    self.countLabelFormat = "%d Characters"
+    self.countLabelFormat = Locale["ListCountCharacters"]
     self.stateManagerKey = "character"
-    self.dataSourceMethod = "getAllCharacters"
     self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Update search placeholder if search box exists
@@ -388,17 +235,15 @@ function VerticalListMixin:ConfigureForCharacters()
         self.SearchBox.PlaceholderText:SetText(self.searchPlaceholder)
     end
 
-    -- Always initialize state subscriptions (needed regardless of KeyValues)
     self:InitializeStateSubscriptions()
 end
 
 -- Built-in configuration for faction lists
 function VerticalListMixin:ConfigureForFactions()
     self.itemType = "faction"
-    self.searchPlaceholder = Locale["SearchCharactersPlaceholder"]
-    self.countLabelFormat = "%d Factions"
+    self.searchPlaceholder = Locale["SearchFactionsPlaceholder"]
+    self.countLabelFormat = Locale["ListCountFactions"]
     self.stateManagerKey = "faction"
-    self.dataSourceMethod = "SearchFactions"
     self.templateKey = private.constants.templateKeys.GENERIC_LIST_ITEM
 
     -- Update search placeholder if search box exists
@@ -406,7 +251,6 @@ function VerticalListMixin:ConfigureForFactions()
         self.SearchBox.PlaceholderText:SetText(self.searchPlaceholder)
     end
 
-    -- Always initialize state subscriptions (needed regardless of KeyValues)
     self:InitializeStateSubscriptions()
 end
 

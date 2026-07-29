@@ -6,7 +6,7 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 =================================================================================
 Module: Settings UI
 Purpose: User preferences and configuration interface management
-Dependencies: AceLocale-3.0, StateManager, Core.Settings
+Dependencies: AceLocale-3.0, StateManager
 Author: Chronicles Team
 =================================================================================
 
@@ -44,12 +44,11 @@ Key Settings Categories:
 Event Integration:
 - Settings changes trigger events.SettingsEventTypeChecked
 - Collection toggles trigger events.SettingsCollectionChecked
-- State changes propagate to FilterEngine and Data modules
+- State changes propagate to the Cache and Data modules
 
 Dependencies:
 - AceLocale-3.0: UI text localization
 - StateManager: Settings persistence
-- Core.Settings: Configuration data management
 =================================================================================
 ]]
 -- Event types
@@ -130,9 +129,9 @@ function SettingsMixin:OnLoad()
     )
 
     if private.Core.StateManager then
-        local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
+        local categoryKey = private.Core.StateManager.buildUIStateKey("settingsCategory")
         private.Core.StateManager.subscribe(
-            activeTabKey,
+            categoryKey,
             function(newTab, oldTab)
                 if newTab then
                     self:OnSettingsTabSelected(newTab)
@@ -286,6 +285,10 @@ function SettingsMixin:OnSettingsTabSelected(tabNameOrData)
 
                 if success then
                     tab.IsLoaded = true
+                else
+                    -- Without this the category just renders blank: IsLoaded stays false, so it is
+                    -- retried on every selection and fails silently every time.
+                    geterrorhandler()(errorMsg)
                 end
             end
             local isSelected = (key == tabName)
@@ -351,9 +354,7 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
 
     private.Core.StateManager.setState(settingsKey, isActive, "Event type setting changed")
 
-    Chronicles.Data:RefreshPeriods()
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
+    private.Core.Cache.invalidateForDataChange("events")
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -372,9 +373,9 @@ function SettingsMixin:OnSettingsCollectionChecked(eventData)
     local collectionKey = private.Core.StateManager.buildCollectionKey(collectionName)
     private.Core.StateManager.setState(collectionKey, isActive, "Collection setting changed")
 
-    Chronicles.Data:RefreshPeriods()
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.PERIODS_FILLING)
-    private.Core.Cache.invalidate(private.Core.Cache.KEYS.FILTERED_EVENTS)
+    -- Enabling or disabling a collection moves events, characters, factions,
+    -- the collection list and the timeline bounds all at once.
+    private.Core.Cache.invalidateForDataChange("all")
 
     private.Core.Timeline.ComputeTimelinePeriods()
     private.Core.Timeline.DisplayTimelineWindow()
@@ -617,7 +618,7 @@ function CategoryButtonMixin:OnClick()
     if self.category and self.category.TabName then -- Update state instead of calling method directly - provides single source of truth
         if private.Core.StateManager then
             private.Core.StateManager.setState(
-                private.Core.StateManager.buildUIStateKey("activeTab"),
+                private.Core.StateManager.buildUIStateKey("settingsCategory"),
                 self.category.TabName,
                 "Settings tab selected from category button"
             )

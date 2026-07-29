@@ -19,10 +19,10 @@ end
 
 T.describe("StateManager.rehydrate", function()
     T.it("re-emits a restored value to subscribers as newValue == oldValue", function()
-        local _, SM = buildPrivate({uiState = {activeTab = "events"}})
+        local _, SM = buildPrivate({uiState = {settingsCategory = "eventTypes"}})
         SM.init()
 
-        local key = SM.buildUIStateKey("activeTab")
+        local key = SM.buildUIStateKey("settingsCategory")
         local seen = {}
         SM.subscribe(key, function(newValue, oldValue)
             seen.new = newValue
@@ -31,15 +31,15 @@ T.describe("StateManager.rehydrate", function()
 
         local notified = SM.rehydrate(key)
         assert_.isTrue(notified)
-        assert_.equals(seen.new, "events")
-        assert_.equals(seen.old, "events", "restored state should present as unchanged")
+        assert_.equals(seen.new, "eventTypes")
+        assert_.equals(seen.old, "eventTypes", "restored state should present as unchanged")
     end)
 
     T.it("returns false and does not notify for a key with no stored value", function()
         local _, SM = buildPrivate({})
         SM.init()
 
-        local key = SM.buildUIStateKey("activeTab")
+        local key = SM.buildUIStateKey("settingsCategory")
         local called = false
         SM.subscribe(key, function()
             called = true

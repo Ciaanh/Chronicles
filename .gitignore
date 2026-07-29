@@ -6,6 +6,13 @@
 
 refs
 
-# Build output and make-release.ps1 staging folder
-.build/
+# Build output
+.build
+
+# OS / editor artefacts
+*.bak
+.DS_Store
+.idea/
+
+# make-release.ps1 staging folder
 /Chronicles/

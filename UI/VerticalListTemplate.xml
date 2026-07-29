@@ -56,13 +56,6 @@
     <Frame name="VerticalListTemplate" mixin="VerticalListMixin" virtual="true">
         <KeyValues>
             <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
-            <!-- Configuration keys for different item types -->
-            <KeyValue key="itemType" value="generic" type="string" />
-            <KeyValue key="searchPlaceholder" value="Search..." type="string" />
-            <KeyValue key="countLabelFormat" value="%d items" type="string" />
-            <KeyValue key="enableSearch" value="true" type="boolean" />
-            <KeyValue key="enableCount" value="true" type="boolean" />
-            <KeyValue key="stateManagerKey" value="generic" type="string" />
         </KeyValues>
         <Frames>
             <!-- Search box for filtering items -->
@@ -154,13 +147,7 @@
     </Frame>    <!-- Specialized Character Vertical List Template -->
 
     <Frame name="VerticalCharacterListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
-        <KeyValues>
-            <KeyValue key="itemType" value="character" type="string" />
-            <KeyValue key="searchPlaceholder" value="Search Characters..." type="string" />
-            <KeyValue key="countLabelFormat" value="%d Characters" type="string" />
-            <KeyValue key="stateManagerKey" value="character" type="string" />
-            <KeyValue key="dataSourceMethod" value="getAllCharacters" type="string" />
-        </KeyValues>        <Scripts>
+        <Scripts>
             <OnLoad>
                 VerticalListMixin.OnLoad(self)
                 self:ConfigureForCharacters()
@@ -170,13 +157,6 @@
         </Scripts>
     </Frame>    <!-- Specialized Faction Vertical List Template -->
     <Frame name="VerticalFactionListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
-        <KeyValues>
-            <KeyValue key="itemType" value="faction" type="string" />
-            <KeyValue key="searchPlaceholder" value="Search Factions..." type="string" />
-            <KeyValue key="countLabelFormat" value="%d Factions" type="string" />
-            <KeyValue key="stateManagerKey" value="faction" type="string" />
-            <KeyValue key="dataSourceMethod" value="SearchFactions" type="string" />
-        </KeyValues>
         <Scripts>
             <OnLoad>
                 VerticalListMixin.OnLoad(self)

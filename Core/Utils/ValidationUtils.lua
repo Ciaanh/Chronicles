@@ -15,16 +15,15 @@ This module provides comprehensive data validation for Chronicles addon:
 - Input sanitization and bounds checking
 
 Key Features:
-- Null/empty value detection
 - Type-specific validation (numbers, strings, tables)
 - Chronicles entity validation (events, characters, factions)
 - Year and date validation for timeline system
 - Safe validation with no external dependencies
 
 Validation Categories:
-- Basic Types: IsValidNumber, IsValidString, IsValidTable
+- Basic Types: IsValidNumber, IsValidString, IsValidTable, ValidateTable
 - Chronicles Entities: IsValidEvent, IsValidCharacter, IsValidFaction
-- Timeline Data: IsValidYear, date range validation
+- Timeline Data: IsValidYear, IsValidPeriod
 - Special Cases: NaN detection, empty collection handling
 
 Usage Patterns:
@@ -40,27 +39,6 @@ private.Core.Utils = private.Core.Utils or {}
 private.Core.Utils.ValidationUtils = {}
 
 local ValidationUtils = private.Core.Utils.ValidationUtils
-
---[[
-    Check if a value is nil or empty
-    @param value [any] Value to check
-    @return [boolean] True if value is nil or empty
-]]
-function ValidationUtils.IsNilOrEmpty(value)
-    if value == nil then
-        return true
-    end
-
-    if type(value) == "string" then
-        return value == ""
-    end
-
-    if type(value) == "table" then
-        return next(value) == nil
-    end
-
-    return false
-end
 
 --[[
     Check if a value is a valid number
@@ -109,28 +87,6 @@ function ValidationUtils.ValidateTable(value, allowEmpty)
 
     if not allowEmptyTable and next(value) == nil then
         return false
-    end
-
-    return true
-end
-
---[[
-    Validate an events collection
-    @param events [table] Events array/table
-    @param allowEmpty [boolean] Allow empty tables (default true)
-    @return [boolean] True when collection is valid
-]]
-function ValidationUtils.IsValidEventList(events, allowEmpty)
-    local allowEmptyList = allowEmpty ~= false
-
-    if not ValidationUtils.ValidateTable(events, allowEmptyList) then
-        return false
-    end
-
-    for _, event in pairs(events) do
-        if not ValidationUtils.IsValidEvent(event) then
-            return false
-        end
     end
 
     return true

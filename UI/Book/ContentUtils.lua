@@ -120,13 +120,16 @@ function ContentUtils.TransformEntityToBook(entity)
 
     -- Generate list of HTML documents using HTMLBuilder
     local htmlDocuments
+    local navigationData
     if HTMLBuilder.CreateEntityHTML then
         local htmlResult = HTMLBuilder.CreateEntityHTML(entity)
-        
+
         -- HTMLBuilder.CreateEntityHTML returns {documents = [...], navigationData = {...}}
-        -- We need the documents array for content transformation
+        -- Both halves matter: the documents are the pages, and navigationData maps chapter ids to
+        -- page indices, which is what makes the table-of-contents links clickable.
         if htmlResult and htmlResult.documents then
             htmlDocuments = htmlResult.documents
+            navigationData = htmlResult.navigationData
         elseif htmlResult and type(htmlResult) == "table" and #htmlResult > 0 then
             -- Fallback: if it's an array, use it directly
             htmlDocuments = htmlResult
@@ -173,12 +176,15 @@ function ContentUtils.TransformEntityToBook(entity)
         })
     end
 
-    -- Return array of section objects, each with an elements array
+    -- Return array of section objects, each with an elements array. navigationData rides along as a
+    -- named field: it is not a section, so ipairs-based consumers skip it, and BookContainerTemplate
+    -- reads it off the returned table to resolve chapter links.
     local result = {
         {
             elements = elements
         }
     }
+    result.navigationData = navigationData
 
     if cacheKey and Cache and Cache.setBookContent then
         Cache.setBookContent(cacheKey, result)

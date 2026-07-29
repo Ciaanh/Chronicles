@@ -22,9 +22,9 @@ _G.H = harness
 -- Specs are listed explicitly so the run order is deterministic and a missing
 -- file is an obvious error rather than a silently skipped test.
 local specs = {
-    "MathUtils_spec.lua",
     "TableUtils_spec.lua",
     "StringUtils_spec.lua",
+    "ValidationUtils_spec.lua",
     "TimelineBusiness_spec.lua",
     "StateManager_spec.lua",
     "EventManager_spec.lua"
