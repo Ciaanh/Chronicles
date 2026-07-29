@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    GreatwarsCharactersDB = {
+private.DB = private.DB or {}
+private.DB.GreatwarsCharactersDB = {
         [2] = {
             id = 2,
             name = Locale["223_khadgar"],

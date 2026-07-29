@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    LegionEventsDB = {
+private.DB = private.DB or {}
+private.DB.LegionEventsDB = {
         [165] = {
             id=165,
             label=Locale["549_broken_shore_invasion___deaths_of_varian_and_vol'j"],

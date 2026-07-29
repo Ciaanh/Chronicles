@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    BattleforazerothFactionsDB = {
+private.DB = private.DB or {}
+private.DB.BattleforazerothFactionsDB = {
         [48] = {
             id = 48,
             name = Locale["595_zandalari_empire"],

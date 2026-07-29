@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    DragonflightFactionsDB = {
+private.DB = private.DB or {}
+private.DB.DragonflightFactionsDB = {
         [57] = {
             id = 57,
             name = Locale["653_dragon_aspects_restored"],

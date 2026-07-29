@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    ShadowlandsEventsDB = {
+private.DB = private.DB or {}
+private.DB.ShadowlandsEventsDB = {
         [175] = {
             id=175,
             label=Locale["605_helm_of_domination_shattered"],

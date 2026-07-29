@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    LichkingEventsDB = {
+private.DB = private.DB or {}
+private.DB.LichkingEventsDB = {
         [145] = {
             id=145,
             label=Locale["423_northrend_campaign_begins"],

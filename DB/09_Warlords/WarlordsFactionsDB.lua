@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    WarlordsFactionsDB = {
+private.DB = private.DB or {}
+private.DB.WarlordsFactionsDB = {
         [41] = {
             id = 41,
             name = Locale["541_iron_horde"],

@@ -6,59 +6,61 @@ function private.registerInternalDBs()
 		return
 	end
 
-	if ExpansionsEventsDB then Data:RegisterEventDB("Expansions", ExpansionsEventsDB) end
+	local DB = private.DB or {}
 
-	if OriginsEventsDB then Data:RegisterEventDB("Origins", OriginsEventsDB) end
+	if DB.ExpansionsEventsDB then Data:RegisterEventDB("Expansions", DB.ExpansionsEventsDB) end
 
-	if GreatwarsEventsDB then Data:RegisterEventDB("Greatwars", GreatwarsEventsDB) end
-	if GreatwarsFactionsDB then Data:RegisterFactionDB("Greatwars", GreatwarsFactionsDB) end
-	if GreatwarsCharactersDB then Data:RegisterCharacterDB("Greatwars", GreatwarsCharactersDB) end
+	if DB.OriginsEventsDB then Data:RegisterEventDB("Origins", DB.OriginsEventsDB) end
 
-	if WorldofwarcraftEventsDB then Data:RegisterEventDB("Worldofwarcraft", WorldofwarcraftEventsDB) end
-	if WorldofwarcraftFactionsDB then Data:RegisterFactionDB("Worldofwarcraft", WorldofwarcraftFactionsDB) end
-	if WorldofwarcraftCharactersDB then Data:RegisterCharacterDB("Worldofwarcraft", WorldofwarcraftCharactersDB) end
+	if DB.GreatwarsEventsDB then Data:RegisterEventDB("Greatwars", DB.GreatwarsEventsDB) end
+	if DB.GreatwarsFactionsDB then Data:RegisterFactionDB("Greatwars", DB.GreatwarsFactionsDB) end
+	if DB.GreatwarsCharactersDB then Data:RegisterCharacterDB("Greatwars", DB.GreatwarsCharactersDB) end
 
-	if BurningcrusadeEventsDB then Data:RegisterEventDB("Burningcrusade", BurningcrusadeEventsDB) end
-	if BurningcrusadeFactionsDB then Data:RegisterFactionDB("Burningcrusade", BurningcrusadeFactionsDB) end
-	if BurningcrusadeCharactersDB then Data:RegisterCharacterDB("Burningcrusade", BurningcrusadeCharactersDB) end
+	if DB.WorldofwarcraftEventsDB then Data:RegisterEventDB("Worldofwarcraft", DB.WorldofwarcraftEventsDB) end
+	if DB.WorldofwarcraftFactionsDB then Data:RegisterFactionDB("Worldofwarcraft", DB.WorldofwarcraftFactionsDB) end
+	if DB.WorldofwarcraftCharactersDB then Data:RegisterCharacterDB("Worldofwarcraft", DB.WorldofwarcraftCharactersDB) end
 
-	if LichkingEventsDB then Data:RegisterEventDB("Lichking", LichkingEventsDB) end
-	if LichkingFactionsDB then Data:RegisterFactionDB("Lichking", LichkingFactionsDB) end
-	if LichkingCharactersDB then Data:RegisterCharacterDB("Lichking", LichkingCharactersDB) end
+	if DB.BurningcrusadeEventsDB then Data:RegisterEventDB("Burningcrusade", DB.BurningcrusadeEventsDB) end
+	if DB.BurningcrusadeFactionsDB then Data:RegisterFactionDB("Burningcrusade", DB.BurningcrusadeFactionsDB) end
+	if DB.BurningcrusadeCharactersDB then Data:RegisterCharacterDB("Burningcrusade", DB.BurningcrusadeCharactersDB) end
 
-	if CataclysmEventsDB then Data:RegisterEventDB("Cataclysm", CataclysmEventsDB) end
-	if CataclysmFactionsDB then Data:RegisterFactionDB("Cataclysm", CataclysmFactionsDB) end
-	if CataclysmCharactersDB then Data:RegisterCharacterDB("Cataclysm", CataclysmCharactersDB) end
+	if DB.LichkingEventsDB then Data:RegisterEventDB("Lichking", DB.LichkingEventsDB) end
+	if DB.LichkingFactionsDB then Data:RegisterFactionDB("Lichking", DB.LichkingFactionsDB) end
+	if DB.LichkingCharactersDB then Data:RegisterCharacterDB("Lichking", DB.LichkingCharactersDB) end
 
-	if MistsofpandariaEventsDB then Data:RegisterEventDB("Mistsofpandaria", MistsofpandariaEventsDB) end
-	if MistsofpandariaFactionsDB then Data:RegisterFactionDB("Mistsofpandaria", MistsofpandariaFactionsDB) end
-	if MistsofpandariaCharactersDB then Data:RegisterCharacterDB("Mistsofpandaria", MistsofpandariaCharactersDB) end
+	if DB.CataclysmEventsDB then Data:RegisterEventDB("Cataclysm", DB.CataclysmEventsDB) end
+	if DB.CataclysmFactionsDB then Data:RegisterFactionDB("Cataclysm", DB.CataclysmFactionsDB) end
+	if DB.CataclysmCharactersDB then Data:RegisterCharacterDB("Cataclysm", DB.CataclysmCharactersDB) end
 
-	if WarlordsEventsDB then Data:RegisterEventDB("Warlords", WarlordsEventsDB) end
-	if WarlordsFactionsDB then Data:RegisterFactionDB("Warlords", WarlordsFactionsDB) end
-	if WarlordsCharactersDB then Data:RegisterCharacterDB("Warlords", WarlordsCharactersDB) end
+	if DB.MistsofpandariaEventsDB then Data:RegisterEventDB("Mistsofpandaria", DB.MistsofpandariaEventsDB) end
+	if DB.MistsofpandariaFactionsDB then Data:RegisterFactionDB("Mistsofpandaria", DB.MistsofpandariaFactionsDB) end
+	if DB.MistsofpandariaCharactersDB then Data:RegisterCharacterDB("Mistsofpandaria", DB.MistsofpandariaCharactersDB) end
 
-	if LegionEventsDB then Data:RegisterEventDB("Legion", LegionEventsDB) end
-	if LegionFactionsDB then Data:RegisterFactionDB("Legion", LegionFactionsDB) end
-	if LegionCharactersDB then Data:RegisterCharacterDB("Legion", LegionCharactersDB) end
+	if DB.WarlordsEventsDB then Data:RegisterEventDB("Warlords", DB.WarlordsEventsDB) end
+	if DB.WarlordsFactionsDB then Data:RegisterFactionDB("Warlords", DB.WarlordsFactionsDB) end
+	if DB.WarlordsCharactersDB then Data:RegisterCharacterDB("Warlords", DB.WarlordsCharactersDB) end
 
-	if BattleforazerothEventsDB then Data:RegisterEventDB("Battleforazeroth", BattleforazerothEventsDB) end
-	if BattleforazerothFactionsDB then Data:RegisterFactionDB("Battleforazeroth", BattleforazerothFactionsDB) end
-	if BattleforazerothCharactersDB then Data:RegisterCharacterDB("Battleforazeroth", BattleforazerothCharactersDB) end
+	if DB.LegionEventsDB then Data:RegisterEventDB("Legion", DB.LegionEventsDB) end
+	if DB.LegionFactionsDB then Data:RegisterFactionDB("Legion", DB.LegionFactionsDB) end
+	if DB.LegionCharactersDB then Data:RegisterCharacterDB("Legion", DB.LegionCharactersDB) end
 
-	if ShadowlandsEventsDB then Data:RegisterEventDB("Shadowlands", ShadowlandsEventsDB) end
-	if ShadowlandsFactionsDB then Data:RegisterFactionDB("Shadowlands", ShadowlandsFactionsDB) end
-	if ShadowlandsCharactersDB then Data:RegisterCharacterDB("Shadowlands", ShadowlandsCharactersDB) end
+	if DB.BattleforazerothEventsDB then Data:RegisterEventDB("Battleforazeroth", DB.BattleforazerothEventsDB) end
+	if DB.BattleforazerothFactionsDB then Data:RegisterFactionDB("Battleforazeroth", DB.BattleforazerothFactionsDB) end
+	if DB.BattleforazerothCharactersDB then Data:RegisterCharacterDB("Battleforazeroth", DB.BattleforazerothCharactersDB) end
 
-	if DragonflightEventsDB then Data:RegisterEventDB("Dragonflight", DragonflightEventsDB) end
-	if DragonflightFactionsDB then Data:RegisterFactionDB("Dragonflight", DragonflightFactionsDB) end
-	if DragonflightCharactersDB then Data:RegisterCharacterDB("Dragonflight", DragonflightCharactersDB) end
+	if DB.ShadowlandsEventsDB then Data:RegisterEventDB("Shadowlands", DB.ShadowlandsEventsDB) end
+	if DB.ShadowlandsFactionsDB then Data:RegisterFactionDB("Shadowlands", DB.ShadowlandsFactionsDB) end
+	if DB.ShadowlandsCharactersDB then Data:RegisterCharacterDB("Shadowlands", DB.ShadowlandsCharactersDB) end
 
-	if FutureEventsDB then Data:RegisterEventDB("Future", FutureEventsDB) end
-	if FutureFactionsDB then Data:RegisterFactionDB("Future", FutureFactionsDB) end
-	if FutureCharactersDB then Data:RegisterCharacterDB("Future", FutureCharactersDB) end
+	if DB.DragonflightEventsDB then Data:RegisterEventDB("Dragonflight", DB.DragonflightEventsDB) end
+	if DB.DragonflightFactionsDB then Data:RegisterFactionDB("Dragonflight", DB.DragonflightFactionsDB) end
+	if DB.DragonflightCharactersDB then Data:RegisterCharacterDB("Dragonflight", DB.DragonflightCharactersDB) end
 
-	if WarwithinEventsDB then Data:RegisterEventDB("Warwithin", WarwithinEventsDB) end
-	if WarwithinFactionsDB then Data:RegisterFactionDB("Warwithin", WarwithinFactionsDB) end
-	if WarwithinCharactersDB then Data:RegisterCharacterDB("Warwithin", WarwithinCharactersDB) end
+	if DB.FutureEventsDB then Data:RegisterEventDB("Future", DB.FutureEventsDB) end
+	if DB.FutureFactionsDB then Data:RegisterFactionDB("Future", DB.FutureFactionsDB) end
+	if DB.FutureCharactersDB then Data:RegisterCharacterDB("Future", DB.FutureCharactersDB) end
+
+	if DB.WarwithinEventsDB then Data:RegisterEventDB("Warwithin", DB.WarwithinEventsDB) end
+	if DB.WarwithinFactionsDB then Data:RegisterFactionDB("Warwithin", DB.WarwithinFactionsDB) end
+	if DB.WarwithinCharactersDB then Data:RegisterCharacterDB("Warwithin", DB.WarwithinCharactersDB) end
 end

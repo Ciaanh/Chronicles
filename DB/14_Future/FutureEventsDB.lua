@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    FutureEventsDB = {
+private.DB = private.DB or {}
+private.DB.FutureEventsDB = {
         [188] = {
             id=188,
             label=Locale["681_azeroth's_worldsoul_resonance"],

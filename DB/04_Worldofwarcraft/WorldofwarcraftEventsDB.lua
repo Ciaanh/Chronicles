@@ -1,7 +1,8 @@
 local FOLDER_NAME, private = ...
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
-    WorldofwarcraftEventsDB = {
+private.DB = private.DB or {}
+private.DB.WorldofwarcraftEventsDB = {
         [131] = {
             id=131,
             label=Locale["359_world_of_warcraft_classic_campaign"],
