@@ -1,5 +1,7 @@
 local FOLDER_NAME, private = ...
 
+local Spacing = private.Core.Utils.Spacing
+
 -- -------------------------
 -- Templates
 -- -------------------------
@@ -7,8 +9,6 @@ local FOLDER_NAME, private = ...
 EventListItemMixin = {}
 function EventListItemMixin:Init(eventData)
 	local text = self.Text
-	local contentTexture = self.Content
-	local sideTexture = self.Side
 
 	text:SetText(eventData.text)
 	text:SetWordWrap(true)
@@ -16,33 +16,10 @@ function EventListItemMixin:Init(eventData)
 	text:SetJustifyV("MIDDLE")
 	self.Event = eventData.event
 
-	local isRightSide = self:GetParent().side == "right"
-	local textMargin = 5
-
-	-- Configure bookmark-style positioning based on side
-	if isRightSide then
-		contentTexture:SetTexCoord(1, 0, 0, 1)
-		sideTexture:SetTexCoord(1, 0, 0, 1)
-
-		contentTexture:ClearAllPoints()
-		contentTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
-
-		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
-	else
-		contentTexture:SetTexCoord(0, 1, 0, 1)
-		sideTexture:SetTexCoord(0, 1, 0, 1)
-
-		contentTexture:ClearAllPoints()
-		contentTexture:SetPoint("RIGHT", self, "RIGHT", 0, 0)
-
-		sideTexture:ClearAllPoints()
-		sideTexture:SetPoint("LEFT", self, "LEFT", 0, 0)
-	end
-
-	text:ClearAllPoints()
-	text:SetPoint("TOPLEFT", contentTexture, "TOPLEFT", 10, -12)
-	text:SetPoint("BOTTOMRIGHT", contentTexture, "BOTTOMRIGHT", -10, 18)
+	-- Texture and text placement is entirely the template's. This used to mirror the bookmark art
+	-- for right-hand rows, driven by a "side" KeyValue on the row's parent that went away with the
+	-- two-column split; re-applying single points here would now collapse the Content texture,
+	-- which stretches between two anchors.
 end
 
 function EventListItemMixin:OnClick()
@@ -73,21 +50,12 @@ function EventListItemMixin:OnClick()
 	end
 end
 
-EventListTitleMixin = {}
-function EventListTitleMixin:Init(eventData)
-	self.Text:SetText(eventData.text)
-end
-
 -- -------------------------
 -- Event List
 -- -------------------------
 EventListMixin = {}
 function EventListMixin:OnLoad()
-	-- Ensure the paged list is configured before any data providers are applied
-	if self.PagedEventList then
-		self.PagedEventList:SetElementTemplateData(private.constants.templates)
-		self._templatesInitialized = true
-	end
+	self:InitializeEventList()
 
 	-- Register only for events that don't have a state equivalent
 	private.Core.registerCallback(private.constants.events.UIRefresh, self.OnUIRefresh, self)
@@ -115,21 +83,51 @@ function EventListMixin:OnLoad()
 	end
 end
 
-function EventListMixin:OnUIRefresh()
-	if not self.PagedEventList then
+--[[
+    Wire the event scroll box to its scroll bar with a linear, single-column view
+
+    The row template is resolved through the shared template registry so
+    templateKeys.EVENT_DESCRIPTION stays the single source of truth for what an event row looks like.
+]]
+function EventListMixin:InitializeEventList()
+	if not self.EventScrollList or not self.EventScrollBar then
 		return
 	end
 
-	if not self._templatesInitialized then
-		self.PagedEventList:SetElementTemplateData(private.constants.templates)
-		self._templatesInitialized = true
+	local rowTemplate = private.constants.templates[private.constants.templateKeys.EVENT_DESCRIPTION]
+	if not rowTemplate or not rowTemplate.template then
+		return
 	end
 
-	local data = {}
-	local dataProvider = CreateDataProvider(data)
-	local retainScrollPosition = false
+	local view = CreateScrollBoxListLinearView()
+	view:SetElementInitializer(
+		rowTemplate.template,
+		function(row, elementData)
+			row:Init(elementData)
+		end
+	)
+	view:SetPadding(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
 
-	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
+	ScrollUtil.InitScrollBoxListWithScrollBar(self.EventScrollList, self.EventScrollBar, view)
+end
+
+--[[
+    Replace the rail contents with a flat list of event rows
+
+    @param elements [table] Sequential array of event row descriptors (may be empty)
+]]
+function EventListMixin:SetEventDataProvider(elements)
+	if not self.EventScrollList then
+		return
+	end
+
+	local dataProvider = CreateDataProvider(elements or {})
+	local retainScrollPosition = false
+	self.EventScrollList:SetDataProvider(dataProvider, retainScrollPosition)
+end
+
+function EventListMixin:OnUIRefresh()
+	self:SetEventDataProvider({})
 end
 
 function EventListMixin:OnTimelinePeriodSelected(period)
@@ -162,22 +160,13 @@ local function hasEventsMeta(period)
 end
 
 function EventListMixin:UpdateFromSelectedPeriod(period, attempt)
-	if not self.PagedEventList then
+	if not self.EventScrollList then
 		return
-	end
-
-	if not self._templatesInitialized then
-		self.PagedEventList:SetElementTemplateData(private.constants.templates)
-		self._templatesInitialized = true
 	end
 
 	local currentAttempt = attempt or 0
 	local eventList = private.Core.Cache.getSearchEvents(period.lower, period.upper)
 	private.Core.Timeline.SetYear(math.floor((period.lower + period.upper) / 2))
-
-	local content = {
-		elements = {}
-	}
 
 	local filteredEvents = private.Core.Events.FilterEvents(eventList)
 	local numberOfEvents = #filteredEvents
@@ -191,24 +180,22 @@ function EventListMixin:UpdateFromSelectedPeriod(period, attempt)
 		)
 		return
 	end
-	for key, event in pairs(filteredEvents) do
-		local eventSummary = {
-			templateKey = private.constants.templateKeys.EVENT_DESCRIPTION,
-			text = event.label,
-			event = event
-		}
 
-		table.insert(content.elements, eventSummary)
+	-- ipairs, not pairs: FilterEvents returns a sequential array and the rail's order must be
+	-- reproducible from one selection to the next.
+	local elements = {}
+	for _, event in ipairs(filteredEvents) do
+		table.insert(
+			elements,
+			{
+				templateKey = private.constants.templateKeys.EVENT_DESCRIPTION,
+				text = event.label,
+				event = event
+			}
+		)
 	end
 
-	local data = {}
-	if numberOfEvents > 0 then
-		table.insert(data, content)
-	end
-
-	local dataProvider = CreateDataProvider(data)
-	local retainScrollPosition = false
-	self.PagedEventList:SetDataProvider(dataProvider, retainScrollPosition)
+	self:SetEventDataProvider(elements)
 end
 
 function EventListMixin:HydrateFromState()

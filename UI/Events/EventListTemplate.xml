@@ -4,29 +4,6 @@
 
     <Script file="EventListTemplate.lua"/>
 
-    <Frame name="EventListTitleTemplate" mixin="EventListTitleMixin" virtual="true">
-        <Size x="50" y="30"/>
-        <Anchors>
-            <Anchor point="TOPLEFT"/>
-        </Anchors>
-        <Layers>
-            <Layer level="BACKGROUND">
-                <Texture parentKey="BlackBG" setAllPoints="true" alpha="0.5">
-                    <Color r="0.0" g="125.0" b="0.0"/>
-                </Texture>
-            </Layer>
-            <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Huge" justifyH="CENTER">
-                    <Anchors>
-                        <Anchor point="LEFT"/>
-                        <Anchor point="RIGHT"/>
-                    </Anchors>
-                    <Color color="WHITE_FONT_COLOR" />
-                </FontString>
-            </Layer>
-        </Layers>
-    </Frame>
-
     <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
         <Size x="150" y="110"/>
         <KeyValues>
@@ -35,6 +12,7 @@
         <Layers>
             <Layer level="BACKGROUND">
 
+                <!-- Fixed 45x64 art, pinned to the left edge -->
                 <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
                     <Size x="45" y="64"/>
                     <Anchors>
@@ -42,9 +20,15 @@
                     </Anchors>
                 </Texture>
 
+                <!--
+                    Spans from the side art to the row's right edge rather than carrying a fixed 105
+                    width: a linear scroll view stretches each row to the scroll box width, so a
+                    fixed-width strip anchored RIGHT would leave a gap in the middle of the row.
+                -->
                 <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
-                    <Size x="105" y="64"/>
+                    <Size y="64"/>
                     <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Side" relativePoint="RIGHT" x="0" y="0"/>
                         <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
@@ -67,56 +51,25 @@
 
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
         <Frames>
-            <Frame parentKey="PagedEventList" inherits="PagedCondensedVerticalGridContentFrameTemplate">
-                <KeyValues>
-                    <KeyValue key="viewsPerPage" value="2" type="number"/>
-                    <KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
-                    <KeyValue key="xPadding" value="10" type="number"/>
-                    <KeyValue key="columnsPerRow" value="1" type="number"/>
-                    <KeyValue key="autoExpandElements" value="true" type="boolean"/>
-                </KeyValues>
+            <!--
+                Scrolling, single-column event rail. Was a two-view paged grid (View1/View2 split
+                left/right) driving a hand-rolled paging control; at the rail's width a second
+                column has nothing to gain, and the rail scrolls now rather than paging.
+                Wired to its scroll bar in EventListMixin:OnLoad.
+            -->
+            <WowScrollBoxList parentKey="EventScrollList">
                 <Anchors>
                     <Anchor point="TOPLEFT" />
-                    <Anchor point="BOTTOMRIGHT" />
+                    <Anchor point="BOTTOMRIGHT" x="-12" y="0"/> <!-- -Spacing.md, room for the scroll bar -->
                 </Anchors>
-                <Frames>
+            </WowScrollBoxList>
 
-                    <Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-                        <Size x="150" y="560"/>
-                        <KeyValues>
-                            <KeyValue key="side" value="left" type="string"/>
-                        </KeyValues>
-                        <Anchors>
-                            <Anchor point="LEFT" x="0" y="0" />
-                        </Anchors>
-                    </Frame>
-
-                    <Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
-                        <Size x="150" y="560"/>
-                        <KeyValues>
-                            <KeyValue key="side" value="right" type="string"/>
-                        </KeyValues>
-                        <Anchors>
-                            <Anchor point="RIGHT" x="0" y="0" />
-                        </Anchors>
-                    </Frame>
-
-                    <!-- TODO implement a new paging control for the event list -->
-                    <Frame parentKey="PagingControls" inherits="EventListPagingControlsTemplate">
-                        <Anchors>
-                            <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                        </Anchors>
-                        <KeyValues>
-                            <KeyValue key="hideWhenSinglePage" value="true" type="boolean" />
-                            <KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
-                            <KeyValue key="fontColor" value="WHITE_FONT_COLOR" type="global" />
-                            <KeyValue key="spacing" value="8" type="number"/>
-                            <KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
-                            <KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
-                        </KeyValues>
-                    </Frame>
-                </Frames>
-            </Frame>
+            <EventFrame parentKey="EventScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.EventScrollList" relativePoint="TOPRIGHT" x="4" y="0"/> <!-- Spacing.xs -->
+                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.EventScrollList" relativePoint="BOTTOMRIGHT" x="4" y="0"/>
+                </Anchors>
+            </EventFrame>
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad"/>
