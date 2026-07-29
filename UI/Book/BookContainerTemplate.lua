@@ -82,8 +82,16 @@ function BookContainerMixin:OnContentReceived(bookContent)
             self.navigationData = bookContent.navigationData
         end
 
+        -- Keep the reader's place when this is a re-render of the content already on screen, and
+        -- reset it when a different entity is opened. A UI refresh should not throw away the page
+        -- you were reading; selecting something new should start at its beginning.
+        --
+        -- Table identity is a sound test here: ContentUtils.TransformEntityToBook caches its result
+        -- per entity and returns the cached table, so the same entity yields the same table and a
+        -- different entity yields a different one.
+        local retainScrollPosition = self.currentlyDisplayedContent == bookContent
+
         local dataProvider = CreateDataProvider(bookContent)
-        local retainScrollPosition = false
         self.PagedDetails:SetDataProvider(dataProvider, retainScrollPosition)
         self.currentlyDisplayedContent = bookContent
     else
