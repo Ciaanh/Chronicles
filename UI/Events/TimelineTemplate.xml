@@ -24,9 +24,6 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Scripts>
-            <OnLoad method="OnLoad" />
-        </Scripts>
     </Frame>
 
     <Button name="TimelinePeriodTemplate" mixin="TimelinePeriodMixin" virtual="true">
@@ -50,17 +47,34 @@
             </Layer>
         </Layers>
         <Scripts>
-            <OnLoad method="OnLoad" />
             <OnClick method="OnClick" />
         </Scripts>
     </Button>
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Frames>
-            <!-- Date Search Input -->
-            <EditBox parentKey="DateSearchInput" inherits="InputBoxTemplate">
-                <Size x="120" y="25" />
+            <!--
+                Layout rail for the toolbar row. It draws nothing and owns no children: the controls
+                stay direct children of the timeline (the mixin reads them as self.ZoomOut,
+                self.Previous, ...) and anchor LEFT/RIGHT to this rail, which centres them in the
+                row's height without a per-control vertical offset.
+
+                Before this, the controls sat in three separate places around the period grid, the
+                zoom group held off the right edge by a hand-measured offset that only worked at one
+                particular frame width.
+            -->
+            <Frame parentKey="Toolbar">
+                <Size y="38"/>
                 <Anchors>
-                    <Anchor point="BOTTOMLEFT" x="15" y="15" />
+                    <Anchor point="TOPLEFT" x="12" y="-12" />   <!-- Spacing.md -->
+                    <Anchor point="TOPRIGHT" x="-12" y="-12" />
+                </Anchors>
+            </Frame>
+
+            <!-- Left of the row: jump to a year, then the zoom scale -->
+            <EditBox parentKey="DateSearchInput" inherits="InputBoxTemplate">
+                <Size x="180" y="25" />
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Toolbar" relativePoint="LEFT" />
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
@@ -73,11 +87,10 @@
                     </Layer>
                 </Layers>
             </EditBox>
-            <!-- Search Button -->
             <Button parentKey="DateSearchButton" inherits="UIPanelButtonTemplate">
                 <Size x="35" y="25" />
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.DateSearchInput" relativePoint="RIGHT" x="5" y="0" />
+                    <Anchor point="LEFT" relativeKey="$parent.DateSearchInput" relativePoint="RIGHT" x="8" y="0" /> <!-- Spacing.sm -->
                 </Anchors>
             </Button>
 
@@ -85,30 +98,26 @@
                 <KeyValues>
                     <KeyValue key="direction" value="-1" type="number"/>
                 </KeyValues>
-                <Size x="20" y="20" />
+                <Size x="24" y="24" />
                 <Anchors>
-                    <Anchor point="BOTTOMRIGHT" x="-175" y="15" />
+                    <Anchor point="LEFT" relativeKey="$parent.DateSearchButton" relativePoint="RIGHT" x="12" y="0" /> <!-- Spacing.md, group break -->
                 </Anchors>
             </Button>
             <Frame parentKey="ZoomLevelIndicator">
-                <Size x="120" y="25" />
+                <Size x="90" y="25" />
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomOut" x="5" y="0" />
+                    <Anchor point="LEFT" relativeKey="$parent.ZoomOut" relativePoint="RIGHT" x="8" y="0" />
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
-                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label">
-                            <Size x="120" y="25"/>
-                            <Anchors>
-                                <Anchor point="CENTER" />
-                            </Anchors>
-                        </Texture>
+                        <!-- setAllPoints, so the art follows the frame's width instead of restating it -->
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
                     </Layer>
                     <Layer level="ARTWORK">
                         <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
                             <Anchors>
-                                <Anchor point="TOPLEFT" x="5" y="-3" />
-                                <Anchor point="BOTTOMRIGHT" x="-5" y="3" />
+                                <Anchor point="TOPLEFT" x="4" y="-4" />   <!-- Spacing.xs -->
+                                <Anchor point="BOTTOMRIGHT" x="-4" y="4" />
                             </Anchors>
                             <Color color="HIGHLIGHT_FONT_COLOR" />
                         </FontString>
@@ -119,203 +128,60 @@
                 <KeyValues>
                     <KeyValue key="direction" value="1" type="number"/>
                 </KeyValues>
-                <Size x="20" y="20" />
+                <Size x="24" y="24" />
                 <Anchors>
-                    <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.ZoomLevelIndicator" x="5" y="0" />
+                    <Anchor point="LEFT" relativeKey="$parent.ZoomLevelIndicator" relativePoint="RIGHT" x="8" y="0" />
                 </Anchors>
             </Button>
 
-            <Button parentKey="Previous">
-                <Size x="50" y="50" />
+            <!--
+                Right of the row: page the window, with the range it currently covers between the
+                two arrows. These were 50x50 buttons skinned with a covenant-sanctum atlas borrowed
+                for paging art, which only pointed one way and so needed its texture coordinates
+                mirrored in Lua to face right. They now use the same button vocabulary as their
+                neighbours in the row.
+            -->
+            <Button parentKey="Next" inherits="UIPanelButtonTemplate">
+                <Size x="24" y="24" />
                 <Anchors>
-                    <Anchor point="LEFT" x="10" y="25" />
+                    <Anchor point="RIGHT" relativeKey="$parent.Toolbar" relativePoint="RIGHT" />
                 </Anchors>
-                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </NormalTexture>
-                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </PushedTexture>
-                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </DisabledTexture>
-                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </HighlightTexture>
             </Button>
-            <Button parentKey="Next">
-                <Size x="50" y="50" />
+            <Frame parentKey="RangeIndicator">
+                <Size x="120" y="25" />
                 <Anchors>
-                    <Anchor point="RIGHT" x="-10" y="25" />
+                    <Anchor point="RIGHT" relativeKey="$parent.Next" relativePoint="LEFT" x="-8" y="0" />
                 </Anchors>
-                <NormalTexture atlas="CovenantSanctum-Renown-Arrow" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </NormalTexture>
-                <PushedTexture atlas="CovenantSanctum-Renown-Arrow-Depressed" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </PushedTexture>
-                <DisabledTexture atlas="CovenantSanctum-Renown-Arrow-Disabled" useAtlasSize="true">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </DisabledTexture>
-                <HighlightTexture atlas="CovenantSanctum-Renown-Arrow-Hover" useAtlasSize="true" alphaMode="ADD">
-                    <Anchors>
-                        <Anchor point="CENTER" y="1"/>
-                    </Anchors>
-                </HighlightTexture>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="4" y="-4" />
+                                <Anchor point="BOTTOMRIGHT" x="-4" y="4" />
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR" />
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+            <Button parentKey="Previous" inherits="UIPanelButtonTemplate">
+                <Size x="24" y="24" />
+                <Anchors>
+                    <Anchor point="RIGHT" relativeKey="$parent.RangeIndicator" relativePoint="LEFT" x="-8" y="0" />
+                </Anchors>
             </Button>
 
-            <Frame name="Label1" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeKey="$parent.Previous" x="0" y="-40" />
-                    <!-- <Anchor point="BOTTOMLEFT" x="15" y="10" /> -->
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="1" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label2" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label1" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="2" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label3" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label2" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="3" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label4" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label3" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="4" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label5" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label4" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="5" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label6" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label5" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="6" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label7" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label6" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="7" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label8" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label7" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="8" type="number" />
-                </KeyValues>
-            </Frame>
-            <Frame name="Label9" inherits="TimelineLabelTemplate">
-                <Anchors>
-                    <Anchor point="LEFT" relativeTo="Label8" relativePoint="RIGHT" x="0" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="9" type="number" />
-                </KeyValues>
-            </Frame>
+            <!--
+                The period grid is not declared here. Nine labels and eight periods used to be
+                hand-chained in this file, each named — so each published as a frame global, and
+                anchored to the next by that global — and the count restated a value that
+                config.timeline.pageSize already owns. TimelineMixin:RefreshTimelinePools now builds
+                them from that constant, into pools of unnamed frames.
+            -->
 
-            <Button name="Period1" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label1" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="1" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period2" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label2" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="2" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period3" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label3" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="3" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period4" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label4" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="4" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period5" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label5" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="5" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period6" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label6" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="6" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period7" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label7" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="7" type="number" />
-                </KeyValues>
-            </Button>
-            <Button name="Period8" inherits="TimelinePeriodTemplate">
-                <Anchors>
-                    <Anchor point="BOTTOMLEFT" relativeTo="Label8" relativePoint="TOP" x="5" y="0" />
-                </Anchors>
-                <KeyValues>
-                    <KeyValue key="index" value="8" type="number" />
-                </KeyValues>
-            </Button>
         </Frames>
         <Scripts>
             <OnLoad method="OnLoad" />

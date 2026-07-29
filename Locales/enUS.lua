@@ -120,9 +120,12 @@ if L then
     -- Book view
     L["NoContentAvailable"] = "No content available"
 
-    -- Timeline zoom button text
+    -- Timeline toolbar button glyphs, and the separator in the visible-range readout
     L["Zoom Out"] = "-"
     L["Zoom In"] = "+"
+    L["Previous Page"] = "<"
+    L["Next Page"] = ">"
+    L["RangeSeparator"] = " to "
     L["EventTypesDescription"] = "Configure which types of events to display in the timeline and event lists."
     L["CollectionsDescription"] = "Enable or disable event collections to customize which content is available."
 
