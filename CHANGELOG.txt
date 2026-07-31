@@ -1,5 +1,111 @@
 # Chronicles Addon Changelog
 
+## v2.3.0 (unreleased)
+
+The reading surface. v2.2.0 fixed what was wrong; this pass changes what the window shows and how the
+parts of it agree with each other.
+
+### Breaking Changes
+- The Settings landing page is gone. "Settings" is the panel's own header now rather than a category
+  button, so the only two categories are the two that configure something, and the panel opens on
+  Event types instead of on a page of prose. Its overview, tips and version blocks went with it,
+  along with the `SettingsHome*` locale keys and `SettingsMixin:LoadSettingsHome`.
+- `EventListItemTemplate` and `EventListItemMixin` no longer exist. The Events rail renders the same
+  `VerticalListItemTemplate` as the Characters and Factions rails; `templateKeys.EVENT_DESCRIPTION`
+  resolves to it. Anything that referenced the event row template by name must use the shared one.
+- `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
+
+### Book
+- **`chapter.pages` produces pages.** One entry in the array is one book page, in the order it was
+  written, whether it is plain text, a fragment or a full HTML document. Every authored page break
+  used to collapse: a page became its own page only if it contained a literal `<html>` tag, which no
+  string in the shipped data does, so multi-page chapters rendered as one long scrolling page. Five
+  events in `DB/02_Origins` were already affected. A chapter mixing plain and HTML pages also came out
+  in the wrong order, because the HTML ones were collected into a side list and appended afterwards.
+- Contents links land on the right page. The chapter-to-page mapping counted `chapter.pageCount`, a
+  field no record sets, so every chapter advanced it by one page regardless of length. Both the
+  mapping and the page loop now derive from `HTMLBuilder.GetChapterPageCount`.
+- Contents rows are links again, not text. They were built with `CreateParagraph`, which escapes its
+  input, so every row rendered its own `<a href=...>` markup as visible characters.
+- Contents rows carry the page number they lead to, and the number is what the pager will show: the
+  mapping is in documents and the reader sees spreads of two, so a chapter starting at document 5 is
+  printed, and navigated to, as page 3. That conversion is `HTMLBuilder.DocumentIndexToSpread` and the
+  frame's own `GetPageForViewDataIndex`; before, a document index went straight to `SetCurrentPage`.
+- The contents list moved onto the front matter and the standalone contents page is gone, so the
+  front matter is always page 1 and the page count no longer depends on chapter count twice over.
+- **The front matter carries the spread.** The left page now holds the portrait slot, the title, a
+  metadata line of year, event type and collection, a rule, and the entity's factions and characters
+  resolved from ids to names. It was a title, a rule and a year.
+- Cross-references resolve at all. Every record keys them by a lowercase collection name
+  (`characters={["dragonflight"] = {...}}`) while collections register capitalised, and both the
+  collection status check and the registry index are case-sensitive, so every reference in the shipped
+  data returned nothing. `UI/Book/FrontMatter.lua` normalises the key; the generator now emits the
+  registered name so the normalisation becomes a no-op rather than the thing holding it up.
+- Name lists cap at eight with a trailing "+ N more", so an event referencing thirty characters cannot
+  grow the front matter past its view and push the body prose onto the next page.
+- Body prose is 15px on its own font family rather than the 14px the panel chrome uses, `<h2>` and
+  `<h3>` are declared instead of falling back to a gold system font, and the portrait slot is 128x128
+  left-aligned for when data exists (no record carries an `image` field today).
+- The empty book is a spread, not a lone centred line: the left page says what the tab holds.
+- Paging controls sit inside the text column. They were anchored 30px below the page, out on the
+  parchment margin.
+- The book content cache key includes total page count. It folded in chapter count but not pages, so a
+  chapter that gained a page kept its cached pre-edit book.
+
+### Lists
+- One row template for all three rails, 88 high instead of 110 and 120, with the art centred and the
+  label at 13px instead of 11.
+- Clicking a row lights it, on every rail. The whole state path existed; `SetSelected` drew nothing.
+- The Events rail has a search box and a count label, matching the other two. It filters within the
+  selected period, which is what the timeline put there. Hover tooltips come free with the shared row.
+- Selecting an event from the timeline lights its row in the rail.
+- The bookmark plate's text band is 20% darker, for contrast with the white label.
+
+### Timeline
+- Hovering a period names its span, its event count and its first five events, filtered by the same
+  event-type settings the rail obeys.
+- A one-line density legend under the toolbar says what the crystal colours mean. Its thresholds are
+  built from `config.timeline.densityTiers`, never written out in a locale string.
+- The event-density ladder moved to `private.constants.config.timeline`, from a file-local with two
+  would-be consumers. `TimelineBusiness.getEventDensityTexture` is the only thing that walks it.
+- The selected period gets a focus ring. The `-selected` texture only lightens the crystal, and a
+  low-density selected crystal is still dark.
+
+### Characters and Factions
+- The 175px band both tabs left empty now holds a filter strip: an A to Z jump row and allegiance or
+  race chips built from the values actually present. It drives the same search term the rail's own box
+  writes, so the two cannot disagree about what is filtered.
+
+### Settings
+- The auction-house furniture is gone: `UI-Background-Rock`, the dark overlay wash, the
+  `NineSlicePanelTemplate` border inside the window's own border, `auctionhouse-background-categories`,
+  `auctionhouse-background-index`, and the four `auctionhouse-nav-button` atlases. The panel is a
+  spellbook page like the book, and a category is a bookmark row like every other row in the window.
+- The three settings pages collapse into one `SettingsPageTemplate`, roughly 180 lines of repetition.
+- Checkboxes are in two columns: seven event types become four rows, fifteen collections become eight
+  and stop scrolling. The scroll height is derived from one place instead of three.
+- Each event type says how many events it covers, counted once per load.
+- The feedback line sits under the content column, fades after three seconds, and says when a toggle
+  has emptied the timeline instead of leaving a blank rail as the only evidence.
+
+### Conformance
+- Hardcoded font colours in `Settings.lua` use `NORMAL_FONT_COLOR` / `HIGHLIGHT_FONT_COLOR`; the gold
+  literal on `ChroniclesFontFamily_Shadow_Medium` uses `NORMAL_FONT_COLOR`; the two hardcoded
+  `SetFont` overrides on checkbox labels are gone, so the font families' CJK members apply again.
+- Escape closes the window (`UISpecialFrames`). A `UIPanelWindows` area entry is deliberately *not*
+  registered: `area="center"` re-anchors on show and this window persists where you put it.
+- The timeline's last unlocalised literal, `"Year " .. year`, is `L["TimelineYearLabel"]`.
+
+### Tests
+- 133 specs, up from 67. New: `HTMLBuilder_spec` (page counting, authored order, the mapping, and the
+  document-to-spread conversion), `FrontMatter_spec` (both reference shapes, the case mismatch, the
+  cap), `VerticalListItem_spec` (the row's `Init` and `OnClick` shapes, both of which fail silently,
+  plus the rail's anchored and field filters). Extended: `TimelineBusiness_spec` (the density ladder's
+  boundaries), `Settings_spec` (two-column heights, flat categories).
+- `DB/99_Fixture/FixtureEventsDB.lua` holds the four records the shipped data cannot supply: a
+  five-chapter book, a 3000-character page, twenty cross-references, and the ordinary case. It is
+  loaded by hand via two temporary lines documented in its own header, and excluded from the package.
+
 ## v2.2.0 (unreleased)
 ### Breaking Changes
 - Removed the roleplay integration. Chronicles no longer reads your character's age and name from

@@ -124,6 +124,38 @@ function HTMLContentMixin:OnHyperlinkClick(link, text, button)
 end
 
 --[[
+    Convert a document index into the page the pager displays it on.
+
+    Two different units meet here. navigationData.pageMapping counts *documents*, because HTMLBuilder
+    has no access to the book frame. The pager counts *spreads*: viewsPerPage documents share one
+    displayed page, so document 5 is on page 3 at the book's viewsPerPage of 2. Handing a document
+    index straight to SetCurrentPage is only invisible while a book is short enough that the two
+    numbers coincide, which is every book in the reduced content set and no book with real chapters.
+
+    PagedContentFrameBaseMixin ships GetPageForViewDataIndex, which is exactly this arithmetic against
+    the frame's own viewsPerPage; the fallback covers a frame that has not wired it up yet and still
+    reads viewsPerPage from the frame rather than assuming 2.
+
+    @param pagedDetails [table] The book's PagedDetails frame
+    @param documentIndex [number] 1-based index into the htmlDocuments array
+    @return [number] 1-based displayed page number
+]]
+local function DocumentIndexToPage(pagedDetails, documentIndex)
+    if pagedDetails and pagedDetails.GetPageForViewDataIndex then
+        return pagedDetails:GetPageForViewDataIndex(documentIndex)
+    end
+
+    local viewsPerPage = (pagedDetails and pagedDetails.viewsPerPage) or 1
+    if viewsPerPage < 1 then
+        viewsPerPage = 1
+    end
+
+    return math.ceil(documentIndex / viewsPerPage)
+end
+
+HTMLContentMixin.DocumentIndexToPage = DocumentIndexToPage
+
+--[[
     Navigate to a specific chapter
     @param chapterData [string] Chapter identifier
 ]]
@@ -138,15 +170,18 @@ function HTMLContentMixin:NavigateToChapter(chapterData)
         return
     end
 
-    -- navigationData.pageMapping holds chapter id -> page index
-    local pageIndex = bookContainer.navigationData.pageMapping[chapterData]
-    if not pageIndex then
+    -- navigationData.pageMapping holds chapter id -> document index
+    local documentIndex = bookContainer.navigationData.pageMapping[chapterData]
+    if not documentIndex then
         return
     end
 
-    if bookContainer.PagedDetails and bookContainer.PagedDetails.SetCurrentPage then
-        bookContainer.PagedDetails:SetCurrentPage(pageIndex)
-    elseif bookContainer.PagedDetails and bookContainer.PagedDetails.PagingControls and bookContainer.PagedDetails.PagingControls.SetCurrentPage then
-        bookContainer.PagedDetails.PagingControls:SetCurrentPage(pageIndex)
+    local pagedDetails = bookContainer.PagedDetails
+    local pageIndex = DocumentIndexToPage(pagedDetails, documentIndex)
+
+    if pagedDetails and pagedDetails.SetCurrentPage then
+        pagedDetails:SetCurrentPage(pageIndex)
+    elseif pagedDetails and pagedDetails.PagingControls and pagedDetails.PagingControls.SetCurrentPage then
+        pagedDetails.PagingControls:SetCurrentPage(pageIndex)
     end
 end

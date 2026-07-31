@@ -1,0 +1,116 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <Script file="EntityFilterStripTemplate.lua"/>
+
+    <!--
+        A letter in the A to Z jump row. A letter with no entries behind it is drawn dim and stops
+        responding, rather than being hidden: the row is a fixed alphabet, and a gap-toothed one is
+        harder to aim at than a greyed-out one.
+    -->
+    <Button name="EntityFilterLetterTemplate" mixin="EntityFilterLetterMixin" virtual="true">
+        <Size x="40" y="24"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture parentKey="HighlightTexture" file="Interface\AddOns\Chronicles\Art\label"
+                         alphaMode="ADD" alpha="0.25" setAllPoints="true" hidden="true"/>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="1">
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\label"
+                         alphaMode="ADD" alpha="0.45" setAllPoints="true" hidden="true"/>
+            </Layer>
+        </Layers>
+        <ButtonText parentKey="Text" justifyH="CENTER">
+            <Anchors>
+                <Anchor point="TOPLEFT" x="2" y="-2"/>
+                <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="ChroniclesFontFamily_Text_Medium"/>
+        <Scripts>
+            <OnClick method="OnClick"/>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+        </Scripts>
+    </Button>
+
+    <!-- A value chip: one distinct allegiance or race present in the rail's entries -->
+    <Button name="EntityFilterChipTemplate" mixin="EntityFilterChipMixin" virtual="true">
+        <Size x="120" y="24"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="1">
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\label"
+                         alphaMode="ADD" alpha="0.45" setAllPoints="true" hidden="true"/>
+            </Layer>
+        </Layers>
+        <ButtonText parentKey="Text" justifyH="CENTER">
+            <Anchors>
+                <Anchor point="TOPLEFT" x="4" y="-2"/>
+                <Anchor point="BOTTOMRIGHT" x="-4" y="2"/>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="ChroniclesFontFamily_Text_Medium"/>
+        <Scripts>
+            <OnClick method="OnClick"/>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+        </Scripts>
+    </Button>
+
+    <!--
+        Filter strip for the Characters and Factions tabs.
+
+        It exists because those two tabs left the top 175 of the 815 tall content area empty: the Events
+        tab spends that band on its timeline, and the other two drew nothing there at all. Rather than
+        shrink the window per tab, which would make the book's page geometry depend on which tab is open,
+        the band gets the affordance the rail needed anyway.
+
+        It drives the *same* currentSearchTerm the rail's own search box writes, so typing a name and
+        clicking a letter are one filter with one result. Two controls that both claim to filter, and
+        disagree, would be worse than the empty space.
+    -->
+    <Frame name="EntityFilterStripTemplate" mixin="EntityFilterStripMixin" virtual="true">
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture parentKey="Divider" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size y="8"/>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="12" y="0"/>  <!-- Spacing.md -->
+                        <Anchor point="BOTTOMRIGHT" x="-12" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <!-- Rails the pooled buttons anchor into, so the mixin never positions a row against the
+                 strip's edges directly and the two rows cannot drift apart. -->
+            <Frame parentKey="LetterRow">
+                <Size y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="12" y="-12"/>
+                    <Anchor point="TOPRIGHT" x="-12" y="-12"/>
+                </Anchors>
+            </Frame>
+            <Frame parentKey="ChipRow">
+                <Size y="24"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.LetterRow" relativePoint="BOTTOMLEFT" x="0" y="-12"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.LetterRow" relativePoint="BOTTOMRIGHT" x="0" y="-12"/>
+                </Anchors>
+            </Frame>
+        </Frames>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <!-- The rail populates allItems in its own OnLoad and again on OnShow; refreshing here as
+                 well means a tab opened after a settings change gets a live strip either way. -->
+            <OnShow method="Refresh"/>
+        </Scripts>
+    </Frame>
+
+</Ui>

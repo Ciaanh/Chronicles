@@ -6,7 +6,10 @@
 
 	<Include file="Fonts.xml" />
 	<Include file="VerticalListTemplate.xml" />
-	
+
+	<!-- After VerticalListTemplate, whose search state it drives; before MainFrameUI, which places it -->
+	<Include file="EntityFilterStripTemplate.xml" />
+
 	<Include file="Book\_Includes.xml" />
 
 	<Include file="Events\TimelineTemplate.xml" />

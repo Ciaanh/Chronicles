@@ -73,26 +73,23 @@ SettingsMixin = {}
 ]]
 function SettingsMixin:OnLoad()
     self.prefix = "Entry"
+
+    -- Flat, two entries. "Settings" used to be a third category button with these two nested under it
+    -- at an indent, which meant a rail sized for three rows where the top one only ever selected a
+    -- landing page of static prose. It is the panel's header now, not a destination, so the first
+    -- category with a TabName -- and therefore the tab that opens by default -- is Event types.
     self.ConfiguredCategories = {
         {
-            text = Locale["Settings"],
-            TabName = "SettingsHome",
-            TabFrame = self.TabUI.SettingsHome,
-            Load = self.LoadSettingsHome,
-            subMenu = {
-                {
-                    text = Locale["Event types"],
-                    TabName = "EventTypes",
-                    TabFrame = self.TabUI.EventTypes,
-                    Load = self.LoadEventTypes
-                },
-                {
-                    text = Locale["Collections"],
-                    TabName = "Collections",
-                    TabFrame = self.TabUI.Collections,
-                    Load = self.LoadCollections
-                }
-            }
+            text = Locale["Event types"],
+            TabName = "EventTypes",
+            TabFrame = self.TabUI.EventTypes,
+            Load = self.LoadEventTypes
+        },
+        {
+            text = Locale["Collections"],
+            TabName = "Collections",
+            TabFrame = self.TabUI.Collections,
+            Load = self.LoadCollections
         }
     }
 
@@ -154,64 +151,52 @@ function SettingsMixin:OnLoad()
     end
 
     self:InitializeLocalizedText()
+    self:AnchorStatusToContentColumn()
+end
+
+--[[
+    Put the feedback line under the content column.
+
+    Done here rather than in XML because Status is a Layer FontString and layers are created before
+    frames: it cannot reference the TabUI column it belongs under from the markup.
+]]
+function SettingsMixin:AnchorStatusToContentColumn()
+    if not self.Status or not self.TabUI then
+        return
+    end
+
+    self.Status:ClearAllPoints()
+    self.Status:SetPoint("BOTTOMLEFT", self.TabUI, "BOTTOMLEFT", 0, -26)
+    self.Status:SetPoint("BOTTOMRIGHT", self.TabUI, "BOTTOMRIGHT", 0, -26)
+    self.Status:SetText("")
+end
+
+--[[
+    Say something in the panel's feedback line, and start it fading.
+
+    @param message [string] Already-localised text; an empty message clears the line
+]]
+function SettingsMixin:ShowStatus(message)
+    if not self.Status then
+        return
+    end
+
+    if self.StatusFadeOut then
+        self.StatusFadeOut:Stop()
+    end
+
+    self.Status:SetText(message or "")
+    self.Status:SetAlpha(1)
+
+    if message and message ~= "" and self.StatusFadeOut then
+        self.StatusFadeOut:Play()
+    end
 end
 
 function SettingsMixin:InitializeLocalizedText()
     if self.CategoriesList and self.CategoriesList.Header then
-        self.CategoriesList.Header:SetText(Locale["Configuration"])
-    end
-
-    if self.TabUI and self.TabUI.SettingsHome then
-        local settingsHome = self.TabUI.SettingsHome
-
-        if settingsHome.Title then
-            settingsHome.Title:SetText(Locale["Settings"])
-        end
-        if settingsHome.Description then
-            settingsHome.Description:SetText(Locale["SettingsHomeDescription"])
-        end
-
-        if settingsHome.OverviewSection then
-            local overview = settingsHome.OverviewSection
-            if overview.SectionTitle then
-                overview.SectionTitle:SetText(Locale["SettingsHomeOverviewSectionTitle"])
-            end
-            if overview.EventTypesInfo then
-                overview.EventTypesInfo:SetText(Locale["SettingsHomeOverviewEventTypesInfo"])
-            end
-            if overview.CollectionsInfo then
-                overview.CollectionsInfo:SetText(Locale["SettingsHomeOverviewCollectionsInfo"])
-            end
-        end
-
-        if settingsHome.QuickActionsSection then
-            local quickActions = settingsHome.QuickActionsSection
-            if quickActions.SectionTitle then
-                quickActions.SectionTitle:SetText(Locale["SettingsHomeQuickActionsSectionTitle"])
-            end
-            if quickActions.Tip1 then
-                quickActions.Tip1:SetText(Locale["SettingsHomeQuickActionsTip1"])
-            end
-            if quickActions.Tip2 then
-                quickActions.Tip2:SetText(Locale["SettingsHomeQuickActionsTip2"])
-            end
-            if quickActions.Tip3 then
-                quickActions.Tip3:SetText(Locale["SettingsHomeQuickActionsTip3"])
-            end
-        end
-
-        if settingsHome.VersionSection then
-            local version = settingsHome.VersionSection
-            if version.SectionTitle then
-                version.SectionTitle:SetText(Locale["SettingsHomeVersionSectionTitle"])
-            end
-            if version.VersionInfo then
-                version.VersionInfo:SetText(Locale["SettingsHomeVersionVersionInfo"])
-            end
-            if version.ConfigNote then
-                version.ConfigNote:SetText(Locale["SettingsHomeVersionConfigNote"])
-            end
-        end
+        -- The panel's own name, now that "Settings" is a header rather than a category button
+        self.CategoriesList.Header:SetText(Locale["Settings"])
     end
 
     if self.TabUI and self.TabUI.EventTypes then
@@ -297,7 +282,7 @@ function SettingsMixin:OnSettingsTabSelected(tabNameOrData)
                 local scrollFrame = tab.TabFrame.ScrollFrame
                 local content = scrollFrame and scrollFrame.Content
                 if content and content.checkboxes and #content.checkboxes > 0 then
-                    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+                    local totalHeight = SettingsMixin.ComputeCheckboxContentHeight(#content.checkboxes)
                     if type(content.SetSize) == "function" and type(scrollFrame.GetWidth) == "function" then
                         pcall(content.SetSize, content, scrollFrame:GetWidth() - 20, totalHeight)
                     end
@@ -327,21 +312,133 @@ function SettingsMixin:GetVisibleCategories(categories)
 end
 
 function SettingsMixin:AddCategory(index, category)
-    local initialXoffset = 12
-    local initialYoffset = -50
-    local xOffset = 8
-
     local categoryButton = CreateFrame("Button", nil, self.CategoriesList, "CategoryButtonTemplate")
 
+    -- Flat: no per-level indent, because there are no levels any more. The rows stack under the rail's
+    -- header separator, spanning the rail's full width like the bookmark rows on the content tabs.
     if index == 1 then
-        categoryButton:SetPoint("TOPLEFT", initialXoffset, initialYoffset)
+        categoryButton:SetPoint("TOPLEFT", self.CategoriesList.HeaderSeparator, "BOTTOMLEFT", 0, -8)
+        categoryButton:SetPoint("TOPRIGHT", self.CategoriesList.HeaderSeparator, "BOTTOMRIGHT", 0, -8)
     else
-        categoryButton:SetPoint("TOP", self.Buttons[self.prefix .. (index - 1)], "BOTTOM", 0, -3)
-        categoryButton:SetPoint("LEFT", initialXoffset + xOffset * category.level, 0)
+        local previous = self.Buttons[self.prefix .. (index - 1)]
+        categoryButton:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, -4) -- Spacing.xs
+        categoryButton:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT", 0, -4)
     end
 
     categoryButton:SetData(category, index)
     self.Buttons[self.prefix .. index] = categoryButton
+end
+
+-- =============================================================================================
+-- CHECKBOX COLUMN LAYOUT
+-- =============================================================================================
+
+--[[
+    Two columns, because one column of 15 collections scrolled a page that had room for all of them
+    twice over. Seven event types become 4 + 3; fifteen collections become 8 + 7 and stop scrolling.
+
+    The pitch numbers live here, once. The scroll range is derived from the same constants by
+    ComputeCheckboxContentHeight: three separate places used to compute a one-column height, and a
+    height that disagrees with the content hides the scroll bar while the content is still clipped.
+]]
+local CHECKBOX_COLUMNS = 2
+local CHECKBOX_ROW_PITCH = 33
+local CHECKBOX_COLUMN_PITCH = 380
+local CHECKBOX_TOP_OFFSET = -15
+local CHECKBOX_CONTENT_PADDING = 30
+local CHECKBOX_MIN_HEIGHT = 200
+
+--[[
+    Place one checkbox container in the grid.
+
+    @param content [table] The scroll child every container is parented to
+    @param container [table] The container frame to place
+    @param index [number] 1-based position in the list, filling left to right then down
+]]
+local function placeCheckboxContainer(content, container, index)
+    local column = (index - 1) % CHECKBOX_COLUMNS
+    local row = math.floor((index - 1) / CHECKBOX_COLUMNS)
+
+    container:ClearAllPoints()
+    container:SetPoint(
+        "TOPLEFT",
+        content,
+        "TOPLEFT",
+        column * CHECKBOX_COLUMN_PITCH,
+        CHECKBOX_TOP_OFFSET - row * CHECKBOX_ROW_PITCH
+    )
+end
+
+--[[
+    Scroll-child height for a given number of checkboxes.
+
+    @param count [number] Checkboxes on the page
+    @return [number] Height in pixels
+]]
+function SettingsMixin.ComputeCheckboxContentHeight(count)
+    local rows = math.ceil((count or 0) / CHECKBOX_COLUMNS)
+    return math.max(CHECKBOX_MIN_HEIGHT, rows * CHECKBOX_ROW_PITCH + CHECKBOX_CONTENT_PADDING)
+end
+
+--[[
+    Show the rule between the two columns, sized to the rows that are actually there.
+
+    Hidden for a page with a single column's worth of entries: a divider with nothing on its right is
+    a line for its own sake.
+
+    @param frame [table] The settings page
+    @param count [number] Checkboxes on the page
+]]
+local function updateColumnDivider(frame, count)
+    local divider = frame and frame.ColumnDivider
+    if not divider then
+        return
+    end
+
+    if (count or 0) <= CHECKBOX_COLUMNS - 1 then
+        divider:Hide()
+        return
+    end
+
+    local rows = math.ceil(count / CHECKBOX_COLUMNS)
+    divider:SetHeight(math.max(CHECKBOX_ROW_PITCH, rows * CHECKBOX_ROW_PITCH))
+    divider:ClearAllPoints()
+    divider:SetPoint("TOP", frame.Description, "BOTTOM", CHECKBOX_COLUMN_PITCH / 2, -10)
+    divider:Show()
+end
+
+--[[
+    How many events each event type would add or remove.
+
+    Answers "what does this checkbox do" where the checkbox is, rather than leaving the reader to
+    toggle it and go looking. Computed once per LoadEventTypes rather than per toggle: it walks every
+    registered collection, and the number does not change while the panel is open.
+
+    Counts across *all* collections regardless of whether a collection is currently enabled, because the
+    number describes the event type, not the current filter state. Returns an empty table when the data
+    layer is not reachable, so the labels simply carry no count rather than a zero that looks like a fact.
+
+    @return [table] eventTypeId to count
+]]
+function SettingsMixin:CountEventsByType()
+    local counts = {}
+    local data = Chronicles and Chronicles.Data
+
+    if not data or type(data.Events) ~= "table" then
+        return counts
+    end
+
+    for _, eventsGroup in pairs(data.Events) do
+        if eventsGroup and eventsGroup.data then
+            for _, event in pairs(eventsGroup.data) do
+                if event and event.eventType then
+                    counts[event.eventType] = (counts[event.eventType] or 0) + 1
+                end
+            end
+        end
+    end
+
+    return counts
 end
 
 function SettingsMixin:OnSettingsEventTypeChecked(eventData)
@@ -361,6 +458,41 @@ function SettingsMixin:OnSettingsEventTypeChecked(eventData)
     private.Core.Timeline.DisplayTimelineWindow()
 
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsEventTypeChecked")
+
+    self:ReportTimelineEmptiness()
+end
+
+--[[
+    Say something if the toggle just emptied the timeline.
+
+    The handlers above recompute the timeline behind the settings panel, where the reader cannot see it.
+    Without this, the only evidence that a toggle emptied the current page is a blank rail on the Events
+    tab minutes later.
+]]
+function SettingsMixin:ReportTimelineEmptiness()
+    local business = private.Core.Data and private.Core.Data.TimelineBusiness
+    if not business or not business.computeTimelinePeriods then
+        return
+    end
+
+    local ok, periods = pcall(business.computeTimelinePeriods)
+    if not ok then
+        return
+    end
+
+    local hasAnyEvents = false
+    for _, period in ipairs(periods or {}) do
+        if period and period.hasEvents then
+            hasAnyEvents = true
+            break
+        end
+    end
+
+    if not hasAnyEvents then
+        self:ShowStatus(Locale["SettingsTimelineNowEmpty"])
+    else
+        self:ShowStatus("")
+    end
 end
 
 function SettingsMixin:OnSettingsCollectionChecked(eventData)
@@ -382,12 +514,8 @@ function SettingsMixin:OnSettingsCollectionChecked(eventData)
     private.Core.Timeline.DisplayTimelineWindow()
 
     private.Core.triggerEvent(private.constants.events.UIRefresh, nil, "Settings:OnSettingsCollectionChecked")
-end
 
-function SettingsMixin:LoadSettingsHome(frame)
-    if frame then
-        frame:Show()
-    end
+    self:ReportTimelineEmptiness()
 end
 
 function SettingsMixin:LoadEventTypes(frame)
@@ -401,9 +529,6 @@ function SettingsMixin:LoadEventTypes(frame)
         return
     end
     content.checkboxes = content.checkboxes or {}
-
-    local previousCheckbox = nil
-    local yOffset = -15
 
     -- Use UIUtils for cleanup
     local UIUtils = private.Core.Utils.UIUtils
@@ -422,16 +547,23 @@ function SettingsMixin:LoadEventTypes(frame)
     if not private.constants or not private.constants.eventType then
         return
     end
+
+    -- Counted once per load, not per toggle: the same data the toggle handler goes on to invalidate
+    local eventCounts = self:CountEventsByType()
+
     for eventTypeId, eventTypeName in ipairs(private.constants.eventType) do
         local text = Locale[eventTypeName]
+        local affected = eventCounts[eventTypeId]
+        if affected then
+            text = string.format(Locale["SettingsEventTypeCount"], text, affected)
+        end
 
         local checkboxContainer = CreateFrame("Frame", nil, content)
-        checkboxContainer:SetSize(400, 28)
+        checkboxContainer:SetSize(CHECKBOX_COLUMN_PITCH - 20, 28)
 
         local newCheckbox = CreateFrame("CheckButton", nil, checkboxContainer, "ChroniclesSettingsCheckboxTemplate")
         newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
-        newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.eventTypeId = eventTypeId
         newCheckbox.eventTypeName = eventTypeName
 
@@ -466,17 +598,14 @@ function SettingsMixin:LoadEventTypes(frame)
             end
         )
 
-        if previousCheckbox then
-            checkboxContainer:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -5)
-        else
-            checkboxContainer:SetPoint("TOPLEFT", content, "TOPLEFT", 0, yOffset)
-        end
-        checkboxContainer:Show()
         table.insert(content.checkboxes, checkboxContainer)
-        previousCheckbox = checkboxContainer
+        placeCheckboxContainer(content, checkboxContainer, #content.checkboxes)
+        checkboxContainer:Show()
     end
-    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+
+    local totalHeight = SettingsMixin.ComputeCheckboxContentHeight(#content.checkboxes)
     content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+    updateColumnDivider(frame, #content.checkboxes)
 
     if type(self.UpdateScrollIndicators) == "function" then
         pcall(function()
@@ -509,9 +638,6 @@ function SettingsMixin:LoadCollections(frame)
     end
     content.checkboxes = content.checkboxes or {}
 
-    local previousCheckbox = nil
-    local yOffset = -15
-
     -- Use UIUtils for cleanup
     local UIUtils = private.Core.Utils.UIUtils
     if UIUtils then
@@ -532,12 +658,11 @@ function SettingsMixin:LoadCollections(frame)
         local collectionName = collection.name
         local text = Locale[collectionName] or collectionName
         local checkboxContainer = CreateFrame("Frame", nil, content)
-        checkboxContainer:SetSize(400, 28)
+        checkboxContainer:SetSize(CHECKBOX_COLUMN_PITCH - 20, 28)
 
         local newCheckbox = CreateFrame("CheckButton", nil, checkboxContainer, "ChroniclesSettingsCheckboxTemplate")
         newCheckbox:SetPoint("LEFT", 10, 0)
         newCheckbox.Text:SetText(text)
-        newCheckbox.Text:SetFont("Fonts\\FRIZQT__.TTF", 12)
         newCheckbox.collectionName = collectionName
 
         newCheckbox:SetChecked(Chronicles.Data:GetCollectionStatus(collectionName))
@@ -557,18 +682,17 @@ function SettingsMixin:LoadCollections(frame)
             end
         )
 
-        if previousCheckbox then
-            checkboxContainer:SetPoint("TOP", previousCheckbox, "BOTTOM", 0, -5)
-        else
-            checkboxContainer:SetPoint("TOPLEFT", content, "TOPLEFT", 0, yOffset)
-        end
-        checkboxContainer:Show()
         table.insert(content.checkboxes, checkboxContainer)
-        previousCheckbox = checkboxContainer
+        placeCheckboxContainer(content, checkboxContainer, #content.checkboxes)
+        checkboxContainer:Show()
     end
 
-    local totalHeight = math.max(200, (#content.checkboxes * 33) + 30)
+    local totalHeight = SettingsMixin.ComputeCheckboxContentHeight(#content.checkboxes)
     content:SetSize(scrollFrame:GetWidth() - 20, totalHeight)
+    updateColumnDivider(frame, #content.checkboxes)
+
+    content:Show()
+    scrollFrame:Show()
 end
 
 CategoryButtonMixin = {}
@@ -579,12 +703,14 @@ function CategoryButtonMixin:OnLoad()
 
     -- Set up default text properties if text exists
     if self.Text then
-        self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white text
+        self.Text:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
     end
 
-    -- Initialize selection state textures
-    if self.SelectedTexture then
-        self.SelectedTexture:Hide()
+    -- Initialize selection state textures. SelectedGlow, not SelectedTexture: the button draws the
+    -- same bookmark art and the same additive selected pass as every rail row in the window, rather
+    -- than the auction house's nav-button atlases it used to borrow.
+    if self.SelectedGlow then
+        self.SelectedGlow:Hide()
     end
     if self.HighlightTexture then
         self.HighlightTexture:Hide()
@@ -596,9 +722,11 @@ function CategoryButtonMixin:OnEnter()
         self.HighlightTexture:Show()
     end
 
-    -- Enhanced text coloring on hover
+    -- Enhanced text coloring on hover. The literal here was (1.0, 1.0, 0.8), a faint warm white with
+    -- no global equivalent; HIGHLIGHT_FONT_COLOR is the nearest one and the shift is not perceptible
+    -- against the gold selected state it sits between.
     if self.Text then
-        self.Text:SetTextColor(1.0, 1.0, 0.8) -- Slight golden tint
+        self.Text:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
     end
 end
 
@@ -610,9 +738,9 @@ function CategoryButtonMixin:OnLeave()
     -- Reset text color based on selection state
     if self.Text then
         if self.isSelected then
-            self.Text:SetTextColor(1.0, 0.82, 0.0) -- Gold for selected
+            self.Text:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
         else
-            self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white
+            self.Text:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
         end
     end
 end
@@ -666,19 +794,15 @@ end
 function CategoryButtonMixin:SetSelected(selected)
     self.isSelected = selected
 
-    if selected then
-        if self.SelectedTexture then
-            self.SelectedTexture:Show()
-        end
-        if self.Text then
-            self.Text:SetTextColor(1.0, 0.82, 0.0) -- Gold for selected
-        end
-    else
-        if self.SelectedTexture then
-            self.SelectedTexture:Hide()
-        end
-        if self.Text then
-            self.Text:SetTextColor(0.9, 0.9, 0.9) -- Default white
+    if self.SelectedGlow then
+        self.SelectedGlow:SetShown(selected)
+    end
+
+    if self.Text then
+        if selected then
+            self.Text:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
+        else
+            self.Text:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
         end
     end
 end

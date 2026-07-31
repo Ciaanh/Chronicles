@@ -46,8 +46,64 @@
                 </FontString>
             </Layer>
         </Layers>
+        <Frames>
+            <!--
+                Selected state. The density texture already swaps to its "-selected" variant, but that
+                only makes the crystal lighter, and a low-density selected crystal is still dark: on a
+                row of eight, "a slightly different shade" is not an answer to which one is selected. An
+                outline reads as selection at any density.
+
+                Four solid 2px edges rather than a border atlas: the crystals are not a nine-slice shape
+                and no atlas in the client outlines one, while a plain rectangle needs no art at all.
+                Shown from ApplyEventDensityTexture, which every redraw already calls.
+            -->
+            <Frame parentKey="FocusRing" hidden="true">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="-2" y="2"/>
+                    <Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <Texture parentKey="Top">
+                            <Size y="2"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT"/>
+                                <Anchor point="TOPRIGHT"/>
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR"/>
+                        </Texture>
+                        <Texture parentKey="Bottom">
+                            <Size y="2"/>
+                            <Anchors>
+                                <Anchor point="BOTTOMLEFT"/>
+                                <Anchor point="BOTTOMRIGHT"/>
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR"/>
+                        </Texture>
+                        <Texture parentKey="Left">
+                            <Size x="2"/>
+                            <Anchors>
+                                <Anchor point="TOPLEFT"/>
+                                <Anchor point="BOTTOMLEFT"/>
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR"/>
+                        </Texture>
+                        <Texture parentKey="Right">
+                            <Size x="2"/>
+                            <Anchors>
+                                <Anchor point="TOPRIGHT"/>
+                                <Anchor point="BOTTOMRIGHT"/>
+                            </Anchors>
+                            <Color color="HIGHLIGHT_FONT_COLOR"/>
+                        </Texture>
+                    </Layer>
+                </Layers>
+            </Frame>
+        </Frames>
         <Scripts>
             <OnClick method="OnClick" />
+            <OnEnter method="OnEnter" />
+            <OnLeave method="OnLeave" />
         </Scripts>
     </Button>
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
@@ -174,6 +230,25 @@
                     <Anchor point="RIGHT" relativeKey="$parent.RangeIndicator" relativePoint="LEFT" x="-8" y="0" />
                 </Anchors>
             </Button>
+
+            <!--
+                Density legend: what the crystal colours mean, so a reader can answer that without
+                clicking. Its swatches and labels are built in TimelineMixin:BuildDensityLegend from
+                config.timeline.densityTiers, never from literals, so the legend and the crystals cannot
+                describe different thresholds.
+
+                13 tall, which is what the band has spare. The arithmetic, because it is easy to get
+                wrong: the frame is 175; the toolbar is 38 inset 12 from the top, so it occupies 125 to
+                163; the grid is a 25 label plus a 75 period inset 12 from the bottom, so it occupies 12
+                to 112. That leaves exactly 112 to 125.
+            -->
+            <Frame parentKey="DensityLegend">
+                <Size y="13"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Toolbar" relativePoint="BOTTOMLEFT"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.Toolbar" relativePoint="BOTTOMRIGHT"/>
+                </Anchors>
+            </Frame>
 
             <!--
                 The period grid is not declared here. Nine labels and eight periods used to be

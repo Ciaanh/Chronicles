@@ -41,8 +41,23 @@ _G.UIParent = makeFrame()
 _G.GameTooltip = {
     SetOwner = function() end,
     SetText = function() end,
+    AddLine = function() end,
+    Show = function() end,
     Hide = function() end
 }
+
+-- Click and hover feedback. SOUNDKIT resolves any key to its own name so a module referencing a
+-- constant this file has never heard of still gets a value rather than indexing nil.
+_G.PlaySound = function() end
+_G.SOUNDKIT =
+    setmetatable(
+    {},
+    {
+        __index = function(_, key)
+            return key
+        end
+    }
+)
 
 -- WoW's global string split helper (returns multiple values). A minimal
 -- single-separator implementation is enough for the tested code paths.

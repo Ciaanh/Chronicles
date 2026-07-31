@@ -58,13 +58,27 @@
                         <Anchors>
                             <Anchor point="TOPLEFT"/>
                         </Anchors>
-                        <FontString inherits="ChroniclesFontFamily_Text_Medium">
+                        <!-- Body prose at 15, one step above the 14 the panel chrome uses -->
+                        <FontString inherits="ChroniclesFontFamily_Text_Body">
                             <Color color="SPELLBOOK_FONT_COLOR"/>
                         </FontString>
                         <FontStringHeader1 inherits="ChroniclesFontFamily_Text_Huge" spacing="4">
                             <Color color="SPELLBOOK_FONT_COLOR"/>
                         </FontStringHeader1>
-                        <!-- <FontStringHeader2 inherits="GameFontHighlight" spacing="4"/> -->
+                        <!--
+                            h2 is a label, not a heading: the CHAPTER n eyebrow on the body page and the
+                            FACTIONS / CHARACTERS / Contents sub-heads on the front matter. Small on
+                            purpose, and in the book's own font with the parchment colour. Declared at
+                            all because an undeclared header font falls back to a gold system font,
+                            which is what the commented-out GameFontHighlight stub would have done.
+                        -->
+                        <FontStringHeader2 inherits="ChroniclesFontFamily_Text_Medium" spacing="4">
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
+                        </FontStringHeader2>
+                        <!-- h3 is a chapter's own header, present only when a record actually sets one -->
+                        <FontStringHeader3 inherits="ChroniclesFontFamily_Text_Medium" spacing="4">
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
+                        </FontStringHeader3>
                     </SimpleHTML>
                 </ScrollChild>
 

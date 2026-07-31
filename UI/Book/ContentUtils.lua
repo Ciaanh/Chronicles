@@ -30,6 +30,29 @@ local function countEntries(tbl)
     return count
 end
 
+-- Total book pages the entity's chapters occupy. Part of the cache key because chapter *count* alone
+-- cannot see a chapter gaining a page: since one entry in chapter.pages is one book page, an edit that
+-- adds a page changes the document count and the whole navigation mapping while leaving the chapter
+-- count identical, and the reader would keep getting the cached pre-edit book until a /reload.
+local function countPages(entity)
+    if type(entity.chapters) ~= "table" then
+        return 0
+    end
+
+    local HTMLBuilderRef = private.Core.Utils.HTMLBuilder
+    local total = 0
+
+    for _, chapter in pairs(entity.chapters) do
+        if HTMLBuilderRef and HTMLBuilderRef.GetChapterPageCount then
+            total = total + HTMLBuilderRef.GetChapterPageCount(chapter)
+        else
+            total = total + countEntries(chapter and chapter.pages)
+        end
+    end
+
+    return total
+end
+
 local function buildEntityCacheKey(entity)
     if type(entity) ~= "table" then
         return nil
@@ -50,7 +73,15 @@ local function buildEntityCacheKey(entity)
     local chaptersCount = countEntries(entity.chapters)
     local descriptionLength = entity.description and #entity.description or 0
 
-    return string.format("%s:%s:%s:%s:%s", tostring(source), tostring(id), tostring(revision), tostring(chaptersCount), tostring(descriptionLength))
+    return string.format(
+        "%s:%s:%s:%s:%s:%s",
+        tostring(source),
+        tostring(id),
+        tostring(revision),
+        tostring(chaptersCount),
+        tostring(countPages(entity)),
+        tostring(descriptionLength)
+    )
 end
 
 -- Initialize ContentUtils namespace
