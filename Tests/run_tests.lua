@@ -28,7 +28,10 @@ local specs = {
     "TimelineBusiness_spec.lua",
     "StateManager_spec.lua",
     "EventManager_spec.lua",
-    "Settings_spec.lua"
+    "Settings_spec.lua",
+    "VerticalListItem_spec.lua",
+    "FrontMatter_spec.lua",
+    "HTMLBuilder_spec.lua"
 }
 
 for _, spec in ipairs(specs) do

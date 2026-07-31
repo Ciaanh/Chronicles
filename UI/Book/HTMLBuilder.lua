@@ -59,11 +59,13 @@ local WOW_COLORS = {
     reset = "|r"
 }
 
--- Portrait settings for WoW image display
+-- Portrait settings for WoW image display. Powers of two, because SimpleHTML's <img> wants them, and
+-- left-aligned so the slot seats at the top-left of the front matter when data eventually exists: no
+-- record in the DB carries an image field today.
 local PORTRAIT_SETTINGS = {
-    width = "140",
-    height = "140",
-    align = "right"
+    width = "128",
+    height = "128",
+    align = "left"
 }
 
 -- HTML entities for SimpleHTML
@@ -157,16 +159,21 @@ end
     Create a title block with WoW color codes
     Uses <h1> which is supported by SimpleHTML
     @param title [string] Title text
+    @param options [table] Optional; set options.divider = false to omit the rule under the title, for
+                           callers that put something between the two (the front matter's metadata line)
     @return [string] HTML title element
 ]]
-function HTMLBuilder.CreateTitle(title)
+function HTMLBuilder.CreateTitle(title, options)
     if not title or title == "" then
         return ""
     end
 
     --local coloredTitle = ApplyWoWColor(safeTitle, WOW_COLORS.title)
 
-    local divider = HTMLBuilder.CreateDecorativeDivider()
+    local divider = ""
+    if not options or options.divider ~= false then
+        divider = HTMLBuilder.CreateDecorativeDivider()
+    end
 
     return string.format('<h1 align="center">%s</h1>%s', EscapeHTML(title), divider)
 end
@@ -200,13 +207,16 @@ function HTMLBuilder.CreateAuthor(author)
 end
 
 --[[
-    Create a date range block for events
-    Uses <p> with align="center" which is supported by SimpleHTML
+    The wording of an event's date, as plain text.
+
+    Split out from CreateDateRange so the front matter's metadata line can join the same phrasing with
+    the event type and collection instead of reproducing it. One wording, two placements.
+
     @param yearStart [number] Start year
     @param yearEnd [number] End year
-    @return [string] HTML date range element
+    @return [string] Date text, empty when neither bound is given
 ]]
-function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
+function HTMLBuilder.GetDateRangeText(yearStart, yearEnd)
     if not yearStart and not yearEnd then
         return ""
     end
@@ -227,6 +237,22 @@ function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
     elseif yearEnd then
         dateText = Locale["BOOK_DATE_UNTIL_YEAR"] and string.format(Locale["BOOK_DATE_UNTIL_YEAR"], yearEnd) or
                        string.format("Until Year %d", yearEnd)
+    end
+
+    return dateText
+end
+
+--[[
+    Create a date range block for events
+    Uses <p> with align which is supported by SimpleHTML
+    @param yearStart [number] Start year
+    @param yearEnd [number] End year
+    @return [string] HTML date range element
+]]
+function HTMLBuilder.CreateDateRange(yearStart, yearEnd)
+    local dateText = HTMLBuilder.GetDateRangeText(yearStart, yearEnd)
+    if dateText == "" then
+        return ""
     end
 
     return string.format('<p align="right">%s</p>', dateText)
@@ -256,7 +282,11 @@ end
     Create a paragraph element with text escaping
     Uses <p> with optional align attribute - both supported by SimpleHTML
     @param text [string] Paragraph text
-    @param options [table] Optional styling (align: left, center, right)
+    @param options [table] Optional styling (align: left, center, right) and options.escape = false for
+                           content this builder has already turned into markup. Escaping is the default
+                           because most callers pass author text; a caller that has just built an <a>
+                           element must opt out, or the reader sees &lt;a href=... spelled out. That was
+                           happening to every table-of-contents row and every CreateNavigationLinks list.
     @return [string] HTML paragraph element
 ]]
 function HTMLBuilder.CreateParagraph(text, options)
@@ -265,7 +295,10 @@ function HTMLBuilder.CreateParagraph(text, options)
     end
 
     options = options or {}
-    local safe = EscapeHTML(text)
+    local safe = text
+    if options.escape ~= false then
+        safe = EscapeHTML(text)
+    end
     if options.align then
         return string.format('<p align="%s">%s</p>', options.align, safe)
     else
@@ -333,8 +366,9 @@ function HTMLBuilder.CreateNavigationLinks(links, separator)
         return ""
     end
 
+    -- escape = false: these are <a> elements built by CreateLink, which has already escaped their text
     local navigationContent = table.concat(linkElements, separator)
-    return HTMLBuilder.CreateParagraph(navigationContent, {align = "center"})
+    return HTMLBuilder.CreateParagraph(navigationContent, {align = "center", escape = false})
 end
 
 --[[
@@ -380,24 +414,100 @@ function HTMLBuilder.CreateTableOfContents(entity, navigationData)
 
     local tocTitle = Locale["BOOK_CONTENTS_TITLE"] or "Contents"
     local tocContent = HTMLBuilder.CreateSubtitle(tocTitle)
+    local pageMapping = navigationData and navigationData.pageMapping
 
     for i, chapter in ipairs(entity.chapters) do
         local chapterTitle = chapter.title or chapter.header or ((Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or ("Chapter " .. i))
         local chapterNumber = (Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or string.format("Chapter %d", i)
+        local chapterId = ChapterLinkId(chapter, i)
 
         -- Create clickable link to navigate to the chapter
-        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", ChapterLinkId(chapter, i))
+        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", chapterId)
 
         -- Format: "Chapter 1: Chapter Title"
         local tocEntry = string.format("%s: %s", chapterNumber, chapterLink)
-        tocContent = tocContent .. HTMLBuilder.CreateParagraph(tocEntry, {align = "left"})
+
+        -- ...and the page it is on, which is what makes this a table of contents rather than a list of
+        -- links. The mapping is in document units and the reader sees spreads, so convert: chapter 2 of
+        -- a book whose chapters run three pages each starts at document 5 and is printed as page 3.
+        local documentIndex = pageMapping and pageMapping[chapterId]
+        if documentIndex then
+            local pageFmt = Locale["BOOK_CONTENTS_PAGE_N"] or "%d"
+            local separator = Locale["BOOK_FRONT_META_SEPARATOR"] or " . "
+            tocEntry =
+                tocEntry .. separator .. string.format(pageFmt, HTMLBuilder.DocumentIndexToSpread(documentIndex))
+        end
+
+        -- escape = false: tocEntry holds the <a> element CreateLink built, and CreateLink has already
+        -- escaped the chapter title inside it
+        tocContent = tocContent .. HTMLBuilder.CreateParagraph(tocEntry, {align = "left", escape = false})
     end
 
     return tocContent
 end
 
 --[[
+    How many book pages a chapter occupies.
+
+    One entry in chapter.pages is one book page. This is the single derivation of that count: both
+    the document loop in CreateEntityHTML and the id -> page mapping in CreateChapterNavigationData
+    call it, so the mapping cannot drift from the documents actually emitted. It replaces a
+    chapter.pageCount field that no record has ever set, which is why a contents link into chapter 3
+    of a paged book used to land on the wrong page.
+
+    A chapter with no pages array still occupies one page: either it carries the single-field
+    chapter.content alternative, or it is empty and renders as a blank page under its heading.
+
+    @param chapter [table] Chapter data
+    @return [number] Page count, never below 1 for a chapter that exists
+]]
+function HTMLBuilder.GetChapterPageCount(chapter)
+    if not chapter then
+        return 0
+    end
+
+    local pages = chapter.pages
+    if type(pages) == "table" and #pages > 0 then
+        return #pages
+    end
+
+    return 1
+end
+
+--[[
+    Convert a document index into the page the reader will see it on.
+
+    pageMapping counts documents; the book displays a spread of viewsPerPage documents per page. The
+    builder has no frame to ask, so it reads the constant that BookContainerTemplate.xml's KeyValue is
+    kept equal to. Anything holding the actual frame should call its GetPageForViewDataIndex instead,
+    which is the same arithmetic against the value the pager is really using.
+
+    @param documentIndex [number] 1-based index into the htmlDocuments array
+    @return [number] 1-based displayed page number
+]]
+function HTMLBuilder.DocumentIndexToSpread(documentIndex)
+    if not documentIndex or documentIndex < 1 then
+        return 1
+    end
+
+    local bookConfig = private.constants and private.constants.config and private.constants.config.book
+    local viewsPerPage = (bookConfig and bookConfig.viewsPerPage) or 1
+    if viewsPerPage < 1 then
+        viewsPerPage = 1
+    end
+
+    return math.ceil(documentIndex / viewsPerPage)
+end
+
+--[[
     Create chapter navigation data structure
+
+    pageMapping is in *document* units, i.e. indices into the htmlDocuments array, because the
+    builder has no access to the book frame's viewsPerPage. Consumers convert: a displayed page is a
+    spread of viewsPerPage views, so document index 5 is on spread 3 at viewsPerPage = 2. Convert at
+    the point of use (HTMLContentMixin:NavigateToChapter, and the printed contents page numbers),
+    never here.
+
     @param entity [table] Entity with chapters
     @return [table] Navigation data with chapter mappings
 ]]
@@ -408,21 +518,17 @@ function HTMLBuilder.CreateChapterNavigationData(entity)
 
     local navigationData = {
         chapters = {},
-        pageMapping = {}, -- Maps chapter ID to page index in htmlDocuments
+        pageMapping = {}, -- Maps chapter ID to document index in htmlDocuments
         chapterLookup = {} -- Maps chapter ID to chapter data
     }
 
+    -- Front matter is always document 1, and there is no separate contents document: the contents
+    -- list lives on the front matter. A page that exists only for entities with more than one chapter
+    -- made the whole book's numbering depend on chapter count in a second, redundant way, and every
+    -- contents row has to carry a page number regardless.
     local currentPageIndex = 1
-
-    -- Cover page (page 1)
     navigationData.pageMapping["cover"] = currentPageIndex
     currentPageIndex = currentPageIndex + 1
-
-    -- TOC page (only if entity has more than 1 chapter)
-    if entity.chapters and #entity.chapters > 1 then
-        navigationData.pageMapping["toc"] = currentPageIndex
-        currentPageIndex = currentPageIndex + 1
-    end
 
     -- Chapter pages
     for i, chapter in ipairs(entity.chapters) do
@@ -438,9 +544,8 @@ function HTMLBuilder.CreateChapterNavigationData(entity)
         navigationData.pageMapping[chapterId] = currentPageIndex
         navigationData.chapterLookup[chapterId] = navigationData.chapters[i]
 
-        -- Account for multiple pages per chapter if needed
-        local pagesInChapter = chapter.pageCount or 1
-        currentPageIndex = currentPageIndex + pagesInChapter
+        -- Same derivation the document loop walks, so the two cannot disagree
+        currentPageIndex = currentPageIndex + HTMLBuilder.GetChapterPageCount(chapter)
     end
 
     return navigationData
@@ -448,11 +553,10 @@ end
 
 --[[
     Create page header with chapter information
-    @param chapter [table] Chapter data
-    @param navigationData [table] Navigation data
+    @param chapter [table] A navigationData.chapters entry, carrying index and title
     @return [string] HTML page header
 ]]
-function HTMLBuilder.CreatePageHeader(chapter, navigationData)
+function HTMLBuilder.CreatePageHeader(chapter)
     if not chapter then
         return ""
     end
@@ -466,6 +570,135 @@ end
 -- =============================================================================================
 -- ENTITY CONTENT GENERATION
 -- =============================================================================================
+
+--[[
+    Render one authored page into body HTML.
+
+    Three shapes, applied per page rather than per chapter. The distinction used to decide whether a
+    page became its own book page or was concatenated into the chapter's single page, which meant
+    every authored page break collapsed unless the author wrote a literal <html> document: no locale
+    string in the DB does. Now it decides only how the content is wrapped.
+
+    A full document goes through ExtractInnerHTML rather than being passed along untouched, so it
+    ends up wrapped by CreateHTMLDocument like its siblings instead of reaching the widget with
+    whatever wrapper the author happened to write.
+
+    @param page [string] One entry from chapter.pages, or a chapter.content field
+    @return [string] Body HTML, empty string for an absent or empty page
+]]
+local function RenderPageBody(page)
+    if not page or page == "" then
+        return ""
+    end
+
+    if StringUtils.ContainsHTML(page) then
+        return ExtractInnerHTML(page)
+    end
+
+    -- Fragment: some markup but not a document, so it is already body content
+    if string.find(page, "<[^>]+>") then
+        return page
+    end
+
+    return HTMLBuilder.CreateParagraph(page)
+end
+
+--[[
+    Build the heading that opens a chapter: its "Chapter n: title" line and, when the record actually
+    carries one, the chapter header and its section rule. It goes on the chapter's first page only.
+
+    The header is tested against "" as well as nil: the generator emits Locale[""] for a chapter with
+    no header, which resolves to an empty string, and an empty <h3> plus a divider is visible noise.
+
+    @param chapterData [table|nil] The navigation entry for this chapter
+    @param chapter [table] Chapter data
+    @return [string] Heading HTML, possibly empty
+]]
+local function BuildChapterHeading(chapterData, chapter)
+    local heading = ""
+
+    if chapterData then
+        heading = heading .. HTMLBuilder.CreatePageHeader(chapterData)
+    end
+
+    if chapter.header and chapter.header ~= "" then
+        heading =
+            heading .. string.format("<h3>%s</h3>", chapter.header) .. HTMLBuilder.CreateDecorativeDivider("section")
+    end
+
+    return heading
+end
+
+--[[
+    The front matter's metadata line: year, event type and collection, joined by a separator.
+
+    Parts that are absent are dropped rather than rendered empty, so a character (no year, no event
+    type) gets its collection alone and nothing ever renders a bare separator.
+
+    @param entity [table] Entity data
+    @return [string] Paragraph HTML, empty string when the entity carries none of the three
+]]
+local function BuildMetadataLine(entity)
+    local parts = {}
+
+    local dateText = HTMLBuilder.GetDateRangeText(entity.yearStart, entity.yearEnd)
+    if dateText ~= "" then
+        table.insert(parts, dateText)
+    end
+
+    local eventTypes = private.constants and private.constants.eventType
+    local eventTypeKey = eventTypes and entity.eventType and eventTypes[entity.eventType]
+    -- "undefined" is the zero value of the enum, not a type a reader wants to be told about
+    if eventTypeKey and eventTypeKey ~= "undefined" then
+        table.insert(parts, Locale[eventTypeKey] or eventTypeKey)
+    end
+
+    if entity.source and entity.source ~= "" then
+        table.insert(parts, Locale[entity.source] or entity.source)
+    end
+
+    if #parts == 0 then
+        return ""
+    end
+
+    local separator = Locale["BOOK_FRONT_META_SEPARATOR"] or " . "
+    return HTMLBuilder.CreateParagraph(table.concat(parts, separator), {align = "center"})
+end
+
+--[[
+    One cross-reference block: a sub-head and a single paragraph of resolved names.
+
+    Returns an empty string when nothing resolved, which is what keeps an event with no factions from
+    showing a FACTIONS heading over blank space. That is the common case in the current data: roughly
+    two events in five carry either kind of reference.
+
+    @param refs [table|nil] The entity's raw reference table, either shape
+    @param kind [string] "character" or "faction"
+    @param fallbackCollection [string|nil] Collection for the flat shape, normally entity.source
+    @param headingKey [string] Locale key for the sub-head
+    @return [string] HTML block, possibly empty
+]]
+local function BuildReferenceBlock(refs, kind, fallbackCollection, headingKey)
+    local FrontMatter = private.Core.Utils.FrontMatter
+    if not FrontMatter or not FrontMatter.ResolveNames then
+        return ""
+    end
+
+    local names, omitted = FrontMatter.ResolveNames(refs, kind, fallbackCollection)
+    if not names then
+        return ""
+    end
+
+    local separator = Locale["BOOK_FRONT_META_SEPARATOR"] or " . "
+    local line = table.concat(names, separator)
+
+    if omitted and omitted > 0 then
+        local moreFmt = Locale["BOOK_FRONT_MORE"] or "+ %d more"
+        line = line .. separator .. string.format(moreFmt, omitted)
+    end
+
+    return HTMLBuilder.CreateSubtitle(Locale[headingKey] or headingKey) .. HTMLBuilder.CreateParagraph(line)
+end
 
 --[[
     Create a list of HTML documents for any entity type (event, character, faction)
@@ -492,26 +725,35 @@ function HTMLBuilder.CreateEntityHTML(entity)
     -- Create navigation data structure first
     local navigationData = HTMLBuilder.CreateChapterNavigationData(entity)
 
-    -- Create main/cover page with title, description and portrait
+    -- Front matter, the left half of the spread. It carries who and when, so the right half can be
+    -- nothing but prose: portrait, title, metadata line, rule, the resolved cross-reference lists, and
+    -- the contents list appended further down.
     local coverContent = ""
     local title = entity.name or entity.label or (Locale["BOOK_UNTITLED"] or "Untitled")
 
-    coverContent = coverContent .. HTMLBuilder.CreateTitle(title)
-
-    -- Add date range for events
-    if entity.yearStart or entity.yearEnd then
-        coverContent = coverContent .. HTMLBuilder.CreateDateRange(entity.yearStart, entity.yearEnd)
+    -- Portrait first so it seats at the top. No record in the DB carries an image field yet and the art
+    -- directory holds one portrait, so this is a slot waiting for data, not a feature: absent image,
+    -- absent slot. There is deliberately no fallback to a collection crest, because there are no crests.
+    if entity.image and entity.image ~= "" then
+        coverContent = coverContent .. HTMLBuilder.CreatePortrait(entity.image)
     end
+
+    -- The rule goes under the metadata rather than under the title, so title and metadata read as one
+    -- block of identity and the rule separates it from the reference lists.
+    coverContent = coverContent .. HTMLBuilder.CreateTitle(title, {divider = false})
+    coverContent = coverContent .. BuildMetadataLine(entity)
+    coverContent = coverContent .. HTMLBuilder.CreateDecorativeDivider()
 
     -- Add author if present
     if entity.author and entity.author ~= "" then
         coverContent = coverContent .. HTMLBuilder.CreateAuthor(entity.author)
     end
 
-    -- Add portrait/image if present
-    if entity.image and entity.image ~= "" then
-        coverContent = coverContent .. HTMLBuilder.CreatePortrait(entity.image)
-    end
+    -- Cross-references, resolved from ids to names. Events key them by collection; a character's
+    -- factions are a flat id array whose collection is the character's own source.
+    coverContent = coverContent .. BuildReferenceBlock(entity.factions, "faction", entity.source, "BOOK_FRONT_FACTIONS")
+    coverContent =
+        coverContent .. BuildReferenceBlock(entity.characters, "character", entity.source, "BOOK_FRONT_CHARACTERS")
 
     -- Add description if present
     if entity.description and entity.description ~= "" then
@@ -527,74 +769,46 @@ function HTMLBuilder.CreateEntityHTML(entity)
         end
     end
 
+    -- Contents, on the front matter rather than on a page of its own. Hidden at one chapter because a
+    -- single-chapter entity has nothing to navigate to; this is a #chapters test, so an entity that
+    -- gains a second chapter gets a contents list with no further work.
+    if entity.chapters and #entity.chapters > 1 then
+        coverContent = coverContent .. HTMLBuilder.CreateTableOfContents(entity, navigationData)
+    end
+
     -- Add cover page as first document (if it has content)
     if coverContent ~= "" then
         table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(coverContent))
     end
 
-    -- Create table of contents page (only create if entity has more than 1 chapter)
-    if entity.chapters and #entity.chapters > 1 then
-        local tocContent = HTMLBuilder.CreateTableOfContents(entity, navigationData)
-        local toc = HTMLBuilder.CreateHTMLDocument(tocContent)
-        -- toc is already a complete document; avoid double-wrapping
-        table.insert(htmlDocuments, toc)
-        -- removed debug print
-    end
-
-    -- Add chapters as separate documents if present
+    -- Add chapters as documents: one per authored page, in authored order.
+    --
+    -- There is deliberately one list. The previous shape kept a second, per-chapter side-list holding
+    -- only the full-HTML pages and appended it after the chapter's concatenated text, so a chapter
+    -- mixing plain and HTML pages rendered out of the order it was written in. With every page a
+    -- document there is nothing to reorder.
     if entity.chapters and type(entity.chapters) == "table" then
         for i, chapter in ipairs(entity.chapters) do
-            local chapterData = navigationData.chapters[i]
-            local chapterContent = ""
-            local chapterDocuments = {}
+            local heading = BuildChapterHeading(navigationData.chapters[i], chapter)
+            local pages = (type(chapter.pages) == "table" and #chapter.pages > 0) and chapter.pages or nil
 
-            -- Create chapter header with navigation
-            if chapterData then
-                chapterContent = chapterContent .. HTMLBuilder.CreatePageHeader(chapterData, navigationData)
-            end
-
-            if chapter.header then
-                chapterContent =
-                    chapterContent ..
-                    string.format("<h3>%s</h3>", chapter.header) .. HTMLBuilder.CreateDecorativeDivider("section") --"chapter"
-            end
-
-            if chapter.pages and type(chapter.pages) == "table" then
-                for _, page in ipairs(chapter.pages) do
-                    if page and page ~= "" then
-                        -- Check if page content is a complete HTML document using StringUtils
-                        if StringUtils.ContainsHTML(page) then
-                            -- Page is a complete HTML document, add to chapter documents
-                            table.insert(chapterDocuments, page)
-                        elseif string.find(page, "<[^>]+>") then
-                            -- Page contains HTML tags but isn't a complete document
-                            chapterContent = chapterContent .. page
-                        else
-                            chapterContent = chapterContent .. HTMLBuilder.CreateParagraph(page)
-                        end
+            if pages then
+                for pageIndex, page in ipairs(pages) do
+                    local content = RenderPageBody(page)
+                    if pageIndex == 1 then
+                        content = heading .. content
                     end
-                end
-            elseif chapter.content and chapter.content ~= "" then
-                -- Support for single content field (alternative to pages array)
-                if StringUtils.ContainsHTML(chapter.content) then
-                    -- Content is a complete HTML document, add to chapter documents
-                    table.insert(chapterDocuments, chapter.content)
-                elseif string.find(chapter.content, "<[^>]+>") then
-                    -- Content contains HTML tags but isn't a complete document
-                    chapterContent = chapterContent .. chapter.content
-                else
-                    chapterContent = chapterContent .. HTMLBuilder.CreateParagraph(chapter.content)
-                end
-            end
 
-            -- Add chapter content as a document if it has content
-            if chapterContent ~= "" then
-                table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(chapterContent))
-            end
-
-            -- Add any complete HTML page documents for this chapter in order
-            for _, pageDoc in ipairs(chapterDocuments) do
-                table.insert(htmlDocuments, pageDoc)
+                    -- Emitted unconditionally, including for an empty page. The count must equal
+                    -- GetChapterPageCount(chapter) or every later chapter's contents link points at
+                    -- the wrong page; an authored empty page showing as a blank page is the honest
+                    -- rendering of the record, and silently renumbering the book is not.
+                    table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(content))
+                end
+            else
+                -- Single chapter.content field, the documented alternative to a pages array. It stays
+                -- one page: it is one field, so there is nothing in it to break pages on.
+                table.insert(htmlDocuments, HTMLBuilder.CreateHTMLDocument(heading .. RenderPageBody(chapter.content)))
             end
         end
     end

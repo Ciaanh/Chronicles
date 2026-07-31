@@ -143,6 +143,68 @@ function TimelineMixin:RefreshTimelinePools(pageSize)
 end
 
 --[[
+    Build the density legend from the tier ladder.
+
+    Swatch art and label text both come from config.timeline.densityTiers: a legend that restated
+    "< 10 / < 25 / 25+" in a locale file would be a third copy of the ladder, and the copy nobody
+    updates. The locale strings are format strings only.
+
+    Built once in OnLoad rather than per redraw: the ladder is a constant, so the legend never changes
+    after load. Frames are created here rather than declared in XML for the same reason the period grid
+    is: the count comes from the data.
+]]
+function TimelineMixin:BuildDensityLegend()
+    local legend = self.DensityLegend
+    if not legend or legend.built then
+        return
+    end
+
+    local timelineConfig = private.constants.config.timeline
+    local tiers = timelineConfig.densityTiers or {}
+
+    -- One entry per tier, plus the dense case above them all
+    local entries = {}
+    for _, tier in ipairs(tiers) do
+        table.insert(
+            entries,
+            {texture = tier.texture, text = string.format(Locale["TimelineDensityLegendUnder"], tier.below)}
+        )
+    end
+
+    local highestCeiling = #tiers > 0 and tiers[#tiers].below or 0
+    table.insert(
+        entries,
+        {
+            texture = timelineConfig.denseTexture,
+            text = string.format(Locale["TimelineDensityLegendOver"], highestCeiling)
+        }
+    )
+
+    local previous
+    for index, entry in ipairs(entries) do
+        local swatch = legend:CreateTexture(nil, "ARTWORK")
+        swatch:SetTexture("Interface\\AddOns\\Chronicles\\Art\\" .. entry.texture)
+        swatch:SetSize(20, 10)
+        if previous then
+            swatch:SetPoint("LEFT", previous, "RIGHT", Spacing.md, 0)
+        else
+            swatch:SetPoint("LEFT", legend, "LEFT", 0, 0)
+        end
+
+        local label = legend:CreateFontString(nil, "ARTWORK", "ChroniclesFontFamily_Text_Shadow_Small")
+        label:SetPoint("LEFT", swatch, "RIGHT", Spacing.xs, 0)
+        label:SetText(entry.text)
+        label:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
+
+        previous = label
+        legend["Swatch" .. index] = swatch
+        legend["Label" .. index] = label
+    end
+
+    legend.built = true
+end
+
+--[[
     Restate the span the visible page covers, read off the outermost year marks
 
     Derived from the labels rather than from the pagination data so it cannot disagree with what is
@@ -196,6 +258,8 @@ function TimelineMixin:OnLoad()
 
     -- Before any Display* event fires: the pooled frames are what register for those events.
     self:RefreshTimelinePools(private.constants.config.timeline.pageSize)
+
+    self:BuildDensityLegend()
 
     self:InitializeStateSubscriptions()
 
@@ -256,7 +320,11 @@ function TimelineMixin:OnDisplayEventsForYear(eventData)
         local yearSpecificPeriod = {
             lower = year,
             upper = year,
-            text = "Year " .. year,
+            -- This string is stored *into* state as selectedPeriod.text and persisted, so a saved value
+            -- from before this key existed keeps its old English text until the next selection. That is
+            -- acceptable; it is one label and it corrects itself on first use, which is cheaper than a
+            -- migration for a value that is rewritten every time the reader picks a period.
+            text = string.format(Locale["TimelineYearLabel"], year),
             nbEvents = #events,
             hasEvents = #events > 0,
             isYearSpecific = true
@@ -587,15 +655,9 @@ end
 TimelinePeriodMixin = {}
 
 local ART_PATH = "Interface\\AddOns\\Chronicles\\Art\\"
-local NO_EVENTS_TEXTURE = "no-events"
 
--- Ordered low to high; the first tier whose ceiling the count is under wins, and anything above
--- them all is dense. The same ladder used to be written out three times over.
-local EVENT_DENSITY_TIERS = {
-    {below = 10, texture = "low-events"},
-    {below = 25, texture = "medium-events"}
-}
-local DENSE_TEXTURE = "high-events"
+-- How many event labels a period's tooltip lists before it stops naming them
+local TOOLTIP_EVENT_LIMIT = 5
 
 --[[
     Claim a position in the timeline and subscribe to the event that fills it
@@ -621,20 +683,66 @@ end
 function TimelinePeriodMixin:ApplyEventDensityTexture(selected)
     local data = self.data
 
+    -- The focus ring rides this call rather than carrying its own subscription: the texture swap is
+    -- already reapplied on every OnDisplayTimelinePeriod, which is what survives paging and zoom
+    -- redraws, and a second path to the same visual state is a second path to get out of step.
+    if self.FocusRing then
+        self.FocusRing:SetShown(selected == true)
+    end
+
     if not data or not data.hasEvents then
-        self.Background:SetTexture(ART_PATH .. NO_EVENTS_TEXTURE)
+        self.Background:SetTexture(ART_PATH .. private.constants.config.timeline.noEventsTexture)
         return
     end
 
-    local textureName = DENSE_TEXTURE
-    for _, tier in ipairs(EVENT_DENSITY_TIERS) do
-        if data.nbEvents < tier.below then
-            textureName = tier.texture
-            break
-        end
-    end
+    -- The ladder lives in constants and is walked in one place, TimelineBusiness, so the legend below
+    -- the toolbar cannot describe a threshold the crystals do not use.
+    local textureName = private.Core.Data.TimelineBusiness.getEventDensityTexture(data.nbEvents)
 
     self.Background:SetTexture(ART_PATH .. textureName .. (selected and "-selected" or ""))
+end
+
+--[[
+    Name what this period holds, on hover.
+
+    Reads the same cache call EventListMixin:UpdateFromSelectedPeriod makes, so hovering a period the
+    reader has already selected costs nothing, and runs it through the same event-type filter, so the
+    tooltip never names an event the reader has switched off in settings.
+]]
+function TimelinePeriodMixin:OnEnter()
+    local data = self.data
+    if not data then
+        return
+    end
+
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText(
+        string.format(Locale["TimelinePeriodTooltipSpan"], data.lower, data.upper),
+        HIGHLIGHT_FONT_COLOR:GetRGB()
+    )
+
+    local events = private.Core.Cache.getSearchEvents(data.lower, data.upper)
+    events = private.Core.Events.FilterEvents(events) or {}
+
+    GameTooltip:AddLine(string.format(Locale["TimelinePeriodTooltipCount"], #events), NORMAL_FONT_COLOR:GetRGB())
+
+    for index, event in ipairs(events) do
+        if index > TOOLTIP_EVENT_LIMIT then
+            GameTooltip:AddLine(
+                string.format(Locale["TimelinePeriodTooltipMore"], #events - TOOLTIP_EVENT_LIMIT),
+                GRAY_FONT_COLOR:GetRGB()
+            )
+            break
+        end
+
+        GameTooltip:AddLine(event.label or event.name or "", WHITE_FONT_COLOR:GetRGB())
+    end
+
+    GameTooltip:Show()
+end
+
+function TimelinePeriodMixin:OnLeave()
+    GameTooltip:Hide()
 end
 
 function TimelinePeriodMixin:OnDisplayTimelinePeriod(periodData)

@@ -64,6 +64,9 @@
 			<!-- Main paged content display -->
 			<Frame parentKey="PagedDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
 				<KeyValues>
+					<!-- Kept equal to constants.config.book.viewsPerPage, which is what HTMLBuilder
+					     prints contents page numbers against. XML cannot read the Lua constant, so
+					     the two are a matched pair: change one and change the other. -->
 					<KeyValue key="viewsPerPage" value="2" type="number"/>
 					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
 					<KeyValue key="xPadding" value="15" type="number"/>
@@ -93,10 +96,19 @@
 						</Anchors>
 					</Frame>
 
-					<!-- Paging controls with customizable styling -->
+					<!--
+						Paging controls, inside the text column.
+
+						y was -30: thirty pixels *below* PagedDetails' own bottom edge, which put the
+						"Page n/N" readout and its arrows out on the parchment margin, outside the page's 50
+						padding, reading as chrome bolted to the book rather than part of it. 15 brings them
+						onto the page and still clears the corner flipbook, which is 75 x 77 anchored
+						BOTTOMRIGHT -15, 6 of the *container* and so covers about the first 30 of this
+						frame's bottom-right corner.
+					-->
 					<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
 						<Anchors>
-							<Anchor point="BOTTOMRIGHT" x="-25" y="-30"/>
+							<Anchor point="BOTTOMRIGHT" x="-25" y="15"/>
 						</Anchors>
 						<KeyValues>
 							<KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />

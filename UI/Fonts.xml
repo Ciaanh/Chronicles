@@ -5,10 +5,18 @@
     FONT FAMILIES (Base Definitions)
     ============================================================================================= -->
 
-    <!-- Meta (11px base; CJK members stay 13 - deliberately larger at small sizes) -->
+    <!--
+        Meta (13px base). Used only by the rail's bookmark rows and the timeline's density legend, so
+        the size is theirs alone: a bookmark label is the primary way a reader picks what to read, and
+        11 was small enough that the longest event names were the hardest to scan.
+
+        All members are now 13. The CJK ones were already there, deliberately larger than the roman at
+        small sizes; raising roman and cyrillic to meet them means the row height is the same in every
+        locale rather than only in Chinese and Korean.
+    -->
     <FontFamily name="ChroniclesFontFamily_Text_Shadow_Small" virtual="true">
         <Member alphabet="roman">
-            <Font font="Fonts\FRIZQT__.TTF" height="11">
+            <Font font="Fonts\FRIZQT__.TTF" height="13">
                 <Shadow x="1" y="-1">
                     <Color r="0" g="0" b="0"/>
                 </Shadow>
@@ -36,7 +44,7 @@
             </Font>
         </Member>
         <Member alphabet="russian">
-            <Font font="Fonts\FRIZQT___CYR.TTF" height="11">
+            <Font font="Fonts\FRIZQT___CYR.TTF" height="13">
                 <Shadow x="1" y="-1">
                     <Color r="0" g="0" b="0"/>
                 </Shadow>
@@ -59,6 +67,29 @@
         </Member>
         <Member alphabet="russian">
             <Font font="Fonts\FRIZQT___CYR.TTF" height="14"/>
+        </Member>
+    </FontFamily>
+
+    <!--
+        Book body prose (15px base). Its own family rather than a change to _Text_Medium, which is 14
+        and is used by the settings panel, the rail count labels, the timeline range readout and the
+        paging controls: prose wants a size those do not.
+    -->
+    <FontFamily name="ChroniclesFontFamily_Text_Body" virtual="true">
+        <Member alphabet="roman">
+            <Font font="Fonts\FRIZQT__.TTF" height="15"/>
+        </Member>
+        <Member alphabet="korean">
+            <Font font="Fonts\2002.TTF" height="15"/>
+        </Member>
+        <Member alphabet="simplifiedchinese">
+            <Font font="Fonts\ARKai_T.ttf" height="15"/>
+        </Member>
+        <Member alphabet="traditionalchinese">
+            <Font font="Fonts\bKAI00M.TTF" height="15"/>
+        </Member>
+        <Member alphabet="russian">
+            <Font font="Fonts\FRIZQT___CYR.TTF" height="15"/>
         </Member>
     </FontFamily>
 
@@ -100,7 +131,8 @@
         </Member>
     </FontFamily>
 
-    <!-- Chronicles Gold - Medium -->
+    <!-- Chronicles Gold - Medium. The gold is NORMAL_FONT_COLOR, named rather than spelled as
+         (1, .82, 0) so it tracks the client's own value instead of a copy of it. -->
     <Font name="ChroniclesFontFamily_Shadow_Medium" inherits="ChroniclesFontFamily_Medium" virtual="true">
         <Shadow>
             <Offset>
@@ -108,7 +140,7 @@
             </Offset>
             <Color r="0" g="0" b="0"/>
         </Shadow>
-        <Color r="1" g=".82" b="0"/>
+        <Color color="NORMAL_FONT_COLOR"/>
     </Font>
 
 

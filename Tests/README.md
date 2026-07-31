@@ -5,6 +5,12 @@ plain Lua 5.1 interpreter — no WoW client required — so they can run locally
 and in CI. LuaJIT 2.1 implements the same 5.1 language and runs the suite
 unchanged.
 
+133 specs as of v2.3.0. Some of them cover UI mixins rather than pure logic:
+`VerticalListItem_spec` exercises the shared rail row's `Init` and `OnClick`,
+because both fail *silently* when their data shape drifts (a row renders blank,
+or a click writes a selection no book consumer reads). Anything that is pure
+table or string manipulation over stubs is in reach even when it lives in `UI/`.
+
 ## Running
 
 From the repo root (or anywhere; paths resolve relative to the runner):
@@ -15,10 +21,10 @@ lua Tests/run_tests.lua
 
 Exit code is non-zero if any test fails, so CI can gate on it.
 
-On Windows with LuaJIT:
+Or through the workspace harness, which finds the interpreter itself:
 
 ```powershell
-& "$env:LOCALAPPDATA\Programs\LuaJIT\bin\luajit.exe" Tests\run_tests.lua
+./tools/harness.ps1 test -Addon Chronicles
 ```
 
 ## How it works

@@ -168,6 +168,36 @@ function MainFrameUIMixin:OnLoad()
 	if self.DragStrip then
 		self.DragStrip:RegisterForDrag("LeftButton")
 	end
+
+	self:RegisterForEscape()
+end
+
+--[[
+    Let Escape close the window, the way every other panel in the game does.
+
+    UISpecialFrames is the whole of the panel-management convention this frame adopts, and deliberately
+    so. The rest of it -- a UIPanelWindows entry with a UIPanelLayout area -- is incompatible with what
+    this window is: `area="center"` hands position to UIParent's panel manager, which re-anchors the frame
+    every time it is shown. This frame is movable and persists where the reader put it under
+    ui.windowPosition, so registering an area would make the window jump back on every open, and the
+    reader's own choice is worth more than the convention. toplevel and frameStrata="DIALOG" are already
+    set in XML, which covers the rest of what an area entry would have bought.
+
+    Guarded against double registration: OnLoad runs once per frame, but the table is global and shared.
+]]
+function MainFrameUIMixin:RegisterForEscape()
+	local frameName = self:GetName()
+	if not frameName or type(UISpecialFrames) ~= "table" then
+		return
+	end
+
+	for _, registered in pairs(UISpecialFrames) do
+		if registered == frameName then
+			return
+		end
+	end
+
+	table.insert(UISpecialFrames, frameName)
 end
 
 -- =============================================================================================
@@ -287,6 +317,62 @@ end
 -- These methods handle the transformation and display of content in BookContainerTemplate instances.
 -- They ensure that content is always transformed before being passed to OnContentReceived.
 
+--[[
+    The left page of an empty book: what this tab holds, so the spread is balanced before the reader has
+    selected anything.
+
+    Formatted here rather than in BookContainerMixin because the book frame is handed content and knows
+    nothing about the rail beside it, while this mixin already owns the selection-to-book mapping. Every
+    count is best-effort: a nil from the cache means the line simply carries less, never that the empty
+    book fails to draw.
+
+    @param entityCount [number|nil] How many entries this tab lists
+    @return [string|nil] Front-matter line, or nil to keep the old single-prompt behaviour
+]]
+local function formatEmptyBookFrontMatter(entityCount)
+	local parts = {}
+
+	local collections = private.Core.Cache and private.Core.Cache.getCollectionsNames()
+	if type(collections) == "table" and #collections > 0 then
+		table.insert(parts, string.format(Locale["BOOK_EMPTY_COLLECTIONS"], #collections))
+	end
+
+	if type(entityCount) == "number" and entityCount > 0 then
+		table.insert(parts, string.format(Locale["BOOK_EMPTY_ENTITIES"], entityCount))
+	end
+
+	if #parts == 0 then
+		return nil
+	end
+
+	return table.concat(parts, Locale["BOOK_FRONT_META_SEPARATOR"])
+end
+
+--[[
+    How many entries a tab's rail is showing, for the empty book's front matter.
+
+    Reads the rail's own cached array rather than re-querying the data layer: the rail has already
+    flattened, sorted and filtered it, and this number should agree with the count label the reader can
+    see beside it.
+
+    @param listFrame [table|nil] The tab's rail frame
+    @return [number|nil]
+]]
+local function railEntryCount(listFrame)
+	if not listFrame then
+		return nil
+	end
+
+	-- allItems on the Characters and Factions rail, periodEvents on the Events rail: the first holds a
+	-- whole collection, the second only the selected period, and each is what its own count label shows.
+	local items = listFrame.allItems or listFrame.periodEvents
+	if type(items) ~= "table" then
+		return nil
+	end
+
+	return #items
+end
+
 function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 	local eventBook = self.TabUI.Events.Book
 	if not eventBook then
@@ -306,7 +392,10 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 		end
 	end
 
-	eventBook:ShowEmptyBook(Locale["BookEmptyPromptEvent"])
+	eventBook:ShowEmptyBook(
+		Locale["BookEmptyPromptEvent"],
+		formatEmptyBookFrontMatter(railEntryCount(self.TabUI.Events.EventList))
+	)
 end
 
 function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
@@ -318,7 +407,10 @@ function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
 	if characterSelection and characterSelection.characterId and characterSelection.collectionName then
 		-- Check if Chronicles.Data is available
 		if not Chronicles.Data then
-			characterBook:ShowEmptyBook(Locale["BookEmptyPromptCharacter"])
+			characterBook:ShowEmptyBook(
+				Locale["BookEmptyPromptCharacter"],
+				formatEmptyBookFrontMatter(railEntryCount(self.TabUI.Characters.MyCharacterList))
+			)
 			return
 		end
 
@@ -335,7 +427,10 @@ function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
 		end
 	end
 
-	characterBook:ShowEmptyBook(Locale["BookEmptyPromptCharacter"])
+	characterBook:ShowEmptyBook(
+		Locale["BookEmptyPromptCharacter"],
+		formatEmptyBookFrontMatter(railEntryCount(self.TabUI.Characters.MyCharacterList))
+	)
 end
 
 function MainFrameUIMixin:UpdateFactionBookContent(factionSelection)
@@ -358,7 +453,10 @@ function MainFrameUIMixin:UpdateFactionBookContent(factionSelection)
 		end
 	end
 
-	factionBook:ShowEmptyBook(Locale["BookEmptyPromptFaction"])
+	factionBook:ShowEmptyBook(
+		Locale["BookEmptyPromptFaction"],
+		formatEmptyBookFrontMatter(railEntryCount(self.TabUI.Factions.MyFactionList))
+	)
 end
 
 --[[

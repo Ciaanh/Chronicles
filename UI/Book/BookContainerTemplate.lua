@@ -104,20 +104,47 @@ end
 --[[
     Display the empty book state — what the reader sees before they pick anything.
 
+    Two elements, not one, so the empty book is a balanced spread like every other: element 1 lands on
+    View1 where front matter normally goes, element 2 on View2 where the prose goes. A single centred
+    line left the left page blank and made the book look broken rather than waiting.
+
+    The counts are the caller's job. This frame is a sibling of the rail and is handed content, not a
+    selection; MainFrameUI already owns the selection-to-book mapping and can reach the collection and
+    entity counts, so it formats both strings. Walking the frame tree from here to find the rail would
+    couple the book to a layout it does not own.
+
     @param promptText [string] Optional invitation to select something. The caller knows which kind
                               of entity this book shows; without it we fall back to a neutral line.
+    @param frontMatterText [string] Optional line for the left page, normally what this tab holds.
+                                    Absent, the left page stays empty and behaviour matches the old
+                                    single-prompt form.
 ]]
-function BookContainerMixin:ShowEmptyBook(promptText)
+function BookContainerMixin:ShowEmptyBook(promptText, frontMatterText)
     local message = promptText or Locale["NoContentAvailable"]
+
+    local elements = {}
+
+    if frontMatterText and frontMatterText ~= "" then
+        table.insert(
+            elements,
+            {
+                templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
+                htmlContent = string.format('<html><body><p align="center">%s</p></body></html>', frontMatterText)
+            }
+        )
+    end
+
+    table.insert(
+        elements,
+        {
+            templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
+            htmlContent = string.format('<html><body><p align="center">%s</p></body></html>', message)
+        }
+    )
 
     local emptyContent = {
         {
-            elements = {
-                {
-                    templateKey = private.constants.bookTemplateKeys.HTML_CONTENT,
-                    htmlContent = string.format('<html><body><p align="center">%s</p></body></html>', message)
-                }
-            }
+            elements = elements
         }
     }
 

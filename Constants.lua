@@ -36,7 +36,24 @@ constants.config = {
 	mythos = -999999,
 	futur = 999999,
 	timeline = {
-		pageSize = 8
+		pageSize = 8,
+		--[[
+			Event-density ladder for the timeline's crystals. Ordered low to high: the first tier whose
+			ceiling the count is under wins, and anything above them all is dense.
+
+			Here rather than file-local in TimelineTemplate.lua because there are now two consumers in
+			the addon (the period mixin that paints a crystal and the legend that explains what the
+			colours mean), and the Chronicles-tauri companion's period band needs the same numbers.
+			Three copies of a ladder is how the legend ends up describing a threshold the crystals do
+			not use. The tier wording in the legend is built from these numbers, never restated in a
+			locale string.
+		]]
+		densityTiers = {
+			{below = 10, texture = "low-events"},
+			{below = 25, texture = "medium-events"}
+		},
+		denseTexture = "high-events",
+		noEventsTexture = "no-events"
 	},
 	eventList = {
 		pageSize = 6
@@ -46,6 +63,17 @@ constants.config = {
 	},
 	collectionsFilter = {
 		pageSize = 7
+	},
+	book = {
+		-- How many documents share one displayed page. The book is a spread: two documents side by
+		-- side, front matter facing the first body page.
+		--
+		-- This number exists twice by necessity. BookContainerTemplate.xml declares it as the
+		-- PagedDetails viewsPerPage KeyValue, which is what the pager actually obeys and which XML
+		-- cannot read from Lua; this copy is what HTMLBuilder uses to print a contents page number
+		-- that matches what the pager will show. Change one, change the other. Code holding a frame
+		-- should ask the frame (GetPageForViewDataIndex) instead of reading this.
+		viewsPerPage = 2
 	},
 	stepValues = {1000, 500, 100, 10}
 }

@@ -3,6 +3,8 @@
 ..\FrameXML\UI.xsd">
     
     <!-- Book System Includes -->
+    <!-- FrontMatter before HTMLBuilder: the builder calls its resolver while composing the cover -->
+    <Script file="FrontMatter.lua"/>
     <Script file="HTMLBuilder.lua"/>
     <Script file="ContentUtils.lua"/>
     

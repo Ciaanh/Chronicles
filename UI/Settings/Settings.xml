@@ -23,45 +23,65 @@
         </Scripts>
     </CheckButton>
 
+    <!--
+        A settings category is a page marker, drawn with the same bookmark art as every row in the
+        Events, Characters and Factions rails: Bookmark-side pinned left at its native 45x64, then
+        Bookmark-content stretched to the row's right edge. It replaces four auction-house nav-button
+        atlases, which were the last thing in the addon still borrowing the auction house's furniture.
+
+        Same 88 height and same SelectedGlow idiom as the content rails, so the whole window has one
+        vocabulary for "this is the thing you are looking at" rather than one per panel.
+    -->
     <Button name="CategoryButtonTemplate" parentArray="Buttons" inherits="TruncatedTooltipScriptTemplate" virtual="true" mixin="CategoryButtonMixin">
-        <Size x="165" y="24"/>
+        <Size x="292" y="88"/>
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Lines" atlas="auctionhouse-nav-button-tertiary-filterline" useAtlasSize="true">
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="45" y="64"/>
                     <Anchors>
-                        <Anchor point="LEFT" x="18" y="3"/>
+                        <Anchor point="LEFT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
-                <Texture parentKey="NormalTexture" atlas="auctionhouse-nav-button" useAtlasSize="false">
-                    <Size x="169" y="35"/>
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size y="64"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="-2" y="0"/>
+                        <Anchor point="LEFT" relativeKey="$parent.Side" relativePoint="RIGHT" x="0" y="0"/>
+                        <Anchor point="RIGHT" x="0" y="0"/>
                     </Anchors>
                 </Texture>
             </Layer>
+
+            <!-- Selected state, shown from CategoryButtonMixin:SetSelected. See VerticalListTemplate.xml
+                 for why the alpha is 0.45. -->
+            <Layer level="BACKGROUND" textureSubLevel="1">
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\Bookmark-content"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
             <Layer level="BORDER">
-                <Texture parentKey="HighlightTexture" atlas="auctionhouse-nav-button-highlight" hidden="true">
-                    <Size x="165" y="24"/>
+                <Texture parentKey="HighlightTexture" file="Interface\AddOns\Chronicles\Art\Bookmark-content"
+                        alphaMode="ADD" alpha="0.2" hidden="true">
                     <Anchors>
-                        <Anchor point="CENTER" />
-                    </Anchors>
-                </Texture>
-            </Layer>
-            <Layer level="ARTWORK">
-                <Texture parentKey="SelectedTexture" atlas="auctionhouse-nav-button-select" alphaMode="ADD" hidden="true">
-                    <Size x="165" y="24"/>
-                    <Anchors>
-                        <Anchor point="CENTER" />
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
                     </Anchors>
                 </Texture>
             </Layer>
         </Layers>
 
-        <ButtonText parentKey="Text" justifyH="LEFT">
-            <Size x="0" y="10"/>
+        <!--
+            Still parentKey Text, and still a ButtonText: TruncatedTooltipScriptTemplate's contract is a
+            child FontString named Text, and the mixin writes through self.Text.
+        -->
+        <ButtonText parentKey="Text" justifyH="CENTER">
             <Anchors>
-                <Anchor point="TOPLEFT" x="6" y="0"/>
-                <Anchor point="BOTTOMRIGHT" x="-6" y="0"/>
+                <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12"/>
+                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="12"/>
             </Anchors>
             <Shadow>
                 <Offset>
@@ -70,8 +90,8 @@
                 <Color r="0" g="0" b="0"/>
             </Shadow>
         </ButtonText>
-        <NormalFont style="GameFontNormalSmall"/>
-        <HighlightFont style="GameFontHighlightSmall"/>
+        <NormalFont style="ChroniclesFontFamily_Text_Shadow_Small"/>
+        <HighlightFont style="ChroniclesFontFamily_Text_Shadow_Small"/>
         <Scripts>
             <OnLoad method="OnLoad" />
             <OnClick method="OnClick" />
@@ -80,402 +100,186 @@
         </Scripts>
     </Button>
 
-
-
-
-    <Frame name="SettingsTemplate" virtual="true" mixin="SettingsMixin">
-        <KeyValues>
-            <KeyValue key="layoutType" value="BFAMissionAlliance" type="string"/>
-        </KeyValues>
-
-        <Size x="1200" y="650"/>
-
+    <!--
+        One page shape, inherited by every settings page. Title, a spellbook rule under it, a
+        description, and a scrolling body. Each page used to restate all four, which is why a reskin of
+        the panel meant the same edit three times over, and why the three drifted.
+    -->
+    <Frame name="SettingsPageTemplate" virtual="true" hidden="true">
+        <Anchors>
+            <Anchor point="TOPLEFT"/>
+            <Anchor point="BOTTOMRIGHT"/>
+        </Anchors>
         <Layers>
-            <Layer level="BACKGROUND" textureSubLevel="-8">
-                <Texture file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Bg">
+            <Layer level="OVERLAY">
+                <FontString parentKey="Title" inherits="ChroniclesFontFamily_Text_Huge" justifyH="LEFT">
+                    <Size y="25"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-21"/>
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+                        <Anchor point="TOPLEFT" x="0" y="0"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
+                    <Size y="8"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
+                        <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.Title" x="0" y="-5"/>
+                    </Anchors>
+                </Texture>
+                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Body" justifyH="LEFT">
+                    <Size y="40"/>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                        <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
+                    </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+            <Layer level="ARTWORK">
+                <!--
+                    Rule between the two checkbox columns, the same spellbook-divider the title uses,
+                    turned on its side by being drawn narrow and tall. Positioned by
+                    SettingsMixin:LayoutCheckboxColumns, which owns the column pitch.
+                -->
+                <Texture parentKey="ColumnDivider" atlas="spellbook-divider" useAtlasSize="false" hidden="true">
+                    <Size x="8" y="200"/>
+                    <Anchors>
+                        <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Description" x="0" y="-10"/>
                     </Anchors>
                 </Texture>
             </Layer>
-            <Layer level="BACKGROUND" textureSubLevel="-7">
-                <Texture parentKey="OverlayBg" setAllPoints="true" alpha="0.3">
-                    <Color r="0.05" g="0.05" b="0.1"/>
+        </Layers>
+        <Frames>
+            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
+                <KeyValues>
+                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
+                    <KeyValue key="scrollBarX" value="10" type="number"/>
+                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
+                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Description" x="0" y="-10"/>
+                    <Anchor point="BOTTOMRIGHT" x="-20" y="0"/>
+                </Anchors>
+                <ScrollChild>
+                    <Frame parentKey="Content">
+                        <Size x="1" y="1"/>
+                        <Anchors>
+                            <Anchor point="TOPLEFT"/>
+                        </Anchors>
+                    </Frame>
+                </ScrollChild>
+                <Scripts>
+                    <OnLoad method="OnLoad"/>
+                </Scripts>
+            </ScrollFrame>
+        </Frames>
+    </Frame>
+
+    <Frame name="SettingsTemplate" virtual="true" mixin="SettingsMixin">
+        <Size x="1200" y="640"/>
+
+        <Layers>
+            <!--
+                The same spellbook page pair the book uses, so Settings is a page of the same book
+                rather than a panel borrowed from the auction house. What this replaces: a tiling
+                UI-Background-Rock, a dark overlay wash, and a NineSlicePanelTemplate that drew a second
+                border *inside* the window's own dialog border.
+            -->
+            <Layer level="BACKGROUND" textureSubLevel="1">
+                <Texture parentKey="BgLeft" atlas="spellbook-background-evergreen-left" useAtlasSize="false">
+                    <Anchors>
+                        <Anchor point="TOPLEFT"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM"/>
+                    </Anchors>
+                </Texture>
+                <Texture parentKey="BgRight" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOP"/>
+                        <Anchor point="BOTTOMRIGHT"/>
+                    </Anchors>
                 </Texture>
             </Layer>
             <Layer level="OVERLAY">
-                <FontString parentKey="Status" inherits="GameFontNormal" justifyH="LEFT">
-                    <Size x="350" y="24" />
+                <!--
+                    Feedback sits under the content column it describes. It used to be anchored 200 in
+                    from the panel's left edge, a number that meant "just past the category rail" and
+                    pointed at nothing once the rail's width changed. The real anchor is applied in
+                    SettingsMixin:OnLoad against the TabUI column: a Layer cannot reference a sibling
+                    frame declared after it, and layers are built before frames.
+                -->
+                <FontString parentKey="Status" inherits="ChroniclesFontFamily_Text_Body" justifyH="LEFT">
+                    <Size y="24"/>
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" x="200" y="4" />
+                        <Anchor point="BOTTOMLEFT" x="50" y="20"/>
                     </Anchors>
+                    <Color color="SPELLBOOK_FONT_COLOR"/>
                 </FontString>
             </Layer>
         </Layers>
 
-        <Frames>
-            <Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
+        <Animations>
+            <!--
+                Status fades out three seconds after a message appears, so feedback about something the
+                reader has already moved on from does not sit there for the rest of the session.
+                SettingsMixin:ShowStatus restarts it on every message. Declared on the frame rather than
+                on the FontString because an AnimationGroup belongs to a frame; childKey aims it at the
+                string.
+            -->
+            <AnimationGroup parentKey="StatusFadeOut">
+                <Alpha childKey="Status" duration="1.5" startDelay="3" order="1" fromAlpha="1" toAlpha="0"/>
+            </AnimationGroup>
+        </Animations>
 
+        <Frames>
+            <!--
+                Category rail, 292 wide like the content tabs' rails, its rows tucking 12 under the page
+                beside it. It was 200 x 445 for three buttons of 24; it is now sized to the two
+                categories it actually has.
+            -->
             <Frame parentKey="CategoriesList">
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="25" y="-65"/>
+                    <Anchor point="TOPLEFT" x="50" y="-50"/> <!-- page padding -->
+                    <Anchor point="BOTTOMLEFT" x="50" y="50"/>
                 </Anchors>
-                <Size x="200" y="445"/>
+                <Size x="292"/>
                 <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="-3">
-                        <Texture parentKey="Background" atlas="auctionhouse-background-categories">
-                            <Size x="194" y="439"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="3" y="-3"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
                     <Layer level="OVERLAY">
-                        <FontString parentKey="Header" inherits="SystemFont_Large2" justifyH="CENTER">
+                        <FontString parentKey="Header" inherits="ChroniclesFontFamily_Text_Huge" justifyH="CENTER">
                             <Size y="25"/>
                             <Anchors>
-                                <Anchor point="TOP" x="0" y="-8"/>
+                                <Anchor point="TOPLEFT"/>
+                                <Anchor point="TOPRIGHT"/>
                             </Anchors>
-                            <Color r="0.9" g="0.9" b="0.9"/>
+                            <Color color="SPELLBOOK_FONT_COLOR"/>
                         </FontString>
                         <Texture parentKey="HeaderSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                            <Size x="150" y="8"/>
+                            <Size y="8"/>
                             <Anchors>
-                                <Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Header" x="0" y="-5"/>
+                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Header" x="0" y="-5"/>
+                                <Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.Header" x="0" y="-5"/>
                             </Anchors>
                         </Texture>
                     </Layer>
                 </Layers>
             </Frame>
 
-
+            <!--
+                Pages. Anchored off the rail's right edge with the same 12 overlap the content tabs use,
+                so a selected category's bookmark tucks under the page it opens. The
+                auctionhouse-background-index texture that used to back this frame is gone: the
+                spellbook page art behind it makes a second background redundant.
+            -->
             <Frame parentKey="TabUI">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="8" y="0"/>
-                    <Anchor point="RIGHT" x="-35" y="0"/>
-                    <Anchor point="BOTTOM" x="0" y="30"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.CategoriesList" relativePoint="TOPRIGHT" x="-12" y="0"/>
+                    <Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
                 </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND" textureSubLevel="-5">
-                        <Texture parentKey="bg" atlas="auctionhouse-background-index" useAtlasSize="false">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="0" y="0"/>
-                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                            </Anchors>
-                        </Texture>
-                    </Layer>
-                </Layers>
 
                 <Frames>
-                    <!-- Home/Welcome Tab -->
-                    <Frame parentKey="SettingsHome" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" x="15" y="-15"/>
-                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="-1">
-                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
-                                    <Color r="0.1" g="0.1" b="0.2"/>
-                                </Texture>
-                            </Layer>
-                            <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
-                                    <Size y="25"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="700" y="8"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
-                                    </Anchors>
-                                </Texture>
-                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                    <Size x="700" y="40"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                            </Layer>
-                        </Layers>
-                        <Frames>
-                            <!-- Settings Overview Section -->
-                            <Frame parentKey="OverviewSection">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
-                                    <Anchor point="TOPRIGHT" x="-20" y="-80"/>
-                                </Anchors>
-                                <Size y="150"/>
-                                <Layers>
-                                    <Layer level="BACKGROUND" textureSubLevel="0">
-                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="0" y="0"/>
-                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                                            </Anchors>
-                                        </Texture>
-                                    </Layer>
-                                    <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
-                                            <Size y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="15" y="-20"/>
-                                            </Anchors>
-                                            <Color r="1" g="0.82" b="0"/>
-                                        </FontString>
-                                        <FontString parentKey="EventTypesInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                        <FontString parentKey="CollectionsInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.EventTypesInfo" x="0" y="-5"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                    </Layer>
-                                </Layers>
-                            </Frame>
-
-                            <!-- Quick Actions Section -->
-                            <Frame parentKey="QuickActionsSection">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" relativeKey="$parent.OverviewSection" relativePoint="BOTTOMLEFT" x="0" y="-15"/>
-                                    <Anchor point="TOPRIGHT" relativeKey="$parent.OverviewSection" relativePoint="BOTTOMRIGHT" x="0" y="-15"/>
-                                </Anchors>
-                                <Size y="120"/>
-                                <Layers>
-                                    <Layer level="BACKGROUND" textureSubLevel="0">
-                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="0" y="0"/>
-                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                                            </Anchors>
-                                        </Texture>
-                                    </Layer>
-                                    <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
-                                            <Size y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="15" y="-10"/>
-                                            </Anchors>
-                                            <Color r="1" g="0.82" b="0"/>
-                                        </FontString>
-                                        <FontString parentKey="Tip1" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="18"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-10"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                        <FontString parentKey="Tip2" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="18"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip1" x="0" y="-3"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                        <FontString parentKey="Tip3" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="18"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Tip2" x="0" y="-3"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                    </Layer>
-                                </Layers>
-                            </Frame>
-
-                            <!-- Version Info Section -->
-                            <Frame parentKey="VersionSection">
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" relativeKey="$parent.QuickActionsSection" relativePoint="BOTTOMLEFT" x="0" y="-15"/>
-                                    <Anchor point="TOPRIGHT" relativeKey="$parent.QuickActionsSection" relativePoint="BOTTOMRIGHT" x="0" y="-15"/>
-                                </Anchors>
-                                <Size y="80"/>
-                                <Layers>
-                                    <Layer level="BACKGROUND" textureSubLevel="0">
-                                        <Texture parentKey="SectionBg" file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" alpha="0.2">
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="0" y="0"/>
-                                                <Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-                                            </Anchors>
-                                        </Texture>
-                                    </Layer>
-                                    <Layer level="OVERLAY">
-                                        <FontString parentKey="SectionTitle" inherits="SystemFont_Large2" justifyH="LEFT">
-                                            <Size y="20"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" x="15" y="-10"/>
-                                            </Anchors>
-                                            <Color r="1" g="0.82" b="0"/>
-                                        </FontString>
-                                        <FontString parentKey="VersionInfo" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="18"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.SectionTitle" x="5" y="-8"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                        <FontString parentKey="ConfigNote" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                            <Size x="700" y="18"/>
-                                            <Anchors>
-                                                <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.VersionInfo" x="0" y="-3"/>
-                                            </Anchors>
-                                            <Color r="0.9" g="0.9" b="0.9"/>
-                                        </FontString>
-                                    </Layer>
-                                </Layers>
-                            </Frame>
-                        </Frames>
-                    </Frame>
-
-                    <!-- Event Types Configuration Tab -->
-                    <Frame parentKey="EventTypes" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" x="15" y="-15"/>
-                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="-1">
-                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
-                                    <Color r="0.1" g="0.1" b="0.2"/>
-                                </Texture>
-                            </Layer>
-                            <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
-                                    <Size y="25"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="700" y="8"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
-                                    </Anchors>
-                                </Texture>
-                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                    <Size x="700" y="40"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                            </Layer>
-                        </Layers>
-                        <Frames>
-                            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
-                                <KeyValues>
-                                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
-                                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
-                                    <KeyValue key="scrollBarX" value="10" type="number"/>
-                                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
-                                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
-                                </KeyValues>
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
-                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
-                                </Anchors>
-                                <ScrollChild>
-                                    <Frame parentKey="Content">
-                                        <Size x="1" y="1"/>
-                                        <Anchors>
-                                            <Anchor point="TOPLEFT"/>
-                                        </Anchors>
-                                    </Frame>
-                                </ScrollChild>
-                                <Scripts>
-                                    <OnLoad method="OnLoad"/>
-                                </Scripts>
-                            </ScrollFrame>
-                        </Frames>
-                        <Scripts>
-                            <OnShow>
-                                local parent = self:GetParent():GetParent()
-                                if parent and parent.TabUI and parent.TabUI.currentTab == "EventTypes" then
-                                    local scrollFrame = self.ScrollFrame
-                                    if scrollFrame and scrollFrame.Content then
-                                        scrollFrame:Show()
-                                        scrollFrame.Content:Show()
-                                    end
-                                end
-                            </OnShow>
-                        </Scripts>
-                    </Frame>
-
-                    <!-- Event Collections Configuration Tab -->
-                    <Frame parentKey="Collections" frameLevel="100" hidden="true">
-                        <Anchors>
-                            <Anchor point="TOPLEFT" x="15" y="-15"/>
-                            <Anchor point="BOTTOMRIGHT" x="-15" y="15"/>
-                        </Anchors>
-                        <Layers>
-                            <Layer level="BACKGROUND" textureSubLevel="-1">
-                                <Texture parentKey="ContentBg" setAllPoints="true" alpha="0.1">
-                                    <Color r="0.1" g="0.1" b="0.2"/>
-                                </Texture>
-                            </Layer>
-                            <Layer level="OVERLAY">
-                                <FontString parentKey="Title" inherits="SystemFont_Large2" justifyH="LEFT">
-                                    <Size y="25"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" x="20" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                                <Texture parentKey="TitleSeparator" atlas="spellbook-divider" useAtlasSize="false">
-                                    <Size x="700" y="8"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.Title" x="0" y="-5"/>
-                                    </Anchors>
-                                </Texture>
-                                <FontString parentKey="Description" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                                    <Size x="700" y="40"/>
-                                    <Anchors>
-                                        <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.TitleSeparator" x="0" y="-10"/>
-                                    </Anchors>
-                                    <Color r="0.9" g="0.9" b="0.9"/>
-                                </FontString>
-                            </Layer>
-                        </Layers>
-                        <Frames>
-                            <ScrollFrame parentKey="ScrollFrame" mixin="ScrollFrameMixin" enableMouse="true">
-                                <KeyValues>
-                                    <KeyValue key="scrollOnMouse" value="true" type="boolean"/>
-                                    <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="boolean"/>
-                                    <KeyValue key="scrollBarX" value="10" type="number"/>
-                                    <KeyValue key="scrollBarTopY" value="-10" type="number"/>
-                                    <KeyValue key="scrollBarBottomY" value="10" type="number"/>
-                                </KeyValues>
-                                <Anchors>
-                                    <Anchor point="TOPLEFT" x="20" y="-80"/>
-                                    <Anchor point="BOTTOMRIGHT" x="-30" y="10"/>
-                                </Anchors>
-                                <ScrollChild>
-                                    <Frame parentKey="Content">
-                                        <Size x="1" y="1"/>
-                                        <Anchors>
-                                            <Anchor point="TOPLEFT"/>
-                                        </Anchors>
-                                    </Frame>
-                                </ScrollChild>
-                                <Scripts>
-                                    <OnLoad method="OnLoad"/>
-                                </Scripts>
-                            </ScrollFrame>
-                        </Frames>
-                    </Frame>
+                    <Frame parentKey="EventTypes" inherits="SettingsPageTemplate" frameLevel="100"/>
+                    <Frame parentKey="Collections" inherits="SettingsPageTemplate" frameLevel="100"/>
                 </Frames>
             </Frame>
 

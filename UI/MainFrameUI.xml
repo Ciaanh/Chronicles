@@ -47,6 +47,19 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
+                    <!--
+                        The 175 band the Events tab spends on its timeline. Characters and Factions drew
+                        nothing here, leaving a fifth of the window transparent on two of four tabs. The
+                        strip filters the rail beside it, driving the same search term the rail's own box
+                        writes: see EntityFilterStripTemplate.lua.
+                    -->
+                    <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
+                        <Size x="1200" y="175" />
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
                     <Frame parentKey="MyCharacterList" inherits="VerticalCharacterListSharedTemplate">
                         <Size x="292" y="640"/>
                         <Anchors>
@@ -68,6 +81,14 @@
                     <Anchor point="BOTTOMRIGHT" />
                 </Anchors>
                 <Frames>
+                    <!-- Same band, same strip, same rail contract. See the Characters tab above. -->
+                    <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
+                        <Size x="1200" y="175" />
+                        <Anchors>
+                            <Anchor point="TOP" />
+                        </Anchors>
+                    </Frame>
+
                     <Frame parentKey="MyFactionList" inherits="VerticalFactionListSharedTemplate">
                         <Size x="292" y="640"/>
                         <Anchors>

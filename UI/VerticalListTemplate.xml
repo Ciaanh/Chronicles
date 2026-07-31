@@ -3,12 +3,20 @@
 
     <Script file="VerticalListTemplate.lua" />
 
-    <!-- Shared Vertical List Item Template -->
+    <!--
+        Shared Vertical List Item Template
+
+        The one row template in the addon: Events, Characters and Factions all render this. The
+        Events tab used to carry its own near-identical EventListItemTemplate at a different height
+        with no hover and no selection; templateKeys.EVENT_DESCRIPTION now points here too.
+
+        88 high, not 120: the art inside is 64, so 88 centres it with 12 of breathing room above and
+        below and fits 7 bookmarks in the rail's 640 instead of 5. The height is declared twice, here
+        and as SetElementExtent(88) in the two list mixins, because a linear scroll view sizes rows
+        from the extent and never reads the template's Size.
+    -->
     <Button name="VerticalListItemTemplate" mixin="VerticalListItemMixin" virtual="true">
-        <Size x="150" y="120"/>
-        <KeyValues>
-            <KeyValue key="textureHeight" value="80" type="number"/>
-        </KeyValues>
+        <Size x="150" y="88"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <!-- Bookmark side texture: fixed 45x64 art, pinned to the left edge -->
@@ -34,12 +42,35 @@
                 </Texture>
             </Layer>
 
+            <!--
+                Selected state. The plumbing (OnClick to setState to subscribe to
+                SyncWithCurrentSelection to UpdateVisualSelection to SetSelected) has always been
+                there; SetSelected just had nothing to draw. An additive re-draw of the plate itself
+                lights the row without introducing a second art family, and it sits one sublevel
+                above Content so it reads as the same bookmark, brighter.
+            -->
+            <Layer level="BACKGROUND" textureSubLevel="1">
+                <!--
+                    0.45, not 0.35: an additive pass of the plate over itself adds a fraction of the
+                    plate's own brightness, and the plate's text band was darkened 20% for contrast with
+                    the white label. The same alpha over the darker art added visibly less, so the alpha
+                    carries the same 1.25 the darkening took away.
+                -->
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\Bookmark-content"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
             <Layer level="ARTWORK">
-                <!-- Item name text -->
+                <!-- Item name text, centred in the 64 of art: 12 top, 12 bottom -->
                 <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-10" />
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="20" />
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="12" />
                     </Anchors>
                     <Color color="WHITE_FONT_COLOR" />
                 </FontString>
@@ -113,8 +144,11 @@
             -->
             <Frame parentKey="ItemList" inherits="WowScrollBoxList">
                 <Anchors>
-                    <!-- x left inset clears the scroll bar; y clears the search box and count label -->
-                    <Anchor point="TOPLEFT" x="16" y="-44"/>
+                    <!-- x left inset clears the scroll bar and leaves it a 4 margin off the rail edge:
+                         the bar hangs 8 outside this inset and is itself 8 wide, so 20 is the
+                         smallest inset that keeps it off the boundary.
+                         y clears the search box and count label -->
+                    <Anchor point="TOPLEFT" x="20" y="-44"/>
                     <!-- right edge runs to the rail edge (under the book) so rows tuck in; y bottom-inset to the book page -->
                     <Anchor point="BOTTOMRIGHT" x="0" y="50"/>
                 </Anchors>

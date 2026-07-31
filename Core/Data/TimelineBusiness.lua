@@ -689,6 +689,35 @@ function TimelineBusiness.getStepValueIndex(stepValue)
 end
 
 -- -------------------------
+-- Event density
+-- -------------------------
+
+--[[
+    Classify an event count against the density ladder.
+
+    The one place the ladder is walked. Both consumers go through it: the period mixin, to pick which
+    crystal to draw, and the legend, to say what each crystal means. A count below no tier's ceiling is
+    dense; a period with no events at all is a fourth, separate case the caller handles, because "empty"
+    is not a density.
+
+    @param eventCount [number|nil] Events in the period
+    @return [string] The texture name to draw, without the "-selected" suffix
+    @return [number|nil] The winning tier's ceiling, nil for the dense case
+]]
+function TimelineBusiness.getEventDensityTexture(eventCount)
+    local timelineConfig = private.constants.config.timeline
+    local count = eventCount or 0
+
+    for _, tier in ipairs(timelineConfig.densityTiers or {}) do
+        if count < tier.below then
+            return tier.texture, tier.below
+        end
+    end
+
+    return timelineConfig.denseTexture, nil
+end
+
+-- -------------------------
 -- Main Timeline Business Logic Interface
 -- -------------------------
 

@@ -74,11 +74,29 @@ function VerticalListItemMixin:OnClick()
             local selectionKey = private.Core.StateManager.buildSelectionKey(stateManagerKey)
             local stateData = {}
 
-            -- Build appropriate state data based on item type
+            -- Build appropriate state data based on item type. The field name is not cosmetic: each
+            -- book consumer in MainFrameUI reads exactly one of eventId / characterId / factionId and
+            -- silently shows the empty book for anything else, so a row whose type has no branch here
+            -- looks like it does nothing when clicked.
             if stateManagerKey == "character" then
                 stateData = {characterId = itemId, collectionName = collectionName}
             elseif stateManagerKey == "faction" then
                 stateData = {factionId = itemId, collectionName = collectionName}
+            elseif stateManagerKey == "event" then
+                -- Dedup, carried over from the Events tab's own row handler when the two templates
+                -- merged: re-selecting the event that is already open is a no-op rather than a
+                -- redundant state write. Characters and factions deliberately keep re-writing, which
+                -- is how a book that failed to render once can be reopened by clicking the row again.
+                local currentSelection = private.Core.StateManager.getState(selectionKey)
+                if
+                    currentSelection and currentSelection.eventId == itemId and
+                        currentSelection.collectionName == collectionName
+                 then
+                    self:SetSelected(true)
+                    return
+                end
+
+                stateData = {eventId = itemId, collectionName = collectionName}
             else
                 stateData = {itemId = itemId, collectionName = collectionName}
             end
@@ -127,9 +145,14 @@ function VerticalListItemMixin:OnLeave()
 end
 
 function VerticalListItemMixin:SetSelected(selected)
-    -- Bookmark-style visual feedback through hover states
     -- Maintain internal selection state for consistency
     self.isSelected = selected
+
+    -- Light the bookmark plate. Guarded on the texture rather than assumed: SetSelected is also
+    -- called from Init, which can run before a template revision that lacks SelectedGlow is reloaded.
+    if self.SelectedGlow then
+        self.SelectedGlow:SetShown(selected)
+    end
 end
 
 -- -------------------------
@@ -153,6 +176,8 @@ function VerticalListMixin:OnLoad()
     self.selectedItem = nil
     self.allItems = {}
     self.currentSearchTerm = ""
+    -- Set by EntityFilterStripTemplate's chips; a value the search box cannot express
+    self.currentFieldFilter = nil
 
     -- Configure search box
     if self.SearchBox and self.enableSearch then
@@ -202,7 +227,9 @@ function VerticalListMixin:InitializeItemList()
         end
     )
     -- Fixed row height; skips the per-frame measurement pass that can otherwise yield a zero extent.
-    view:SetElementExtent(120)
+    -- Must stay equal to VerticalListItemTemplate's <Size y> in VerticalListTemplate.xml: the view
+    -- sizes rows from this number, so changing only the XML moves nothing.
+    view:SetElementExtent(88)
 
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ItemList, self.ItemListScrollBar, view)
     self._itemViewReady = true
@@ -318,8 +345,10 @@ function VerticalListMixin:RefreshItemList()
     -- Cache all items for search performance, in stable display order
     self.allItems = toSortedItemArray(items)
 
-    -- Apply current search filter if any
+    -- Both filters, in order: the name term from the search box or the strip's letter row, then the
+    -- field value from the strip's chips. They narrow together.
     local filteredItems = self:FilterItemsByName(self.allItems, self.currentSearchTerm)
+    filteredItems = self:FilterItemsByField(filteredItems, self.currentFieldFilter)
 
     self:DisplayItems(filteredItems)
 end
@@ -374,18 +403,74 @@ function VerticalListMixin:SetItemDataProvider(elements)
     self.ItemList:SetDataProvider(CreateDataProvider(elements or {}), ScrollBoxConstants.RetainScrollPosition)
 end
 
+--[[
+    Filter the rail by name.
+
+    Two match modes. A term beginning with "^" is an *anchored* match on the first character, which is
+    what the A to Z jump row in EntityFilterStripTemplate writes: clicking "S" must show names starting
+    with S, not every name containing one. Anything else is the plain substring match a typed search
+    wants, so "sun" still finds "The Sundering".
+
+    The caret is a deliberate reuse of Lua pattern syntax as a marker, not a pattern: the rest of the
+    term is still matched literally, so a name containing pattern characters cannot break the search.
+
+    @param items [table] Sequential array of entries, already sorted
+    @param searchTerm [string|nil]
+    @return [table] Sequential array
+]]
 function VerticalListMixin:FilterItemsByName(items, searchTerm)
     if not searchTerm or searchTerm == "" then
         return items
     end
 
     local filtered = {}
-    local lowerSearchTerm = string.lower(searchTerm)
+    local anchored = string.sub(searchTerm, 1, 1) == "^"
+    local needle = string.lower(anchored and string.sub(searchTerm, 2) or searchTerm)
+
+    if needle == "" then
+        return items
+    end
 
     -- Sequential in, sequential out: the caller passes an already-sorted array, and preserving the
     -- source keys here (as the previous pairs() version did) would reintroduce undefined order.
     for _, item in ipairs(items) do
-        if item.name and string.find(string.lower(item.name), lowerSearchTerm, 1, true) then
+        if item.name then
+            local name = string.lower(item.name)
+            local matches
+            if anchored then
+                matches = string.sub(name, 1, #needle) == needle
+            else
+                matches = string.find(name, needle, 1, true) ~= nil
+            end
+
+            if matches then
+                table.insert(filtered, item)
+            end
+        end
+    end
+
+    return filtered
+end
+
+--[[
+    Filter the rail by an allegiance or race value.
+
+    Separate from the name filter because it reads a different field: the filter strip's chips select a
+    value the search box has no way to express. Both are applied, so a chip and a typed term narrow
+    together rather than replacing each other.
+
+    @param items [table] Sequential array of entries
+    @param value [string|nil] Exact field value, nil for no field filter
+    @return [table] Sequential array
+]]
+function VerticalListMixin:FilterItemsByField(items, value)
+    if not value or value == "" then
+        return items
+    end
+
+    local filtered = {}
+    for _, item in ipairs(items) do
+        if item.allegiance == value or item.race == value then
             table.insert(filtered, item)
         end
     end

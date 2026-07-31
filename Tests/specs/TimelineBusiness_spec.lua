@@ -10,7 +10,15 @@ local function realConfig()
         historyStartYear = -150000,
         mythos = -999999,
         futur = 999999,
-        timeline = {pageSize = 8},
+        timeline = {
+            pageSize = 8,
+            densityTiers = {
+                {below = 10, texture = "low-events"},
+                {below = 25, texture = "medium-events"}
+            },
+            denseTexture = "high-events",
+            noEventsTexture = "no-events"
+        },
         stepValues = {1000, 500, 100, 10}
     }
 end
@@ -196,5 +204,40 @@ T.describe("TimelineBusiness.calculateTimelinePagination", function()
         end
         local p = TB.calculateTimelinePagination(periods, nil)
         assert_.equals(p.currentPage, 3)
+    end)
+end)
+
+T.describe("TimelineBusiness.getEventDensityTexture", function()
+    -- The ladder is a constant with two consumers in the addon (the crystal a period paints and the
+    -- legend that explains the colours) and a third in the Chronicles-tauri companion's period band.
+    -- These cases are the contract all three share; the companion mirrors them in Vitest.
+    T.it("classifies each boundary the same way on both sides of it", function()
+        local _, TB = buildPrivate({})
+
+        assert_.equals(TB.getEventDensityTexture(0), "low-events")
+        assert_.equals(TB.getEventDensityTexture(9), "low-events")
+        assert_.equals(TB.getEventDensityTexture(10), "medium-events", "10 is the low tier's ceiling, not in it")
+        assert_.equals(TB.getEventDensityTexture(24), "medium-events")
+        assert_.equals(TB.getEventDensityTexture(25), "high-events", "25 is the medium tier's ceiling")
+        assert_.equals(TB.getEventDensityTexture(99), "high-events")
+    end)
+
+    T.it("returns the winning tier's ceiling, and nothing for the dense case", function()
+        -- The legend labels are built from this second return value rather than from literals
+        local _, TB = buildPrivate({})
+
+        local _, lowCeiling = TB.getEventDensityTexture(3)
+        local _, mediumCeiling = TB.getEventDensityTexture(15)
+        local _, denseCeiling = TB.getEventDensityTexture(500)
+
+        assert_.equals(lowCeiling, 10)
+        assert_.equals(mediumCeiling, 25)
+        assert_.isNil(denseCeiling, "nothing bounds the dense tier from above")
+    end)
+
+    T.it("treats a nil count as zero rather than raising", function()
+        local _, TB = buildPrivate({})
+
+        assert_.equals(TB.getEventDensityTexture(nil), "low-events")
     end)
 end)

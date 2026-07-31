@@ -4,77 +4,103 @@
 
     <Script file="EventListTemplate.lua"/>
 
-    <Button name="EventListItemTemplate" mixin="EventListItemMixin" virtual="true">
-        <Size x="150" y="110"/>
-        <KeyValues>
-            <KeyValue key="textureHeight" value="80" type="number"/>
-        </KeyValues>
-        <Layers>
-            <Layer level="BACKGROUND">
-
-                <!-- Fixed 45x64 art, pinned to the left edge -->
-                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
-                    <Size x="45" y="64"/>
-                    <Anchors>
-                        <Anchor point="LEFT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-
-                <!--
-                    Spans from the side art to the row's right edge rather than carrying a fixed 105
-                    width: a linear scroll view stretches each row to the scroll box width, so a
-                    fixed-width strip anchored RIGHT would leave a gap in the middle of the row.
-                -->
-                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
-                    <Size y="64"/>
-                    <Anchors>
-                        <Anchor point="LEFT" relativeKey="$parent.Side" relativePoint="RIGHT" x="0" y="0"/>
-                        <Anchor point="RIGHT" x="0" y="0"/>
-                    </Anchors>
-                </Texture>
-
-            </Layer>
-            <Layer level="ARTWORK">
-                <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
-                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="18" />
-                    </Anchors>
-                    <Color color="WHITE_FONT_COLOR" />
-                </FontString>
-            </Layer>
-        </Layers>
-        <Scripts>
-            <OnClick method="OnClick"/>
-        </Scripts>
-    </Button>
+    <!--
+        There is no event row template here any more. Events, Characters and Factions all render
+        VerticalListItemTemplate (UI/VerticalListTemplate.xml): the two row templates drew the same
+        bookmark art at two different heights, and only the shared one carried hover and selection.
+        templateKeys.EVENT_DESCRIPTION now resolves to it in PageTemplatesRegistration.lua, so the
+        list mixins stay separate (period-driven here, search-driven there) while the row is one thing.
+    -->
 
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
         <Frames>
             <!--
+                Search box, mirroring the one on the Characters and Factions rail so all three rails
+                offer the same affordance. It filters *within the selected period*, which is the Events
+                rail's contract: the period is what puts rows here in the first place.
+            -->
+            <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
+                <Size y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="12" y="0"/>
+                    <Anchor point="TOPRIGHT" x="-12" y="0"/>
+                </Anchors>
+                <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
+                <Layers>
+                    <Layer level="OVERLAY">
+                        <FontString parentKey="PlaceholderText" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="LEFT" x="5" y="0"/>
+                            </Anchors>
+                            <Color r="0.5" g="0.5" b="0.5" a="0.8"/>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnTextChanged>
+                        if self:GetText() ~= "" then
+                            self.PlaceholderText:Hide()
+                        else
+                            self.PlaceholderText:Show()
+                        end
+
+                        if self:GetParent().OnSearchTextChanged then
+                            self:GetParent():OnSearchTextChanged(self:GetText())
+                        end
+                    </OnTextChanged>
+                    <OnEditFocusGained>
+                        self.PlaceholderText:Hide()
+                    </OnEditFocusGained>
+                    <OnEditFocusLost>
+                        if self:GetText() == "" then
+                            self.PlaceholderText:Show()
+                        end
+                    </OnEditFocusLost>
+                    <OnLoad>
+                        if self:GetParent().InitializeSearchPlaceholder then
+                            self:GetParent():InitializeSearchPlaceholder()
+                        end
+                    </OnLoad>
+                </Scripts>
+            </EditBox>
+
+            <!--
                 Scrolling, single-column event rail on the modern ScrollBox: a WowScrollBoxList plus
                 a MinimalScrollBar, wired with a linear view in EventListMixin. Rows come from the
-                shared EventListItemTemplate via templateKeys.EVENT_DESCRIPTION. The scroll region is
-                inset top and bottom by the book's own 50 page padding so the first row lines up with
-                the book page beside it.
+                shared VerticalListItemTemplate via templateKeys.EVENT_DESCRIPTION.
             -->
             <Frame parentKey="EventScrollList" inherits="WowScrollBoxList">
                 <Anchors>
-                    <!-- Left inset clears the scroll bar; the right edge runs to the rail edge, which
-                         sits under the book, so the bookmark tips tuck in. Top/bottom inset by the
-                         book's own 50 page padding so row 1 lines up with the book page. -->
-                    <Anchor point="TOPLEFT" x="16" y="-50"/>
+                    <!-- Left inset clears the scroll bar and leaves it a 4 margin off the rail edge:
+                         the bar hangs 8 outside this inset and is itself 8 wide, so 20 is the
+                         smallest inset that keeps it off the boundary. The right edge runs to the
+                         rail edge, which sits under the book, so the bookmark tips tuck in.
+                         y is -44 to clear the search box and count label, matching the other rail:
+                         row 1 no longer lines up with the book page, which is the trade the vertical
+                         rail already makes for having a search box at all. -->
+                    <Anchor point="TOPLEFT" x="20" y="-44"/>
                     <Anchor point="BOTTOMRIGHT" x="0" y="50"/>
                 </Anchors>
             </Frame>
             <!-- Scroll bar on the outer (left) edge so nothing separates the bookmarks from the book -->
             <EventFrame parentKey="EventScrollBar" inherits="MinimalScrollBar">
                 <Anchors>
-                    <Anchor point="TOPRIGHT" relativeKey="$parent.EventScrollList" relativePoint="TOPLEFT" x="-4" y="-3"/>
-                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.EventScrollList" relativePoint="BOTTOMLEFT" x="-4" y="2"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.EventScrollList" relativePoint="TOPLEFT" x="-8" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.EventScrollList" relativePoint="BOTTOMLEFT" x="-8" y="2"/>
                 </Anchors>
             </EventFrame>
         </Frames>
+        <Layers>
+            <Layer level="OVERLAY">
+                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="12" y="-24"/> <!-- Spacing.md / -Spacing.xl -->
+                        <Anchor point="TOPRIGHT" x="-12" y="-24"/>
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
         <Scripts>
             <OnLoad method="OnLoad"/>
         </Scripts>
