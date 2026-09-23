@@ -46,60 +46,6 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Frames>
-            <!--
-                Selected state. The density texture already swaps to its "-selected" variant, but that
-                only makes the crystal lighter, and a low-density selected crystal is still dark: on a
-                row of eight, "a slightly different shade" is not an answer to which one is selected. An
-                outline reads as selection at any density.
-
-                Four solid 2px edges rather than a border atlas: the crystals are not a nine-slice shape
-                and no atlas in the client outlines one, while a plain rectangle needs no art at all.
-                Shown from ApplyEventDensityTexture, which every redraw already calls.
-            -->
-            <Frame parentKey="FocusRing" hidden="true">
-                <Anchors>
-                    <Anchor point="TOPLEFT" x="-2" y="2"/>
-                    <Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
-                </Anchors>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <Texture parentKey="Top">
-                            <Size y="2"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT"/>
-                                <Anchor point="TOPRIGHT"/>
-                            </Anchors>
-                            <Color color="HIGHLIGHT_FONT_COLOR"/>
-                        </Texture>
-                        <Texture parentKey="Bottom">
-                            <Size y="2"/>
-                            <Anchors>
-                                <Anchor point="BOTTOMLEFT"/>
-                                <Anchor point="BOTTOMRIGHT"/>
-                            </Anchors>
-                            <Color color="HIGHLIGHT_FONT_COLOR"/>
-                        </Texture>
-                        <Texture parentKey="Left">
-                            <Size x="2"/>
-                            <Anchors>
-                                <Anchor point="TOPLEFT"/>
-                                <Anchor point="BOTTOMLEFT"/>
-                            </Anchors>
-                            <Color color="HIGHLIGHT_FONT_COLOR"/>
-                        </Texture>
-                        <Texture parentKey="Right">
-                            <Size x="2"/>
-                            <Anchors>
-                                <Anchor point="TOPRIGHT"/>
-                                <Anchor point="BOTTOMRIGHT"/>
-                            </Anchors>
-                            <Color color="HIGHLIGHT_FONT_COLOR"/>
-                        </Texture>
-                    </Layer>
-                </Layers>
-            </Frame>
-        </Frames>
         <Scripts>
             <OnClick method="OnClick" />
             <OnEnter method="OnEnter" />

@@ -683,13 +683,8 @@ end
 function TimelinePeriodMixin:ApplyEventDensityTexture(selected)
     local data = self.data
 
-    -- The focus ring rides this call rather than carrying its own subscription: the texture swap is
-    -- already reapplied on every OnDisplayTimelinePeriod, which is what survives paging and zoom
-    -- redraws, and a second path to the same visual state is a second path to get out of step.
-    if self.FocusRing then
-        self.FocusRing:SetShown(selected == true)
-    end
-
+    -- The "-selected" variant is the whole selected state: its art carries a blue rounded border
+    -- around the crystals. A separate white outline drawn on top of it read as a second selection.
     if not data or not data.hasEvents then
         self.Background:SetTexture(ART_PATH .. private.constants.config.timeline.noEventsTexture)
         return

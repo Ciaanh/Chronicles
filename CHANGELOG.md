@@ -68,8 +68,6 @@ parts of it agree with each other.
   built from `config.timeline.densityTiers`, never written out in a locale string.
 - The event-density ladder moved to `private.constants.config.timeline`, from a file-local with two
   would-be consumers. `TimelineBusiness.getEventDensityTexture` is the only thing that walks it.
-- The selected period gets a focus ring. The `-selected` texture only lightens the crystal, and a
-  low-density selected crystal is still dark.
 
 ### Characters and Factions
 - The 175px band both tabs left empty now holds a filter strip: an A to Z jump row and allegiance or
