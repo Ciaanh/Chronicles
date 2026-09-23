@@ -172,7 +172,7 @@ MyChroniclesPack/
 **`MyChroniclesPack.toc`**
 
 ```
-## Interface: 120001
+## Interface: 120100
 ## Title: My Chronicles Pack
 ## Notes: Sample content pack for Chronicles
 ## OptionalDeps: Chronicles

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon targets World of Warcraft Retail interface version 120001 (Midnight) and features a sophisticated state management system with event-driven architecture.
+Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon targets World of Warcraft Retail interface version 120100 (Midnight, Patch 12.1) and features a sophisticated state management system with event-driven architecture.
 
 > Contributor quick rules: see .github/copilot-instructions.md for enforceable architecture and coding standards (state, events, UI patterns, localization).
 
@@ -174,4 +174,4 @@ the last released version was v2.1.0 (July 29, 2026). `CHANGELOG.txt` has the
 full history; `./tools/harness.ps1 version -Addon Chronicles` checks that this line, the TOC and the
 changelog still agree.
 
-Compatible with World of Warcraft Retail, interface 120001 (Midnight)
+Compatible with World of Warcraft Retail, interface 120100 (Midnight, Patch 12.1)

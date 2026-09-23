@@ -1,5 +1,5 @@
-## Interface: 120001
-## Interface-Retail: 120001
+## Interface: 120100
+## Interface-Retail: 120100
 
 ## Title: Chronicles
 ## Notes: Simple timeline of wow historical events
