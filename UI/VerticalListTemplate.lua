@@ -178,6 +178,7 @@ function VerticalListMixin:OnLoad()
     self.currentSearchTerm = ""
     -- Set by EntityFilterStripTemplate's chips; a value the search box cannot express
     self.currentFieldFilter = nil
+    self.currentLetterFilter = nil
 
     -- Configure search box
     if self.SearchBox and self.enableSearch then
@@ -345,9 +346,13 @@ function VerticalListMixin:RefreshItemList()
     -- Cache all items for search performance, in stable display order
     self.allItems = toSortedItemArray(items)
 
-    -- Both filters, in order: the name term from the search box or the strip's letter row, then the
-    -- field value from the strip's chips. They narrow together.
-    local filteredItems = self:FilterItemsByName(self.allItems, self.currentSearchTerm)
+    -- Every filter, in order: the strip's letter as an anchored initial match, the typed term from the
+    -- search box, then the field value from the strip's chips. They narrow together.
+    local filteredItems = self.allItems
+    if self.currentLetterFilter then
+        filteredItems = self:FilterItemsByName(filteredItems, "^" .. self.currentLetterFilter)
+    end
+    filteredItems = self:FilterItemsByName(filteredItems, self.currentSearchTerm)
     filteredItems = self:FilterItemsByField(filteredItems, self.currentFieldFilter)
 
     self:DisplayItems(filteredItems)
@@ -407,8 +412,8 @@ end
     Filter the rail by name.
 
     Two match modes. A term beginning with "^" is an *anchored* match on the first character, which is
-    what the A to Z jump row in EntityFilterStripTemplate writes: clicking "S" must show names starting
-    with S, not every name containing one. Anything else is the plain substring match a typed search
+    how RefreshItemList applies the A to Z jump row's currentLetterFilter: clicking "S" must show names
+    starting with S, not every name containing one. Anything else is the plain substring match a typed search
     wants, so "sun" still finds "The Sundering".
 
     The caret is a deliberate reuse of Lua pattern syntax as a marker, not a pattern: the rest of the
@@ -552,7 +557,7 @@ function VerticalListMixin:SyncWithCurrentSelection()
     end
 
     -- Update visual selection for all visible items
-    self:UpdateVisualSelection(selectedId)
+    self:UpdateVisualSelection(selectedId, currentSelection.collectionName)
 end
 
 function VerticalListMixin:ClearAllSelections()
@@ -570,8 +575,18 @@ function VerticalListMixin:ClearAllSelections()
     )
 end
 
-function VerticalListMixin:UpdateVisualSelection(selectedId)
-    -- Update visual selection to match the selected item ID
+--[[
+    Light the row matching the selection, and unlight the rest.
+
+    Ids are unique within a collection, not across them, so the collection has to match too: a plugin
+    whose character 12 shares an id with a shipped character 12 would otherwise light both rows. This
+    is the same two-field test EventListMixin:SyncWithCurrentSelection makes.
+
+    @param selectedId [number] Selected record's id
+    @param selectedCollection [string|nil] Selected record's collection; nil matches on id alone, for
+                                          a selection saved before it carried one
+]]
+function VerticalListMixin:UpdateVisualSelection(selectedId, selectedCollection)
     if not self.ItemList or not selectedId then
         return
     end
@@ -579,7 +594,9 @@ function VerticalListMixin:UpdateVisualSelection(selectedId)
     self:ForEachRenderedRow(
         function(row)
             if row and row.Item and row.Item.id and row.SetSelected then
-                row:SetSelected(row.Item.id == selectedId)
+                local isSelected = row.Item.id == selectedId and
+                    (selectedCollection == nil or row.Item.source == selectedCollection)
+                row:SetSelected(isSelected)
             end
         end
     )

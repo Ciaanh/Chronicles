@@ -7,16 +7,17 @@ local Spacing = private.Core.Utils.Spacing
 
     The filter strip above the Characters and Factions rails.
 
-    Two rows, both driving the rail's own currentSearchTerm so there is exactly one filter in play:
+    Two rows, at most one selection between them:
 
-      * An A to Z jump row. Clicking a letter sets the term to "^<letter>", which the rail's
-        FilterItemsByName understands as an anchored match. Letters with no entries behind them are drawn
-        dim and stop responding.
+      * An A to Z jump row. Clicking a letter sets the rail's currentLetterFilter, an anchored match on
+        the first character. Letters with no entries behind them are drawn dim and stop responding.
       * Allegiance and race chips, built from the distinct values actually present in the rail's entries
-        rather than from a hardcoded list, because both fields are free text authored per record.
+        rather than from a hardcoded list, because both fields are free text authored per record. A chip
+        sets the rail's currentFieldFilter.
 
-    The strip owns no data. It reads the rail's allItems and writes the rail's search term, so a change of
-    collection or a settings toggle refreshes it through the same path that refreshes the rail.
+    The strip owns no data. It reads the rail's allItems and writes the rail's letter and field filters,
+    so a change of collection or a settings toggle refreshes it through the same path that refreshes the
+    rail. Selecting either clears the typed search; typing afterwards narrows within the selection.
 ]]
 
 -- =============================================================================================
@@ -288,27 +289,33 @@ end
 -- =============================================================================================
 
 --[[
-    Push a search term into the rail, exactly as if it had been typed.
+    Hand the strip's current letter and chip to the rail and redraw it.
 
-    Writes through the rail's own search box when there is one, so the box shows what is filtering and
-    clearing it by hand still works. That is the whole point of routing through one term: the strip and
-    the box are two ways to say the same thing, not two filters.
+    The letter used to travel as a "^X" search term written into the rail's search box, which put the
+    marker on screen as text the reader never typed. Letter and chip are now fields of their own on the
+    rail, like the chip always was, and the box is cleared so it only ever shows what was typed.
 
-    @param term [string] Term, "^X" for an anchored initial match, or "" to clear
+    Refreshes directly rather than through the box's OnTextChanged: clearing a box that is already
+    empty is not a change, so a filter that relied on it would silently not apply.
 ]]
-function EntityFilterStripMixin:ApplySearchTerm(term)
+function EntityFilterStripMixin:ApplyToRail()
     local rail = self:GetRail()
     if not rail then
         return
     end
 
-    if rail.SearchBox and rail.SearchBox.SetText then
-        -- SetText fires OnTextChanged, which is the rail's own throttled filter path
-        rail.SearchBox:SetText(term)
-        return
-    end
+    rail.currentLetterFilter = self.activeLetter
+    rail.currentFieldFilter = self.activeChip
 
-    rail.currentSearchTerm = term
+    if rail.SearchBox and rail.SearchBox.SetText then
+        rail.SearchBox:SetText("")
+    end
+    if rail.searchThrottle then
+        rail.searchThrottle:Cancel()
+        rail.searchThrottle = nil
+    end
+    rail.currentSearchTerm = ""
+
     if rail.RefreshItemList then
         rail:RefreshItemList()
     end
@@ -332,7 +339,7 @@ function EntityFilterStripMixin:ToggleLetter(letter)
         chip:SetSelected(false)
     end
 
-    self:ApplySearchTerm(self.activeLetter and ("^" .. self.activeLetter) or "")
+    self:ApplyToRail()
 end
 
 --[[
@@ -353,15 +360,5 @@ function EntityFilterStripMixin:ToggleChip(value)
         button:SetSelected(false)
     end
 
-    -- A chip filters by a field the rail's own search does not read, so it cannot go through the search
-    -- term. It sets the rail's field filter instead, and the rail applies both.
-    local rail = self:GetRail()
-    if rail then
-        rail.currentFieldFilter = self.activeChip
-        if rail.SearchBox and rail.SearchBox.SetText then
-            rail.SearchBox:SetText("")
-        elseif rail.RefreshItemList then
-            rail:RefreshItemList()
-        end
-    end
+    self:ApplyToRail()
 end

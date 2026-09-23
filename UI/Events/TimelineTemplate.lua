@@ -795,6 +795,13 @@ function TimelinePeriodMixin:ResetAllPeriodTextures()
 end
 
 function TimelinePeriodMixin:OnClick()
+    -- A cell past the last period has no data: DistributeTimelinePeriods hands it nil whenever there
+    -- are fewer periods than the page holds (most collections switched off, for instance). The cell is
+    -- still drawn and still takes clicks, so there is nothing to select rather than a nil to index.
+    if not self.data then
+        return
+    end
+
     -- Clear year-specific mode when clicking on timeline periods (normal navigation)
     if private.Core.StateManager then
         private.Core.StateManager.setState(

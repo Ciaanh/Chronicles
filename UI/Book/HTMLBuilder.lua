@@ -407,6 +407,23 @@ local function ChapterLinkId(chapter, index)
     return chapter.id or ("chapter_" .. index)
 end
 
+-- A chapter's own title, or nil when it has none. The generator emits `header = Locale[""]` for a
+-- chapter with no header, which is an empty string and so truthy in Lua: tested with `or` alone it won
+-- over the "Chapter n" fallback and the contents row rendered as a blank link.
+local function ChapterTitle(chapter)
+    for _, candidate in ipairs({chapter.title, chapter.header}) do
+        if type(candidate) == "string" and candidate ~= "" then
+            return candidate
+        end
+    end
+    return nil
+end
+
+local function ChapterNumberText(index)
+    return (Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], index)) or
+        string.format("Chapter %d", index)
+end
+
 function HTMLBuilder.CreateTableOfContents(entity, navigationData)
     if not entity or not entity.chapters then
         return ""
@@ -417,15 +434,15 @@ function HTMLBuilder.CreateTableOfContents(entity, navigationData)
     local pageMapping = navigationData and navigationData.pageMapping
 
     for i, chapter in ipairs(entity.chapters) do
-        local chapterTitle = chapter.title or chapter.header or ((Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or ("Chapter " .. i))
-        local chapterNumber = (Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or string.format("Chapter %d", i)
+        local chapterTitle = ChapterTitle(chapter)
+        local chapterNumber = ChapterNumberText(i)
         local chapterId = ChapterLinkId(chapter, i)
 
         -- Create clickable link to navigate to the chapter
-        local chapterLink = HTMLBuilder.CreateLink(chapterTitle, "chapter", chapterId)
+        local chapterLink = HTMLBuilder.CreateLink(chapterTitle or chapterNumber, "chapter", chapterId)
 
-        -- Format: "Chapter 1: Chapter Title"
-        local tocEntry = string.format("%s: %s", chapterNumber, chapterLink)
+        -- Format: "Chapter 1: Chapter Title", or the linked "Chapter 1" alone for an untitled chapter
+        local tocEntry = chapterTitle and string.format("%s: %s", chapterNumber, chapterLink) or chapterLink
 
         -- ...and the page it is on, which is what makes this a table of contents rather than a list of
         -- links. The mapping is in document units and the reader sees spreads, so convert: chapter 2 of
@@ -536,7 +553,7 @@ function HTMLBuilder.CreateChapterNavigationData(entity)
 
         navigationData.chapters[i] = {
             id = chapterId,
-            title = chapter.title or chapter.header or ((Locale["BOOK_CHAPTER_N"] and string.format(Locale["BOOK_CHAPTER_N"], i)) or ("Chapter " .. i)),
+            title = ChapterTitle(chapter), -- nil for an untitled chapter
             startPage = currentPageIndex,
             index = i
         }
@@ -561,8 +578,16 @@ function HTMLBuilder.CreatePageHeader(chapter)
         return ""
     end
 
-    local headerFmt = Locale["BOOK_CHAPTER_HEADER"] or "Chapter %d: %s"
-    local headerContent = HTMLBuilder.CreateParagraph(string.format(headerFmt, chapter.index, EscapeHTML(chapter.title or "")), {align = "center"})
+    -- An untitled chapter gets "Chapter n" rather than "Chapter n: ". The title is not escaped here:
+    -- CreateParagraph escapes, and escaping twice put "&amp;" on the page for every "&" in a title.
+    local headerText
+    if chapter.title then
+        local headerFmt = Locale["BOOK_CHAPTER_HEADER"] or "Chapter %d: %s"
+        headerText = string.format(headerFmt, chapter.index, chapter.title)
+    else
+        headerText = ChapterNumberText(chapter.index)
+    end
+    local headerContent = HTMLBuilder.CreateParagraph(headerText, {align = "center"})
 
     return headerContent .. HTMLBuilder.CreateDivider()
 end

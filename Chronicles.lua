@@ -37,8 +37,9 @@ local Icon = LibStub("LibDBIcon-1.0")
 local DataBroker = LibStub("LibDataBroker-1.1")
 
 local function getAddonVersion()
-    if GetAddOnMetadata then
-        return GetAddOnMetadata(FOLDER_NAME, "Version") or ""
+    -- The global GetAddOnMetadata is gone in 12.x; C_AddOns is the only form the client still ships.
+    if C_AddOns and C_AddOns.GetAddOnMetadata then
+        return C_AddOns.GetAddOnMetadata(FOLDER_NAME, "Version") or ""
     end
     return ""
 end

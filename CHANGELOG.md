@@ -96,6 +96,22 @@ parts of it agree with each other.
   registered: `area="center"` re-anchors on show and this window persists where you put it.
 - The timeline's last unlocalised literal, `"Year " .. year`, is `L["TimelineYearLabel"]`.
 
+### Fixes
+- Clicking an empty timeline cell no longer raises a Lua error. When there are fewer periods than the
+  page holds (most collections switched off, for instance) the trailing cells carry no data, and
+  `TimelinePeriodMixin:OnClick` indexed it anyway.
+- The addon version resolves again: the global `GetAddOnMetadata` is gone in 12.x, so the guarded call
+  always returned an empty string. It uses `C_AddOns.GetAddOnMetadata`.
+- The Characters and Factions rails light a row only when its collection matches too. Ids are unique per
+  collection, so a plugin reusing a shipped id lit two rows. The Events rail already made this test.
+- The A to Z row no longer writes `^S` into the search box. The letter is a filter of its own on the rail,
+  like the chips, and the box only shows what was typed. Picking a letter after a chip also clears the
+  chip's filter; it used to keep applying it with the chip drawn unselected.
+- An untitled chapter reads "Chapter n" in the contents and on its page, instead of a blank link and
+  "Chapter n: ". The generator's `header = Locale[""]` is an empty string, which is truthy in Lua. Chapter
+  titles containing `&` are no longer escaped twice.
+- Same-year events with no `order` sort instead of erroring on `nil < number`.
+
 ### Tests
 - 133 specs, up from 67. New: `HTMLBuilder_spec` (page counting, authored order, the mapping, and the
   document-to-spread conversion), `FrontMatter_spec` (both reference shapes, the case mismatch, the

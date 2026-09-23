@@ -71,9 +71,9 @@
         shrink the window per tab, which would make the book's page geometry depend on which tab is open,
         the band gets the affordance the rail needed anyway.
 
-        It drives the *same* currentSearchTerm the rail's own search box writes, so typing a name and
-        clicking a letter are one filter with one result. Two controls that both claim to filter, and
-        disagree, would be worse than the empty space.
+        It drives the rail's own letter and field filters, which the rail applies together with its
+        search box, so the strip and the box narrow one list rather than competing over it. Selecting a
+        letter or chip clears the box, which only ever shows what the reader typed.
     -->
     <Frame name="EntityFilterStripTemplate" mixin="EntityFilterStripMixin" virtual="true">
         <Layers>

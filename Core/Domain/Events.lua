@@ -93,7 +93,9 @@ function private.Core.Events.FilterEvents(events)
         foundEvents,
         function(a, b)
             if (a.yearStart == b.yearStart) then
-                return a.order < b.order
+                -- order is optional in the editor and a blank one reaches Lua as nil, which < cannot
+                -- compare. Treat it as 0, the value the editor now exports by default.
+                return (a.order or 0) < (b.order or 0)
             end
             return a.yearStart < b.yearStart
         end
