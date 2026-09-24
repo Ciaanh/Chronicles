@@ -227,9 +227,9 @@ end
 local BAR_MAX_HEIGHT = 28
 local BUCKET_COUNT = 10
 local CHIP_GAP = 6
-local CHIP_HEIGHT = 22
--- The label plate's scroll ends take about 14 on each side; the text must sit between them
-local CHIP_TEXT_PADDING = 32
+local CHIP_HEIGHT = 25 -- the plate's own height, so its carved centre never tiles vertically
+-- Clears the plate's 6 pixel bevelled ends with a little air on each side
+local CHIP_TEXT_PADDING = 18
 
 -- The row frames can report a zero width before the first layout pass; the rail's geometry is fixed
 -- (292 wide, controls 12 in on the left and 24 on the right), so fall back to it.
@@ -434,10 +434,26 @@ end
 EventListTypeChipMixin = {}
 
 function EventListTypeChipMixin:Init(list, typeId, text, selected)
+	if not self.plateSliced then
+		private.Core.Utils.UIUtils.ApplyPlateSlicing(self.Background, self.SelectedGlow)
+		self.plateSliced = true
+	end
+
 	self.list = list
 	self.typeId = typeId
 	self:SetText(text)
+
+	-- The glow alone was too faint to see which chip narrows the rail; the text turns gold as well,
+	-- the colour the selected zoom and letter use elsewhere in the window.
 	self.SelectedGlow:SetShown(selected)
+	local fontString = self:GetFontString()
+	if fontString then
+		if selected then
+			fontString:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
+		else
+			fontString:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
+		end
+	end
 end
 
 function EventListTypeChipMixin:OnClick()
@@ -577,6 +593,43 @@ function EventListMixin:SyncWithCurrentSelection()
 			end
 		end
 	)
+end
+
+--[[
+    Bring the selected event's row into view
+
+    Called after a link or a Back/Forward opened an event (MainFrameUI:RevealEntry), once the timeline
+    has moved to the event's period. If the reader's narrowing hides the row (a bar, a type chip, the
+    search box), the narrowing is cleared: they asked for this event, so the rail shows it.
+]]
+function EventListMixin:RevealSelection()
+	if not private.Core.StateManager or not self._eventViewReady then
+		return
+	end
+
+	local selection = private.Core.StateManager.getState(private.Core.StateManager.buildSelectionKey("event"))
+	if not selection or not selection.eventId then
+		return
+	end
+
+	local function isSelected(elementData)
+		local item = elementData and elementData.item
+		return item ~= nil and item.id == selection.eventId and item.source == selection.collectionName
+	end
+
+	if not self.EventScrollList:FindElementDataByPredicate(isSelected) then
+		self.activeBucket = nil
+		self.activeType = nil
+		self.currentSearchTerm = ""
+		if self.SearchBox then
+			self.SearchBox:SetText("")
+			self.SearchBox:ClearFocus()
+		end
+		self:RefreshBreakdown()
+		self:DisplayEvents(self:ApplyFilters())
+	end
+
+	self.EventScrollList:ScrollToElementDataByPredicate(isSelected, ScrollBoxConstants.AlignCenter, nil, true)
 end
 
 function EventListMixin:HydrateFromState()

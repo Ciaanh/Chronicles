@@ -712,6 +712,9 @@ function CategoryButtonMixin:OnLoad()
     if self.SelectedGlow then
         self.SelectedGlow:Hide()
     end
+    if self.SelectedGlowSide then
+        self.SelectedGlowSide:Hide()
+    end
     if self.HighlightTexture then
         self.HighlightTexture:Hide()
     end
@@ -796,6 +799,9 @@ function CategoryButtonMixin:SetSelected(selected)
 
     if self.SelectedGlow then
         self.SelectedGlow:SetShown(selected)
+    end
+    if self.SelectedGlowSide then
+        self.SelectedGlowSide:SetShown(selected)
     end
 
     if self.Text then

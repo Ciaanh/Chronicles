@@ -59,18 +59,18 @@
     </Button>
 
     <!--
-        An event-type chip under the bars: "Battle 4". Same label-plate art as the filter strip's chips
-        on the Characters and Factions tabs; the width follows the text, set in Init.
+        An event-type chip under the bars: "Battle 4". The plain wood plate (Art/plate, the middle of the
+        year label without its scrolls), 9-sliced in Init so it stretches cleanly; the width follows the text.
     -->
     <Button name="EventListTypeChipTemplate" mixin="EventListTypeChipMixin" virtual="true">
-        <Size x="60" y="22"/>
+        <Size x="60" y="25"/>
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
             </Layer>
             <Layer level="ARTWORK" textureSubLevel="1">
-                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\label"
-                         alphaMode="ADD" alpha="0.45" setAllPoints="true" hidden="true"/>
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\plate"
+                         alphaMode="ADD" alpha="0.8" setAllPoints="true" hidden="true"/>
             </Layer>
         </Layers>
         <ButtonText parentKey="Text" justifyH="CENTER">
@@ -92,48 +92,32 @@
                 offer the same affordance. It filters *within the selected period*, which is the Events
                 rail's contract: the period is what puts rows here in the first place.
             -->
-            <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
+            <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate" autoFocus="false">
                 <Size y="20"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" x="12" y="0"/>
                     <Anchor point="TOPRIGHT" x="-12" y="0"/>
                 </Anchors>
-                <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <FontString parentKey="PlaceholderText" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                            <Anchors>
-                                <Anchor point="LEFT" x="5" y="0"/>
-                            </Anchors>
-                            <Color r="0.5" g="0.5" b="0.5" a="0.8"/>
-                        </FontString>
-                    </Layer>
-                </Layers>
+                <!--
+                    Blizzard's SearchBoxTemplate: the magnifier, the clear button and the grey
+                    instruction text every search field in the game has. InputBoxTemplate at 20 tall
+                    drew a thin bar with no affordance. PlaceholderText is kept as an alias of the
+                    template's Instructions so the mixins that set the placeholder did not change.
+                -->
                 <Scripts>
-                    <OnTextChanged>
-                        if self:GetText() ~= "" then
-                            self.PlaceholderText:Hide()
-                        else
-                            self.PlaceholderText:Show()
-                        end
-
-                        if self:GetParent().OnSearchTextChanged then
-                            self:GetParent():OnSearchTextChanged(self:GetText())
-                        end
-                    </OnTextChanged>
-                    <OnEditFocusGained>
-                        self.PlaceholderText:Hide()
-                    </OnEditFocusGained>
-                    <OnEditFocusLost>
-                        if self:GetText() == "" then
-                            self.PlaceholderText:Show()
-                        end
-                    </OnEditFocusLost>
                     <OnLoad>
+                        SearchBoxTemplate_OnLoad(self)
+                        self.PlaceholderText = self.Instructions
                         if self:GetParent().InitializeSearchPlaceholder then
                             self:GetParent():InitializeSearchPlaceholder()
                         end
                     </OnLoad>
+                    <OnTextChanged>
+                        SearchBoxTemplate_OnTextChanged(self)
+                        if self:GetParent().OnSearchTextChanged then
+                            self:GetParent():OnSearchTextChanged(self:GetText())
+                        end
+                    </OnTextChanged>
                 </Scripts>
             </EditBox>
 
@@ -157,7 +141,7 @@
                 </Anchors>
             </Frame>
             <Frame parentKey="TypeRow">
-                <Size y="22"/>
+                <Size y="25"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.YearBars" relativePoint="BOTTOMLEFT" x="0" y="-8"/> <!-- Spacing.sm -->
                     <Anchor point="TOPRIGHT" relativeKey="$parent.YearBars" relativePoint="BOTTOMRIGHT" x="0" y="-8"/>

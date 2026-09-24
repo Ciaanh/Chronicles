@@ -9,17 +9,17 @@
         harder to aim at than a greyed-out one.
     -->
     <Button name="EntityFilterLetterTemplate" mixin="EntityFilterLetterMixin" virtual="true">
-        <Size x="40" y="24"/>
+        <Size x="40" y="25"/>
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
             </Layer>
             <Layer level="BORDER">
-                <Texture parentKey="HighlightTexture" file="Interface\AddOns\Chronicles\Art\label"
+                <Texture parentKey="HighlightTexture" file="Interface\AddOns\Chronicles\Art\plate"
                          alphaMode="ADD" alpha="0.25" setAllPoints="true" hidden="true"/>
             </Layer>
             <Layer level="ARTWORK" textureSubLevel="1">
-                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\label"
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\plate"
                          alphaMode="ADD" alpha="0.45" setAllPoints="true" hidden="true"/>
             </Layer>
         </Layers>
@@ -39,13 +39,13 @@
 
     <!-- A value chip: one distinct allegiance or race present in the rail's entries -->
     <Button name="EntityFilterChipTemplate" mixin="EntityFilterChipMixin" virtual="true">
-        <Size x="120" y="24"/>
+        <Size x="120" y="25"/>
         <Layers>
             <Layer level="BACKGROUND">
-                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
             </Layer>
             <Layer level="ARTWORK" textureSubLevel="1">
-                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\label"
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\plate"
                          alphaMode="ADD" alpha="0.45" setAllPoints="true" hidden="true"/>
             </Layer>
         </Layers>
@@ -91,14 +91,14 @@
             <!-- Rails the pooled buttons anchor into, so the mixin never positions a row against the
                  strip's edges directly and the two rows cannot drift apart. -->
             <Frame parentKey="LetterRow">
-                <Size y="24"/>
+                <Size y="25"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" x="12" y="-12"/>
                     <Anchor point="TOPRIGHT" x="-12" y="-12"/>
                 </Anchors>
             </Frame>
             <Frame parentKey="ChipRow">
-                <Size y="24"/>
+                <Size y="25"/>
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.LetterRow" relativePoint="BOTTOMLEFT" x="0" y="-12"/>
                     <Anchor point="TOPRIGHT" relativeKey="$parent.LetterRow" relativePoint="BOTTOMRIGHT" x="0" y="-12"/>

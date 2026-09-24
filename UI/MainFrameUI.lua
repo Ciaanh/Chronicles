@@ -183,6 +183,24 @@ function MainFrameUIMixin:OnLoad()
 	self:RegisterForEscape()
 
 	self:InitializeNavigationBar()
+	self:DockRailSearches()
+end
+
+-- The Characters and Factions rails keep their search box in the panel above them
+function MainFrameUIMixin:DockRailSearches()
+	local docks = {
+		{tab = self.TabUI.Characters, rail = "MyCharacterList", label = "FindCharacterLabel"},
+		{tab = self.TabUI.Factions, rail = "MyFactionList", label = "FindFactionLabel"}
+	}
+
+	for _, dock in ipairs(docks) do
+		local panel = dock.tab and dock.tab.FindPanel
+		local rail = dock.tab and dock.tab[dock.rail]
+		if panel and rail and rail.DockSearchInto then
+			panel.Label:SetText(Locale[dock.label])
+			rail:DockSearchInto(panel)
+		end
+	end
 end
 
 -- =============================================================================================
@@ -243,6 +261,11 @@ function MainFrameUIMixin:InitializeNavigationBar()
 			self.TabUI:ShowTabForKind(kind)
 		end
 	)
+	navigation.SetRevealer(
+		function(entry)
+			self:RevealEntry(entry)
+		end
+	)
 	navigation.AddListener(
 		function()
 			self:UpdateNavigationBar()
@@ -270,6 +293,48 @@ local function entryName(entry)
 	end
 
 	return record and (record.label or record.name) or nil
+end
+
+--[[
+    Bring a record opened by a link or by Back/Forward into view beyond its book
+
+    An event may sit in a period the timeline is not showing; the timeline moves to the period holding
+    its first year, unless the selected period already overlaps the event (moving would be a jump for
+    nothing). The rails then scroll to the row on the next frame, once the scroll box has laid out the
+    period's rows.
+]]
+function MainFrameUIMixin:RevealEntry(entry)
+	if not entry or not Chronicles.Data then
+		return
+	end
+
+	local tabs = self.TabUI
+	local rail = (entry.kind == "event" and tabs.Events.EventList) or
+		(entry.kind == "character" and tabs.Characters.MyCharacterList) or
+		(entry.kind == "faction" and tabs.Factions.MyFactionList)
+
+	if entry.kind == "event" then
+		local event = Chronicles.Data:FindEventByIdAndCollection(entry.id, entry.collection)
+		local stateManager = private.Core.StateManager
+		if event and stateManager and private.Core.Timeline and private.Core.Timeline.NavigateToYear then
+			local period = stateManager.getState(stateManager.buildUIStateKey("selectedPeriod"))
+			local yearEnd = event.yearEnd or event.yearStart
+			local periodHoldsEvent = period and period.lower and period.upper and event.yearStart <= period.upper and
+				yearEnd >= period.lower
+			if not periodHoldsEvent then
+				private.Core.Timeline.NavigateToYear(event.yearStart)
+			end
+		end
+	end
+
+	if rail and rail.RevealSelection then
+		C_Timer.After(
+			0,
+			function()
+				rail:RevealSelection()
+			end
+		)
+	end
 end
 
 function MainFrameUIMixin:UpdateNavigationBar()

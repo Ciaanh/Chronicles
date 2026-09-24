@@ -153,6 +153,9 @@ function VerticalListItemMixin:SetSelected(selected)
     if self.SelectedGlow then
         self.SelectedGlow:SetShown(selected)
     end
+    if self.SelectedGlowSide then
+        self.SelectedGlowSide:SetShown(selected)
+    end
 end
 
 -- -------------------------
@@ -520,6 +523,66 @@ function VerticalListMixin:ForEachRenderedRow(callback)
     end
 
     self.ItemList:ForEachFrame(callback)
+end
+
+--[[
+    Scroll the selected record's row into view, when the rail's current filters show it
+
+    Called after a link or a Back/Forward opened a character or faction. Unlike the event rail it does
+    not clear the letter or the search: those are the filter strip's state, and a row the filters hide
+    still has its book open.
+]]
+--[[
+    Move the search box and the count out of the rail, into a panel above it
+
+    The widgets stay children of the rail, so their scripts (OnTextChanged calls GetParent():
+    OnSearchTextChanged) keep working; only their anchors move. The list then starts at the top of the
+    rail, which gives the bookmarks back the room the two widgets took.
+
+    @param panel [Frame] The panel, with a Label FontString at its top-left
+]]
+function VerticalListMixin:DockSearchInto(panel)
+    if not panel or not self.SearchBox or not self.ItemList then
+        return
+    end
+
+    self.SearchBox:ClearAllPoints()
+    -- x 6: InputBoxTemplate draws its left cap 5 outside the edit area
+    self.SearchBox:SetPoint("TOPLEFT", panel.Label, "BOTTOMLEFT", 6, -Spacing.xs)
+    self.SearchBox:SetPoint("RIGHT", panel, "RIGHT", -Spacing.md, 0)
+
+    if self.CountLabel then
+        self.CountLabel:ClearAllPoints()
+        self.CountLabel:SetPoint("TOPLEFT", self.SearchBox, "BOTTOMLEFT", -6, -Spacing.sm)
+        self.CountLabel:SetJustifyH("LEFT")
+    end
+
+    self.ItemList:ClearAllPoints()
+    self.ItemList:SetPoint("TOPLEFT", self, "TOPLEFT", 20, -Spacing.md)
+    self.ItemList:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 50)
+end
+
+function VerticalListMixin:RevealSelection()
+    if not private.Core.StateManager or not self._itemViewReady or not self.ItemList then
+        return
+    end
+
+    local selection = private.Core.StateManager.getState(private.Core.StateManager.buildSelectionKey(self.stateManagerKey))
+    local idField = (self.stateManagerKey == "character" and "characterId") or
+        (self.stateManagerKey == "faction" and "factionId") or nil
+    if not selection or not idField or selection[idField] == nil then
+        return
+    end
+
+    self.ItemList:ScrollToElementDataByPredicate(
+        function(elementData)
+            local item = elementData and elementData.item
+            return item ~= nil and item.id == selection[idField] and item.source == selection.collectionName
+        end,
+        ScrollBoxConstants.AlignCenter,
+        nil,
+        true
+    )
 end
 
 function VerticalListMixin:SyncWithCurrentSelection()

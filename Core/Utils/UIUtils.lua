@@ -101,6 +101,30 @@ function UIUtils.ReleaseFramesAbove(pool, count)
     end
 end
 
+--[[
+    9-slice the plain wood plate (Art/plate) so it stretches to any width without distorting
+
+    The plate is 64 x 25: 6 pixel bevelled ends on each side are kept as drawn, and the carved centre is
+    tiled rather than stretched, which is what keeps its pattern from smearing on a wide readout. The
+    elements using it are 25 tall, the plate's own height, so the centre never tiles vertically.
+
+    Texture:SetTextureSliceMargins is the Retail API (Blizzard_APIDocumentationGenerated,
+    SimpleTextureBase); without it the plate is simply stretched, which still reads as wood.
+
+    @param ... [Texture] Textures drawing Art/plate
+]]
+function UIUtils.ApplyPlateSlicing(...)
+    for index = 1, select("#", ...) do
+        local texture = select(index, ...)
+        if texture and texture.SetTextureSliceMargins then
+            texture:SetTextureSliceMargins(6, 5, 6, 5)
+            if texture.SetTextureSliceMode and Enum and Enum.UITextureSliceMode then
+                texture:SetTextureSliceMode(Enum.UITextureSliceMode.Tiled)
+            end
+        end
+    end
+end
+
 -- REMOVED: Global export for UIUtils
 -- This module is now accessed via: private.Core.Utils.UIUtils.*
 -- External plugins should update to use the module pattern instead of globals

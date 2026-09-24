@@ -158,6 +158,10 @@ if L then
     L["NavigationBack"] = "Back"
     L["NavigationForward"] = "Forward"
     L["NavigationSeparator"] = "  »  "
+
+    -- Panel above the Characters and Factions rails
+    L["FindCharacterLabel"] = "Find a character"
+    L["FindFactionLabel"] = "Find a faction"
     L["BOOK_CONTENTS_PAGE_N"] = "%d"
     -- Empty book state, before the reader has selected anything
     L["BOOK_EMPTY_COLLECTIONS"] = "%d collections"

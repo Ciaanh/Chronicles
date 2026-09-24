@@ -56,6 +56,33 @@
                         strip filters the rail beside it, driving the same search term the rail's own box
                         writes: see EntityFilterStripTemplate.lua.
                     -->
+                    <!--
+                        Top-left corner, above the rail: the rail's search box and count, docked here by
+                        VerticalListMixin:DockSearchInto so the rail below holds nothing but bookmarks. Same
+                        column and same dark panel as the Events tab's Navigator.
+                    -->
+                    <Frame parentKey="FindPanel">
+                        <Size x="268" y="175" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <Texture parentKey="Background" setAllPoints="true">
+                                    <Color r="0" g="0" b="0" a="0.35"/>
+                                </Texture>
+                            </Layer>
+                            <Layer level="ARTWORK">
+                                <FontString parentKey="Label" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" x="12" y="-12" /> <!-- Spacing.md -->
+                                    </Anchors>
+                                    <Color color="NORMAL_FONT_COLOR" />
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
                     <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
                         <Size x="1200" y="175" />
                         <Anchors>
@@ -85,6 +112,33 @@
                 </Anchors>
                 <Frames>
                     <!-- Same band, same strip, same rail contract. See the Characters tab above. -->
+                    <!--
+                        Top-left corner, above the rail: the rail's search box and count, docked here by
+                        VerticalListMixin:DockSearchInto so the rail below holds nothing but bookmarks. Same
+                        column and same dark panel as the Events tab's Navigator.
+                    -->
+                    <Frame parentKey="FindPanel">
+                        <Size x="268" y="175" />
+                        <Anchors>
+                            <Anchor point="TOPLEFT" />
+                        </Anchors>
+                        <Layers>
+                            <Layer level="BACKGROUND">
+                                <Texture parentKey="Background" setAllPoints="true">
+                                    <Color r="0" g="0" b="0" a="0.35"/>
+                                </Texture>
+                            </Layer>
+                            <Layer level="ARTWORK">
+                                <FontString parentKey="Label" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                                    <Anchors>
+                                        <Anchor point="TOPLEFT" x="12" y="-12" /> <!-- Spacing.md -->
+                                    </Anchors>
+                                    <Color color="NORMAL_FONT_COLOR" />
+                                </FontString>
+                            </Layer>
+                        </Layers>
+                    </Frame>
+
                     <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
                         <Size x="1200" y="175" />
                         <Anchors>

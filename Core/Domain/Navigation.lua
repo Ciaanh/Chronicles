@@ -49,6 +49,7 @@ local replaying = false
 -- MainFrameUI's tab hook), which is the *old* one when a link is about to select a new one.
 local switchingTab = false
 local tabSwitcher = nil
+local revealer = nil
 local listeners = {}
 
 local function notify()
@@ -106,6 +107,17 @@ function Navigation.SetTabSwitcher(switcher)
     tabSwitcher = switcher
 end
 
+--[[
+    Register what brings an opened record into view beyond its book: the timeline period of an event,
+    the rail row. Called after a link or a Back/Forward opens a record, never for a rail click, since the
+    reader is already looking at the row they clicked.
+
+    @param fn [function] fn(entry) with entry = {kind, id, collection}
+]]
+function Navigation.SetRevealer(fn)
+    revealer = fn
+end
+
 function Navigation.AddListener(listener)
     if type(listener) == "function" then
         table.insert(listeners, listener)
@@ -132,6 +144,13 @@ local function showEntry(entry)
         Navigation.BuildSelection(entry.kind, entry.id, entry.collection),
         "Navigation: " .. entry.kind .. " opened"
     )
+
+    if revealer then
+        local ok, err = pcall(revealer, entry)
+        if not ok and geterrorhandler then
+            geterrorhandler()(err)
+        end
+    end
 end
 
 --[[
@@ -242,6 +261,7 @@ function Navigation.Reset()
     replaying = false
     switchingTab = false
     tabSwitcher = nil
+    revealer = nil
     listeners = {}
 end
 

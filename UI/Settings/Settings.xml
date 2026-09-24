@@ -61,6 +61,14 @@
                         <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
                     </Anchors>
                 </Texture>
+                <!-- The same pass over the side art, so the whole bookmark lights, not only its body -->
+                <Texture parentKey="SelectedGlowSide" file="Interface\AddOns\Chronicles\Art\Bookmark-side"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Side"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Side"/>
+                    </Anchors>
+                </Texture>
             </Layer>
 
             <Layer level="BORDER">

@@ -166,7 +166,7 @@
                 <Layers>
                     <Layer level="BACKGROUND">
                         <!-- setAllPoints, so the art follows the frame's width instead of restating it -->
-                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
                     </Layer>
                     <Layer level="ARTWORK">
                         <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
@@ -222,7 +222,7 @@
                 </Anchors>
                 <Layers>
                     <Layer level="BACKGROUND">
-                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\label" setAllPoints="true"/>
+                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
                     </Layer>
                     <Layer level="ARTWORK">
                         <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">

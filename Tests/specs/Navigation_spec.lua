@@ -157,3 +157,20 @@ T.describe("Navigation and tab switches", function()
         assert_.equals(trail[2].id, 7)
     end)
 end)
+
+T.describe("Navigation reveal hook", function()
+    T.it("reveals what a link or a Back opens, and not a rail click", function()
+        install()
+        local revealed = {}
+        Navigation.SetRevealer(function(entry)
+            table.insert(revealed, entry.kind .. ":" .. entry.id)
+        end)
+
+        -- A rail click: the selection is written directly, Navigation only records it
+        private.Core.StateManager.setState("ui.selection.event", {eventId = 105, collectionName = "Greatwars"})
+        Navigation.Open("character", 7, "Greatwars")
+        Navigation.Back()
+
+        assert_.deepEquals(revealed, {"character:7", "event:105"})
+    end)
+end)

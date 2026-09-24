@@ -286,6 +286,8 @@ function TimelineMixin:OnLoad()
     self:InitializeDateSearch()
 
     self:InitializeNavigator()
+
+    private.Core.Utils.UIUtils.ApplyPlateSlicing(self.ZoomLevelIndicator.Background, self.RangeIndicator.Background)
 end
 
 -- -------------------------

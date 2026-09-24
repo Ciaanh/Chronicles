@@ -32,6 +32,11 @@ EntityFilterLetterMixin = {}
     @param hasEntries [boolean] Whether any entry starts with this letter
 ]]
 function EntityFilterLetterMixin:Init(letter, strip, hasEntries)
+    if not self.plateSliced then
+        private.Core.Utils.UIUtils.ApplyPlateSlicing(self.Background, self.HighlightTexture, self.SelectedGlow)
+        self.plateSliced = true
+    end
+
     self.letter = letter
     self.strip = strip
     self.hasEntries = hasEntries
@@ -90,6 +95,11 @@ EntityFilterChipMixin = {}
     @param strip [table] The owning strip
 ]]
 function EntityFilterChipMixin:Init(value, strip)
+    if not self.plateSliced then
+        private.Core.Utils.UIUtils.ApplyPlateSlicing(self.Background, self.SelectedGlow)
+        self.plateSliced = true
+    end
+
     self.value = value
     self.strip = strip
 

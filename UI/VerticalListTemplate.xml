@@ -63,6 +63,14 @@
                         <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
                     </Anchors>
                 </Texture>
+                <!-- The same pass over the side art, so the whole bookmark lights, not only its body -->
+                <Texture parentKey="SelectedGlowSide" file="Interface\AddOns\Chronicles\Art\Bookmark-side"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Side"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Side"/>
+                    </Anchors>
+                </Texture>
             </Layer>
 
             <Layer level="ARTWORK">
@@ -90,50 +98,33 @@
         </KeyValues>
         <Frames>
             <!-- Search box for filtering items -->
-            <EditBox parentKey="SearchBox" inherits="InputBoxTemplate" autoFocus="false">
+            <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate" autoFocus="false">
                 <Size y="20"/>
                 <Anchors>
                     <!-- Spans the rail rather than a fixed 120, which no longer fits the 268 width -->
                     <Anchor point="TOPLEFT" x="12" y="0"/>
                     <Anchor point="TOPRIGHT" x="-12" y="0"/>
                 </Anchors>
-                <FontString inherits="ChroniclesFontFamily_Text_Medium"/>
-                <Layers>
-                    <Layer level="OVERLAY">
-                        <FontString parentKey="PlaceholderText" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
-                            <Anchors>
-                                <Anchor point="LEFT" x="5" y="0"/>
-                            </Anchors>
-                            <Color r="0.5" g="0.5" b="0.5" a="0.8"/>
-                        </FontString>
-                    </Layer>
-                </Layers>
+                <!--
+                    Blizzard's SearchBoxTemplate: the magnifier, the clear button and the grey
+                    instruction text every search field in the game has. InputBoxTemplate at 20 tall
+                    drew a thin bar with no affordance. PlaceholderText is kept as an alias of the
+                    template's Instructions so the mixins that set the placeholder did not change.
+                -->
                 <Scripts>
-                    <OnTextChanged>
-                        if self:GetText() ~= "" then
-                            self.PlaceholderText:Hide()
-                        else
-                            self.PlaceholderText:Show()
-                        end
-                        
-                        -- Notify parent of text change
-                        if self:GetParent().OnSearchTextChanged then
-                            self:GetParent():OnSearchTextChanged(self:GetText())
-                        end
-                    </OnTextChanged>
-                    <OnEditFocusGained>
-                        self.PlaceholderText:Hide()
-                    </OnEditFocusGained>
-                    <OnEditFocusLost>
-                        if self:GetText() == "" then
-                            self.PlaceholderText:Show()
-                        end
-                    </OnEditFocusLost>
                     <OnLoad>
+                        SearchBoxTemplate_OnLoad(self)
+                        self.PlaceholderText = self.Instructions
                         if self:GetParent().InitializeSearchPlaceholder then
                             self:GetParent():InitializeSearchPlaceholder()
                         end
                     </OnLoad>
+                    <OnTextChanged>
+                        SearchBoxTemplate_OnTextChanged(self)
+                        if self:GetParent().OnSearchTextChanged then
+                            self:GetParent():OnSearchTextChanged(self:GetText())
+                        end
+                    </OnTextChanged>
                 </Scripts>
             </EditBox>
 

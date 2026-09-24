@@ -16,6 +16,10 @@ parts of it agree with each other.
 - `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
 
 ### Book
+- Opening an event from a link, or by Back and Forward, moves the timeline to its period when the
+  selected period does not hold it, and scrolls the rail to its row, clearing a bar, chip or search
+  that would hide it. Characters and factions scroll into view when the rail's filters show them.
+- The selected event-type chip is drawn in gold with a stronger glow; it was hard to tell apart.
 - Characters and factions named on the front matter are links. Clicking one opens its tab on that
   record; the link carries the collection as well as the id, since ids repeat across collections.
 - An event's front matter ends with its previous and next events in reading order, as links.
@@ -69,6 +73,13 @@ parts of it agree with each other.
   chapter that gained a page kept its cached pre-edit book.
 
 ### Lists
+- The bookmark's side art matches its body: its teal and gold were brighter than the strip it joins,
+  which had been darkened for the white labels. The selected glow now lights the side as well.
+- The search boxes are Blizzard's search field (magnifier, clear button, grey instructions) instead
+  of a bare 20 tall input box.
+- Letters, chips and the zoom and range readouts use a plain wood plate cut from the middle of the
+  year label, 9-sliced so it stretches to any width. The year label's gold scrolls only fit its own
+  130 x 25 and were squashed or smeared on every other size; the timeline's year labels keep them.
 - One row template for all three rails, 88 high instead of 110 and 120, with the art centred and the
   label at 13px instead of 11.
 - Clicking a row lights it, on every rail. The whole state path existed; `SetSelected` drew nothing.
@@ -97,6 +108,8 @@ parts of it agree with each other.
   would-be consumers. `TimelineBusiness.getEventDensityTexture` is the only thing that walks it.
 
 ### Characters and Factions
+- The search box and the count sit in a panel in the top-left corner, above the rail, the way the
+  Events tab's Navigator does; the rail below holds only bookmarks and gains the room they took.
 - The 175px band both tabs left empty now holds a filter strip: an A to Z jump row and allegiance or
   race chips built from the values actually present. It drives the same search term the rail's own box
   writes, so the two cannot disagree about what is filtered.
