@@ -16,6 +16,17 @@ parts of it agree with each other.
 - `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
 
 ### Book
+- Characters and factions named on the front matter are links. Clicking one opens its tab on that
+  record; the link carries the collection as well as the id, since ids repeat across collections.
+- An event's front matter ends with its previous and next events in reading order, as links.
+- A character's or faction's front matter lists the events it appears in, one linked line each with
+  its date, capped at twelve with "+ N more".
+- Back and forward buttons and a breadcrumb sit right of the tabs. Every selection change is a step:
+  a rail row, a link, switching tab by hand. Back after following a link returns to the book and the
+  tab you came from.
+- Links are drawn in a dark rust so they read as clickable on the parchment; the contents list too.
+- The book cache keys on the record's kind, so an event and a character sharing a collection and an
+  id can no longer be served each other's book.
 - The front matter is on the left page again and the text on the right. The book shrank to 640 tall
   while each page stayed sized for 650, so no page fitted the left view: every event opened on a
   blank left page, its front matter on the right and its text on page 2.

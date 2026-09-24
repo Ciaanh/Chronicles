@@ -103,16 +103,27 @@ end
     @param text [string] The link text
     @param button [string] The mouse button used
 ]]
+-- Link kinds that open a record, as HTMLBuilder writes them: chronicles:<kind>:<collection>:<id>
+local RECORD_LINK_KINDS = {event = true, character = true, faction = true}
+
+--[[
+    Split a record link's data into its collection and id
+
+    The id is the last field and the collection everything before it, so a collection name holding a
+    colon would still parse.
+
+    @param linkData [string] "<collection>:<id>"
+    @return [string|nil] collection
+    @return [number|nil] id
+]]
+local function ParseRecordLinkData(linkData)
+    local collection, id = string.match(linkData or "", "^(.+):(%-?%d+)$")
+    return collection, tonumber(id)
+end
+
+HTMLContentMixin.ParseRecordLinkData = ParseRecordLinkData
+
 function HTMLContentMixin:OnHyperlinkClick(link, text, button)
-    -- Parse Chronicles links.
-    --
-    -- Only "chapter" is handled, because only chapter links are ever generated — the table of
-    -- contents builds them in HTMLBuilder.CreateTableOfContents. Cross-entity links
-    -- (chronicles:event:<id> and friends) are not produced anywhere, and the handlers that once
-    -- existed for them were wrong: they wrote a bare id into the selection state where every
-    -- consumer expects a {<kind>Id, collectionName} table. Re-adding entity navigation means
-    -- teaching HTMLBuilder.CreateLink to emit collection-qualified link data first, since an id
-    -- alone cannot identify a record across collections.
     if not link:match("^chronicles:") then
         return
     end
@@ -120,6 +131,15 @@ function HTMLContentMixin:OnHyperlinkClick(link, text, button)
     local linkType, linkData = link:match("^chronicles:([^:]+):(.+)$")
     if linkType == "chapter" then
         self:NavigateToChapter(linkData)
+    elseif RECORD_LINK_KINDS[linkType] and private.Core.Navigation then
+        -- Characters, factions and events named in the front matter. The link carries the collection as
+        -- well as the id because ids are only unique within a collection; Navigation writes the same
+        -- {<kind>Id, collectionName} selection a rail click does, and switches to the record's tab.
+        local collection, id = ParseRecordLinkData(linkData)
+        if collection and id then
+            PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+            private.Core.Navigation.Open(linkType, id, collection)
+        end
     end
 end
 

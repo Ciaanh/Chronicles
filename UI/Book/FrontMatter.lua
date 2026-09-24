@@ -101,19 +101,23 @@ local function isFlatIdArray(refs)
 end
 
 --[[
-    Resolve cross-referenced ids into display names.
+    Resolve cross-referenced ids into the records they name.
 
     Ids that resolve to nothing are skipped rather than rendered as a placeholder: a disabled
     collection legitimately yields no names, and "Unknown" repeated three times is worse than a shorter
     list.
 
+    Each entry keeps the id and the collection it was found in, normalised to the registered name, so
+    the book can turn it into a link that opens that record.
+
     @param refs [table|nil] Either {[collectionName] = {id, ...}} or a flat {id, ...}
     @param kind [string] "character" or "faction", selecting the finder
     @param fallbackCollection [string|nil] Collection for the flat shape, normally entity.source
-    @return [table|nil] Sequential array of names capped at MAX_NAMES, nil when there is nothing to show
-    @return [number] How many further names were omitted by the cap
+    @return [table|nil] Sequential array of {name, id, collection} capped at MAX_NAMES, sorted by name,
+                        nil when there is nothing to show
+    @return [number] How many further entries were omitted by the cap
 ]]
-function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
+function FrontMatter.ResolveEntries(refs, kind, fallbackCollection)
     if type(refs) ~= "table" then
         return nil, 0
     end
@@ -129,7 +133,7 @@ function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
         return nil, 0
     end
 
-    local names = {}
+    local entries = {}
 
     local function resolveOne(id, collectionName)
         if type(id) ~= "number" or not collectionName then
@@ -139,9 +143,10 @@ function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
         -- Every id is resolved even past the cap, rather than stopping at MAX_NAMES: the "+ N more"
         -- count has to describe names the reader would recognise, and ids that resolve to nothing
         -- (a disabled collection, a stale reference) are not among them.
-        local record = data[finderName](data, id, FrontMatter.NormaliseCollectionName(collectionName))
+        local registeredName = FrontMatter.NormaliseCollectionName(collectionName)
+        local record = data[finderName](data, id, registeredName)
         if record and record.name and record.name ~= "" then
-            table.insert(names, record.name)
+            table.insert(entries, {name = record.name, id = id, collection = registeredName})
         end
     end
 
@@ -150,9 +155,8 @@ function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
             resolveOne(id, fallbackCollection)
         end
     else
-        -- pairs, so the iteration order across collections is undefined. Sorting the ids inside each
-        -- collection is not enough to make the whole list stable, and the alternative is sorting the
-        -- resolved names, which is what happens below.
+        -- pairs, so the iteration order across collections is undefined; the sort below is what makes
+        -- the list stable.
         for collectionName, ids in pairs(refs) do
             if type(ids) == "table" then
                 for _, id in ipairs(ids) do
@@ -165,24 +169,149 @@ function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
         end
     end
 
-    if #names == 0 then
+    if #entries == 0 then
         return nil, 0
     end
 
-    -- Alphabetical, so the same event reads the same way on every render. pairs() over the collection
-    -- keys above gives no order at all, and a list that reshuffles between openings looks like a bug.
-    -- Sorting before the cap also makes *which* names survive truncation deterministic.
-    table.sort(names)
+    -- Alphabetical, so the same event reads the same way on every render, and so *which* names survive
+    -- truncation is deterministic. Ties (two records with one name, like Durotan and his alternate-timeline
+    -- self when both are named alike) break on collection, then id.
+    table.sort(
+        entries,
+        function(a, b)
+            if a.name ~= b.name then
+                return a.name < b.name
+            end
+            if a.collection ~= b.collection then
+                return tostring(a.collection) < tostring(b.collection)
+            end
+            return a.id < b.id
+        end
+    )
 
     local omitted = 0
-    if #names > MAX_NAMES then
-        omitted = #names - MAX_NAMES
-        for index = #names, MAX_NAMES + 1, -1 do
-            names[index] = nil
+    if #entries > MAX_NAMES then
+        omitted = #entries - MAX_NAMES
+        for index = #entries, MAX_NAMES + 1, -1 do
+            entries[index] = nil
         end
     end
 
+    return entries, omitted
+end
+
+--[[
+    Resolve cross-referenced ids into display names only.
+
+    Kept for callers that only print names; see ResolveEntries for the contract.
+
+    @return [table|nil] Sequential array of names, nil when there is nothing to show
+    @return [number] How many further names were omitted by the cap
+]]
+function FrontMatter.ResolveNames(refs, kind, fallbackCollection)
+    local entries, omitted = FrontMatter.ResolveEntries(refs, kind, fallbackCollection)
+    if not entries then
+        return nil, 0
+    end
+
+    local names = {}
+    for index, entry in ipairs(entries) do
+        names[index] = entry.name
+    end
+
     return names, omitted
+end
+
+-- =============================================================================================
+-- RELATED EVENTS
+-- =============================================================================================
+
+--[[
+    The events on either side of an event in reading order
+
+    @param events [table] Sequential array of events already in reading order (Events.FilterEvents)
+    @param event [table] The event being read; matched by id and source, since ids repeat across
+                         collections
+    @return [table|nil] The previous event, nil at the start or when the event is not in the list
+    @return [table|nil] The next event, nil at the end or when the event is not in the list
+]]
+function FrontMatter.FindEventNeighbours(events, event)
+    if type(events) ~= "table" or type(event) ~= "table" then
+        return nil, nil
+    end
+
+    for index, candidate in ipairs(events) do
+        if candidate.id == event.id and candidate.source == event.source then
+            return events[index - 1], events[index + 1]
+        end
+    end
+
+    return nil, nil
+end
+
+-- How many "Appears in" lines a character or faction page prints before "+ N more"
+local MAX_APPEARANCES = 12
+
+--[[
+    The events that reference a character or a faction
+
+    Events key their references by collection, in lowercase in the shipped data, while the record's
+    own collection is the registered, capitalised name: the comparison ignores case for that reason.
+
+    @param events [table] Sequential array of events in reading order
+    @param kind [string] "character" or "faction", selecting event.characters or event.factions
+    @param id [number] The record's id
+    @param collection [string] The record's collection (registered name)
+    @return [table] Sequential array of events, in the order given, capped at MAX_APPEARANCES
+    @return [number] How many further events were omitted by the cap
+    @return [number] The total count before the cap
+]]
+function FrontMatter.FindEventsReferencing(events, kind, id, collection)
+    local field = (kind == "character" and "characters") or (kind == "faction" and "factions") or nil
+    if type(events) ~= "table" or not field or type(id) ~= "number" or type(collection) ~= "string" then
+        return {}, 0, 0
+    end
+
+    local wanted = string.lower(collection)
+    local found = {}
+
+    for _, event in ipairs(events) do
+        local refs = event[field]
+        if type(refs) == "table" then
+            local matched = false
+            for refCollection, ids in pairs(refs) do
+                if type(refCollection) == "string" and string.lower(refCollection) == wanted then
+                    if type(ids) == "table" then
+                        for _, refId in ipairs(ids) do
+                            if refId == id then
+                                matched = true
+                                break
+                            end
+                        end
+                    elseif ids == id then
+                        matched = true
+                    end
+                end
+                if matched then
+                    break
+                end
+            end
+            if matched then
+                table.insert(found, event)
+            end
+        end
+    end
+
+    local total = #found
+    local omitted = 0
+    if total > MAX_APPEARANCES then
+        omitted = total - MAX_APPEARANCES
+        for index = total, MAX_APPEARANCES + 1, -1 do
+            found[index] = nil
+        end
+    end
+
+    return found, omitted, total
 end
 
 return FrontMatter

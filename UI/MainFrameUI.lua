@@ -77,6 +77,14 @@ end
 -- -------------------------
 MainFrameUIMixin = {}
 
+-- Every selection change lands in the navigation history, whatever made it: a rail row, a book link,
+-- a timeline jump. See Core/Domain/Navigation.lua.
+local function recordNavigation(kind, selection)
+	if private.Core.Navigation then
+		private.Core.Navigation.Record(kind, selection)
+	end
+end
+
 function MainFrameUIMixin:SetupStateSubscriptions()
 	if not private.Core.StateManager then
 		return
@@ -90,6 +98,7 @@ function MainFrameUIMixin:SetupStateSubscriptions()
 				id = frameName .. "_EventBook",
 				callback = function(newSelection, oldSelection)
 					self:UpdateEventBookContent(newSelection)
+					recordNavigation("event", newSelection)
 				end
 			},
 			{
@@ -97,6 +106,7 @@ function MainFrameUIMixin:SetupStateSubscriptions()
 				id = frameName .. "_CharacterBook",
 				callback = function(newSelection, oldSelection)
 					self:UpdateCharacterBookContent(newSelection)
+					recordNavigation("character", newSelection)
 				end
 			},
 			{
@@ -104,6 +114,7 @@ function MainFrameUIMixin:SetupStateSubscriptions()
 				id = frameName .. "_FactionBook",
 				callback = function(newSelection, oldSelection)
 					self:UpdateFactionBookContent(newSelection)
+					recordNavigation("faction", newSelection)
 				end
 			}
 		}
@@ -170,6 +181,123 @@ function MainFrameUIMixin:OnLoad()
 	end
 
 	self:RegisterForEscape()
+
+	self:InitializeNavigationBar()
+end
+
+-- =============================================================================================
+-- NAVIGATION BAR (back, forward, breadcrumb)
+-- =============================================================================================
+
+-- How many entries the breadcrumb names, the current one included
+local BREADCRUMB_LENGTH = 3
+
+function MainFrameUIMixin:InitializeNavigationBar()
+	local bar = self.NavigationBar
+	local navigation = private.Core.Navigation
+	if not bar or not navigation then
+		return
+	end
+
+	-- Right of the tabs, now that TabUI has moved its tab system into the drag strip
+	local tabSystem = self.TabUI and self.TabUI.TabSystem
+	if tabSystem then
+		bar:ClearAllPoints()
+		bar:SetPoint("TOP", self.DragStrip, "TOP")
+		bar:SetPoint("BOTTOM", self.DragStrip, "BOTTOM")
+		bar:SetPoint("LEFT", tabSystem, "RIGHT", Spacing.xl, 0)
+		bar:SetPoint("RIGHT", self.DragStrip, "RIGHT", -Spacing.xxl, 0)
+	end
+
+	bar.BackButton:SetScript(
+		"OnClick",
+		function()
+			PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+			navigation.Back()
+		end
+	)
+	bar.ForwardButton:SetScript(
+		"OnClick",
+		function()
+			PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+			navigation.Forward()
+		end
+	)
+
+	for _, button in ipairs({bar.BackButton, bar.ForwardButton}) do
+		button:SetScript(
+			"OnEnter",
+			function(owner)
+				GameTooltip:SetOwner(owner, "ANCHOR_BOTTOM")
+				GameTooltip:SetText(owner == bar.BackButton and Locale["NavigationBack"] or Locale["NavigationForward"])
+				GameTooltip:Show()
+			end
+		)
+		button:SetScript("OnLeave", GameTooltip_Hide)
+		-- Disabled buttons still show their tooltip, which says why nothing happens
+		button:SetMotionScriptsWhileDisabled(true)
+	end
+
+	navigation.SetTabSwitcher(
+		function(kind)
+			self.TabUI:ShowTabForKind(kind)
+		end
+	)
+	navigation.AddListener(
+		function()
+			self:UpdateNavigationBar()
+		end
+	)
+
+	self:UpdateNavigationBar()
+end
+
+--[[
+    The display name of a navigation entry: an event's label, a character's or faction's name
+]]
+local function entryName(entry)
+	if not entry or not Chronicles.Data then
+		return nil
+	end
+
+	local record
+	if entry.kind == "event" then
+		record = Chronicles.Data:FindEventByIdAndCollection(entry.id, entry.collection)
+	elseif entry.kind == "character" then
+		record = Chronicles.Data:FindCharacterByIdAndCollection(entry.id, entry.collection)
+	elseif entry.kind == "faction" then
+		record = Chronicles.Data:FindFactionByIdAndCollection(entry.id, entry.collection)
+	end
+
+	return record and (record.label or record.name) or nil
+end
+
+function MainFrameUIMixin:UpdateNavigationBar()
+	local bar = self.NavigationBar
+	local navigation = private.Core.Navigation
+	if not bar or not navigation then
+		return
+	end
+
+	bar.BackButton:SetEnabled(navigation.CanGoBack())
+	bar.ForwardButton:SetEnabled(navigation.CanGoForward())
+
+	-- Earlier entries grey, the open one white. A record that no longer resolves (its collection was
+	-- disabled since) is left out rather than shown as a gap.
+	local parts = {}
+	local trail = navigation.GetTrail(BREADCRUMB_LENGTH)
+	for index, entry in ipairs(trail) do
+		local name = entryName(entry)
+		if name then
+			if index == #trail then
+				table.insert(parts, WHITE_FONT_COLOR:WrapTextInColorCode(name))
+			else
+				table.insert(parts, GRAY_FONT_COLOR:WrapTextInColorCode(name))
+			end
+		end
+	end
+
+	bar.Breadcrumb:SetText(table.concat(parts, GRAY_FONT_COLOR:WrapTextInColorCode(Locale["NavigationSeparator"])))
 end
 
 --[[
@@ -285,6 +413,9 @@ function MainFrameUIMixin:OnShow()
 	self.TabUI:UpdateTabs() -- Update state instead of triggering event - provides single source of truth
 	self:SetupStateSubscriptions()
 	self:EnableStateSubscriptions()
+	-- The book already open when the window opens is where Back must return to after the first link;
+	-- it was never a selection *change*, so record it here.
+	self.TabUI:RecordCurrentTabSelection()
 	if private.Core.StateManager then
 		local frameStateKey = private.Core.StateManager.buildUIStateKey("isMainFrameOpen")
 		private.Core.StateManager.setState(frameStateKey, true, "Main frame opened")
@@ -542,7 +673,41 @@ end
 function TabUIMixin:SetTab(tabID)
 	TabSystemOwnerMixin.SetTab(self, tabID)
 
+	-- Switching tabs by hand changes which book the reader is looking at, so it counts as a step in
+	-- the history like any selection does. Navigation ignores this while it switches tabs itself.
+	self:RecordCurrentTabSelection()
+
 	return true -- Don't show the tab as selected yet.
+end
+
+-- The kind of record each content tab shows; Settings shows none
+function TabUIMixin:GetKindForTab(tabID)
+	if tabID == self.EventsTabID then
+		return "event"
+	elseif tabID == self.CharactersTabID then
+		return "character"
+	elseif tabID == self.FactionsTabID then
+		return "faction"
+	end
+	return nil
+end
+
+function TabUIMixin:ShowTabForKind(kind)
+	local tabID = (kind == "event" and self.EventsTabID) or (kind == "character" and self.CharactersTabID) or
+		(kind == "faction" and self.FactionsTabID)
+	if tabID and self:GetTab() ~= tabID then
+		self:SetTab(tabID)
+	end
+end
+
+function TabUIMixin:RecordCurrentTabSelection()
+	local kind = self:GetKindForTab(self:GetTab())
+	local stateManager = private.Core.StateManager
+	if not kind or not stateManager then
+		return
+	end
+
+	recordNavigation(kind, stateManager.getState(stateManager.buildSelectionKey(kind)))
 end
 
 -- =============================================================================================

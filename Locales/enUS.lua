@@ -147,6 +147,17 @@ if L then
     -- row's page number.
     L["BOOK_FRONT_META_SEPARATOR"] = " · "
     L["BOOK_FRONT_MORE"] = "+ %d more"
+    -- Related events on the front matter. Previous/next wrap the "Year n . Label" text of the neighbour.
+    L["BOOK_FRONT_CHRONICLE"] = "In the chronicle"
+    L["BOOK_FRONT_PREVIOUS"] = "« %s"
+    L["BOOK_FRONT_NEXT"] = "%s »"
+    L["BOOK_FRONT_APPEARS_IN"] = "Appears in %d events"
+    L["BOOK_FRONT_APPEARS_IN_ONE"] = "Appears in 1 event"
+
+    -- Navigation bar, right of the tabs
+    L["NavigationBack"] = "Back"
+    L["NavigationForward"] = "Forward"
+    L["NavigationSeparator"] = "  »  "
     L["BOOK_CONTENTS_PAGE_N"] = "%d"
     -- Empty book state, before the reader has selected anything
     L["BOOK_EMPTY_COLLECTIONS"] = "%d collections"

@@ -293,7 +293,7 @@ T.describe("HTMLBuilder contents list", function()
         local frontMatter = result.documents[1]
 
         assert_.isNotNil(
-            string.find(frontMatter, "chronicles:chapter:c2\">Chapter 2</a>" .. SEPARATOR .. "3", 1, true),
+            string.find(frontMatter, "chronicles:chapter:c2\">|cff8a3414Chapter 2|r</a>" .. SEPARATOR .. "3", 1, true),
             "chapter 2 is printed as page 3"
         )
     end)
@@ -372,8 +372,14 @@ T.describe("HTMLBuilder front matter", function()
             makeEvent({characters = {["dragonflight"] = {79, 81}}, factions = {["dragonflight"] = {57}}})
         ).documents[1]
 
-        assert_.isNotNil(string.find(frontMatter, "Alexstrasza" .. SEPARATOR .. "Iridikron", 1, true), "characters")
-        assert_.isNotNil(string.find(frontMatter, "Dragonflights", 1, true), "factions")
+        -- Each name is a link carrying the registered collection and the id, so a click can open it
+        local alexstrasza = '<a href="chronicles:character:Dragonflight:79">|cff8a3414Alexstrasza|r</a>'
+        local iridikron = '<a href="chronicles:character:Dragonflight:81">|cff8a3414Iridikron|r</a>'
+        assert_.isNotNil(string.find(frontMatter, alexstrasza .. SEPARATOR .. iridikron, 1, true), "characters")
+        assert_.isNotNil(
+            string.find(frontMatter, '<a href="chronicles:faction:Dragonflight:57">|cff8a3414Dragonflights|r</a>', 1, true),
+            "factions"
+        )
         assert_.isNotNil(string.find(frontMatter, "BOOK_FRONT_CHARACTERS", 1, true), "characters head")
         assert_.isNotNil(string.find(frontMatter, "BOOK_FRONT_FACTIONS", 1, true), "factions head")
     end)
@@ -452,5 +458,70 @@ T.describe("HTMLBuilder.GetDateRangeText sentinels", function()
 
         private.constants.config.mythos = saved
         private.constants.config.futur = nil
+    end)
+end)
+
+T.describe("HTMLBuilder related events", function()
+    local ordered = {
+        {id = 3, source = "Greatwars", label = "Banishment of the Frostwolves", yearStart = 0, yearEnd = 0, characters = {}},
+        {id = 105, source = "Greatwars", label = "Birth of Thrall", yearStart = 1, yearEnd = 1, characters = {["greatwars"] = {7}}},
+        {id = 4, source = "Greatwars", label = "Death of Medivh", yearStart = 3, yearEnd = 3, characters = {}},
+        {id = 30, source = "Greatwars", label = "Battle of Mount Hyjal", yearStart = 21, yearEnd = 21, characters = {["greatwars"] = {7}}}
+    }
+
+    local function installEvents()
+        private.constants.config.mythos = -999999
+        private.constants.config.futur = 999999
+        private.Core.Cache = {
+            getSearchEvents = function()
+                return ordered
+            end
+        }
+        private.Core.Events = {
+            FilterEvents = function(events)
+                return events
+            end
+        }
+        private.Chronicles = {Data = {GetCollectionsNames = function() return {} end}}
+    end
+
+    local function uninstallEvents()
+        private.Core.Cache = nil
+        private.Core.Events = nil
+        private.constants.config.mythos = nil
+        private.constants.config.futur = nil
+    end
+
+    T.it("links an event to the events before and after it", function()
+        installEvents()
+        local frontMatter =
+            HTMLBuilder.CreateEntityHTML(
+            {kind = "event", id = 105, source = "Greatwars", label = "Birth of Thrall", yearStart = 1, yearEnd = 1, eventType = 1}
+        ).documents[1]
+        uninstallEvents()
+
+        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:3"', 1, true), "previous")
+        assert_.isNotNil(string.find(frontMatter, "Banishment of the Frostwolves", 1, true))
+        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:4"', 1, true), "next")
+        assert_.isNotNil(string.find(frontMatter, '<p align="right">', 1, true), "next sits on the right")
+    end)
+
+    T.it("lists the events a character appears in, as links", function()
+        installEvents()
+        local frontMatter =
+            HTMLBuilder.CreateEntityHTML({kind = "character", id = 7, source = "Greatwars", name = "Thrall", chapters = {}}).documents[1]
+        uninstallEvents()
+
+        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:105"', 1, true))
+        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:30"', 1, true))
+        assert_.isNil(string.find(frontMatter, 'chronicles:event:Greatwars:3"', 1, true), "not an event without him")
+        assert_.isNotNil(string.find(frontMatter, "Year 21", 1, true), "each line carries its date")
+    end)
+
+    T.it("adds nothing when the data layer is not loaded", function()
+        local frontMatter =
+            HTMLBuilder.CreateEntityHTML({kind = "character", id = 7, source = "Greatwars", name = "Thrall", chapters = {}}).documents[1]
+
+        assert_.isNil(string.find(frontMatter, "chronicles:event", 1, true))
     end)
 end)

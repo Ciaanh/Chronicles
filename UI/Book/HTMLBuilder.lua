@@ -361,8 +361,14 @@ function HTMLBuilder.CreateLink(text, linkType, linkData)
 
     local href = string.format("chronicles:%s:%s", linkType, tostring(linkData))
 
-    return string.format('<a href="%s">%s</a>', href, EscapeHTML(text))
+    -- A link takes the page's font colour unless told otherwise, which on parchment makes it read as
+    -- plain text. The colour escape inside the anchor marks it as clickable: a dark rust that holds its
+    -- contrast against the spellbook page.
+    return string.format('<a href="%s">|c%s%s|r</a>', href, HTMLBuilder.LINK_COLOR, EscapeHTML(text))
 end
+
+-- ARGB for the colour escape; 8A3414 is the rust the redesign uses for links on parchment
+HTMLBuilder.LINK_COLOR = "ff8a3414"
 
 --[[
     Create multiple navigation links in a paragraph
@@ -731,20 +737,147 @@ local function BuildReferenceBlock(refs, kind, fallbackCollection, headingKey)
         return ""
     end
 
-    local names, omitted = FrontMatter.ResolveNames(refs, kind, fallbackCollection)
-    if not names then
+    local entries, omitted = FrontMatter.ResolveEntries(refs, kind, fallbackCollection)
+    if not entries then
         return ""
     end
 
+    -- Each name is a link that opens that record: chronicles:<kind>:<collection>:<id>. The collection is
+    -- part of the link because ids are only unique within a collection.
+    local links = {}
+    for index, entry in ipairs(entries) do
+        links[index] = HTMLBuilder.CreateLink(entry.name, kind, entry.collection .. ":" .. tostring(entry.id))
+    end
+
     local separator = Locale["BOOK_FRONT_META_SEPARATOR"] or " . "
-    local line = table.concat(names, separator)
+    local line = table.concat(links, EscapeHTML(separator))
 
     if omitted and omitted > 0 then
         local moreFmt = Locale["BOOK_FRONT_MORE"] or "+ %d more"
-        line = line .. separator .. string.format(moreFmt, omitted)
+        line = line .. EscapeHTML(separator .. string.format(moreFmt, omitted))
     end
 
-    return HTMLBuilder.CreateSubtitle(Locale[headingKey] or headingKey) .. HTMLBuilder.CreateParagraph(line)
+    -- escape = false: the line is <a> elements from CreateLink plus already-escaped separators
+    return HTMLBuilder.CreateSubtitle(Locale[headingKey] or headingKey) ..
+        HTMLBuilder.CreateParagraph(line, {escape = false})
+end
+
+--[[
+    Every enabled event in reading order, for the related-events blocks
+
+    The same list the timeline and the rail are built from: the cached search over the whole range, then
+    Events.FilterEvents, which drops disabled collections and event types and sorts by year then order.
+
+    @return [table] Sequential array of events, empty when the data layer is not loaded
+]]
+local function GetOrderedEvents()
+    local config = private.constants and private.constants.config
+    local cache = private.Core.Cache
+    if not config or not cache or not cache.getSearchEvents then
+        return {}
+    end
+
+    local events = cache.getSearchEvents(config.mythos, config.futur) or {}
+    if private.Core.Events and private.Core.Events.FilterEvents then
+        events = private.Core.Events.FilterEvents(events)
+    end
+
+    return events
+end
+
+-- A link to an event, labelled with its date and name: "Year 3 · Death of Medivh"
+local function EventLinkText(event)
+    local separator = Locale["BOOK_FRONT_META_SEPARATOR"] or " . "
+    local dateText = HTMLBuilder.GetDateRangeText(event.yearStart, event.yearEnd)
+    if dateText ~= "" then
+        return dateText .. separator .. (event.label or "")
+    end
+    return event.label or ""
+end
+
+local function CreateEventLink(event, text)
+    return HTMLBuilder.CreateLink(text or EventLinkText(event), "event", tostring(event.source) .. ":" .. tostring(event.id))
+end
+
+--[[
+    The previous and next events in reading order, at the foot of an event's front matter
+
+    @param entity [table] The event being read
+    @param events [table] Every enabled event in reading order
+    @return [string] HTML, empty when the event has no neighbour in the list
+]]
+local function BuildEventNeighboursBlock(entity, events)
+    local FrontMatter = private.Core.Utils.FrontMatter
+    if not FrontMatter or not FrontMatter.FindEventNeighbours then
+        return ""
+    end
+
+    local previous, nextEvent = FrontMatter.FindEventNeighbours(events, entity)
+    if not previous and not nextEvent then
+        return ""
+    end
+
+    local html = HTMLBuilder.CreateSubtitle(Locale["BOOK_FRONT_CHRONICLE"] or "In the chronicle")
+    if previous then
+        local text = string.format(Locale["BOOK_FRONT_PREVIOUS"] or "< %s", EventLinkText(previous))
+        html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(previous, text), {escape = false, align = "left"})
+    end
+    if nextEvent then
+        local text = string.format(Locale["BOOK_FRONT_NEXT"] or "%s >", EventLinkText(nextEvent))
+        html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(nextEvent, text), {escape = false, align = "right"})
+    end
+
+    return html
+end
+
+--[[
+    The events a character or faction appears in, one linked line each
+
+    @param entity [table] The character or faction
+    @param kind [string] "character" or "faction"
+    @param events [table] Every enabled event in reading order
+    @return [string] HTML, empty when no event references the record
+]]
+local function BuildAppearancesBlock(entity, kind, events)
+    local FrontMatter = private.Core.Utils.FrontMatter
+    if not FrontMatter or not FrontMatter.FindEventsReferencing then
+        return ""
+    end
+
+    local found, omitted, total = FrontMatter.FindEventsReferencing(events, kind, entity.id, entity.source)
+    if total == 0 then
+        return ""
+    end
+
+    local headingFmt = total == 1 and (Locale["BOOK_FRONT_APPEARS_IN_ONE"] or "Appears in 1 event") or
+        (Locale["BOOK_FRONT_APPEARS_IN"] or "Appears in %d events")
+    local html = HTMLBuilder.CreateSubtitle(string.format(headingFmt, total))
+
+    for _, event in ipairs(found) do
+        html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(event), {escape = false})
+    end
+
+    if omitted > 0 then
+        html = html .. HTMLBuilder.CreateParagraph(string.format(Locale["BOOK_FRONT_MORE"] or "+ %d more", omitted))
+    end
+
+    return html
+end
+
+--[[
+    Which kind of record an entity is
+
+    The transforms stamp entity.kind; the fallback covers a caller that did not, by the one field only an
+    event carries.
+]]
+local function EntityKind(entity)
+    if entity.kind then
+        return entity.kind
+    end
+    if entity.eventType ~= nil or entity.yearStart ~= nil then
+        return "event"
+    end
+    return nil
 end
 
 --[[
@@ -821,6 +954,14 @@ function HTMLBuilder.CreateEntityHTML(entity)
     -- gains a second chapter gets a contents list with no further work.
     if entity.chapters and #entity.chapters > 1 then
         coverContent = coverContent .. HTMLBuilder.CreateTableOfContents(entity, navigationData)
+    end
+
+    -- Related events last, under everything that describes the record itself
+    local kind = EntityKind(entity)
+    if kind == "event" then
+        coverContent = coverContent .. BuildEventNeighboursBlock(entity, GetOrderedEvents())
+    elseif kind == "character" or kind == "faction" then
+        coverContent = coverContent .. BuildAppearancesBlock(entity, kind, GetOrderedEvents())
     end
 
     -- Add cover page as first document (if it has content)

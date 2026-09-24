@@ -30,5 +30,8 @@ function private.Core.Factions.TransformFactionToBook(faction)
         error("TransformFactionToBook: ContentUtils.TransformEntityToBook not available")
     end
 
+    -- A projection from the finder, safe to stamp; see Events.TransformEventToBook
+    faction.kind = "faction"
+
     return private.Core.Utils.ContentUtils.TransformEntityToBook(faction)
 end

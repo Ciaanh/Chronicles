@@ -31,7 +31,8 @@ local specs = {
     "Settings_spec.lua",
     "VerticalListItem_spec.lua",
     "FrontMatter_spec.lua",
-    "HTMLBuilder_spec.lua"
+    "HTMLBuilder_spec.lua",
+    "Navigation_spec.lua"
 }
 
 for _, spec in ipairs(specs) do

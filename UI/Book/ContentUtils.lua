@@ -73,8 +73,11 @@ local function buildEntityCacheKey(entity)
     local chaptersCount = countEntries(entity.chapters)
     local descriptionLength = entity.description and #entity.description or 0
 
+    -- The kind leads the key: ids are only unique within a collection *and* a kind, so without it an
+    -- event and a character sharing collection and id could be served each other's cached book.
     return string.format(
-        "%s:%s:%s:%s:%s:%s",
+        "%s:%s:%s:%s:%s:%s:%s",
+        tostring(entity.kind or "entity"),
         tostring(source),
         tostring(id),
         tostring(revision),

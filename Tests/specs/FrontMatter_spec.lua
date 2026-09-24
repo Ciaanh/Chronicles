@@ -246,3 +246,97 @@ T.describe("FrontMatter.ResolveNames truncation", function()
         assert_.equals(omitted, 4, "the three unresolvable ids are not counted as more")
     end)
 end)
+
+-- -------------------------
+-- Entries for links
+-- -------------------------
+
+T.describe("FrontMatter.ResolveEntries", function()
+    T.it("keeps the id and the registered collection of each name, for the link", function()
+        installData({Greatwars = {[7] = "Thrall", [5] = "Durotan"}, Warlords = {[61] = "Durotan"}}, {})
+
+        local entries = FrontMatter.ResolveEntries({["greatwars"] = {7, 5}, ["warlords"] = {61}}, "character")
+
+        assert_.equals(#entries, 3)
+        assert_.deepEquals(entries[1], {name = "Durotan", id = 5, collection = "Greatwars"})
+        assert_.deepEquals(entries[2], {name = "Durotan", id = 61, collection = "Warlords"}, "same name: collection breaks the tie")
+        assert_.deepEquals(entries[3], {name = "Thrall", id = 7, collection = "Greatwars"})
+    end)
+
+    T.it("returns nil when nothing resolves", function()
+        installData({}, {})
+        assert_.isNil(FrontMatter.ResolveEntries({["greatwars"] = {7}}, "character"))
+    end)
+end)
+
+-- -------------------------
+-- Related events
+-- -------------------------
+
+T.describe("FrontMatter.FindEventNeighbours", function()
+    local events = {
+        {id = 3, source = "Greatwars", label = "Banishment of the Frostwolves"},
+        {id = 105, source = "Greatwars", label = "Birth of Thrall"},
+        {id = 4, source = "Greatwars", label = "Death of Medivh"}
+    }
+
+    T.it("returns the events either side, matched by id and source", function()
+        local previous, nextEvent = FrontMatter.FindEventNeighbours(events, {id = 105, source = "Greatwars"})
+
+        assert_.equals(previous.label, "Banishment of the Frostwolves")
+        assert_.equals(nextEvent.label, "Death of Medivh")
+    end)
+
+    T.it("returns nil at the ends and for an event not in the list", function()
+        local previous = FrontMatter.FindEventNeighbours(events, {id = 3, source = "Greatwars"})
+        local _, nextEvent = FrontMatter.FindEventNeighbours(events, {id = 4, source = "Greatwars"})
+        local p2, n2 = FrontMatter.FindEventNeighbours(events, {id = 105, source = "Legion"})
+
+        assert_.isNil(previous)
+        assert_.isNil(nextEvent)
+        assert_.isNil(p2, "same id in another collection is another event")
+        assert_.isNil(n2)
+    end)
+end)
+
+T.describe("FrontMatter.FindEventsReferencing", function()
+    local events = {
+        {id = 1, label = "Birth of Thrall", characters = {["greatwars"] = {7, 5}}, factions = {["greatwars"] = {3}}},
+        {id = 2, label = "Battle of Mount Hyjal", characters = {["greatwars"] = {7}}},
+        {id = 3, label = "Warlords event", characters = {["warlords"] = {7}}},
+        {id = 4, label = "No refs"}
+    }
+
+    T.it("finds the events referencing a character, comparing collections without case", function()
+        local found, omitted, total = FrontMatter.FindEventsReferencing(events, "character", 7, "Greatwars")
+
+        assert_.equals(#found, 2)
+        assert_.equals(found[1].label, "Birth of Thrall")
+        assert_.equals(found[2].label, "Battle of Mount Hyjal")
+        assert_.equals(omitted, 0)
+        assert_.equals(total, 2)
+    end)
+
+    T.it("reads factions from the factions field", function()
+        local found = FrontMatter.FindEventsReferencing(events, "faction", 3, "Greatwars")
+        assert_.equals(#found, 1)
+    end)
+
+    T.it("caps the list and reports the rest", function()
+        local many = {}
+        for index = 1, 15 do
+            many[index] = {id = index, characters = {["greatwars"] = {7}}}
+        end
+
+        local found, omitted, total = FrontMatter.FindEventsReferencing(many, "character", 7, "Greatwars")
+
+        assert_.equals(#found, 12)
+        assert_.equals(omitted, 3)
+        assert_.equals(total, 15)
+    end)
+
+    T.it("returns nothing for an unknown kind", function()
+        local found = FrontMatter.FindEventsReferencing(events, "event", 7, "Greatwars")
+        assert_.equals(#found, 0)
+    end)
+end)

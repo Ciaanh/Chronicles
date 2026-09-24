@@ -66,6 +66,10 @@ function private.Core.Events.TransformEventToBook(event)
         error("TransformEventToBook: ContentUtils.TransformEntityToBook not available")
     end
 
+    -- The finders hand back a projection, not the DB record, so it is safe to stamp. The book reads the
+    -- kind to pick the related-events block, and the book cache keys on it.
+    event.kind = "event"
+
     local result = private.Core.Utils.ContentUtils.TransformEntityToBook(event)
     return result
 end

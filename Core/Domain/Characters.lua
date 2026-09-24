@@ -31,5 +31,8 @@ function private.Core.Characters.TransformCharacterToBook(character)
         error("TransformCharacterToBook: ContentUtils.TransformEntityToBook not available")
     end
 
+    -- A projection from the finder, safe to stamp; see Events.TransformEventToBook
+    character.kind = "character"
+
     return private.Core.Utils.ContentUtils.TransformEntityToBook(character)
 end

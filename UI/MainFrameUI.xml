@@ -187,6 +187,43 @@
                 </Anchors>
             </Frame>
 
+            <!--
+                Back, forward and the breadcrumb, in the drag strip right of the tabs. The frame itself
+                takes no mouse input, so the strip stays draggable everywhere but the two buttons; its left
+                edge is re-anchored to the tab system in MainFrameUIMixin:InitializeNavigationBar, once
+                the tabs have been moved into the strip and measured.
+            -->
+            <Frame parentKey="NavigationBar" frameLevel="40">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.DragStrip" relativePoint="TOPLEFT" x="520" y="0"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.DragStrip" relativePoint="BOTTOMRIGHT" x="-40" y="0"/>
+                </Anchors>
+                <Frames>
+                    <Button parentKey="BackButton" inherits="UIPanelButtonTemplate" text="&lt;">
+                        <Size x="24" y="24"/>
+                        <Anchors>
+                            <Anchor point="LEFT" x="0" y="0"/>
+                        </Anchors>
+                    </Button>
+                    <Button parentKey="ForwardButton" inherits="UIPanelButtonTemplate" text="&gt;">
+                        <Size x="24" y="24"/>
+                        <Anchors>
+                            <Anchor point="LEFT" relativeKey="$parent.BackButton" relativePoint="RIGHT" x="4" y="0"/> <!-- Spacing.xs -->
+                        </Anchors>
+                    </Button>
+                </Frames>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="Breadcrumb" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT" wordwrap="false">
+                            <Anchors>
+                                <Anchor point="LEFT" relativeKey="$parent.ForwardButton" relativePoint="RIGHT" x="12" y="0"/> <!-- Spacing.md -->
+                                <Anchor point="RIGHT" x="0" y="0"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+
             <!-- frameLevel above DragStrip (30) so the strip cannot swallow its clicks -->
             <Button parentKey="CloseButton" inherits="UIPanelCloseButton" frameLevel="40">
                 <Anchors>
