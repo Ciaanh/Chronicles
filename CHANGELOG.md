@@ -16,6 +16,11 @@ parts of it agree with each other.
 - `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
 
 ### Book
+- The front matter is on the left page again and the text on the right. The book shrank to 640 tall
+  while each page stayed sized for 650, so no page fitted the left view: every event opened on a
+  blank left page, its front matter on the right and its text on page 2.
+- The metadata line names the Mythos and Futur buckets instead of printing their sentinel years:
+  an event in the mythic past read "Year -999999".
 - **`chapter.pages` produces pages.** One entry in the array is one book page, in the order it was
   written, whether it is plain text, a fragment or a full HTML document. Every authored page break
   used to collapse: a page became its own page only if it contained a literal `<html>` tag, which no
@@ -62,6 +67,17 @@ parts of it agree with each other.
 - The bookmark plate's text band is 20% darker, for contrast with the white label.
 
 ### Timeline
+- The timeline lines up with the book. It spans the whole window now: a Navigator column above the
+  rail holds the year search, the zoom and a new "Jump to era" menu, and the period grid sits above
+  the book instead of 140 to its left. The menu lists the era events of the enabled collections in
+  year order and selects the period holding the chosen era at the current zoom.
+- The density legend shares the paging row instead of taking a line of its own.
+- Above the event rail, ten bars show how the selected period's events spread across it (one bar
+  per year at 10-year zoom) and chips count them per event type. Clicking a bar or a chip narrows
+  the rail, together with the search box; clicking it again clears it. An event that began before
+  the period counts in the first bar, so the bars add up to the rail's count.
+- The Characters and Factions filter strips and the Settings panel sit flush right over the book
+  instead of centred on the window.
 - Hovering a period names its span, its event count and its first five events, filtered by the same
   event-type settings the rail obeys.
 - A one-line density legend under the toolbar says what the crystal colours mean. Its thresholds are

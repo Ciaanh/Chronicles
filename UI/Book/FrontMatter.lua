@@ -29,7 +29,7 @@ local FrontMatter = private.Core.Utils.FrontMatter
 --[[
     How many names a list renders before it truncates.
 
-    This is a layout constraint, not a data one. The front matter shares a fixed 500x520 view with the
+    This is a layout constraint, not a data one. The front matter shares a fixed 500x510 view with the
     title, metadata and contents list; a document taller than the view pushes the body text onto the
     next page, so the reader clicks a contents row and lands on front matter with no prose. Nothing in
     the data model bounds the reference count (today's widest event has 3), so the cap is here.

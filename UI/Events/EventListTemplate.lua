@@ -23,6 +23,14 @@ function EventListMixin:OnLoad()
 	self.periodEvents = {}
 	self.currentSearchTerm = ""
 
+	-- Period breakdown: a slice of the period (index into self.buckets) and an event type, each nil
+	-- when not narrowing. Both reset when another period is selected.
+	self.buckets = {}
+	self.activeBucket = nil
+	self.activeType = nil
+	self.barPool = {}
+	self.chipPool = {}
+
 	self:InitializeSearchPlaceholder()
 
 	-- Register only for events that don't have a state equivalent
@@ -116,6 +124,10 @@ end
 
 function EventListMixin:OnUIRefresh()
 	self.periodEvents = {}
+	self.currentPeriod = nil
+	self.activeBucket = nil
+	self.activeType = nil
+	self:RefreshBreakdown()
 	self:SetEventDataProvider({})
 	self:UpdateItemCount(0)
 end
@@ -171,7 +183,267 @@ function EventListMixin:UpdateFromSelectedPeriod(period, attempt)
 	-- back to the cache or re-running the event-type filter.
 	self.periodEvents = filteredEvents
 
-	self:DisplayEvents(self:FilterEventsByLabel(filteredEvents, self.currentSearchTerm))
+	-- A new period starts un-narrowed; the same period re-delivered (a settings change, a refresh)
+	-- keeps the reader's narrowing.
+	local isSamePeriod =
+		self.currentPeriod and self.currentPeriod.lower == period.lower and self.currentPeriod.upper == period.upper
+	if not isSamePeriod then
+		self.activeBucket = nil
+		self.activeType = nil
+	end
+	self.currentPeriod = period
+
+	self:RefreshBreakdown()
+	self:DisplayEvents(self:ApplyFilters())
+end
+
+--[[
+    The period's events narrowed by the selected slice, the selected type and the search box
+
+    @return [table] Sequential array, still in FilterEvents order (yearStart, then order)
+]]
+function EventListMixin:ApplyFilters()
+	local bucket = self.activeBucket and self.buckets[self.activeBucket]
+	local activeType = self.activeType
+	local period = self.currentPeriod
+	local business = private.Core.Data.TimelineBusiness
+
+	local narrowed = {}
+	for _, event in ipairs(self.periodEvents or {}) do
+		local inBucket = not bucket or not period or business.isEventInBucket(event, bucket, period.lower, period.upper)
+		local isType = not activeType or (event.eventType or 0) == activeType
+		if inBucket and isType then
+			table.insert(narrowed, event)
+		end
+	end
+
+	return self:FilterEventsByLabel(narrowed, self.currentSearchTerm)
+end
+
+-- =============================================================================================
+-- PERIOD BREAKDOWN (bars per slice, chips per event type)
+-- =============================================================================================
+
+local BAR_MAX_HEIGHT = 28
+local BUCKET_COUNT = 10
+local CHIP_GAP = 6
+local CHIP_HEIGHT = 22
+-- The label plate's scroll ends take about 14 on each side; the text must sit between them
+local CHIP_TEXT_PADDING = 32
+
+-- The row frames can report a zero width before the first layout pass; the rail's geometry is fixed
+-- (292 wide, controls 12 in on the left and 24 on the right), so fall back to it.
+local function rowWidth(frame)
+	local width = frame and frame:GetWidth() or 0
+	if width and width > 0 then
+		return width
+	end
+	return 256
+end
+
+function EventListMixin:RefreshBreakdown()
+	local business = private.Core.Data.TimelineBusiness
+	local period = self.currentPeriod
+
+	self.buckets = {}
+	if period and business then
+		self.buckets = business.buildYearBuckets(self.periodEvents, period.lower, period.upper, BUCKET_COUNT)
+	end
+
+	self:BuildYearBars()
+	self:BuildTypeChips()
+end
+
+function EventListMixin:BuildYearBars()
+	local UIUtils = private.Core.Utils.UIUtils
+	local row = self.YearBars
+	if not row or not UIUtils then
+		return
+	end
+
+	local buckets = self.buckets or {}
+	local count = #buckets
+
+	-- Mythos and Futur are unbounded: there is no slice to draw, so the row folds away
+	if count == 0 then
+		UIUtils.ReleaseFramesAbove(self.barPool, 0)
+		row:SetHeight(1)
+		return
+	end
+	row:SetHeight(42)
+
+	local maxCount = 0
+	for _, bucket in ipairs(buckets) do
+		maxCount = math.max(maxCount, bucket.count)
+	end
+
+	local barWidth = rowWidth(row) / count
+	local singleYears = buckets[1].lower == buckets[1].upper
+
+	for index, bucket in ipairs(buckets) do
+		local bar = UIUtils.AcquirePooledFrame(self.barPool, "EventListYearBarTemplate", row, index, "Button")
+		bar:ClearAllPoints()
+		bar:SetPoint("TOPLEFT", row, "TOPLEFT", (index - 1) * barWidth, 0)
+		bar:SetSize(barWidth, 42)
+
+		-- One label per bar when a bar is one year; otherwise only the two ends, which is all that
+		-- fits in a 25 wide slot once years run to four or five digits.
+		local labelText = nil
+		if singleYears then
+			labelText = tostring(bucket.lower)
+		elseif index == 1 then
+			labelText = tostring(bucket.lower)
+		elseif index == count then
+			labelText = tostring(bucket.upper)
+		end
+
+		bar:Init(self, index, bucket, maxCount, labelText, self.activeBucket == index)
+	end
+	UIUtils.ReleaseFramesAbove(self.barPool, count)
+end
+
+function EventListMixin:BuildTypeChips()
+	local UIUtils = private.Core.Utils.UIUtils
+	local business = private.Core.Data.TimelineBusiness
+	local row = self.TypeRow
+	if not row or not UIUtils or not business then
+		return
+	end
+
+	local counts, total = business.countEventsByType(self.periodEvents)
+	if total == 0 then
+		UIUtils.ReleaseFramesAbove(self.chipPool, 0)
+		row:SetHeight(1)
+		return
+	end
+
+	-- "All" first, then each type present, in the order of constants.eventType
+	local chips = {{typeId = nil, text = string.format(Locale["EventListTypeChip"], Locale["EventListTypeAll"], total)}}
+	for typeId = 0, #private.constants.eventType do
+		local typeCount = counts[typeId]
+		if typeCount and typeCount > 0 then
+			local typeName = private.constants.eventType[typeId]
+			table.insert(chips, {typeId = typeId, text = string.format(Locale["EventListTypeChip"], Locale[typeName] or typeName, typeCount)})
+		end
+	end
+
+	-- Flow layout: chips wrap onto a new line when the next one would pass the row's right edge
+	local width = rowWidth(row)
+	local x, y, lines = 0, 0, 1
+	for index, chipData in ipairs(chips) do
+		local chip = UIUtils.AcquirePooledFrame(self.chipPool, "EventListTypeChipTemplate", row, index, "Button")
+		chip:Init(self, chipData.typeId, chipData.text, self.activeType == chipData.typeId)
+
+		local chipWidth = math.min(width, chip.Text:GetStringWidth() + CHIP_TEXT_PADDING)
+		if x > 0 and x + chipWidth > width then
+			x = 0
+			y = y + CHIP_HEIGHT + CHIP_GAP
+			lines = lines + 1
+		end
+
+		chip:ClearAllPoints()
+		chip:SetPoint("TOPLEFT", row, "TOPLEFT", x, -y)
+		chip:SetSize(chipWidth, CHIP_HEIGHT)
+		x = x + chipWidth + CHIP_GAP
+	end
+	UIUtils.ReleaseFramesAbove(self.chipPool, #chips)
+
+	row:SetHeight(lines * CHIP_HEIGHT + (lines - 1) * CHIP_GAP)
+end
+
+function EventListMixin:ToggleBucket(index)
+	self.activeBucket = (self.activeBucket ~= index) and index or nil
+	self:BuildYearBars()
+	self:DisplayEvents(self:ApplyFilters())
+end
+
+function EventListMixin:ToggleType(typeId)
+	-- The "All" chip carries no type and always clears the narrowing
+	if typeId == nil or self.activeType == typeId then
+		self.activeType = nil
+	else
+		self.activeType = typeId
+	end
+	self:BuildTypeChips()
+	self:DisplayEvents(self:ApplyFilters())
+end
+
+-- -------------------------
+-- Year bar
+-- -------------------------
+EventListYearBarMixin = {}
+
+function EventListYearBarMixin:Init(list, index, bucket, maxCount, labelText, selected)
+	self.list = list
+	self.index = index
+	self.bucket = bucket
+
+	if bucket.count > 0 and maxCount > 0 then
+		self.Bar:SetHeight(math.max(2, math.floor(BAR_MAX_HEIGHT * bucket.count / maxCount)))
+		self.Bar:Show()
+	else
+		self.Bar:Hide()
+	end
+
+	-- Gold when it is the slice narrowing the rail, bronze otherwise
+	if selected then
+		self.Bar:SetColorTexture(1, 0.82, 0, 1)
+	else
+		self.Bar:SetColorTexture(0.55, 0.43, 0.23, 1)
+	end
+
+	self.Label:SetText(labelText or "")
+	if selected then
+		self.Label:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
+	elseif bucket.count > 0 then
+		self.Label:SetTextColor(0.8, 0.8, 0.8)
+	else
+		self.Label:SetTextColor(0.45, 0.45, 0.45)
+	end
+end
+
+function EventListYearBarMixin:OnClick()
+	if self.list then
+		self.list:ToggleBucket(self.index)
+	end
+end
+
+function EventListYearBarMixin:OnEnter()
+	local bucket = self.bucket
+	if not bucket then
+		return
+	end
+
+	GameTooltip:SetOwner(self, "ANCHOR_TOP")
+	if bucket.lower == bucket.upper then
+		GameTooltip:SetText(string.format(Locale["EventListBucketYear"], bucket.lower), 1, 1, 1)
+	else
+		GameTooltip:SetText(string.format(Locale["EventListBucketYears"], bucket.lower, bucket.upper), 1, 1, 1)
+	end
+	GameTooltip:AddLine(string.format(Locale["EventListBucketCount"], bucket.count))
+	GameTooltip:Show()
+end
+
+function EventListYearBarMixin:OnLeave()
+	GameTooltip:Hide()
+end
+
+-- -------------------------
+-- Event-type chip
+-- -------------------------
+EventListTypeChipMixin = {}
+
+function EventListTypeChipMixin:Init(list, typeId, text, selected)
+	self.list = list
+	self.typeId = typeId
+	self:SetText(text)
+	self.SelectedGlow:SetShown(selected)
+end
+
+function EventListTypeChipMixin:OnClick()
+	if self.list then
+		self.list:ToggleType(self.typeId)
+	end
 end
 
 --[[
@@ -264,7 +536,7 @@ function EventListMixin:OnSearchTextChanged(text)
 		C_Timer.NewTimer(
 		SEARCH_THROTTLE_SECONDS,
 		function()
-			self:DisplayEvents(self:FilterEventsByLabel(self.periodEvents, self.currentSearchTerm))
+			self:DisplayEvents(self:ApplyFilters())
 		end
 	)
 end

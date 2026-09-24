@@ -31,8 +31,13 @@
     ============================================================================================= -->
 
     <Frame name="HTMLContentTemplate" mixin="HTMLContentMixin" virtual="true">
-        <Size x="500" y="550"/>
-        <!-- Dynamic height, will be adjusted based on content -->
+        <!--
+            Must fit one page view: the book is 640 tall (MainFrameUI.xml) and PagedDetails is inset 50
+            top and bottom, so a view is 540. The pager moves an element that does not fit to the next
+            view, so at 550 (sized for the old 650 book) every front matter skipped the left page and
+            every event opened on a blank left page with its text pushed to page 2.
+        -->
+        <Size x="500" y="540"/>
         <Anchors>
             <Anchor point="TOPLEFT"/>
         </Anchors>
@@ -47,7 +52,7 @@
                     <KeyValue key="scrollBarTopY" value="-25" type="number"/>
                     <KeyValue key="scrollBarBottomY" value="25" type="number"/>
                 </KeyValues>
-                <Size x="500" y="520"/>
+                <Size x="500" y="510"/> <!-- the element's 540 minus the 20 top inset, 10 spare at the bottom -->
                 <Anchors>
                     <Anchor point="TOPLEFT" y="-20"/>
                 </Anchors>

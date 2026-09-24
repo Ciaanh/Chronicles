@@ -437,3 +437,20 @@ T.describe("HTMLBuilder front matter", function()
         assert_.isNotNil(string.find(frontMatter, 'width="128" height="128" align="left"', 1, true))
     end)
 end)
+
+T.describe("HTMLBuilder.GetDateRangeText sentinels", function()
+    -- -999999 and 999999 are the Mythos and Futur buckets, not years to print
+    T.it("names the Mythos and Futur sentinels instead of printing them", function()
+        local saved = private.constants.config.mythos
+        private.constants.config.mythos = -999999
+        private.constants.config.futur = 999999
+
+        assert_.equals(HTMLBuilder.GetDateRangeText(-999999, -999999), "Mythos")
+        assert_.equals(HTMLBuilder.GetDateRangeText(43, 999999), "43 - Futur")
+        assert_.equals(HTMLBuilder.GetDateRangeText(-999999, 0), "Mythos - 0")
+        assert_.equals(HTMLBuilder.GetDateRangeText(1, 1), "Year 1", "ordinary years are unchanged")
+
+        private.constants.config.mythos = saved
+        private.constants.config.futur = nil
+    end)
+end)

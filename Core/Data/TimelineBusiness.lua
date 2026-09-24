@@ -767,4 +767,133 @@ function TimelineBusiness.getYearPageIndex(year)
     return TimelineBusiness.getYearPageIndexWithPeriods(year, periods)
 end
 
+-- -------------------------
+-- Navigation and Period Breakdown
+-- -------------------------
+
+local ERA_EVENT_TYPE = 2 -- constants.eventType[2] = "era"
+
+--[[
+    The entries of the Navigator's "jump to era" menu
+
+    Era events are the landmarks a reader navigates by: the Expansions collection holds one per
+    expansion, and story collections open their own chapters with one. Mythos and Futur sentinels are
+    skipped, a menu item that jumps to "year -999999" helps nobody.
+
+    @param events [table] Sequential array of event records (the SearchEngine projections)
+    @return [table] Sequential array of {year, label, source}, sorted by year, then order, then label
+]]
+function TimelineBusiness.buildEraEntries(events)
+    local config = private.constants and private.constants.config or {}
+    local entries = {}
+
+    for _, event in ipairs(events or {}) do
+        local year = event.yearStart
+        local isSentinel = year == config.mythos or year == config.futur
+
+        if event.eventType == ERA_EVENT_TYPE and type(year) == "number" and not isSentinel and event.label then
+            table.insert(entries, {year = year, label = event.label, source = event.source, order = event.order or 0})
+        end
+    end
+
+    table.sort(
+        entries,
+        function(a, b)
+            if a.year ~= b.year then
+                return a.year < b.year
+            end
+            if a.order ~= b.order then
+                return a.order < b.order
+            end
+            return a.label < b.label
+        end
+    )
+
+    return entries
+end
+
+--[[
+    Split a period into equal year buckets and count the events that start in each
+
+    Drives the bars above the event rail. An event is counted once, in the bucket holding its
+    yearStart clamped into the period: a period lists every event that overlaps it, so an event that
+    began earlier counts in the first bucket and the bars add up to the rail's count. A period whose
+    span does not divide evenly gives its last bucket the remainder.
+
+    @param events [table] Sequential array of event records
+    @param lower [number] First year of the period, inclusive
+    @param upper [number] Last year of the period, inclusive
+    @param bucketCount [number] How many buckets to produce (clamped to the number of years)
+    @return [table] Sequential array of {lower, upper, count}; empty when the period is unbounded
+]]
+function TimelineBusiness.buildYearBuckets(events, lower, upper, bucketCount)
+    local config = private.constants and private.constants.config or {}
+    if type(lower) ~= "number" or type(upper) ~= "number" or upper < lower then
+        return {}
+    end
+    if lower == config.mythos or upper == config.futur then
+        return {}
+    end
+
+    local span = upper - lower + 1
+    local count = math.max(1, math.min(bucketCount or 10, span))
+    local size = math.floor(span / count)
+
+    local buckets = {}
+    for index = 1, count do
+        local bucketLower = lower + (index - 1) * size
+        local bucketUpper = index == count and upper or (bucketLower + size - 1)
+        buckets[index] = {lower = bucketLower, upper = bucketUpper, count = 0}
+    end
+
+    for _, event in ipairs(events or {}) do
+        local year = event.yearStart
+        if type(year) == "number" then
+            local clamped = math.max(lower, math.min(upper, year))
+            local index = math.min(count, math.floor((clamped - lower) / size) + 1)
+            buckets[index].count = buckets[index].count + 1
+        end
+    end
+
+    return buckets
+end
+
+--[[
+    Whether an event falls in a bucket, by the same clamping rule buildYearBuckets counts with
+
+    @param event [table] Event record
+    @param bucket [table] {lower, upper} from buildYearBuckets
+    @param periodLower [number] First year of the period the bucket belongs to
+    @param periodUpper [number] Last year of that period
+    @return [boolean]
+]]
+function TimelineBusiness.isEventInBucket(event, bucket, periodLower, periodUpper)
+    local year = event and event.yearStart
+    if type(year) ~= "number" or not bucket then
+        return false
+    end
+
+    local clamped = math.max(periodLower, math.min(periodUpper, year))
+    return clamped >= bucket.lower and clamped <= bucket.upper
+end
+
+--[[
+    Count events per event type
+
+    @param events [table] Sequential array of event records
+    @return [table] Map of eventType id to count, and the total as a second value
+]]
+function TimelineBusiness.countEventsByType(events)
+    local counts = {}
+    local total = 0
+
+    for _, event in ipairs(events or {}) do
+        local eventType = event.eventType or 0
+        counts[eventType] = (counts[eventType] or 0) + 1
+        total = total + 1
+    end
+
+    return counts, total
+end
+
 return TimelineBusiness

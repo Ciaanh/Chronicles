@@ -241,3 +241,122 @@ T.describe("TimelineBusiness.getEventDensityTexture", function()
         assert_.equals(TB.getEventDensityTexture(nil), "low-events")
     end)
 end)
+
+T.describe("TimelineBusiness.buildEraEntries", function()
+    T.it("keeps era events only, sorted by year then order", function()
+        local _, TB = buildPrivate({})
+        local entries = TB.buildEraEntries({
+            {eventType = 2, yearStart = 26, order = 1, label = "Reopening of the Dark Portal", source = "burningcrusade"},
+            {eventType = 1, yearStart = 1, order = 15, label = "Birth of Thrall", source = "greatwars"},
+            {eventType = 2, yearStart = 0, order = 3, label = "The Great Wars", source = "expansions"},
+            {eventType = 2, yearStart = 26, order = 0, label = "The Burning Crusade", source = "expansions"}
+        })
+
+        assert_.equals(#entries, 3)
+        assert_.equals(entries[1].label, "The Great Wars")
+        assert_.equals(entries[2].label, "The Burning Crusade", "same year: lower order first")
+        assert_.equals(entries[3].label, "Reopening of the Dark Portal")
+        assert_.equals(entries[3].year, 26)
+    end)
+
+    T.it("skips the Mythos and Futur sentinels and unlabelled records", function()
+        local _, TB = buildPrivate({})
+        local entries = TB.buildEraEntries({
+            {eventType = 2, yearStart = -999999, label = "Before time"},
+            {eventType = 2, yearStart = 999999, label = "After time"},
+            {eventType = 2, yearStart = 12}
+        })
+
+        assert_.equals(#entries, 0)
+    end)
+
+    T.it("returns an empty list for nil input", function()
+        local _, TB = buildPrivate({})
+        assert_.equals(#TB.buildEraEntries(nil), 0)
+    end)
+end)
+
+T.describe("TimelineBusiness.buildYearBuckets", function()
+    -- Year 0 to 9 of the shipped data: 17, 1, 0, 2, 1, 4, 4, 2, 0, 0
+    T.it("counts events per year in a 10-year period", function()
+        local _, TB = buildPrivate({})
+        local events = {}
+        local perYear = {17, 1, 0, 2, 1, 4, 4, 2, 0, 0}
+        for year = 0, 9 do
+            for _ = 1, perYear[year + 1] do
+                table.insert(events, {yearStart = year})
+            end
+        end
+
+        local buckets = TB.buildYearBuckets(events, 0, 9, 10)
+
+        assert_.equals(#buckets, 10)
+        for year = 0, 9 do
+            assert_.equals(buckets[year + 1].lower, year)
+            assert_.equals(buckets[year + 1].upper, year)
+            assert_.equals(buckets[year + 1].count, perYear[year + 1])
+        end
+    end)
+
+    T.it("groups years into equal buckets for wider periods", function()
+        local _, TB = buildPrivate({})
+        local buckets = TB.buildYearBuckets({{yearStart = -1000}, {yearStart = -901}, {yearStart = -900}, {yearStart = -1}}, -1000, -1, 10)
+
+        assert_.equals(#buckets, 10)
+        assert_.equals(buckets[1].lower, -1000)
+        assert_.equals(buckets[1].upper, -901)
+        assert_.equals(buckets[1].count, 2)
+        assert_.equals(buckets[2].count, 1)
+        assert_.equals(buckets[10].upper, -1)
+        assert_.equals(buckets[10].count, 1)
+    end)
+
+    T.it("clamps the bucket count to the number of years", function()
+        local _, TB = buildPrivate({})
+        local buckets = TB.buildYearBuckets({{yearStart = 5}}, 5, 5, 10)
+
+        assert_.equals(#buckets, 1)
+        assert_.equals(buckets[1].count, 1)
+    end)
+
+    T.it("returns nothing for the unbounded Mythos and Futur periods", function()
+        local _, TB = buildPrivate({})
+
+        assert_.equals(#TB.buildYearBuckets({}, -999999, -150001, 10), 0)
+        assert_.equals(#TB.buildYearBuckets({}, 43, 999999, 10), 0)
+    end)
+end)
+
+T.describe("TimelineBusiness.countEventsByType", function()
+    T.it("counts per type and returns the total", function()
+        local _, TB = buildPrivate({})
+        local counts, total = TB.countEventsByType({{eventType = 1}, {eventType = 1}, {eventType = 4}, {}})
+
+        assert_.equals(counts[1], 2)
+        assert_.equals(counts[4], 1)
+        assert_.equals(counts[0], 1, "a record with no type counts as undefined")
+        assert_.equals(total, 4)
+    end)
+end)
+
+T.describe("TimelineBusiness bucket clamping", function()
+    -- A period lists every event overlapping it, so one that began before the period must still land
+    -- in a bar, or the bars would not add up to the rail's count.
+    T.it("counts an event that began before the period in the first bucket", function()
+        local _, TB = buildPrivate({})
+        local buckets = TB.buildYearBuckets({{yearStart = -3, yearEnd = 4}, {yearStart = 9}}, 0, 9, 10)
+
+        assert_.equals(buckets[1].count, 1)
+        assert_.equals(buckets[10].count, 1)
+    end)
+
+    T.it("matches events to buckets with the same rule", function()
+        local _, TB = buildPrivate({})
+        local buckets = TB.buildYearBuckets({}, 0, 9, 10)
+
+        assert_.isTrue(TB.isEventInBucket({yearStart = -3}, buckets[1], 0, 9))
+        assert_.isTrue(TB.isEventInBucket({yearStart = 5}, buckets[6], 0, 9))
+        assert_.isFalse(TB.isEventInBucket({yearStart = 5}, buckets[5], 0, 9))
+        assert_.isFalse(TB.isEventInBucket({}, buckets[1], 0, 9))
+    end)
+end)

@@ -19,10 +19,13 @@
                     covers the tucked-in tips; the rail and book are visible at the same time.
                 -->
                 <Frames>
+                    <!-- Full tab width: its Navigator column sits above the rail and its Grid column
+                         above the book. See TimelineTemplate.xml. -->
                     <Frame parentKey="Timeline" inherits="TimelineTemplate">
-                        <Size x="1200" y="175" />
+                        <Size y="175" />
                         <Anchors>
-                            <Anchor point="TOP" />
+                            <Anchor point="TOPLEFT" />
+                            <Anchor point="TOPRIGHT" />
                         </Anchors>
                     </Frame>
 
@@ -56,7 +59,7 @@
                     <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
                         <Size x="1200" y="175" />
                         <Anchors>
-                            <Anchor point="TOP" />
+                            <Anchor point="TOPRIGHT" /> <!-- flush right, over the book it filters for -->
                         </Anchors>
                     </Frame>
 
@@ -85,7 +88,7 @@
                     <Frame parentKey="FilterStrip" inherits="EntityFilterStripTemplate">
                         <Size x="1200" y="175" />
                         <Anchors>
-                            <Anchor point="TOP" />
+                            <Anchor point="TOPRIGHT" /> <!-- flush right, over the book it filters for -->
                         </Anchors>
                     </Frame>
 
@@ -107,7 +110,7 @@
             <Frame parentKey="Settings" frameLevel="100" inherits="SettingsTemplate" hidden="true">
                 <Size x="1200" y="640"/>
                 <Anchors>
-                    <Anchor point="BOTTOM" />
+                    <Anchor point="BOTTOMRIGHT" /> <!-- where the book is on the other tabs -->
                 </Anchors>
             </Frame>
 

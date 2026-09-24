@@ -221,6 +221,28 @@ function HTMLBuilder.GetDateRangeText(yearStart, yearEnd)
         return ""
     end
 
+    -- Mythos and Futur are sentinels (-999999 and 999999), not years a reader should see printed. They
+    -- read as the names the timeline gives those buckets.
+    local config = private.constants and private.constants.config or {}
+    local function sentinelName(year)
+        if year ~= nil and year == config.mythos then
+            return Locale["Mythos"] or "Mythos"
+        elseif year ~= nil and year == config.futur then
+            return Locale["Futur"] or "Futur"
+        end
+        return nil
+    end
+
+    local startName, endName = sentinelName(yearStart), sentinelName(yearEnd)
+    if startName or endName then
+        if yearStart == yearEnd or not yearEnd then
+            return startName or tostring(yearStart)
+        elseif not yearStart then
+            return endName
+        end
+        return string.format("%s - %s", startName or tostring(yearStart), endName or tostring(yearEnd))
+    end
+
     local dateText = ""
     if yearStart and yearEnd then
         if yearStart == yearEnd then

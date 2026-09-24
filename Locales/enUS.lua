@@ -18,6 +18,21 @@ if L then
     L["Found %d events for year %d"] = "Found %d events for year %d"
     L["No events found for year %d"] = "No events found for year %d"
 
+    -- Navigator (the column above the event rail)
+    L["TimelineGoToYear"] = "Go to year"
+    L["TimelineZoom"] = "Zoom (years per period)"
+    L["TimelineJumpToEra"] = "Jump to era"
+    L["TimelineChooseEra"] = "Choose an era..."
+    L["TimelineNoEras"] = "No era in the enabled collections"
+    L["TimelineEraEntry"] = "Year %d  -  %s"
+
+    -- Period breakdown above the event rail
+    L["EventListTypeAll"] = "All"
+    L["EventListTypeChip"] = "%s %d"
+    L["EventListBucketYear"] = "Year %d"
+    L["EventListBucketYears"] = "Years %d to %d"
+    L["EventListBucketCount"] = "%d events"
+
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
 

@@ -52,31 +52,83 @@
             <OnLeave method="OnLeave" />
         </Scripts>
     </Button>
+    <!--
+        The timeline spans the whole tab width and splits it in two columns that line up with the
+        rail and the book below:
+
+          Navigator  0..268    above the rail: jump to a year, zoom, jump to an era
+          Grid       280..end  above the book: paging, density legend, period grid
+
+        The grid used to be a 1200 frame centred on the tab while the book sits flush right, which
+        left the timeline 140 left of the book it drives. The 280 is the rail's 292 minus the 12 it
+        runs under the book, so the grid's left edge is the book's left edge.
+
+        The controls stay direct children of the timeline (the mixin reads them as self.ZoomOut,
+        self.Previous, ...) and only anchor to these two layout frames.
+    -->
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Frames>
-            <!--
-                Layout rail for the toolbar row. It draws nothing and owns no children: the controls
-                stay direct children of the timeline (the mixin reads them as self.ZoomOut,
-                self.Previous, ...) and anchor LEFT/RIGHT to this rail, which centres them in the
-                row's height without a per-control vertical offset.
+            <Frame parentKey="Navigator">
+                <Size x="268"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" />
+                    <Anchor point="BOTTOMLEFT" />
+                </Anchors>
+                <Layers>
+                    <Layer level="BACKGROUND">
+                        <Texture parentKey="Background" setAllPoints="true">
+                            <Color r="0" g="0" b="0" a="0.35"/>
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <FontString parentKey="YearLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" x="12" y="-12" /> <!-- Spacing.md -->
+                            </Anchors>
+                            <Color color="NORMAL_FONT_COLOR" />
+                        </FontString>
+                        <FontString parentKey="ZoomLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.YearLabel" relativePoint="BOTTOMLEFT" x="0" y="-41" /> <!-- 4 + 25 row + Spacing.md -->
+                            </Anchors>
+                            <Color color="NORMAL_FONT_COLOR" />
+                        </FontString>
+                        <FontString parentKey="EraLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.ZoomLabel" relativePoint="BOTTOMLEFT" x="0" y="-41" />
+                            </Anchors>
+                            <Color color="NORMAL_FONT_COLOR" />
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
 
-                Before this, the controls sat in three separate places around the period grid, the
-                zoom group held off the right edge by a hand-measured offset that only worked at one
-                particular frame width.
+            <Frame parentKey="Grid">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="280" y="0" />
+                    <Anchor point="BOTTOMRIGHT" />
+                </Anchors>
+            </Frame>
+
+            <!--
+                Layout rail for the grid's toolbar row. It draws nothing and owns no children: the
+                paging controls and the density legend anchor LEFT/RIGHT to it, which centres them in
+                the row's height without a per-control vertical offset.
             -->
             <Frame parentKey="Toolbar">
                 <Size y="38"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="12" y="-12" />   <!-- Spacing.md -->
-                    <Anchor point="TOPRIGHT" x="-12" y="-12" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Grid" relativePoint="TOPLEFT" x="12" y="-12" />   <!-- Spacing.md -->
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.Grid" relativePoint="TOPRIGHT" x="-12" y="-12" />
                 </Anchors>
             </Frame>
 
-            <!-- Left of the row: jump to a year, then the zoom scale -->
+            <!-- Navigator, first row: jump to a year -->
             <EditBox parentKey="DateSearchInput" inherits="InputBoxTemplate">
                 <Size x="180" y="25" />
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.Toolbar" relativePoint="LEFT" />
+                    <!-- x 6: InputBoxTemplate draws its left cap 5 outside the edit area -->
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Navigator.YearLabel" relativePoint="BOTTOMLEFT" x="6" y="-4" /> <!-- Spacing.xs -->
                 </Anchors>
                 <Layers>
                     <Layer level="ARTWORK">
@@ -96,13 +148,14 @@
                 </Anchors>
             </Button>
 
+            <!-- Navigator, second row: the zoom scale -->
             <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
                 <KeyValues>
                     <KeyValue key="direction" value="-1" type="number"/>
                 </KeyValues>
                 <Size x="24" y="24" />
                 <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.DateSearchButton" relativePoint="RIGHT" x="12" y="0" /> <!-- Spacing.md, group break -->
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Navigator.ZoomLabel" relativePoint="BOTTOMLEFT" x="0" y="-4" /> <!-- Spacing.xs -->
                 </Anchors>
             </Button>
             <Frame parentKey="ZoomLevelIndicator">
@@ -137,7 +190,19 @@
             </Button>
 
             <!--
-                Right of the row: page the window, with the range it currently covers between the
+                Navigator, third row: jump to an era. The menu lists the era events of the enabled
+                collections in chronological order and is built in TimelineMixin:InitializeEraJump,
+                each time it opens, so toggling a collection in Settings is reflected without a reload.
+            -->
+            <DropdownButton parentKey="EraDropdown" inherits="WowStyle1DropdownTemplate">
+                <Size x="244" y="25" />
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.Navigator.EraLabel" relativePoint="BOTTOMLEFT" x="0" y="-4" /> <!-- Spacing.xs -->
+                </Anchors>
+            </DropdownButton>
+
+            <!--
+                Grid toolbar, right: page the window, with the range it currently covers between the
                 two arrows. These were 50x50 buttons skinned with a covenant-sanctum atlas borrowed
                 for paging art, which only pointed one way and so needed its texture coordinates
                 mirrored in Lua to face right. They now use the same button vocabulary as their
@@ -183,16 +248,14 @@
                 config.timeline.densityTiers, never from literals, so the legend and the crystals cannot
                 describe different thresholds.
 
-                13 tall, which is what the band has spare. The arithmetic, because it is easy to get
-                wrong: the frame is 175; the toolbar is 38 inset 12 from the top, so it occupies 125 to
-                163; the grid is a 25 label plus a 75 period inset 12 from the bottom, so it occupies 12
-                to 112. That leaves exactly 112 to 125.
+                It shares the toolbar row with the paging controls, on the left where the year search
+                and zoom used to be before they moved to the Navigator.
             -->
             <Frame parentKey="DensityLegend">
                 <Size y="13"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.Toolbar" relativePoint="BOTTOMLEFT"/>
-                    <Anchor point="TOPRIGHT" relativeKey="$parent.Toolbar" relativePoint="BOTTOMRIGHT"/>
+                    <Anchor point="LEFT" relativeKey="$parent.Toolbar" relativePoint="LEFT"/>
+                    <Anchor point="RIGHT" relativeKey="$parent.Previous" relativePoint="LEFT" x="-12" y="0"/> <!-- Spacing.md -->
                 </Anchors>
             </Frame>
 

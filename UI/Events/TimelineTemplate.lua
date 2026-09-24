@@ -116,7 +116,9 @@ function TimelineMixin:RefreshTimelinePools(pageSize)
 
         label:ClearAllPoints()
         if index == 1 then
-            label:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", Spacing.md, Spacing.md)
+            -- The Grid column, not the timeline: the timeline spans the tab and its left column is
+            -- the Navigator above the rail.
+            label:SetPoint("BOTTOMLEFT", self.Grid or self, "BOTTOMLEFT", Spacing.md, Spacing.md)
         else
             label:SetPoint("LEFT", self.labelPool[index - 1], "RIGHT", 0, 0)
         end
@@ -282,6 +284,65 @@ function TimelineMixin:OnLoad()
 
     -- Initialize date search
     self:InitializeDateSearch()
+
+    self:InitializeNavigator()
+end
+
+-- -------------------------
+-- Navigator (the column above the rail)
+-- -------------------------
+
+function TimelineMixin:InitializeNavigator()
+    local navigator = self.Navigator
+    if navigator then
+        navigator.YearLabel:SetText(Locale["TimelineGoToYear"])
+        navigator.ZoomLabel:SetText(Locale["TimelineZoom"])
+        navigator.EraLabel:SetText(Locale["TimelineJumpToEra"])
+    end
+
+    self:InitializeEraJump()
+end
+
+--[[
+    Wire the "jump to era" menu
+
+    The generator runs each time the menu opens, so it always lists the eras of the collections that
+    are enabled right now. Picking one navigates exactly like the year search does, minus the
+    year-specific mode: it selects the period that holds the era's first year at the current zoom.
+]]
+function TimelineMixin:InitializeEraJump()
+    local dropdown = self.EraDropdown
+    if not dropdown or not dropdown.SetupMenu then
+        return
+    end
+
+    dropdown:SetDefaultText(Locale["TimelineChooseEra"])
+
+    local config = private.constants.config
+
+    dropdown:SetupMenu(
+        function(_, rootDescription)
+            rootDescription:SetScrollMode(360)
+
+            local events = private.Core.Cache.getSearchEvents(config.mythos, config.futur)
+            local entries = private.Core.Data.TimelineBusiness.buildEraEntries(events)
+
+            if #entries == 0 then
+                rootDescription:CreateTitle(Locale["TimelineNoEras"])
+                return
+            end
+
+            for _, entry in ipairs(entries) do
+                local text = string.format(Locale["TimelineEraEntry"], entry.year, entry.label)
+                rootDescription:CreateButton(
+                    text,
+                    function()
+                        self:NavigateToYear(entry.year)
+                    end
+                )
+            end
+        end
+    )
 end
 
 function TimelineMixin:OnShow()
