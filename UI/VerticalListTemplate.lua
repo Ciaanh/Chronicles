@@ -233,7 +233,7 @@ function VerticalListMixin:InitializeItemList()
     -- Fixed row height; skips the per-frame measurement pass that can otherwise yield a zero extent.
     -- Must stay equal to VerticalListItemTemplate's <Size y> in VerticalListTemplate.xml: the view
     -- sizes rows from this number, so changing only the XML moves nothing.
-    view:SetElementExtent(88)
+    view:SetElementExtent(64) -- VerticalListItemTemplate's height, the bookmark art's own
 
     ScrollUtil.InitScrollBoxListWithScrollBar(self.ItemList, self.ItemListScrollBar, view)
     self._itemViewReady = true

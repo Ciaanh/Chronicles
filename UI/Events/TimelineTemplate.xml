@@ -63,9 +63,34 @@
         left the timeline 140 left of the book it drives. The 280 is the rail's 292 minus the 12 it
         runs under the book, so the grid's left edge is the book's left edge.
 
-        The controls stay direct children of the timeline (the mixin reads them as self.ZoomOut,
+        The controls stay direct children of the timeline (the mixin reads them as self.ZoomToggle,
         self.Previous, ...) and only anchor to these two layout frames.
     -->
+    <!-- A zoom step in the Navigator: the plain wood plate, gold text when it is the current step -->
+    <Button name="TimelineZoomButtonTemplate" virtual="true">
+        <Size x="58" y="25"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
+            </Layer>
+            <Layer level="ARTWORK" textureSubLevel="1">
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\plate"
+                         alphaMode="ADD" alpha="0.8" setAllPoints="true" hidden="true"/>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture parentKey="Highlight" file="Interface\AddOns\Chronicles\Art\plate"
+                         alphaMode="ADD" alpha="0.25" setAllPoints="true"/>
+            </Layer>
+        </Layers>
+        <ButtonText parentKey="Text" justifyH="CENTER">
+            <Anchors>
+                <Anchor point="TOPLEFT" x="4" y="-2"/>
+                <Anchor point="BOTTOMRIGHT" x="-4" y="2"/>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="ChroniclesFontFamily_Text_Medium"/>
+    </Button>
+
     <Frame name="TimelineTemplate" mixin="TimelineMixin" virtual="true">
         <Frames>
             <Frame parentKey="Navigator">
@@ -148,46 +173,17 @@
                 </Anchors>
             </Button>
 
-            <!-- Navigator, second row: the zoom scale -->
-            <Button parentKey="ZoomOut" inherits="UIPanelButtonTemplate">
-                <KeyValues>
-                    <KeyValue key="direction" value="-1" type="number"/>
-                </KeyValues>
-                <Size x="24" y="24" />
+            <!--
+                Navigator, second row: the zoom, one button per step value. The buttons are built from
+                config.stepValues in TimelineMixin:BuildZoomToggle, so a different set of steps needs no
+                XML; the selected one is drawn gold (UpdateZoomLevelIndicator).
+            -->
+            <Frame parentKey="ZoomToggle">
+                <Size x="244" y="25" />
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeKey="$parent.Navigator.ZoomLabel" relativePoint="BOTTOMLEFT" x="0" y="-4" /> <!-- Spacing.xs -->
                 </Anchors>
-            </Button>
-            <Frame parentKey="ZoomLevelIndicator">
-                <Size x="90" y="25" />
-                <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.ZoomOut" relativePoint="RIGHT" x="8" y="0" />
-                </Anchors>
-                <Layers>
-                    <Layer level="BACKGROUND">
-                        <!-- setAllPoints, so the art follows the frame's width instead of restating it -->
-                        <Texture parentKey="Background" file="Interface\AddOns\Chronicles\Art\plate" setAllPoints="true"/>
-                    </Layer>
-                    <Layer level="ARTWORK">
-                        <FontString parentKey="Text" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
-                            <Anchors>
-                                <Anchor point="TOPLEFT" x="4" y="-4" />   <!-- Spacing.xs -->
-                                <Anchor point="BOTTOMRIGHT" x="-4" y="4" />
-                            </Anchors>
-                            <Color color="HIGHLIGHT_FONT_COLOR" />
-                        </FontString>
-                    </Layer>
-                </Layers>
             </Frame>
-            <Button parentKey="ZoomIn" inherits="UIPanelButtonTemplate">
-                <KeyValues>
-                    <KeyValue key="direction" value="1" type="number"/>
-                </KeyValues>
-                <Size x="24" y="24" />
-                <Anchors>
-                    <Anchor point="LEFT" relativeKey="$parent.ZoomLevelIndicator" relativePoint="RIGHT" x="8" y="0" />
-                </Anchors>
-            </Button>
 
             <!--
                 Navigator, third row: jump to an era. The menu lists the era events of the enabled

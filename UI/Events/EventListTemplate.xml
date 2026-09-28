@@ -85,6 +85,25 @@
         </Scripts>
     </Button>
 
+    <!--
+        "YEAR 1" between the rail's year groups, so a period's events read as a sequence of years rather
+        than one undivided list. Built by EventListMixin:DisplayEvents only when the rail holds more than
+        one year; 22 tall (EventListMixin's HEADER_EXTENT).
+    -->
+    <Frame name="EventListYearHeaderTemplate" virtual="true">
+        <Size x="150" y="22"/>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString parentKey="Label" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="4" y="3"/>
+                    </Anchors>
+                    <Color r="0.66" g="0.61" b="0.52"/>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+
     <Frame name="EventListTemplate" mixin="EventListMixin" virtual="true">
         <Frames>
             <!--
@@ -95,8 +114,9 @@
             <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate" autoFocus="false">
                 <Size y="20"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="12" y="0"/>
-                    <Anchor point="TOPRIGHT" x="-12" y="0"/>
+                    <!-- Under the period title and count; x 16: SearchBoxTemplate draws its left cap outside -->
+                    <Anchor point="TOPLEFT" x="16" y="-26"/>
+                    <Anchor point="TOPRIGHT" x="-24" y="-26"/>
                 </Anchors>
                 <!--
                     Blizzard's SearchBoxTemplate: the magnifier, the clear button and the grey
@@ -136,8 +156,8 @@
             <Frame parentKey="YearBars">
                 <Size y="42"/>
                 <Anchors>
-                    <Anchor point="TOPLEFT" x="12" y="-44"/>
-                    <Anchor point="TOPRIGHT" x="-24" y="-44"/>
+                    <Anchor point="TOPLEFT" x="12" y="-54"/>
+                    <Anchor point="TOPRIGHT" x="-24" y="-54"/>
                 </Anchors>
             </Frame>
             <Frame parentKey="TypeRow">
@@ -170,12 +190,18 @@
         </Frames>
         <Layers>
             <Layer level="OVERLAY">
-                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
+                <!-- The rail's title row: which period it lists, and how many events -->
+                <FontString parentKey="PeriodTitle" inherits="ChroniclesFontFamily_Text_Medium" justifyH="LEFT" wordwrap="false">
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="12" y="-24"/> <!-- Spacing.md / -Spacing.xl -->
-                        <Anchor point="TOPRIGHT" x="-12" y="-24"/>
+                        <Anchor point="TOPLEFT" x="12" y="-2"/> <!-- Spacing.md -->
                     </Anchors>
-                    <Color color="WHITE_FONT_COLOR"/>
+                    <Color color="NORMAL_FONT_COLOR"/>
+                </FontString>
+                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="-24" y="-2"/> <!-- clear of the 12 under the book -->
+                    </Anchors>
+                    <Color r="0.66" g="0.61" b="0.52"/>
                 </FontString>
             </Layer>
         </Layers>

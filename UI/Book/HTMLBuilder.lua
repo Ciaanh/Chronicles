@@ -184,6 +184,28 @@ end
     @param subtitle [string] Subtitle text
     @return [string] HTML subtitle element
 ]]
+--[[
+    A front-matter section heading: "CHARACTERS", "FACTIONS", "APPEARS IN 9 EVENTS"
+
+    Capitals in a muted brown, with a blank line above, so the blocks of the front matter read as
+    separate sections instead of running into each other. SimpleHTML has no letter-spacing or margins:
+    the capitals and the colour escape are what it offers, and a <br/> is the only way to open a gap.
+
+    @param text [string] Heading text, in any case
+    @return [string] HTML
+]]
+function HTMLBuilder.CreateSectionHeading(text)
+    if not text or text == "" then
+        return ""
+    end
+
+    return string.format("<br/><h2>|c%s%s|r</h2>", HTMLBuilder.SECTION_HEADING_COLOR, EscapeHTML(string.upper(text)))
+end
+
+-- ARGB for the colour escape. 4A3218, not the board's 6A5433: on the spellbook parchment 6A5433 read as a
+-- pale beige in game. This stays softer than the body ink, and the capitals do the rest.
+HTMLBuilder.SECTION_HEADING_COLOR = "ff4a3218"
+
 function HTMLBuilder.CreateSubtitle(subtitle)
     if not subtitle or subtitle == "" then
         return ""
@@ -758,7 +780,7 @@ local function BuildReferenceBlock(refs, kind, fallbackCollection, headingKey)
     end
 
     -- escape = false: the line is <a> elements from CreateLink plus already-escaped separators
-    return HTMLBuilder.CreateSubtitle(Locale[headingKey] or headingKey) ..
+    return HTMLBuilder.CreateSectionHeading(Locale[headingKey] or headingKey) ..
         HTMLBuilder.CreateParagraph(line, {escape = false})
 end
 
@@ -795,39 +817,12 @@ local function EventLinkText(event)
     return event.label or ""
 end
 
+-- Exposed for the book's previous/next buttons, which MainFrameUI fills
+HTMLBuilder.GetOrderedEvents = GetOrderedEvents
+HTMLBuilder.EventLinkText = EventLinkText
+
 local function CreateEventLink(event, text)
     return HTMLBuilder.CreateLink(text or EventLinkText(event), "event", tostring(event.source) .. ":" .. tostring(event.id))
-end
-
---[[
-    The previous and next events in reading order, at the foot of an event's front matter
-
-    @param entity [table] The event being read
-    @param events [table] Every enabled event in reading order
-    @return [string] HTML, empty when the event has no neighbour in the list
-]]
-local function BuildEventNeighboursBlock(entity, events)
-    local FrontMatter = private.Core.Utils.FrontMatter
-    if not FrontMatter or not FrontMatter.FindEventNeighbours then
-        return ""
-    end
-
-    local previous, nextEvent = FrontMatter.FindEventNeighbours(events, entity)
-    if not previous and not nextEvent then
-        return ""
-    end
-
-    local html = HTMLBuilder.CreateSubtitle(Locale["BOOK_FRONT_CHRONICLE"] or "In the chronicle")
-    if previous then
-        local text = string.format(Locale["BOOK_FRONT_PREVIOUS"] or "< %s", EventLinkText(previous))
-        html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(previous, text), {escape = false, align = "left"})
-    end
-    if nextEvent then
-        local text = string.format(Locale["BOOK_FRONT_NEXT"] or "%s >", EventLinkText(nextEvent))
-        html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(nextEvent, text), {escape = false, align = "right"})
-    end
-
-    return html
 end
 
 --[[
@@ -851,7 +846,7 @@ local function BuildAppearancesBlock(entity, kind, events)
 
     local headingFmt = total == 1 and (Locale["BOOK_FRONT_APPEARS_IN_ONE"] or "Appears in 1 event") or
         (Locale["BOOK_FRONT_APPEARS_IN"] or "Appears in %d events")
-    local html = HTMLBuilder.CreateSubtitle(string.format(headingFmt, total))
+    local html = HTMLBuilder.CreateSectionHeading(string.format(headingFmt, total))
 
     for _, event in ipairs(found) do
         html = html .. HTMLBuilder.CreateParagraph(CreateEventLink(event), {escape = false})
@@ -931,9 +926,10 @@ function HTMLBuilder.CreateEntityHTML(entity)
 
     -- Cross-references, resolved from ids to names. Events key them by collection; a character's
     -- factions are a flat id array whose collection is the character's own source.
-    coverContent = coverContent .. BuildReferenceBlock(entity.factions, "faction", entity.source, "BOOK_FRONT_FACTIONS")
+    -- Characters first: who took part reads before which side they were on
     coverContent =
         coverContent .. BuildReferenceBlock(entity.characters, "character", entity.source, "BOOK_FRONT_CHARACTERS")
+    coverContent = coverContent .. BuildReferenceBlock(entity.factions, "faction", entity.source, "BOOK_FRONT_FACTIONS")
 
     -- Add description if present
     if entity.description and entity.description ~= "" then
@@ -957,10 +953,10 @@ function HTMLBuilder.CreateEntityHTML(entity)
     end
 
     -- Related events last, under everything that describes the record itself
+    -- (An event's previous and next are not here: BookContainerMixin:SetFooterLinks draws them as buttons
+    -- at the foot of the left page, which SimpleHTML cannot pin anything to.)
     local kind = EntityKind(entity)
-    if kind == "event" then
-        coverContent = coverContent .. BuildEventNeighboursBlock(entity, GetOrderedEvents())
-    elseif kind == "character" or kind == "faction" then
+    if kind == "character" or kind == "faction" then
         coverContent = coverContent .. BuildAppearancesBlock(entity, kind, GetOrderedEvents())
     end
 
@@ -976,8 +972,11 @@ function HTMLBuilder.CreateEntityHTML(entity)
     -- mixing plain and HTML pages rendered out of the order it was written in. With every page a
     -- document there is nothing to reorder.
     if entity.chapters and type(entity.chapters) == "table" then
+        -- One untitled chapter is just the text: a "Chapter 1" header over it names nothing
+        local soleUntitledChapter = #entity.chapters == 1 and not ChapterTitle(entity.chapters[1])
+
         for i, chapter in ipairs(entity.chapters) do
-            local heading = BuildChapterHeading(navigationData.chapters[i], chapter)
+            local heading = soleUntitledChapter and "" or BuildChapterHeading(navigationData.chapters[i], chapter)
             local pages = (type(chapter.pages) == "table" and #chapter.pages > 0) and chapter.pages or nil
 
             if pages then

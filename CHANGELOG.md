@@ -16,6 +16,11 @@ parts of it agree with each other.
 - `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
 
 ### Book
+- The front matter lists characters before factions, under capital headings in a muted ink with a
+  line of space above each block.
+- An event's previous and next events are two links pinned to the foot of the left page, the name
+  over its date, under a small rule; they show on the first spread only.
+- A single untitled chapter no longer opens with a "Chapter 1" header over its only page.
 - Opening an event from a link, or by Back and Forward, moves the timeline to its period when the
   selected period does not hold it, and scrolls the rail to its row, clearing a bar, chip or search
   that would hide it. Characters and factions scroll into view when the rail's filters show them.
@@ -73,6 +78,9 @@ parts of it agree with each other.
   chapter that gained a page kept its cached pre-edit book.
 
 ### Lists
+- Bookmarks are 64 tall, the art's own height, four apart: about seven rows where there were five.
+- The event rail separates its year groups with YEAR headers when it lists more than one year, and
+  opens with the period it lists ("Year 0 to 9") and its count on one line, above the search box.
 - The bookmark's side art matches its body: its teal and gold were brighter than the strip it joins,
   which had been darkened for the white labels. The selected glow now lights the side as well.
 - The search boxes are Blizzard's search field (magnifier, clear button, grey instructions) instead
@@ -89,6 +97,11 @@ parts of it agree with each other.
 - The bookmark plate's text band is 20% darker, for contrast with the white label.
 
 ### Timeline
+- The zoom is four buttons, one per step (1000, 500, 100, 10), the current one gold.
+- The grid's header reads left to right: the paging arrows with the range between them, a note that
+  year 0 is the opening of the Dark Portal, and the legend on the right, titled "Events per period"
+  with ranges (1-9, 10-24, 25+). The crystal cells and the year plates are unchanged.
+- The window's name stands before its tabs.
 - The timeline lines up with the book. It spans the whole window now: a Navigator column above the
   rail holds the year search, the zoom and a new "Jump to era" menu, and the period grid sits above
   the book instead of 140 to its left. The menu lists the era events of the enabled collections in

@@ -222,6 +222,22 @@
                     <Anchor point="TOPLEFT" x="7" y="-7"/>
                     <Anchor point="TOPRIGHT" x="-7" y="-7"/>
                 </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <!-- The window's name before its tabs, in Morpheus, the game's own display face -->
+                        <FontString parentKey="Brand" font="Fonts\MORPHEUS.TTF" justifyH="LEFT">
+                            <FontHeight val="18"/>
+                            <Anchors>
+                                <Anchor point="LEFT" x="16" y="0"/>
+                            </Anchors>
+                            <Color color="NORMAL_FONT_COLOR"/>
+                            <Shadow>
+                                <Offset x="1" y="-1"/>
+                                <Color r="0" g="0" b="0"/>
+                            </Shadow>
+                        </FontString>
+                    </Layer>
+                </Layers>
                 <Scripts>
                     <OnDragStart>
                         self:GetParent():StartDragging()

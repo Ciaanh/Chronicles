@@ -50,6 +50,91 @@ function BookContainerMixin:OnLoad()
     self.SinglePageBookCornerFlipbook.Anim:Pause()
 
     self.currentlyDisplayedContent = nil
+
+    -- The footer links sit over the left page's HTML and must take the clicks, and they follow the
+    -- page: OnUpdate fires after every spread is displayed (PagedContentFrameBaseMixin).
+    if self.FooterLinks then
+        self.FooterLinks:SetFrameLevel(self.PagedDetails:GetFrameLevel() + 50)
+        self.PagedDetails:RegisterCallback(PagedContentFrameBaseMixin.Event.OnUpdate, self.UpdateFooterVisibility, self)
+    end
+end
+
+-- =============================================================================================
+-- FOOTER LINKS (previous and next event)
+-- =============================================================================================
+
+--[[
+    Set the links at the foot of the left page
+
+    @param previous [table|nil] {title, subtitle, onClick}, nil for none
+    @param nextLink [table|nil] same shape
+]]
+function BookContainerMixin:SetFooterLinks(previous, nextLink)
+    self.footerLinks = {previous = previous, next = nextLink}
+
+    if self.FooterLinks then
+        self.FooterLinks.Previous:SetLink(previous, "LEFT")
+        self.FooterLinks.Next:SetLink(nextLink, "RIGHT")
+    end
+
+    self:UpdateFooterVisibility()
+end
+
+function BookContainerMixin:UpdateFooterVisibility()
+    local footer = self.FooterLinks
+    if not footer then
+        return
+    end
+
+    local links = self.footerLinks
+    local hasLinks = links ~= nil and (links.previous ~= nil or links.next ~= nil)
+    local controls = self.PagedDetails and self.PagedDetails.PagingControls
+    local page = (controls and controls.GetCurrentPage and controls:GetCurrentPage()) or 1
+
+    footer:SetShown(hasLinks and page == 1)
+end
+
+BookFooterLinkMixin = {}
+
+-- Rust at rest, darker under the pointer: the same ink as the links in the text (HTMLBuilder.LINK_COLOR)
+local FOOTER_LINK_COLOR = {0.541, 0.204, 0.078}
+local FOOTER_LINK_HOVER_COLOR = {0.37, 0.13, 0.05}
+
+function BookFooterLinkMixin:SetLink(link, justify)
+    self.link = link
+    if not link then
+        self:Hide()
+        return
+    end
+
+    self.Title:SetJustifyH(justify)
+    self.Subtitle:SetJustifyH(justify)
+    self.Title:SetText(link.title or "")
+    self.Subtitle:SetText(link.subtitle or "")
+    self.Title:SetTextColor(unpack(FOOTER_LINK_COLOR))
+    self:Show()
+end
+
+function BookFooterLinkMixin:OnClick()
+    if self.link and self.link.onClick then
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+        self.link.onClick()
+    end
+end
+
+function BookFooterLinkMixin:OnEnter()
+    self.Title:SetTextColor(unpack(FOOTER_LINK_HOVER_COLOR))
+    -- A long name is cut to the button's width; the tooltip gives it whole
+    if self.Title:IsTruncated() then
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:SetText(self.link and self.link.title or "", 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end
+end
+
+function BookFooterLinkMixin:OnLeave()
+    self.Title:SetTextColor(unpack(FOOTER_LINK_COLOR))
+    GameTooltip:Hide()
 end
 
 -- =============================================================================================
@@ -151,4 +236,6 @@ function BookContainerMixin:ShowEmptyBook(promptText, frontMatterText)
     local dataProvider = CreateDataProvider(emptyContent)
     self.PagedDetails:SetDataProvider(dataProvider, false)
     self.currentlyDisplayedContent = emptyContent
+
+    self:SetFooterLinks(nil, nil)
 end

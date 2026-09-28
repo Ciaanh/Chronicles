@@ -20,6 +20,36 @@
 	- Customize paging controls through PagingControls KeyValues
 	- Change animation timing in SinglePageBookCornerFlipbook ============================================================================================= -->
 
+	<!--
+		One of the two links at the foot of an event's left page: the neighbour's name on the first line
+		(rust, like the links in the text), its date under it. Filled by BookFooterLinkMixin:SetLink.
+	-->
+	<Button name="BookFooterLinkTemplate" mixin="BookFooterLinkMixin" virtual="true">
+		<Size x="240" y="40"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Title" inherits="ChroniclesFontFamily_Text_Body" wordwrap="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Subtitle" inherits="ChroniclesFontFamily_Text_Medium" wordwrap="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT" x="0" y="-4"/> <!-- Spacing.xs -->
+						<Anchor point="TOPRIGHT" relativeKey="$parent.Title" relativePoint="BOTTOMRIGHT" x="0" y="-4"/>
+					</Anchors>
+					<Color r="0.29" g="0.196" b="0.094"/> <!-- 4A3218, the ink of the section headings (HTMLBuilder.SECTION_HEADING_COLOR) -->
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick method="OnClick"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+		</Scripts>
+	</Button>
+
 	<Frame name="BookContainerTemplate" mixin="BookContainerMixin" virtual="true">
 		<Size x="1200" y="650"/>
 
@@ -118,6 +148,42 @@
 							<KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
 						</KeyValues>
 					</Frame>
+				</Frames>
+			</Frame>
+
+			<!--
+				Previous and next event, pinned to the foot of the left page. The front matter is HTML and
+				SimpleHTML cannot push anything to the bottom of a page, so these are frames over it. Shown
+				only on the first spread, where the left page is the front matter, and only for events:
+				BookContainerMixin:SetFooterLinks, UpdateFooterVisibility.
+			-->
+			<Frame parentKey="FooterLinks" hidden="true">
+				<Size y="60"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeKey="$parent.PagedDetails.View1" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent.PagedDetails.View1" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Divider" file="Interface\AddOns\Chronicles\Art\Divider">
+							<Size x="260" y="10"/>
+							<Anchors>
+								<Anchor point="TOP"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button parentKey="Previous" inherits="BookFooterLinkTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="Next" inherits="BookFooterLinkTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
 				</Frames>
 			</Frame>
 		</Frames>

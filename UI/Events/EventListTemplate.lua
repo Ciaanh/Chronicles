@@ -80,6 +80,16 @@ end
     so templateKeys.EVENT_DESCRIPTION stays the single source of truth for what an event row looks
     like.
 ]]
+local ROW_EXTENT = 64
+local HEADER_EXTENT = 22
+
+-- "YEAR 1", or "MYTHOS" / "FUTUR" for the sentinel years: the book's own wording, in capitals
+local function yearHeaderText(year)
+	local HTMLBuilder = private.Core.Utils.HTMLBuilder
+	local text = HTMLBuilder and HTMLBuilder.GetDateRangeText(year, year) or tostring(year)
+	return string.upper(text)
+end
+
 function EventListMixin:InitializeEventList()
 	if self._eventViewReady or not self.EventScrollList or not self.EventScrollBar then
 		return
@@ -91,17 +101,33 @@ function EventListMixin:InitializeEventList()
 	end
 
 	local view = CreateScrollBoxListLinearView(Spacing.xs, Spacing.xs, 0, 0, Spacing.xs)
-	view:SetElementInitializer(
-		rowTemplate.template,
-		function(row, elementData)
-			row:Init(elementData)
+	-- Two kinds of element: the bookmark rows and the YEAR headers between their groups
+	view:SetElementFactory(
+		function(factory, elementData)
+			if elementData.isYearHeader then
+				factory(
+					"EventListYearHeaderTemplate",
+					function(header, data)
+						header.Label:SetText(data.text)
+					end
+				)
+			else
+				factory(
+					rowTemplate.template,
+					function(row, data)
+						row:Init(data)
+					end
+				)
+			end
 		end
 	)
-	-- Fixed row height; skips the per-frame measurement pass that can otherwise yield a zero extent.
-	-- Must stay equal to VerticalListItemTemplate's <Size y> in VerticalListTemplate.xml and to the
-	-- extent the Characters/Factions rail sets: one row template, one height, declared three times
-	-- because the view reads the extent and never the template's Size.
-	view:SetElementExtent(88)
+	-- Extents given, not measured: a linear view never reads the templates' Size. ROW_EXTENT must stay
+	-- equal to VerticalListItemTemplate's height (VerticalListTemplate.xml).
+	view:SetElementExtentCalculator(
+		function(_, elementData)
+			return elementData.isYearHeader and HEADER_EXTENT or ROW_EXTENT
+		end
+	)
 
 	ScrollUtil.InitScrollBoxListWithScrollBar(self.EventScrollList, self.EventScrollBar, view)
 	self._eventViewReady = true
@@ -125,6 +151,9 @@ end
 function EventListMixin:OnUIRefresh()
 	self.periodEvents = {}
 	self.currentPeriod = nil
+	if self.PeriodTitle then
+		self.PeriodTitle:SetText("")
+	end
 	self.activeBucket = nil
 	self.activeType = nil
 	self:RefreshBreakdown()
@@ -192,6 +221,7 @@ function EventListMixin:UpdateFromSelectedPeriod(period, attempt)
 		self.activeType = nil
 	end
 	self.currentPeriod = period
+	self:UpdatePeriodTitle()
 
 	self:RefreshBreakdown()
 	self:DisplayEvents(self:ApplyFilters())
@@ -218,6 +248,36 @@ function EventListMixin:ApplyFilters()
 	end
 
 	return self:FilterEventsByLabel(narrowed, self.currentSearchTerm)
+end
+
+--[[
+    "Year 0 to 9" over the rail, or "Year 1" for a one-year period; the Mythos and Futur buckets by name
+]]
+function EventListMixin:UpdatePeriodTitle()
+	local period = self.currentPeriod
+	if not self.PeriodTitle or not period then
+		return
+	end
+
+	local config = private.constants.config
+	local function bound(year)
+		if year == config.mythos then
+			return Locale["Mythos"]
+		elseif year == config.futur then
+			return Locale["Futur"]
+		end
+		return tostring(year)
+	end
+
+	local text
+	if period.lower == period.upper then
+		text = string.format(Locale["EventListPeriodYear"], bound(period.lower))
+	elseif period.lower == config.mythos or period.upper == config.futur then
+		text = string.format(Locale["EventListPeriodSpan"], bound(period.lower), bound(period.upper))
+	else
+		text = string.format(Locale["EventListPeriodYears"], bound(period.lower), bound(period.upper))
+	end
+	self.PeriodTitle:SetText(text)
 end
 
 -- =============================================================================================
@@ -473,7 +533,26 @@ function EventListMixin:DisplayEvents(events)
 	-- ipairs, not pairs: the caller passes a sequential array and the rail's order must be
 	-- reproducible from one selection to the next.
 	local elements = {}
+
+	-- Year headers only when the rail holds more than one year: over a single year the period title
+	-- already says it
+	local years = {}
+	local yearCount = 0
 	for _, event in ipairs(events) do
+		if event.yearStart ~= nil and not years[event.yearStart] then
+			years[event.yearStart] = true
+			yearCount = yearCount + 1
+		end
+	end
+	local withHeaders = yearCount > 1
+	local previousYear = nil
+
+	for _, event in ipairs(events) do
+		if withHeaders and event.yearStart ~= previousYear then
+			table.insert(elements, {isYearHeader = true, text = yearHeaderText(event.yearStart)})
+			previousYear = event.yearStart
+		end
+
 		-- The shared row reads item.name at three sites (the Init guard, the label, the tooltip) and
 		-- events carry their display string as label, so give the record a name here rather than
 		-- teaching the row a second field. Safe to write onto: getSearchEvents hands back
@@ -495,7 +574,8 @@ function EventListMixin:DisplayEvents(events)
 	end
 
 	self:SetEventDataProvider(elements)
-	self:UpdateItemCount(#elements)
+	-- The events, not the elements: the headers are not rows
+	self:UpdateItemCount(#events)
 	self:SyncWithCurrentSelection()
 end
 

@@ -164,13 +164,16 @@ function TimelineMixin:BuildDensityLegend()
     local timelineConfig = private.constants.config.timeline
     local tiers = timelineConfig.densityTiers or {}
 
-    -- One entry per tier, plus the dense case above them all
+    -- One entry per tier, as a range ("1-9", "10-24"), plus the dense case above them all. A period with
+    -- no event draws the empty cell, so the first tier starts at 1.
     local entries = {}
+    local floor = 1
     for _, tier in ipairs(tiers) do
         table.insert(
             entries,
-            {texture = tier.texture, text = string.format(Locale["TimelineDensityLegendUnder"], tier.below)}
+            {texture = tier.texture, text = string.format(Locale["TimelineDensityLegendRange"], floor, tier.below - 1)}
         )
+        floor = tier.below
     end
 
     local highestCeiling = #tiers > 0 and tiers[#tiers].below or 0
@@ -182,16 +185,19 @@ function TimelineMixin:BuildDensityLegend()
         }
     )
 
-    local previous
+    local title = legend:CreateFontString(nil, "ARTWORK", "ChroniclesFontFamily_Text_Medium")
+    title:SetPoint("LEFT", legend, "LEFT", 0, 0)
+    title:SetText(Locale["TimelineDensityLegendTitle"])
+    title:SetTextColor(0.66, 0.61, 0.52)
+    legend.Title = title
+
+    local width = title:GetStringWidth()
+    local previous = title
     for index, entry in ipairs(entries) do
         local swatch = legend:CreateTexture(nil, "ARTWORK")
         swatch:SetTexture("Interface\\AddOns\\Chronicles\\Art\\" .. entry.texture)
         swatch:SetSize(20, 10)
-        if previous then
-            swatch:SetPoint("LEFT", previous, "RIGHT", Spacing.md, 0)
-        else
-            swatch:SetPoint("LEFT", legend, "LEFT", 0, 0)
-        end
+        swatch:SetPoint("LEFT", previous, "RIGHT", Spacing.md, 0)
 
         local label = legend:CreateFontString(nil, "ARTWORK", "ChroniclesFontFamily_Text_Shadow_Small")
         label:SetPoint("LEFT", swatch, "RIGHT", Spacing.xs, 0)
@@ -201,8 +207,11 @@ function TimelineMixin:BuildDensityLegend()
         previous = label
         legend["Swatch" .. index] = swatch
         legend["Label" .. index] = label
+        width = width + Spacing.md + 20 + Spacing.xs + label:GetStringWidth()
     end
 
+    -- The legend is anchored by its right edge only (LayoutGridHeader), so it needs its own width
+    legend:SetWidth(math.ceil(width))
     legend.built = true
 end
 
@@ -239,24 +248,13 @@ end
 
 function TimelineMixin:OnLoad()
     -- Set localized button text
-    self.ZoomOut:SetText(Locale["Zoom Out"])
-    self.ZoomIn:SetText(Locale["Zoom In"])
     self.Previous:SetText(Locale["Previous Page"])
     self.Next:SetText(Locale["Next Page"])
-    self.ZoomOut:SetScript(
-        "OnClick",
-        function()
-            private.Core.Timeline.ChangeCurrentStepValue(-1)
-        end
-    )
-    self.ZoomIn:SetScript(
-        "OnClick",
-        function()
-            private.Core.Timeline.ChangeCurrentStepValue(1)
-        end
-    )
     self.Previous:SetScript("OnClick", self.TimelinePrevious)
     self.Next:SetScript("OnClick", self.TimelineNext)
+
+    self:BuildZoomToggle()
+    self:LayoutGridHeader()
 
     -- Before any Display* event fires: the pooled frames are what register for those events.
     self:RefreshTimelinePools(private.constants.config.timeline.pageSize)
@@ -287,7 +285,75 @@ function TimelineMixin:OnLoad()
 
     self:InitializeNavigator()
 
-    private.Core.Utils.UIUtils.ApplyPlateSlicing(self.ZoomLevelIndicator.Background, self.RangeIndicator.Background)
+end
+
+--[[
+    The grid's header row, as on the validated board: the paging arrows with the range between them on
+    the left, then a note on what year 0 means, and the density legend on the right.
+
+    Anchored here rather than in XML because the chain runs left to right through controls declared in
+    the other order (Next, RangeIndicator, Previous), and XML cannot anchor to a sibling declared later.
+]]
+function TimelineMixin:LayoutGridHeader()
+    self.Previous:ClearAllPoints()
+    self.Previous:SetPoint("LEFT", self.Toolbar, "LEFT", 0, 0)
+
+    self.RangeIndicator:ClearAllPoints()
+    self.RangeIndicator:SetPoint("LEFT", self.Previous, "RIGHT", Spacing.sm, 0)
+    -- The range reads as the row's title, not as a plate among the controls
+    self.RangeIndicator.Background:Hide()
+
+    self.Next:ClearAllPoints()
+    self.Next:SetPoint("LEFT", self.RangeIndicator, "RIGHT", Spacing.sm, 0)
+
+    if not self.YearZeroNote then
+        self.YearZeroNote = self.Grid:CreateFontString(nil, "ARTWORK", "ChroniclesFontFamily_Text_Medium")
+        self.YearZeroNote:SetTextColor(0.66, 0.61, 0.52)
+    end
+    self.YearZeroNote:ClearAllPoints()
+    self.YearZeroNote:SetPoint("LEFT", self.Next, "RIGHT", Spacing.lg, 0)
+    self.YearZeroNote:SetText(Locale["TimelineYearZeroNote"])
+
+    -- Right-aligned: BuildDensityLegend gives the legend the width of its content
+    self.DensityLegend:ClearAllPoints()
+    self.DensityLegend:SetPoint("RIGHT", self.Toolbar, "RIGHT", 0, 0)
+end
+
+-- -------------------------
+-- Zoom toggle (Navigator, second row)
+-- -------------------------
+
+local ZOOM_BUTTON_GAP = 4 -- Spacing.xs
+
+function TimelineMixin:BuildZoomToggle()
+    local toggle = self.ZoomToggle
+    local UIUtils = private.Core.Utils.UIUtils
+    if not toggle or not UIUtils then
+        return
+    end
+
+    local steps = private.constants.config.stepValues
+    local width = (toggle:GetWidth() > 0 and toggle:GetWidth() or 244)
+    local buttonWidth = (width - ZOOM_BUTTON_GAP * (#steps - 1)) / #steps
+
+    self.zoomButtons = self.zoomButtons or {}
+    for index, stepValue in ipairs(steps) do
+        local button = UIUtils.AcquirePooledFrame(self.zoomButtons, "TimelineZoomButtonTemplate", toggle, index, "Button")
+        button:ClearAllPoints()
+        button:SetPoint("LEFT", toggle, "LEFT", (index - 1) * (buttonWidth + ZOOM_BUTTON_GAP), 0)
+        button:SetSize(buttonWidth, 25)
+        button:SetText(tostring(stepValue))
+        button.stepValue = stepValue
+        button:SetScript(
+            "OnClick",
+            function()
+                PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+                private.Core.Timeline.SetStepValue(stepValue)
+            end
+        )
+        UIUtils.ApplyPlateSlicing(button.Background, button.SelectedGlow, button.Highlight)
+    end
+    UIUtils.ReleaseFramesAbove(self.zoomButtons, #steps)
 end
 
 -- -------------------------
@@ -657,19 +723,20 @@ function TimelineMixin:OnMouseWheel(value)
     end
 end
 
+-- Light the zoom button of the current step; the name is kept from the readout it replaced
 function TimelineMixin:UpdateZoomLevelIndicator(stepValue)
-    if not self.ZoomLevelIndicator or not self.ZoomLevelIndicator.Text then
-        return
+    for _, button in ipairs(self.zoomButtons or {}) do
+        local selected = button.stepValue == stepValue
+        button.SelectedGlow:SetShown(selected)
+        local fontString = button:GetFontString()
+        if fontString then
+            if selected then
+                fontString:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
+            else
+                fontString:SetTextColor(HIGHLIGHT_FONT_COLOR:GetRGB())
+            end
+        end
     end
-
-    local displayText = ""
-    if stepValue then
-        displayText = tostring(stepValue) .. Locale["years"]
-    else
-        displayText = "?" .. Locale["years"]
-    end
-
-    self.ZoomLevelIndicator.Text:SetText(displayText)
 end
 
 -- -------------------------

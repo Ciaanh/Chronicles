@@ -583,6 +583,7 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 			local success, bookContent = pcall(private.Core.Events.TransformEventToBook, event)
 			if success and bookContent then
 				eventBook:OnContentReceived(bookContent)
+				self:UpdateEventFooterLinks(eventBook, event)
 				return
 			end
 		end
@@ -592,6 +593,38 @@ function MainFrameUIMixin:UpdateEventBookContent(eventSelection)
 		Locale["BookEmptyPromptEvent"],
 		formatEmptyBookFrontMatter(railEntryCount(self.TabUI.Events.EventList))
 	)
+end
+
+--[[
+    Fill the previous/next links at the foot of an event's left page
+
+    The neighbours in reading order: the same ordered list the rail and the timeline are built from. A
+    click opens the neighbour through Navigation, so it lands in the history and moves the timeline when
+    the neighbour sits in another period.
+]]
+function MainFrameUIMixin:UpdateEventFooterLinks(eventBook, event)
+	local HTMLBuilder = private.Core.Utils.HTMLBuilder
+	local FrontMatter = private.Core.Utils.FrontMatter
+	if not eventBook.SetFooterLinks or not HTMLBuilder or not FrontMatter then
+		return
+	end
+
+	local previous, nextEvent = FrontMatter.FindEventNeighbours(HTMLBuilder.GetOrderedEvents(), event)
+
+	local function toLink(neighbour, formatKey)
+		if not neighbour then
+			return nil
+		end
+		return {
+			title = string.format(Locale[formatKey], neighbour.label or ""),
+			subtitle = HTMLBuilder.GetDateRangeText(neighbour.yearStart, neighbour.yearEnd),
+			onClick = function()
+				private.Core.Navigation.Open("event", neighbour.id, neighbour.source)
+			end
+		}
+	end
+
+	eventBook:SetFooterLinks(toLink(previous, "BOOK_FRONT_PREVIOUS"), toLink(nextEvent, "BOOK_FRONT_NEXT"))
 end
 
 function MainFrameUIMixin:UpdateCharacterBookContent(characterSelection)
@@ -726,7 +759,14 @@ function TabUIMixin:MoveTabSystemToDragStrip()
 	self.TabSystem:SetParent(dragStrip)
 	self.TabSystem:SetFrameLevel(dragStrip:GetFrameLevel() + 10)
 	self.TabSystem:ClearAllPoints()
-	self.TabSystem:SetPoint("LEFT", dragStrip, "LEFT", Spacing.md, 0)
+
+	-- After the window's name when there is one
+	if dragStrip.Brand then
+		dragStrip.Brand:SetText(string.upper(Locale["Chronicles"] == true and "Chronicles" or Locale["Chronicles"]))
+		self.TabSystem:SetPoint("LEFT", dragStrip.Brand, "RIGHT", Spacing.lg, 0)
+	else
+		self.TabSystem:SetPoint("LEFT", dragStrip, "LEFT", Spacing.md, 0)
+	end
 end
 
 function TabUIMixin:UpdateTabs()

@@ -492,7 +492,8 @@ T.describe("HTMLBuilder related events", function()
         private.constants.config.futur = nil
     end
 
-    T.it("links an event to the events before and after it", function()
+    T.it("keeps an event's previous and next out of the page HTML", function()
+        -- They are buttons at the foot of the left page now (BookContainerMixin:SetFooterLinks)
         installEvents()
         local frontMatter =
             HTMLBuilder.CreateEntityHTML(
@@ -500,10 +501,7 @@ T.describe("HTMLBuilder related events", function()
         ).documents[1]
         uninstallEvents()
 
-        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:3"', 1, true), "previous")
-        assert_.isNotNil(string.find(frontMatter, "Banishment of the Frostwolves", 1, true))
-        assert_.isNotNil(string.find(frontMatter, 'href="chronicles:event:Greatwars:4"', 1, true), "next")
-        assert_.isNotNil(string.find(frontMatter, '<p align="right">', 1, true), "next sits on the right")
+        assert_.isNil(string.find(frontMatter, "chronicles:event:", 1, true))
     end)
 
     T.it("lists the events a character appears in, as links", function()
@@ -523,5 +521,43 @@ T.describe("HTMLBuilder related events", function()
             HTMLBuilder.CreateEntityHTML({kind = "character", id = 7, source = "Greatwars", name = "Thrall", chapters = {}}).documents[1]
 
         assert_.isNil(string.find(frontMatter, "chronicles:event", 1, true))
+    end)
+end)
+
+T.describe("HTMLBuilder layout of the spread", function()
+    T.it("puts no chapter header over a single untitled chapter", function()
+        local result =
+            HTMLBuilder.CreateEntityHTML({id = 1, label = "Birth of Thrall", source = "Greatwars", chapters = {{pages = {"prose"}}}})
+
+        assert_.isNil(string.find(result.documents[2], "Chapter 1", 1, true))
+        assert_.isNotNil(string.find(result.documents[2], "prose", 1, true))
+    end)
+
+    T.it("still numbers the chapters of a book that has several", function()
+        local result =
+            HTMLBuilder.CreateEntityHTML(
+            {id = 1, label = "Long", source = "Greatwars", chapters = {{pages = {"one"}}, {pages = {"two"}}}}
+        )
+
+        assert_.isNotNil(string.find(result.documents[2], "Chapter 1", 1, true))
+    end)
+
+    T.it("lists characters before factions, under capital headings", function()
+        private.Chronicles = {
+            Data = {
+                FindCharacterByIdAndCollection = function(_, id) return {id = id, name = "Thrall"} end,
+                FindFactionByIdAndCollection = function(_, id) return {id = id, name = "Frostwolf Clan"} end,
+                GetCollectionsNames = function() return {{name = "Greatwars", isActive = true}} end
+            }
+        }
+        local frontMatter =
+            HTMLBuilder.CreateEntityHTML(
+            {id = 1, label = "Birth", source = "Greatwars", characters = {["greatwars"] = {7}}, factions = {["greatwars"] = {3}}, chapters = {}}
+        ).documents[1]
+
+        local characters = string.find(frontMatter, "BOOK_FRONT_CHARACTERS", 1, true)
+        local factions = string.find(frontMatter, "BOOK_FRONT_FACTIONS", 1, true)
+        assert_.isTrue(characters < factions, "characters first")
+        assert_.isNotNil(string.find(frontMatter, "<br/><h2>|cff4a3218BOOK_FRONT_CHARACTERS|r</h2>", 1, true))
     end)
 end)

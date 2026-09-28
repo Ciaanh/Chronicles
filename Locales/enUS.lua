@@ -25,9 +25,15 @@ if L then
     L["TimelineChooseEra"] = "Choose an era..."
     L["TimelineNoEras"] = "No era in the enabled collections"
     L["TimelineEraEntry"] = "Year %d  -  %s"
+    L["TimelineYearZeroNote"] = "Year 0 = the Dark Portal opens"
+    L["TimelineDensityLegendTitle"] = "Events per period"
+    L["TimelineDensityLegendRange"] = "%d-%d"
 
     -- Period breakdown above the event rail
     L["EventListTypeAll"] = "All"
+    L["EventListPeriodYear"] = "Year %s"
+    L["EventListPeriodYears"] = "Year %s to %s"
+    L["EventListPeriodSpan"] = "%s to %s"
     L["EventListTypeChip"] = "%s %d"
     L["EventListBucketYear"] = "Year %d"
     L["EventListBucketYears"] = "Years %d to %d"

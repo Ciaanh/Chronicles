@@ -10,13 +10,13 @@
         Events tab used to carry its own near-identical EventListItemTemplate at a different height
         with no hover and no selection; templateKeys.EVENT_DESCRIPTION now points here too.
 
-        88 high, not 120: the art inside is 64, so 88 centres it with 12 of breathing room above and
-        below and fits 7 bookmarks in the rail's 640 instead of 5. The height is declared twice, here
-        and as SetElementExtent(88) in the two list mixins, because a linear scroll view sizes rows
-        from the extent and never reads the template's Size.
+        64 high, the bookmark art's own height: the rows sit 4 apart (the view's spacing) like the
+        validated board, instead of 88 with 12 of empty band above and below each. The height is also
+        set in the two list mixins (ROW_EXTENT), because a linear scroll view sizes rows from the
+        extent it is given and never reads the template's Size.
     -->
     <Button name="VerticalListItemTemplate" mixin="VerticalListItemMixin" virtual="true">
-        <Size x="150" y="88"/>
+        <Size x="150" y="64"/>
         <Layers>
             <Layer level="BACKGROUND">
                 <!-- Bookmark side texture: fixed 45x64 art, pinned to the left edge -->

@@ -252,6 +252,24 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
     private.Core.Timeline.DisplayTimelineWindow()
 end
 
+--[[
+    Jump straight to a zoom step, for the Navigator's step buttons
+
+    @param stepValue [number] One of config.stepValues; anything else is ignored
+]]
+function private.Core.Timeline.SetStepValue(stepValue)
+    if not isConfiguredStepValue(stepValue) or stepValue == getCurrentStepValue() then
+        return
+    end
+
+    setCurrentStepValue(stepValue, "Timeline step chosen in the navigator")
+
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.MaintainSelectedYear()
+
+    private.Core.Timeline.DisplayTimelineWindow()
+end
+
 function private.Core.Timeline.MaintainSelectedYear()
     local selectedYear = getSelectedYear()
 
