@@ -166,7 +166,7 @@ required fields it never receives, and the schemas are now enforced (see C6).
 
 **C6. Event Schema `required` Fields are Never Enforced** -- **resolved.** `required` is checked at
 trigger time, including for the dynamic `DisplayTimelineLabel<n>` / `DisplayTimelinePeriod<n>` names,
-which resolve to their base schema. `Tests/specs/EventManager_spec.lua` covers it.
+which resolve to their base schema. `tests/specs/EventManager_spec.lua` covers it.
 This mattered more than the report implied: the timeline's paging handlers took `(isVisible)` while
 the trigger sent `{visible = true}`, so both arrows were permanently disabled. Enforcement is what
 makes that class of mismatch visible.

@@ -2,16 +2,16 @@
     Test runner for the Chronicles addon test suite.
 
     Usage (from anywhere; paths resolve relative to this script):
-        lua Tests/run_tests.lua
+        lua tests/run_tests.lua      (or ./tests/run.sh, which adds the luac syntax gate)
 
     Loads the framework and WoW stubs, then executes every spec under
-    Tests/specs/. Exits non-zero if any test fails so CI can gate on it.
+    tests/specs/. Exits non-zero if any test fails so CI can gate on it.
 ]]
 
 local scriptDir = (arg and arg[0] and arg[0]:match("^(.*[/\\])")) or "./"
 local sep = package.config:sub(1, 1)
 
--- Make Tests/ requireable and expose framework + harness to specs as globals.
+-- Make tests/ requireable and expose framework + harness to specs as globals.
 local framework = dofile(scriptDir .. "framework.lua")
 local harness = dofile(scriptDir .. "harness.lua")
 dofile(scriptDir .. "wow_stubs.lua")

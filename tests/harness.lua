@@ -9,7 +9,7 @@
 
 local harness = {}
 
--- Repo root is the parent of the Tests/ directory that holds this file.
+-- Repo root is the parent of the tests/ directory that holds this file.
 local scriptDir = (arg and arg[0] and arg[0]:match("^(.*[/\\])")) or "./"
 harness.repoRoot = scriptDir .. ".." .. package.config:sub(1, 1)
 

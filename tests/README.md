@@ -13,13 +13,17 @@ table or string manipulation over stubs is in reach even when it lives in `UI/`.
 
 ## Running
 
-From the repo root (or anywhere; paths resolve relative to the runner):
+From the repo root:
 
 ```sh
-lua Tests/run_tests.lua
+./tests/run.sh                # luac -p over every addon Lua file outside Libs/, then the suite
 ```
 
-Exit code is non-zero if any test fails, so CI can gate on it.
+`LUA=` / `LUAC=` override the interpreter paths (the defaults are Windows'). The suite alone runs
+from anywhere, since its paths resolve relative to the runner: `lua tests/run_tests.lua`.
+
+Exit code is non-zero if any check or test fails; `.github/workflows/tests.yml` runs `tests/run.sh`
+on every push to `main`, every pull request and before a release.
 
 Or through the workspace harness, which finds the interpreter itself:
 
@@ -66,7 +70,7 @@ Six specs, run in the order listed in `run_tests.lua`:
 
 ## Adding a spec
 
-1. Create `Tests/specs/MyModule_spec.lua`.
+1. Create `tests/specs/MyModule_spec.lua`.
 2. Pull the globals the runner injects: `local T, H = _G.T, _G.H`.
 3. Build a `private` with `H.newPrivate()`, stub any dependencies, then
    `H.loadModule("Core/.../MyModule.lua", private)`.

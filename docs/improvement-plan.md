@@ -13,8 +13,8 @@ branch are recorded at the bottom; everything above is remaining work, in sugges
 ## Phase 2: Testability — **done**
 
 ### 2.1 Stand up a standalone Lua test harness — **done**
-- Delivered as `Tests/framework.lua`, `Tests/harness.lua`, `Tests/wow_stubs.lua` and
-  `Tests/run_tests.lua`. `harness.loadModule` reproduces the
+- Delivered as `tests/framework.lua`, `tests/harness.lua`, `tests/wow_stubs.lua` and
+  `tests/run_tests.lua`. `harness.loadModule` reproduces the
   `local FOLDER_NAME, private = ...` vararg bootstrap exactly as the client does, and
   `wow_stubs.lua` supplies the WoW globals.
 - Specs cover `TableUtils`, `StringUtils`, `ValidationUtils`, `TimelineBusiness`, `StateManager`
@@ -35,9 +35,9 @@ branch are recorded at the bottom; everything above is remaining work, in sugges
   pagination including the last-page clamp.
 
 ### 2.3 Wire tests into GitHub Actions — **done**
-- `.github/workflows/ci.yml` installs Lua 5.1 via `leafo/gh-actions-lua`, runs `luac -p` over every
-  addon Lua file outside `Libs/`, then `lua Tests/run_tests.lua`. Triggers on pushes to `main` and on
-  every pull request — so work on this branch has not been exercised by it yet.
+- `.github/workflows/tests.yml` (shared with the author's other addons) installs Lua 5.1, runs
+  `luac -p` over every tracked Lua file outside `Libs/`, then `./tests/run.sh`. Triggers on pushes
+  to `main`, on every pull request, and before every release. (It replaced the original `ci.yml`.)
 - The same two gates run locally through `./tools/harness.ps1 check` and `./tools/harness.ps1 test`.
 
 ---
