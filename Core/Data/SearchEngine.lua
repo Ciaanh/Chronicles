@@ -267,43 +267,6 @@ function SearchEngine.matchesFactionSearch(faction, searchTerm)
 end
 
 --[[
-    Find factions by their IDs across collections
-    @param ids [table] Table mapping collection names to arrays of faction IDs
-    @return [table] Array of found factions
-]]
-function SearchEngine.findFactions(ids)
-    local foundFactions = {}
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
-        return foundFactions
-    end
-
-    for collectionName, factionIds in pairs(ids) do
-        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
-
-        if isCollectionActive then
-            local factionsGroup = chronicles.Data.Factions[collectionName]
-
-            if factionsGroup and factionsGroup.data and #factionsGroup.data > 0 then
-                for _, faction in pairs(factionsGroup.data) do
-                    for _, targetId in ipairs(factionIds) do
-                        if faction.id == targetId then
-                            local cleanFaction = SearchEngine.cleanFactionObject(faction, collectionName)
-                            if cleanFaction then
-                                table.insert(foundFactions, cleanFaction)
-                            end
-                            break
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    return foundFactions
-end
-
---[[
     Clean and format a faction object for consumption
     @param faction [table] Raw faction object
     @param collectionName [string] Source collection name
@@ -416,43 +379,6 @@ function SearchEngine.matchesCharacterSearch(character, searchTerm)
 end
 
 --[[
-    Find characters by their IDs across collections
-    @param ids [table] Table mapping collection names to arrays of character IDs
-    @return [table] Array of found characters
-]]
-function SearchEngine.findCharacters(ids)
-    local foundCharacters = {}
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
-        return foundCharacters
-    end
-
-    for collectionName, characterIds in pairs(ids) do
-        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
-
-        if isCollectionActive then
-            local charactersGroup = chronicles.Data.Characters[collectionName]
-
-            if charactersGroup and charactersGroup.data and #charactersGroup.data > 0 then
-                for _, character in pairs(charactersGroup.data) do
-                    for _, targetId in ipairs(characterIds) do
-                        if character.id == targetId then
-                            local cleanCharacter = SearchEngine.cleanCharacterObject(character, collectionName)
-                            if cleanCharacter then
-                                table.insert(foundCharacters, cleanCharacter)
-                            end
-                            break
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    return foundCharacters
-end
-
---[[
     Clean and format a character object for consumption
     @param character [table] Raw character object
     @param collectionName [string] Source collection name
@@ -474,63 +400,6 @@ function SearchEngine.cleanCharacterObject(character, collectionName)
         image = character.image,
         source = collectionName
     }
-end
-
--- -------------------------
--- Utility Functions
--- -------------------------
-
---[[
-    Check if there are any events in the specified year range
-    @param yearStart [integer] Start year of range
-    @param yearEnd [integer] End year of range
-    @return [boolean] True if events exist in range
-]]
-function SearchEngine.hasEvents(yearStart, yearEnd)
-    if yearStart > yearEnd then
-        return false
-    end
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data then
-        return false
-    end
-
-    for collectionName, eventsGroup in pairs(chronicles.Data.Events) do
-        local isCollectionActive = chronicles.Data:GetCollectionStatus(collectionName)
-
-        if isCollectionActive and eventsGroup and eventsGroup.data then
-            if SearchEngine.hasEventsInDB(yearStart, yearEnd, eventsGroup.data) then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
---[[
-    Check if there are any events in a specific database within the year range
-    @param yearStart [integer] Start year of range
-    @param yearEnd [integer] End year of range
-    @param db [table] Database to check
-    @return [boolean] True if events exist in range
-]]
-function SearchEngine.hasEventsInDB(yearStart, yearEnd, db)
-    if not db then
-        return false
-    end
-    for _, event in pairs(db) do
-        if event then
-            local isEventTypeActive =
-                private.Core.Utils.HelperUtils.getChronicles().Data:GetEventTypeStatus(event.eventType)
-
-            if isEventTypeActive and SearchEngine.isEventInRange(event, yearStart, yearEnd) then
-                return true
-            end
-        end
-    end
-
-    return false
 end
 
 -- -------------------------

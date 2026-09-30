@@ -14,7 +14,7 @@ manual-changelog: CHANGELOG.md
 # (.github, .vscode, .copilot-instructions.md, ...) are skipped by the packager on its own.
 ignore:
     - Art/Raw
-    - Tests
+    - tests
     - docs
     - refs
     - TODO

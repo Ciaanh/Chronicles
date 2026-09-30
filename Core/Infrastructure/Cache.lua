@@ -50,7 +50,8 @@ local CACHE_KEYS = {
     COLLECTIONS_NAMES = "collectionsNames",
     FILTERED_EVENTS = "filteredEventResults", -- Cache for filtered event search results with yearStart_yearEnd keys
     ALL_CHARACTERS = "allCharacters", -- Cache for all characters from all data sources
-    FILTERED_CHARACTERS = "filteredCharacterResults" -- Cache for filtered character search results with search term keys
+    FILTERED_CHARACTERS = "filteredCharacterResults", -- Cache for filtered character search results with search term keys
+    BOOK_CONTENT = "bookContent" -- Cache for generated HTML book payloads keyed by entity signatures
 }
 
 -- Export cache keys for use by other modules immediately
@@ -70,7 +71,8 @@ local Cache = {
         [CACHE_KEYS.COLLECTIONS_NAMES] = nil,
         [CACHE_KEYS.FILTERED_EVENTS] = {}, -- Cache for filtered event results with yearStart_yearEnd keys
         [CACHE_KEYS.ALL_CHARACTERS] = nil, -- Cache for all characters from all data sources
-        [CACHE_KEYS.FILTERED_CHARACTERS] = {} -- Cache for filtered character search results with search term keys
+        [CACHE_KEYS.FILTERED_CHARACTERS] = {}, -- Cache for filtered character search results with search term keys
+        [CACHE_KEYS.BOOK_CONTENT] = {} -- Cache for generated HTML book payloads keyed by entity signatures
     },
     _dirty = {
         [CACHE_KEYS.PERIODS_FILLING] = true,
@@ -79,9 +81,119 @@ local Cache = {
         [CACHE_KEYS.COLLECTIONS_NAMES] = true,
         [CACHE_KEYS.FILTERED_EVENTS] = true,
         [CACHE_KEYS.ALL_CHARACTERS] = true,
-        [CACHE_KEYS.FILTERED_CHARACTERS] = true
+        [CACHE_KEYS.FILTERED_CHARACTERS] = true,
+        [CACHE_KEYS.BOOK_CONTENT] = true
     }
 }
+
+Cache._lastWarmError = nil
+
+local WARM_TASK_INTERVAL_DEFAULT = 0.05
+local warmQueue = {}
+local warmTaskInterval = WARM_TASK_INTERVAL_DEFAULT
+local isWarmQueueActive = false
+
+local function processWarmQueue()
+    if #warmQueue == 0 then
+        isWarmQueueActive = false
+        return
+    end
+
+    local task = table.remove(warmQueue, 1)
+    local ok, err = pcall(task)
+    if not ok then
+        Cache._lastWarmError = err
+        geterrorhandler()(err)
+    end
+
+    if #warmQueue > 0 then
+        C_Timer.After(warmTaskInterval, processWarmQueue)
+    else
+        isWarmQueueActive = false
+    end
+end
+
+local function enqueueWarmTasks(tasks, interval)
+    if not tasks or #tasks == 0 then
+        return
+    end
+
+    if not isWarmQueueActive then
+        warmTaskInterval = interval or WARM_TASK_INTERVAL_DEFAULT
+    end
+
+    for _, task in ipairs(tasks) do
+        warmQueue[#warmQueue + 1] = task
+    end
+
+    if not isWarmQueueActive then
+        isWarmQueueActive = true
+        processWarmQueue()
+    end
+end
+
+local function buildWarmTaskList()
+    local tasks = {}
+
+    if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getPeriodsFillingBySteps()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.MIN_EVENT_YEAR] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getMinEventYear()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.MAX_EVENT_YEAR] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getMaxEventYear()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.COLLECTIONS_NAMES] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getCollectionsNames()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.ALL_CHARACTERS] then
+        table.insert(
+            tasks,
+            function()
+                private.Core.Cache.getAllCharacters()
+            end
+        )
+    end
+    if Cache._dirty[CACHE_KEYS.BOOK_CONTENT] then
+        table.insert(
+            tasks,
+            function()
+                Cache._data[CACHE_KEYS.BOOK_CONTENT] = {}
+                Cache._dirty[CACHE_KEYS.BOOK_CONTENT] = false
+            end
+        )
+    end
+
+    table.insert(
+        tasks,
+        function()
+            private.Core.Cache.preWarmSearchCache()
+        end
+    )
+
+    return tasks
+end
 
 -- -------------------------
 -- Core Cache Management Functions
@@ -94,6 +206,8 @@ function private.Core.Cache.invalidate(cacheType)
             Cache._data[CACHE_KEYS.FILTERED_EVENTS] = {}
         elseif cacheType == CACHE_KEYS.FILTERED_CHARACTERS then
             Cache._data[CACHE_KEYS.FILTERED_CHARACTERS] = {}
+        elseif cacheType == CACHE_KEYS.BOOK_CONTENT then
+            Cache._data[CACHE_KEYS.BOOK_CONTENT] = {}
         else
             Cache._data[cacheType] = nil
         end
@@ -108,8 +222,60 @@ function private.Core.Cache.invalidate(cacheType)
             [CACHE_KEYS.COLLECTIONS_NAMES] = nil,
             [CACHE_KEYS.FILTERED_EVENTS] = {},
             [CACHE_KEYS.ALL_CHARACTERS] = nil,
-            [CACHE_KEYS.FILTERED_CHARACTERS] = {}
+            [CACHE_KEYS.FILTERED_CHARACTERS] = {},
+            [CACHE_KEYS.BOOK_CONTENT] = {}
         }
+    end
+end
+
+-- The complete set of derived caches that each kind of data change makes stale.
+-- COLLECTIONS_NAMES and BOOK_CONTENT are listed under all three kinds because
+-- registering any collection adds a name, and any record can appear in a book.
+local DATA_CHANGE_KEYS = {
+    events = {
+        CACHE_KEYS.PERIODS_FILLING,
+        CACHE_KEYS.MIN_EVENT_YEAR,
+        CACHE_KEYS.MAX_EVENT_YEAR,
+        CACHE_KEYS.FILTERED_EVENTS,
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    },
+    characters = {
+        CACHE_KEYS.ALL_CHARACTERS,
+        CACHE_KEYS.FILTERED_CHARACTERS,
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    },
+    factions = {
+        CACHE_KEYS.COLLECTIONS_NAMES,
+        CACHE_KEYS.BOOK_CONTENT
+    }
+}
+
+--[[
+    Invalidate every cache derived from one kind of data change.
+
+    This is the only supported way to invalidate after a mutation or a toggle:
+    the character caches embed the active collection set at build time, so a
+    call site that hand-picks keys leaves rails rendering disabled collections.
+
+    @param kind [string] "events", "characters", "factions", or "all" for a
+                         change that crosses all three (collection enable
+                         /disable)
+]]
+function private.Core.Cache.invalidateForDataChange(kind)
+    if kind == "all" then
+        private.Core.Cache.invalidate()
+        return
+    end
+
+    local keys = DATA_CHANGE_KEYS[kind]
+    if not keys then
+        error("Cache.invalidateForDataChange: unknown data change kind: " .. tostring(kind))
+    end
+
+    for _, cacheType in ipairs(keys) do
+        private.Core.Cache.invalidate(cacheType)
     end
 end
 
@@ -119,6 +285,8 @@ function private.Core.Cache.isValid(cacheType, cacheKey)
     elseif cacheType == CACHE_KEYS.FILTERED_CHARACTERS then
         return not Cache._dirty[CACHE_KEYS.FILTERED_CHARACTERS] and
             Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey] ~= nil
+    elseif cacheType == CACHE_KEYS.BOOK_CONTENT then
+        return not Cache._dirty[CACHE_KEYS.BOOK_CONTENT] and Cache._data[CACHE_KEYS.BOOK_CONTENT][cacheKey] ~= nil
     else
         return not Cache._dirty[cacheType] and Cache._data[cacheType] ~= nil
     end
@@ -132,6 +300,8 @@ function private.Core.Cache.get(cacheType, cacheKey)
             return Cache._data[CACHE_KEYS.FILTERED_EVENTS][cacheKey]
         elseif cacheType == CACHE_KEYS.FILTERED_CHARACTERS then
             return Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey]
+        elseif cacheType == CACHE_KEYS.BOOK_CONTENT then
+            return Cache._data[CACHE_KEYS.BOOK_CONTENT][cacheKey]
         else
             return Cache._data[cacheType]
         end
@@ -165,6 +335,9 @@ function private.Core.Cache.set(cacheType, value, cacheKey)
         end
         Cache._data[CACHE_KEYS.FILTERED_CHARACTERS][cacheKey] = value
         Cache._dirty[CACHE_KEYS.FILTERED_CHARACTERS] = false
+    elseif cacheType == CACHE_KEYS.BOOK_CONTENT then
+        Cache._data[CACHE_KEYS.BOOK_CONTENT][cacheKey] = value
+        Cache._dirty[CACHE_KEYS.BOOK_CONTENT] = false
     else
         Cache._data[cacheType] = value
         Cache._dirty[cacheType] = false
@@ -177,7 +350,7 @@ end
 
 function private.Core.Cache.getPeriodsFillingBySteps()
     local cached = private.Core.Cache.get(CACHE_KEYS.PERIODS_FILLING)
-    if cached then
+    if cached ~= nil then
         return cached
     end
     local result = Chronicles.Data:GetPeriodsFillingBySteps()
@@ -187,9 +360,14 @@ end
 
 function private.Core.Cache.getMinEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MIN_EVENT_YEAR)
-    if cached then
+    if cached ~= nil then
         return cached
     end
+
+    if not Chronicles or not Chronicles.Data or not Chronicles.Data.MinEventYear then
+        return nil
+    end
+
     local result = Chronicles.Data:MinEventYear()
     private.Core.Cache.set(CACHE_KEYS.MIN_EVENT_YEAR, result)
     return result
@@ -197,9 +375,14 @@ end
 
 function private.Core.Cache.getMaxEventYear()
     local cached = private.Core.Cache.get(CACHE_KEYS.MAX_EVENT_YEAR)
-    if cached then
+    if cached ~= nil then
         return cached
     end
+
+    if not Chronicles or not Chronicles.Data or not Chronicles.Data.MaxEventYear then
+        return nil
+    end
+
     local result = Chronicles.Data:MaxEventYear()
     private.Core.Cache.set(CACHE_KEYS.MAX_EVENT_YEAR, result)
     return result
@@ -207,7 +390,7 @@ end
 
 function private.Core.Cache.getCollectionsNames()
     local cached = private.Core.Cache.get(CACHE_KEYS.COLLECTIONS_NAMES)
-    if cached then
+    if cached ~= nil then
         return cached
     end
     local result = Chronicles.Data:GetCollectionsNames()
@@ -221,7 +404,7 @@ function private.Core.Cache.getSearchEvents(yearStart, yearEnd)
     end
     local cacheKey = yearStart .. "_" .. yearEnd
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_EVENTS, cacheKey)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -232,7 +415,7 @@ end
 
 function private.Core.Cache.getAllCharacters()
     local cached = private.Core.Cache.get(CACHE_KEYS.ALL_CHARACTERS)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -252,7 +435,7 @@ function private.Core.Cache.getSearchCharacters(searchTerm)
 
     local cacheKey = string.lower(searchTerm)
     local cached = private.Core.Cache.get(CACHE_KEYS.FILTERED_CHARACTERS, cacheKey)
-    if cached then
+    if cached ~= nil then
         return cached
     end
 
@@ -319,24 +502,22 @@ function private.Core.Cache.preWarmSearchCache()
     end
 end
 
-function private.Core.Cache.warmAllCaches()
-    if Cache._dirty[CACHE_KEYS.PERIODS_FILLING] then
-        private.Core.Cache.getPeriodsFillingBySteps()
-    end
-    if Cache._dirty[CACHE_KEYS.MIN_EVENT_YEAR] then
-        private.Core.Cache.getMinEventYear()
-    end
-    if Cache._dirty[CACHE_KEYS.MAX_EVENT_YEAR] then
-        private.Core.Cache.getMaxEventYear()
-    end
-    if Cache._dirty[CACHE_KEYS.COLLECTIONS_NAMES] then
-        private.Core.Cache.getCollectionsNames()
-    end
-    if Cache._dirty[CACHE_KEYS.ALL_CHARACTERS] then
-        private.Core.Cache.getAllCharacters()
+function private.Core.Cache.warmAllCaches(options)
+    options = options or {}
+    local tasks = buildWarmTaskList()
+
+    if #tasks == 0 then
+        return
     end
 
-    private.Core.Cache.preWarmSearchCache()
+    if options.async then
+        Cache._lastWarmError = nil
+        enqueueWarmTasks(tasks, options.interval)
+    else
+        for _, task in ipairs(tasks) do
+            task()
+        end
+    end
 end
 
 function private.Core.Cache.clearAll()
@@ -358,7 +539,7 @@ function private.Core.Cache.init()
     C_Timer.After(
         1.0,
         function()
-            private.Core.Cache.warmAllCaches()
+            private.Core.Cache.warmAllCaches({async = true})
         end
     )
 end
@@ -367,8 +548,20 @@ function private.Core.Cache.cleanup()
     private.Core.Cache.clearAll()
 end
 
+function private.Core.Cache.getBookContent(cacheKey)
+    return private.Core.Cache.get(CACHE_KEYS.BOOK_CONTENT, cacheKey)
+end
+
+function private.Core.Cache.setBookContent(cacheKey, value)
+    private.Core.Cache.set(CACHE_KEYS.BOOK_CONTENT, value, cacheKey)
+end
+
 -- -------------------------
 -- Export Cache Interface
 -- -------------------------
 
+-- This publishes the *whole* module on the public facade, so every function above is reachable by
+-- external addons even when nothing in Chronicles calls it. `cleanup`, `rebuildAll` and
+-- `getSearchCharacters` currently have no internal callers for exactly that reason -- they are API,
+-- not dead code. Removing one is a breaking change; check consumers before pruning here.
 Chronicles.Cache = private.Core.Cache

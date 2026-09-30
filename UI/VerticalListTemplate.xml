@@ -1,0 +1,195 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+
+    <Script file="VerticalListTemplate.lua" />
+
+    <!--
+        Shared Vertical List Item Template
+
+        The one row template in the addon: Events, Characters and Factions all render this. The
+        Events tab used to carry its own near-identical EventListItemTemplate at a different height
+        with no hover and no selection; templateKeys.EVENT_DESCRIPTION now points here too.
+
+        64 high, the bookmark art's own height: the rows sit 4 apart (the view's spacing) like the
+        validated board, instead of 88 with 12 of empty band above and below each. The height is also
+        set in the two list mixins (ROW_EXTENT), because a linear scroll view sizes rows from the
+        extent it is given and never reads the template's Size.
+    -->
+    <Button name="VerticalListItemTemplate" mixin="VerticalListItemMixin" virtual="true">
+        <Size x="150" y="64"/>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <!-- Bookmark side texture: fixed 45x64 art, pinned to the left edge -->
+                <Texture parentKey="Side" file="Interface\AddOns\Chronicles\Art\Bookmark-side">
+                    <Size x="45" y="64"/>
+                    <Anchors>
+                        <Anchor point="LEFT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+
+                <!--
+                    Bookmark content texture: spans from the side art to the row's right edge rather
+                    than carrying a fixed 105 width. A linear scroll view stretches each row to the
+                    scroll box width, so a fixed-width strip anchored RIGHT would leave a gap in the
+                    middle of the row at any rail width other than the original 150.
+                -->
+                <Texture parentKey="Content" file="Interface\AddOns\Chronicles\Art\Bookmark-content">
+                    <Size y="64"/>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.Side" relativePoint="RIGHT" x="0" y="0"/>
+                        <Anchor point="RIGHT" x="0" y="0"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
+            <!--
+                Selected state. The plumbing (OnClick to setState to subscribe to
+                SyncWithCurrentSelection to UpdateVisualSelection to SetSelected) has always been
+                there; SetSelected just had nothing to draw. An additive re-draw of the plate itself
+                lights the row without introducing a second art family, and it sits one sublevel
+                above Content so it reads as the same bookmark, brighter.
+            -->
+            <Layer level="BACKGROUND" textureSubLevel="1">
+                <!--
+                    0.45, not 0.35: an additive pass of the plate over itself adds a fraction of the
+                    plate's own brightness, and the plate's text band was darkened 20% for contrast with
+                    the white label. The same alpha over the darker art added visibly less, so the alpha
+                    carries the same 1.25 the darkening took away.
+                -->
+                <Texture parentKey="SelectedGlow" file="Interface\AddOns\Chronicles\Art\Bookmark-content"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content"/>
+                    </Anchors>
+                </Texture>
+                <!-- The same pass over the side art, so the whole bookmark lights, not only its body -->
+                <Texture parentKey="SelectedGlowSide" file="Interface\AddOns\Chronicles\Art\Bookmark-side"
+                         alphaMode="ADD" alpha="0.45" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Side"/>
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Side"/>
+                    </Anchors>
+                </Texture>
+            </Layer>
+
+            <Layer level="ARTWORK">
+                <!-- Item name text, centred in the 64 of art: 12 top, 12 bottom -->
+                <FontString parentKey="ItemName" inherits="ChroniclesFontFamily_Text_Shadow_Small" justifyH="CENTER" wordWrap="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativeKey="$parent.Content" x="10" y="-12" />
+                        <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Content" x="-10" y="12" />
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR" />
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick method="OnClick"/>
+            <OnEnter method="OnEnter"/>
+            <OnLeave method="OnLeave"/>
+        </Scripts>
+    </Button>
+
+    <!-- Shared Vertical List Template -->
+    <Frame name="VerticalListTemplate" mixin="VerticalListMixin" virtual="true">
+        <KeyValues>
+            <KeyValue key="layoutType" value="TooltipDefaultDarkLayout" type="string" />
+        </KeyValues>
+        <Frames>
+            <!-- Search box for filtering items -->
+            <EditBox parentKey="SearchBox" inherits="SearchBoxTemplate" autoFocus="false">
+                <Size y="20"/>
+                <Anchors>
+                    <!-- Spans the rail rather than a fixed 120, which no longer fits the 268 width -->
+                    <Anchor point="TOPLEFT" x="12" y="0"/>
+                    <Anchor point="TOPRIGHT" x="-12" y="0"/>
+                </Anchors>
+                <!--
+                    Blizzard's SearchBoxTemplate: the magnifier, the clear button and the grey
+                    instruction text every search field in the game has. InputBoxTemplate at 20 tall
+                    drew a thin bar with no affordance. PlaceholderText is kept as an alias of the
+                    template's Instructions so the mixins that set the placeholder did not change.
+                -->
+                <Scripts>
+                    <OnLoad>
+                        SearchBoxTemplate_OnLoad(self)
+                        self.PlaceholderText = self.Instructions
+                        if self:GetParent().InitializeSearchPlaceholder then
+                            self:GetParent():InitializeSearchPlaceholder()
+                        end
+                    </OnLoad>
+                    <OnTextChanged>
+                        SearchBoxTemplate_OnTextChanged(self)
+                        if self:GetParent().OnSearchTextChanged then
+                            self:GetParent():OnSearchTextChanged(self:GetText())
+                        end
+                    </OnTextChanged>
+                </Scripts>
+            </EditBox>
+
+            <!--
+                Scrolling item list on the modern ScrollBox: a WowScrollBoxList plus a
+                MinimalScrollBar, wired with a linear view in VerticalListMixin. Rows come from the
+                shared VerticalListItemTemplate via templateKeys.GENERIC_LIST_ITEM.
+            -->
+            <Frame parentKey="ItemList" inherits="WowScrollBoxList">
+                <Anchors>
+                    <!-- x left inset clears the scroll bar and leaves it a 4 margin off the rail edge:
+                         the bar hangs 8 outside this inset and is itself 8 wide, so 20 is the
+                         smallest inset that keeps it off the boundary.
+                         y clears the search box and count label -->
+                    <Anchor point="TOPLEFT" x="20" y="-44"/>
+                    <!-- right edge runs to the rail edge (under the book) so rows tuck in; y bottom-inset to the book page -->
+                    <Anchor point="BOTTOMRIGHT" x="0" y="50"/>
+                </Anchors>
+            </Frame>
+            <!-- Scroll bar on the outer (left) edge so nothing separates the list from the book -->
+            <EventFrame parentKey="ItemListScrollBar" inherits="MinimalScrollBar">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.ItemList" relativePoint="TOPLEFT" x="-4" y="-3"/>
+                    <Anchor point="BOTTOMRIGHT" relativeKey="$parent.ItemList" relativePoint="BOTTOMLEFT" x="-4" y="2"/>
+                </Anchors>
+            </EventFrame>
+        </Frames>
+        <Layers>
+            <Layer level="OVERLAY">
+                <!-- Item count label -->
+                <FontString parentKey="CountLabel" inherits="ChroniclesFontFamily_Text_Medium" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="12" y="-24"/> <!-- Spacing.md / -Spacing.xl -->
+                        <Anchor point="TOPRIGHT" x="-12" y="-24"/>
+                    </Anchors>
+                    <Color color="WHITE_FONT_COLOR"/>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Scripts>
+            <OnLoad method="OnLoad" />
+            <OnShow method="OnShow" />
+        </Scripts>
+    </Frame>    <!-- Specialized Character Vertical List Template -->
+
+    <Frame name="VerticalCharacterListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
+        <Scripts>
+            <OnLoad>
+                VerticalListMixin.OnLoad(self)
+                self:ConfigureForCharacters()
+                self:InitializeSearchPlaceholder()
+                self:RefreshItemList()
+            </OnLoad>
+        </Scripts>
+    </Frame>    <!-- Specialized Faction Vertical List Template -->
+    <Frame name="VerticalFactionListSharedTemplate" inherits="VerticalListTemplate" virtual="true">
+        <Scripts>
+            <OnLoad>
+                VerticalListMixin.OnLoad(self)
+                self:ConfigureForFactions()
+                self:InitializeSearchPlaceholder()
+                self:RefreshItemList()
+            </OnLoad>
+        </Scripts>
+    </Frame>
+
+</Ui>

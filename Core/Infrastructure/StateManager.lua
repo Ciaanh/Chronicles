@@ -49,30 +49,6 @@ USAGE EXAMPLES:
 ]]
 private.Core.StateManager = {}
 
--- Lazy initialization to avoid circular dependencies
-local stateManagerDependencies = {
-    chronicles = nil,
-    helperUtils = nil,
-    initialized = false
-}
-
--- Initialize dependencies safely
-local function initStateManagerDependencies()
-    if stateManagerDependencies.initialized then
-        return
-    end
-
-    if not stateManagerDependencies.helperUtils and private.Core.Utils and private.Core.Utils.HelperUtils then
-        stateManagerDependencies.helperUtils = private.Core.Utils.HelperUtils
-    end
-
-    if not stateManagerDependencies.chronicles and stateManagerDependencies.helperUtils then
-        stateManagerDependencies.chronicles = stateManagerDependencies.helperUtils.getChronicles()
-    end
-
-    stateManagerDependencies.initialized = true
-end
-
 -- Local state storage
 local stateStore = {}
 local subscribers = {}
@@ -87,9 +63,14 @@ local subscribers = {}
 --
 -- SUPPORTED KEY TYPES:
 -- • ui.selection: Entity selection state (ui.selectedEvent, ui.selectedCharacter, etc.)
--- • settings: Configuration state (eventTypes.{id}, collections.{name})
--- • collection: Collection status tracking (collections.{name})
--- • ui.state: General UI state (ui.activeTab, ui.isMainFrameOpen, ui.selectedPeriod, timeline.{id})
+-- • settings: Event type configuration state (eventTypes.{id})
+-- • collection: Collection status tracking (collections.{name}) -- the sole owner of the
+--   collections.* namespace; reach it through buildCollectionKey
+-- • userContent: In-session user content (data.userContent.{type})
+-- • ui.state: General UI state (ui.settingsCategory, ui.isMainFrameOpen, ui.selectedPeriod,
+--   ui.windowPosition, timeline.{id}). Note ui.settingsCategory is the Settings panel's own
+--   category, not the main frame's tab -- that one lives in Blizzard's TabSystemOwnerMixin and is
+--   not persisted at all.
 --
 -- KEY VALIDATION:
 -- • Input type checking for all parameters
@@ -109,7 +90,7 @@ local subscribers = {}
     naming conventions, validates inputs, and provides consistent error handling.
     
     @param keyType [string] Type of key: "ui.selection", "settings", "userContent", "collection", "ui.state"
-    @param entityType [string] Entity type: "event", "character", "faction", "eventType", "collection"
+    @param entityType [string] Entity type: "event", "character", "faction", "eventType", "collection", ...
     @param entityId [string|number] Entity identifier (optional for some key types)
     @param options [table] Additional options (reserved for future expansion)
     @return [string] Formatted state key
@@ -147,8 +128,6 @@ function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, 
     elseif keyType == "settings" then
         if entityType == "eventType" and sanitizedId then
             return "eventTypes." .. sanitizedId
-        elseif entityType == "collection" and sanitizedId then
-            return "collections." .. sanitizedId
         else
             error("StateManager.buildStateKey: Invalid entityType or missing entityId for settings: " .. entityType)
         end
@@ -165,7 +144,10 @@ function private.Core.StateManager.buildStateKey(keyType, entityType, entityId, 
             error("StateManager.buildStateKey: entityId required for collection key type")
         end
     elseif keyType == "ui.state" then
-        if entityType == "activeTab" or entityType == "isMainFrameOpen" or entityType == "selectedPeriod" then
+        if
+            entityType == "settingsCategory" or entityType == "isMainFrameOpen" or entityType == "selectedPeriod" or
+                entityType == "windowPosition"
+         then
             return "ui." .. entityType
         elseif entityType == "timeline" and sanitizedId then
             return "timeline." .. sanitizedId
@@ -211,8 +193,12 @@ function private.Core.StateManager.buildSelectionKey(entityType)
 end
 
 --[[
-    Build settings key for event types or collections
-    @param settingType [string] "eventType" or "collection"
+    Build settings key for event types
+
+    Collection status lives in the same settingsState store but is built through
+    buildCollectionKey, which is the only owner of the collections.* namespace.
+
+    @param settingType [string] "eventType"
     @param id [string|number] Setting identifier
     @return [string] Settings state key
 ]]
@@ -240,18 +226,29 @@ function private.Core.StateManager.buildUserContentKey(contentType)
     return private.Core.StateManager.buildStateKey("userContent", contentType)
 end
 
+-- Sub-paths of the structures init() creates under data.userContent.*
+local USER_CONTENT_SUB_PATHS = {
+    byId = true,
+    metadata = true,
+    index = true
+}
+
 --[[
     Build user content data key with subpath
     @param contentType [string] "events", "characters", or "factions"
-    @param subPath [string] Optional subpath like "byId", "metadata", "index"
+    @param subPath [string] Optional subpath: "byId", "metadata" or "index"
     @return [string] Full user content data key
+    @throws Error if subPath is not a known sub-path
 ]]
 function private.Core.StateManager.buildUserContentDataKey(contentType, subPath)
     local baseKey = private.Core.StateManager.buildUserContentKey(contentType)
-    if subPath and type(subPath) == "string" and subPath ~= "" then
-        return baseKey .. "." .. subPath
+    if subPath == nil then
+        return baseKey
     end
-    return baseKey
+    if not USER_CONTENT_SUB_PATHS[subPath] then
+        error("StateManager.buildUserContentDataKey: Unknown subPath: " .. tostring(subPath))
+    end
+    return baseKey .. "." .. subPath
 end
 
 --[[
@@ -286,14 +283,31 @@ function private.Core.StateManager.buildUIStateKey(stateType, subKey)
     end
 end
 
+-- The complete timeline.* namespace. Every key here persists to db.global.timelineState --
+-- persistState only exempts data.userContent.* -- so nothing written under timeline.* is "just for
+-- this session". That is why yearSpecificEvents was removed: it stored whole event records, putting
+-- the text of every year the user searched on disk. yearSpecificMode / yearSpecificTarget are only
+-- ever written, never read; the year-specific view is driven by the DisplayEventsForYear event.
+local TIMELINE_STATE_KEYS = {
+    currentStep = true,
+    currentPage = true,
+    selectedYear = true,
+    yearSpecificMode = true,
+    yearSpecificTarget = true
+}
+
 --[[
     Build timeline state key
-    @param timelineKey [string] Timeline state key like "currentStep", "currentPage", "selectedYear"
+    @param timelineKey [string] Timeline state key, one of TIMELINE_STATE_KEYS
     @return [string] Timeline state key
+    @throws Error if timelineKey is not a known timeline state key
 ]]
 function private.Core.StateManager.buildTimelineKey(timelineKey)
     if not timelineKey or type(timelineKey) ~= "string" or timelineKey == "" then
         error("StateManager.buildTimelineKey: timelineKey must be a non-empty string, got: " .. tostring(timelineKey))
+    end
+    if not TIMELINE_STATE_KEYS[timelineKey] then
+        error("StateManager.buildTimelineKey: Unknown timelineKey: " .. timelineKey)
     end
     return "timeline." .. timelineKey
 end
@@ -438,25 +452,33 @@ end
     
     This is the primary method for updating Chronicles state. It provides:
     • Automatic initialization if StateManager hasn't been set up yet
-    • Input validation with detailed error logging
+    • Input validation (returns false on invalid key)
     • Immediate persistence to AceDB storage
     • Change event notification to all subscribers
-    • Optional description for debugging and audit trails
-    
+    • Optional description passed through for audit/debugging context
+
     PERSISTENCE FLOW:
     1. Validate input parameters
     2. Store old value for change comparison
     3. Update in-memory state store
     4. Persist to appropriate AceDB storage location
     5. Notify subscribers with old and new values
-    6. Log the change with optional description
-    
+
+    UNCHANGED VALUES:
+    A write whose value equals the stored value neither persists nor notifies. Skipping
+    is the default because a SavedVariables write plus a full subscriber fan-out (each
+    subscriber can trigger UI refresh work) is not free, and most call sites write
+    idempotently. Pass { forceNotify = true } to wake subscribers with an unchanged
+    value anyway; rehydrate() is the purpose-built primitive for that.
+
     @param key [string] State key (should be built using buildStateKey functions)
     @param value [any] New state value (any JSON-serializable type)
     @param description [string] Optional description for logging and debugging
+    @param options [table] Optional behavior flags:
+        • forceNotify [boolean] Notify subscribers even when the value is unchanged
     @return [boolean] Success status (false indicates validation failure)
 ]]
-function private.Core.StateManager.setState(key, value, description)
+function private.Core.StateManager.setState(key, value, description, options)
     if not key then
         return false
     end
@@ -470,6 +492,14 @@ function private.Core.StateManager.setState(key, value, description)
     end
 
     local oldValue = stateStore[key]
+
+    if oldValue == value then
+        if options and options.forceNotify then
+            private.Core.StateManager.notifySubscribers(key, value, oldValue)
+        end
+        return true
+    end
+
     stateStore[key] = value
 
     private.Core.StateManager.persistState(key, value)
@@ -501,6 +531,33 @@ function private.Core.StateManager.getState(key)
     end
 
     return stateStore[key]
+end
+
+--[[
+    Re-emit the current value of a state key to its subscribers without
+    mutating or persisting it.
+
+    Used on addon startup to wake UI subscribers with state that was restored
+    from SavedVariables during init(), instead of writing each value back to
+    itself via setState just to trigger a notification (which also incurred a
+    redundant AceDB write). Subscribers receive newValue == oldValue, which
+    reads as "restored" rather than "changed".
+
+    @param key [string] State key to re-broadcast
+    @return [boolean] true if a value existed and subscribers were notified
+]]
+function private.Core.StateManager.rehydrate(key)
+    if type(key) ~= "string" or key == "" then
+        return false
+    end
+
+    local value = stateStore[key]
+    if value == nil then
+        return false
+    end
+
+    private.Core.StateManager.notifySubscribers(key, value, value)
+    return true
 end
 
 function private.Core.StateManager.persistState(key, value)
@@ -563,21 +620,41 @@ end
     Callbacks are executed safely with error handling to prevent
     subscriber failures from affecting other subscribers.
     
+    A subscriberId identifies one subscription per key, so reusing an id -- including
+    omitting it twice, which both map to "anonymous" -- is rejected rather than
+    silently overwriting the first subscriber. The first registration wins so that the
+    working subscriber keeps receiving notifications.
+
     @param key [string] State key to monitor
     @param callback [function] Function to call when state changes: callback(newValue, oldValue, key)
     @param subscriberId [string] Unique identifier for this subscription (for cleanup)
-    @return [boolean] Success status
+    @return [boolean] Success status (false if the id is already taken for this key)
 ]]
 function private.Core.StateManager.subscribe(key, callback, subscriberId)
     if not key or not callback then
         return false
     end
 
+    local resolvedId = subscriberId or "anonymous"
+
     if not subscribers[key] then
         subscribers[key] = {}
     end
 
-    subscribers[key][subscriberId or "anonymous"] = callback
+    local existing = subscribers[key][resolvedId]
+    if existing and existing ~= callback then
+        geterrorhandler()(
+            string.format(
+                "Chronicles StateManager.subscribe: subscriber id '%s' is already registered for state key '%s'; " ..
+                    "the existing subscription was kept. Use a unique subscriberId.",
+                tostring(resolvedId),
+                tostring(key)
+            )
+        )
+        return false
+    end
+
+    subscribers[key][resolvedId] = callback
     return true
 end
 
@@ -599,16 +676,13 @@ function private.Core.StateManager.notifySubscribers(key, newValue, oldValue)
     end
     for subscriberId, callback in pairs(subscribers[key]) do
         if type(callback) == "function" then
+            -- pcall isolates one subscriber's failure from the others, but we
+            -- fail fast: surface the error in-game rather than swallowing it.
             local success, errorMsg = pcall(callback, newValue, oldValue, key)
+            if not success then
+                geterrorhandler()(errorMsg)
+            end
         end
     end
 end
 
-function private.Core.StateManager.getAllState()
-    return stateStore
-end
-
-function private.Core.StateManager.clearState()
-    stateStore = {}
-    subscribers = {}
-end

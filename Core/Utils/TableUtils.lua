@@ -64,25 +64,6 @@ function TableUtils.DeepCopy(tableToCopy)
 end
 
 --[[
-    Check if a table contains a specific value
-    @param table [table] Table to search
-    @param value [any] Value to find
-    @return [boolean] True if value is found
-]]
-function TableUtils.Contains(table, value)
-    if table == nil then
-        return false
-    end
-
-    for _, v in pairs(table) do
-        if v == value then
-            return true
-        end
-    end
-    return false
-end
-
---[[
     Merge two tables, with values from second table taking precedence
     @param table1 [table] First table
     @param table2 [table] Second table (takes precedence)
@@ -123,26 +104,6 @@ function TableUtils.Filter(tbl, predicate)
         if predicate(value, key) then
             table.insert(result, value)
         end
-    end
-
-    return result
-end
-
---[[
-    Map a table to a new table using a transformation function
-    @param table [table] Table to map
-    @param mapper [function] Function to transform each value
-    @return [table] Mapped table
-]]
-function TableUtils.Map(table, mapper)
-    local result = {}
-
-    if table == nil or mapper == nil then
-        return result
-    end
-
-    for key, value in pairs(table) do
-        result[key] = mapper(value, key)
     end
 
     return result

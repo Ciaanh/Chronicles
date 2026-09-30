@@ -1,0 +1,196 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\..\..\..\..\WoW\Data\Interface\AddOns\Blizzard_SharedXML\UI.xsd">
+	<Script file="BookContainerTemplate.lua"/>
+
+	<!-- =============================================================================================
+	BOOK CONTAINER TEMPLATE =============================================================================================
+	
+	Agnostic book component that displays already-transformed content.
+	Handles UI interactions, paging controls, and state management.
+	No longer requires type-specific implementations - content is provided pre-transformed.
+	
+	USAGE:
+	Simply inherit from this template using BookContainerMixin and provide content via OnContentReceived().
+	Content should be pre-transformed into book format with proper template keys.
+	
+	CUSTOMIZATION:
+	- Modify background textures by overriding BookBGLeft/BookBGRight
+	- Adjust page dimensions via viewWidth KeyValue
+	- Customize paging controls through PagingControls KeyValues
+	- Change animation timing in SinglePageBookCornerFlipbook ============================================================================================= -->
+
+	<!--
+		One of the two links at the foot of an event's left page: the neighbour's name on the first line
+		(rust, like the links in the text), its date under it. Filled by BookFooterLinkMixin:SetLink.
+	-->
+	<Button name="BookFooterLinkTemplate" mixin="BookFooterLinkMixin" virtual="true">
+		<Size x="240" y="40"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Title" inherits="ChroniclesFontFamily_Text_Body" wordwrap="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="TOPRIGHT"/>
+					</Anchors>
+				</FontString>
+				<FontString parentKey="Subtitle" inherits="ChroniclesFontFamily_Text_Medium" wordwrap="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Title" relativePoint="BOTTOMLEFT" x="0" y="-4"/> <!-- Spacing.xs -->
+						<Anchor point="TOPRIGHT" relativeKey="$parent.Title" relativePoint="BOTTOMRIGHT" x="0" y="-4"/>
+					</Anchors>
+					<Color r="0.29" g="0.196" b="0.094"/> <!-- 4A3218, the ink of the section headings (HTMLBuilder.SECTION_HEADING_COLOR) -->
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick method="OnClick"/>
+			<OnEnter method="OnEnter"/>
+			<OnLeave method="OnLeave"/>
+		</Scripts>
+	</Button>
+
+	<Frame name="BookContainerTemplate" mixin="BookContainerMixin" virtual="true">
+		<Size x="1200" y="650"/>
+
+		<!-- Book Background Layers -->
+		<Layers>
+			<Layer level="BACKGROUND" textureSubLevel="1">
+				<!-- Left page background -->
+				<Texture parentKey="BookBGLeft" atlas="spellbook-background-evergreen-left" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM"/>
+					</Anchors>
+				</Texture>
+
+				<!-- Right page background -->
+				<Texture parentKey="BookBGRight" atlas="spellbook-background-evergreen-right" useAtlasSize="false">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOP"/>
+						<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BACKGROUND" textureSubLevel="2">
+				<!-- Animated book corner when paging -->
+				<Texture parentKey="SinglePageBookCornerFlipbook" atlas="spellbook-corner-flipbook-evergreen" useAtlasSize="false">
+					<Size x="75" y="77"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="-15" y="6"/>
+					</Anchors>
+					<Animations>
+						<AnimationGroup parentKey="Anim" looping="NONE">
+							<FlipBook flipBookRows="2" flipBookColumns="4" flipBookFrames="8" duration="0.25" smoothing="NONE" />
+						</AnimationGroup>
+					</Animations>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<!-- Content Frames -->
+		<Frames>
+			<!-- Main paged content display -->
+			<Frame parentKey="PagedDetails" inherits="PagedCondensedVerticalGridContentFrameTemplate">
+				<KeyValues>
+					<!-- Kept equal to constants.config.book.viewsPerPage, which is what HTMLBuilder
+					     prints contents page numbers against. XML cannot read the Lua constant, so
+					     the two are a matched pair: change one and change the other. -->
+					<KeyValue key="viewsPerPage" value="2" type="number"/>
+					<KeyValue key="autoExpandHeaders" value="true" type="boolean"/>
+					<KeyValue key="xPadding" value="15" type="number"/>
+					<KeyValue key="columnsPerRow" value="1" type="number"/>
+					<KeyValue key="autoExpandElements" value="true" type="boolean"/>
+					<KeyValue key="viewWidth" value="500" type="number"/>
+				</KeyValues>
+				<Anchors>
+					<Anchor point="TOPLEFT" x="50" y="-50"/>
+					<Anchor point="BOTTOMRIGHT" x="-50" y="50"/>
+				</Anchors>
+
+				<Frames>
+					<!-- Left page view -->
+					<Frame parentKey="View1" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+						<Anchors>
+							<Anchor point="TOPLEFT" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM" x="-50" />
+						</Anchors>
+					</Frame>
+
+					<!-- Right page view -->
+					<Frame parentKey="View2" inherits="StaticGridLayoutFrame" parentArray="ViewFrames">
+						<Anchors>
+							<Anchor point="TOPRIGHT" />
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM" x="50" />
+						</Anchors>
+					</Frame>
+
+					<!--
+						Paging controls, inside the text column.
+
+						y was -30: thirty pixels *below* PagedDetails' own bottom edge, which put the
+						"Page n/N" readout and its arrows out on the parchment margin, outside the page's 50
+						padding, reading as chrome bolted to the book rather than part of it. 15 brings them
+						onto the page and still clears the corner flipbook, which is 75 x 77 anchored
+						BOTTOMRIGHT -15, 6 of the *container* and so covers about the first 30 of this
+						frame's bottom-right corner.
+					-->
+					<Frame parentKey="PagingControls" inherits="PagingControlsHorizontalTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" x="-25" y="15"/>
+						</Anchors>
+						<KeyValues>
+							<KeyValue key="fontName" value="ChroniclesFontFamily_Text_Medium" type="string" />
+							<KeyValue key="fontColor" value="SPELLBOOK_FONT_COLOR" type="global" />
+							<KeyValue key="spacing" value="8" type="number"/>
+							<KeyValue key="prevPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+							<KeyValue key="nextPageSound" value="SOUNDKIT.IG_ABILITY_PAGE_TURN" type="global"/>
+						</KeyValues>
+					</Frame>
+				</Frames>
+			</Frame>
+
+			<!--
+				Previous and next event, pinned to the foot of the left page. The front matter is HTML and
+				SimpleHTML cannot push anything to the bottom of a page, so these are frames over it. Shown
+				only on the first spread, where the left page is the front matter, and only for events:
+				BookContainerMixin:SetFooterLinks, UpdateFooterVisibility.
+			-->
+			<Frame parentKey="FooterLinks" hidden="true">
+				<Size y="60"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeKey="$parent.PagedDetails.View1" relativePoint="BOTTOMLEFT" x="0" y="0"/>
+					<Anchor point="BOTTOMRIGHT" relativeKey="$parent.PagedDetails.View1" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Divider" file="Interface\AddOns\Chronicles\Art\Divider">
+							<Size x="260" y="10"/>
+							<Anchors>
+								<Anchor point="TOP"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button parentKey="Previous" inherits="BookFooterLinkTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT"/>
+						</Anchors>
+					</Button>
+					<Button parentKey="Next" inherits="BookFooterLinkTemplate">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT"/>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+
+		<!-- Event Scripts -->
+		<Scripts>
+			<OnLoad method="OnLoad" />
+		</Scripts>
+	</Frame>
+</Ui>

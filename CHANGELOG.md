@@ -1,5 +1,306 @@
 # Chronicles Addon Changelog
 
+## [2.3.0] - Unreleased
+
+The reading surface. v2.2.0 fixed what was wrong; this pass changes what the window shows and how the
+parts of it agree with each other.
+
+### Breaking Changes
+- The Settings landing page is gone. "Settings" is the panel's own header now rather than a category
+  button, so the only two categories are the two that configure something, and the panel opens on
+  Event types instead of on a page of prose. Its overview, tips and version blocks went with it,
+  along with the `SettingsHome*` locale keys and `SettingsMixin:LoadSettingsHome`.
+- `EventListItemTemplate` and `EventListItemMixin` no longer exist. The Events rail renders the same
+  `VerticalListItemTemplate` as the Characters and Factions rails; `templateKeys.EVENT_DESCRIPTION`
+  resolves to it. Anything that referenced the event row template by name must use the shared one.
+- `HTMLBuilder.CreatePageHeader` no longer takes a second `navigationData` argument. It never read it.
+
+### Book
+- The front matter lists characters before factions, under capital headings in a muted ink with a
+  line of space above each block.
+- An event's previous and next events are two links pinned to the foot of the left page, the name
+  over its date, under a small rule; they show on the first spread only.
+- A single untitled chapter no longer opens with a "Chapter 1" header over its only page.
+- Opening an event from a link, or by Back and Forward, moves the timeline to its period when the
+  selected period does not hold it, and scrolls the rail to its row, clearing a bar, chip or search
+  that would hide it. Characters and factions scroll into view when the rail's filters show them.
+- The selected event-type chip is drawn in gold with a stronger glow; it was hard to tell apart.
+- Characters and factions named on the front matter are links. Clicking one opens its tab on that
+  record; the link carries the collection as well as the id, since ids repeat across collections.
+- An event's front matter ends with its previous and next events in reading order, as links.
+- A character's or faction's front matter lists the events it appears in, one linked line each with
+  its date, capped at twelve with "+ N more".
+- Back and forward buttons and a breadcrumb sit right of the tabs. Every selection change is a step:
+  a rail row, a link, switching tab by hand. Back after following a link returns to the book and the
+  tab you came from.
+- Links are drawn in a dark rust so they read as clickable on the parchment; the contents list too.
+- The book cache keys on the record's kind, so an event and a character sharing a collection and an
+  id can no longer be served each other's book.
+- The front matter is on the left page again and the text on the right. The book shrank to 640 tall
+  while each page stayed sized for 650, so no page fitted the left view: every event opened on a
+  blank left page, its front matter on the right and its text on page 2.
+- The metadata line names the Mythos and Futur buckets instead of printing their sentinel years:
+  an event in the mythic past read "Year -999999".
+- **`chapter.pages` produces pages.** One entry in the array is one book page, in the order it was
+  written, whether it is plain text, a fragment or a full HTML document. Every authored page break
+  used to collapse: a page became its own page only if it contained a literal `<html>` tag, which no
+  string in the shipped data does, so multi-page chapters rendered as one long scrolling page. Five
+  events in `DB/02_Origins` were already affected. A chapter mixing plain and HTML pages also came out
+  in the wrong order, because the HTML ones were collected into a side list and appended afterwards.
+- Contents links land on the right page. The chapter-to-page mapping counted `chapter.pageCount`, a
+  field no record sets, so every chapter advanced it by one page regardless of length. Both the
+  mapping and the page loop now derive from `HTMLBuilder.GetChapterPageCount`.
+- Contents rows are links again, not text. They were built with `CreateParagraph`, which escapes its
+  input, so every row rendered its own `<a href=...>` markup as visible characters.
+- Contents rows carry the page number they lead to, and the number is what the pager will show: the
+  mapping is in documents and the reader sees spreads of two, so a chapter starting at document 5 is
+  printed, and navigated to, as page 3. That conversion is `HTMLBuilder.DocumentIndexToSpread` and the
+  frame's own `GetPageForViewDataIndex`; before, a document index went straight to `SetCurrentPage`.
+- The contents list moved onto the front matter and the standalone contents page is gone, so the
+  front matter is always page 1 and the page count no longer depends on chapter count twice over.
+- **The front matter carries the spread.** The left page now holds the portrait slot, the title, a
+  metadata line of year, event type and collection, a rule, and the entity's factions and characters
+  resolved from ids to names. It was a title, a rule and a year.
+- Cross-references resolve at all. Every record keys them by a lowercase collection name
+  (`characters={["dragonflight"] = {...}}`) while collections register capitalised, and both the
+  collection status check and the registry index are case-sensitive, so every reference in the shipped
+  data returned nothing. `UI/Book/FrontMatter.lua` normalises the key; the generator now emits the
+  registered name so the normalisation becomes a no-op rather than the thing holding it up.
+- Name lists cap at eight with a trailing "+ N more", so an event referencing thirty characters cannot
+  grow the front matter past its view and push the body prose onto the next page.
+- Body prose is 15px on its own font family rather than the 14px the panel chrome uses, `<h2>` and
+  `<h3>` are declared instead of falling back to a gold system font, and the portrait slot is 128x128
+  left-aligned for when data exists (no record carries an `image` field today).
+- The empty book is a spread, not a lone centred line: the left page says what the tab holds.
+- Paging controls sit inside the text column. They were anchored 30px below the page, out on the
+  parchment margin.
+- The book content cache key includes total page count. It folded in chapter count but not pages, so a
+  chapter that gained a page kept its cached pre-edit book.
+
+### Lists
+- Bookmarks are 64 tall, the art's own height, four apart: about seven rows where there were five.
+- The event rail separates its year groups with YEAR headers when it lists more than one year, and
+  opens with the period it lists ("Year 0 to 9") and its count on one line, above the search box.
+- The bookmark's side art matches its body: its teal and gold were brighter than the strip it joins,
+  which had been darkened for the white labels. The selected glow now lights the side as well.
+- The search boxes are Blizzard's search field (magnifier, clear button, grey instructions) instead
+  of a bare 20 tall input box.
+- Letters, chips and the zoom and range readouts use a plain wood plate cut from the middle of the
+  year label, 9-sliced so it stretches to any width. The year label's gold scrolls only fit its own
+  130 x 25 and were squashed or smeared on every other size; the timeline's year labels keep them.
+- One row template for all three rails, 88 high instead of 110 and 120, with the art centred and the
+  label at 13px instead of 11.
+- Clicking a row lights it, on every rail. The whole state path existed; `SetSelected` drew nothing.
+- The Events rail has a search box and a count label, matching the other two. It filters within the
+  selected period, which is what the timeline put there. Hover tooltips come free with the shared row.
+- Selecting an event from the timeline lights its row in the rail.
+- The bookmark plate's text band is 20% darker, for contrast with the white label.
+
+### Timeline
+- The zoom is four buttons, one per step (1000, 500, 100, 10), the current one gold.
+- The grid's header reads left to right: the paging arrows with the range between them, a note that
+  year 0 is the opening of the Dark Portal, and the legend on the right, titled "Events per period"
+  with ranges (1-9, 10-24, 25+). The crystal cells and the year plates are unchanged.
+- The window's name stands before its tabs.
+- The timeline lines up with the book. It spans the whole window now: a Navigator column above the
+  rail holds the year search, the zoom and a new "Jump to era" menu, and the period grid sits above
+  the book instead of 140 to its left. The menu lists the era events of the enabled collections in
+  year order and selects the period holding the chosen era at the current zoom.
+- The density legend shares the paging row instead of taking a line of its own.
+- Above the event rail, ten bars show how the selected period's events spread across it (one bar
+  per year at 10-year zoom) and chips count them per event type. Clicking a bar or a chip narrows
+  the rail, together with the search box; clicking it again clears it. An event that began before
+  the period counts in the first bar, so the bars add up to the rail's count.
+- The Characters and Factions filter strips and the Settings panel sit flush right over the book
+  instead of centred on the window.
+- Hovering a period names its span, its event count and its first five events, filtered by the same
+  event-type settings the rail obeys.
+- A one-line density legend under the toolbar says what the crystal colours mean. Its thresholds are
+  built from `config.timeline.densityTiers`, never written out in a locale string.
+- The event-density ladder moved to `private.constants.config.timeline`, from a file-local with two
+  would-be consumers. `TimelineBusiness.getEventDensityTexture` is the only thing that walks it.
+
+### Characters and Factions
+- The search box and the count sit in a panel in the top-left corner, above the rail, the way the
+  Events tab's Navigator does; the rail below holds only bookmarks and gains the room they took.
+- The 175px band both tabs left empty now holds a filter strip: an A to Z jump row and allegiance or
+  race chips built from the values actually present. It drives the same search term the rail's own box
+  writes, so the two cannot disagree about what is filtered.
+
+### Settings
+- The auction-house furniture is gone: `UI-Background-Rock`, the dark overlay wash, the
+  `NineSlicePanelTemplate` border inside the window's own border, `auctionhouse-background-categories`,
+  `auctionhouse-background-index`, and the four `auctionhouse-nav-button` atlases. The panel is a
+  spellbook page like the book, and a category is a bookmark row like every other row in the window.
+- The three settings pages collapse into one `SettingsPageTemplate`, roughly 180 lines of repetition.
+- Checkboxes are in two columns: seven event types become four rows, fifteen collections become eight
+  and stop scrolling. The scroll height is derived from one place instead of three.
+- Each event type says how many events it covers, counted once per load.
+- The feedback line sits under the content column, fades after three seconds, and says when a toggle
+  has emptied the timeline instead of leaving a blank rail as the only evidence.
+
+### Conformance
+- Hardcoded font colours in `Settings.lua` use `NORMAL_FONT_COLOR` / `HIGHLIGHT_FONT_COLOR`; the gold
+  literal on `ChroniclesFontFamily_Shadow_Medium` uses `NORMAL_FONT_COLOR`; the two hardcoded
+  `SetFont` overrides on checkbox labels are gone, so the font families' CJK members apply again.
+- Escape closes the window (`UISpecialFrames`). A `UIPanelWindows` area entry is deliberately *not*
+  registered: `area="center"` re-anchors on show and this window persists where you put it.
+- The timeline's last unlocalised literal, `"Year " .. year`, is `L["TimelineYearLabel"]`.
+
+### Fixes
+- Clicking an empty timeline cell no longer raises a Lua error. When there are fewer periods than the
+  page holds (most collections switched off, for instance) the trailing cells carry no data, and
+  `TimelinePeriodMixin:OnClick` indexed it anyway.
+- The addon version resolves again: the global `GetAddOnMetadata` is gone in 12.x, so the guarded call
+  always returned an empty string. It uses `C_AddOns.GetAddOnMetadata`.
+- The Characters and Factions rails light a row only when its collection matches too. Ids are unique per
+  collection, so a plugin reusing a shipped id lit two rows. The Events rail already made this test.
+- The A to Z row no longer writes `^S` into the search box. The letter is a filter of its own on the rail,
+  like the chips, and the box only shows what was typed. Picking a letter after a chip also clears the
+  chip's filter; it used to keep applying it with the chip drawn unselected.
+- An untitled chapter reads "Chapter n" in the contents and on its page, instead of a blank link and
+  "Chapter n: ". The generator's `header = Locale[""]` is an empty string, which is truthy in Lua. Chapter
+  titles containing `&` are no longer escaped twice.
+- Same-year events with no `order` sort instead of erroring on `nil < number`.
+
+### Tests
+- 133 specs, up from 67. New: `HTMLBuilder_spec` (page counting, authored order, the mapping, and the
+  document-to-spread conversion), `FrontMatter_spec` (both reference shapes, the case mismatch, the
+  cap), `VerticalListItem_spec` (the row's `Init` and `OnClick` shapes, both of which fail silently,
+  plus the rail's anchored and field filters). Extended: `TimelineBusiness_spec` (the density ladder's
+  boundaries), `Settings_spec` (two-column heights, flat categories).
+- `DB/99_Fixture/FixtureEventsDB.lua` holds the four records the shipped data cannot supply: a
+  five-chapter book, a 3000-character page, twenty cross-references, and the ordinary case. It is
+  loaded by hand via two temporary lines documented in its own header, and excluded from the package.
+
+## [2.2.0] - Unreleased
+### Breaking Changes
+- Removed the roleplay integration. Chronicles no longer reads your character's age and name from
+  totalRP3 or MyRolePlay to add a birth event, and the empty "Roleplay" collection it created no
+  longer appears in Settings. `Chronicles.Data:AddRPEvent`, `Chronicles.Data:LoadRolePlayProfile`
+  and the whole `Chronicles.Data.RP` table went with it.
+- Trimmed the unused half of the `Chronicles.Data` facade: SearchEventsInDB, IsInRange,
+  CleanEventObject, FindFactions, CleanFactionObject, FindCharacters, CleanCharacterObject,
+  HasEvents, HasEventsInDB, RefreshPeriods and AvailableDbId. Nothing inside Chronicles called any
+  of them; a plugin that did will now find a nil field.
+- Removed `private.Core.EventManager.PluginEvents`. It declared a plugin-facing event catalogue that
+  nothing ever triggered and nothing ever listened to.
+- Plugin data is now type-checked. Each of `events`, `characters` and `factions` in a manifest must
+  be a table; a bad payload is refused with an error in chat naming the collection, instead of
+  failing later and less legibly inside the timeline scan. A manifest whose every payload is
+  rejected registers nothing and does not refresh the timeline.
+
+### Timeline
+- The previous/next page arrows enable and disable correctly. They were reading the wrong shape of
+  event payload, so both stayed disabled on every page.
+- Period event counts no longer double-count. An event spanning several buckets was counted once per
+  bucket, so a war lasting three centuries inflated the count shown at the 100-year zoom.
+- The timeline no longer stretches back to year 0 for data that does not reach it. The earliest and
+  latest years now come from the events themselves rather than being seeded at 0.
+- The last page of periods no longer reads past the end of the list when there are fewer periods
+  than fit on one page.
+- A zoom level saved by an older version that no longer offers it falls back to the widest step
+  instead of leaving the zoom buttons unusable.
+- Dropped the 250- and 50-year period buckets. No zoom level has used them since v2.0.0, so they
+  were being built and held on every timeline rebuild for nothing.
+
+### Book
+- The table of contents is clickable again. Chapter links went nowhere because the chapter-to-page
+  mapping they need was dropped between the HTML builder and the book frame.
+- Toggling a collection or an event type no longer blanks an open book. Each book is re-derived from
+  what you had selected, and you keep your page wherever that selection still exists.
+- An empty book now tells you what to do — "Select an event from the timeline or the list to read
+  its chronicle." — instead of showing placeholder test content.
+- Book error messages are localized rather than hardcoded English.
+- Cross-entity links (`chronicles:event:<id>` and its character/faction siblings) are no longer
+  handled. Nothing ever generated them, and the handlers wrote a bare id where every consumer
+  expects a collection-qualified selection, so such a link would have selected nothing anyway.
+
+### Lists
+- The character and faction rails have their own search placeholder text and show how many entries
+  they hold.
+
+### Settings
+- Enabling or disabling a collection or an event type refreshes everything derived from it. The
+  character rail in particular kept listing entries from a collection you had just switched off.
+
+### Code Quality & Architecture
+- Cache invalidation goes through one function, `Cache.invalidateForDataChange(kind)`, which owns
+  the full set of caches each kind of data change makes stale. Call sites used to hand-pick keys,
+  and each picked a different, incomplete set.
+- A failure inside the asynchronous cache warm-up is reported to the error handler instead of being
+  filed in a field nobody reads.
+- Startup state restoration is one path instead of two. Two handlers restored the same five keys by
+  different means; the survivor uses StateManager.rehydrate.
+- An error raised by a state subscriber during the initial replay now surfaces instead of being
+  swallowed.
+- Deleted the Business layer (FilterEngine, DateCalculator), Core/Domain/Settings.lua,
+  Core/Utils/MathUtils.lua, and unused functions across StringUtils, TableUtils, UIUtils,
+  ValidationUtils, SearchEngine and VerticalListTemplate — about 2,100 lines net.
+- Eleven of the twelve book template keys had no template and no producer. The book renders one HTML
+  document per page, so one key remains.
+- ScrollFrameMixin.lua and PageTemplatesRegistration.lua were registered with `<Include>` instead of
+  `<Script>`. Both are Lua files.
+- Dropped the unread `constants.viewWidth` and `constants.configurationName`.
+- Renamed the `ui.activeTab` state key to `ui.settingsCategory`, which is what it always held -- the
+  Settings panel's own category, never the main tab strip, which is not persisted at all. The
+  Settings panel opens on its first category once after upgrading, and the retired key is dropped
+  from your saved variables rather than being reloaded every login.
+- Renamed the `UIRefresh` event's string from `Timeline.CLEAN` to `UI.REFRESH`. It was never
+  timeline-scoped: Settings raises it and the event list, the book and the character/faction rails
+  answer it.
+- Deleted the `AddonShutdown` and `TabUITabSet` events. Each had a constant and a validation schema,
+  neither had a listener, and only one of them had a producer.
+- Test suite extended to ValidationUtils and pruned where the functions under test were deleted.
+
+## [2.1.0] - 2026-07-29
+### Breaking Changes
+- Plugin registration moved to a per-plugin manifest table. External data addons now declare
+  `ChroniclesPlugins["Name"] = {events = ..., characters = ..., factions = ...}` (any subset), which
+  Chronicles scans at load and again as later addons load. `Chronicles:RegisterPluginDB(name, manifest)`
+  takes the same manifest shape for callers that prefer a function call.
+- Removed the `ChroniclesPluginData.Register()` hook. It was a single shared global with one Register
+  function, so a plugin and Chronicles' own data layer overwrote each other — only one could ever be
+  registered. Addons still using it load no data and report no error. Chronicles-Sample v1.0.1 is
+  affected; its main branch already uses the manifest form.
+  [Corrected 2026-07-29: this entry originally said exports from Chronicles-tauri still emitted the
+  old hook and needed regenerating. That was wrong at the time of writing -- dbService.ts on
+  feat/edition already emitted `ChroniclesPlugins["Name"] = {...}` manifests. No regeneration is
+  needed for this reason.]
+
+### Book
+- Replaced the paged book layer with HTML content rendering (BookContainerTemplate). SharedBookTemplate,
+  BookPages and BookUtils are gone.
+- A UI refresh now keeps your place in the book; opening a different entity starts at its beginning.
+
+### Timeline
+- Rebuilt the period grid on frame pools sized from the configured page size, replacing nine labels and
+  eight periods hand-chained in XML. Seventeen frame globals removed.
+- Search, zoom and paging controls collected into one toolbar row, with a readout of the span on screen.
+- Paging arrows now match the surrounding buttons instead of a borrowed covenant-sanctum atlas.
+
+### Lists
+- Character, faction and event rails scroll instead of paging, and are single-column. The hand-rolled
+  paging control is gone.
+- Rails widened to sit beside the book rather than overlapping it.
+
+### Window
+- The main panel is movable by a drag strip along its top, and remembers where you left it.
+- The tab strip moved into that drag strip, which also fixes the tabs overflowing the frame's top edge.
+
+### Code Quality & Architecture
+- Data collections no longer publish globals. The 41 generated files under DB/ declared their table
+  bare (`ExpansionsEventsDB = {`), which in Lua means a global, and DB/DB.lua read them back by
+  global name; both sides now use `private.DB`. Chronicles-tauri's exporter was changed to match, so
+  regenerated content keeps the same shape. `ChroniclesPlugins` stays global by design — it is the
+  cross-addon contract.
+- Removed the dependency container; load order is resolved by the include chain and lazy lookups.
+- Added a shared spacing scale and applied it to the reworked UI.
+- Deleted the unreachable event-list title template and two unused font families.
+- Added a test suite over EventManager, StateManager, MathUtils, StringUtils, TableUtils and
+  TimelineBusiness (Tests/, needs a Lua 5.1 interpreter to run).
+- Replaced the sample database with real expansion data across fifteen collections.
+
 ## [2.0.1] - 2026-02-09
 ### Critical Bug Fixes
 - Fixed TableUtils.Filter producing sparse tables causing incorrect array counts and pagination issues

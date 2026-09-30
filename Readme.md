@@ -2,7 +2,9 @@
 
 ## Overview
 
-Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon is compatible with World of Warcraft interface version 11.2.0 (The War Within expansion) and features a sophisticated state management system with event-driven architecture.
+Chronicles is a comprehensive World of Warcraft addon that provides an interactive timeline and database of historical events in the Warcraft universe. It allows players to explore events, characters, and factions from the lore through an intuitive, modern interface. The addon targets World of Warcraft Retail interface version 120100 (Midnight, Patch 12.1) and features a sophisticated state management system with event-driven architecture.
+
+> Contributor quick rules: see .github/copilot-instructions.md for enforceable architecture and coding standards (state, events, UI patterns, localization).
 
 ## Key Features
 
@@ -24,8 +26,7 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 ### Advanced Features
 
 1. **Custom Data Support**: Plugin-compatible architecture for custom events, characters, and factions
-2. **External Integration**: Optional integration with roleplay addons (totalRP3, MyRolePlay) for enhanced character information
-3. **Localization Ready**: Full localization support with comprehensive string externalization
+2. **Localization Ready**: Full localization support with comprehensive string externalization
 
 ## Technical Architecture
 
@@ -33,8 +34,6 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 
 1. **State Management System**:
    - Centralized StateManager with automatic persistence via AceDB-3.0
-   - Event-driven state synchronization across UI components
-   - Subscription patterns for reactive programming
    - Hierarchical state organization (ui.*, timeline.*, settings.*, data.*)
 
 2. **Event-Driven Architecture**:
@@ -53,13 +52,13 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
    - Modular database architecture with plugin support
    - Data cleaning and localization processing pipeline
    - Search engine with multi-criteria filtering capabilities
-   - User content management with versioning and metadata
+   - Derived results (period filling, year bounds, filtered lists, book content) held in a bounded cache
 
 5. **Modern UI Framework**:
    - XML-based UI with Mixin patterns for code organization
-   - Book-style content display with chapter/page navigation
+   - Book-style content display rendered as HTML documents, one per page
    - Shared template system for consistent UI components
-   - Tab system with lazy loading and state persistence
+   - Tab system with lazy loading
 
 ### Libraries & Dependencies
 
@@ -73,90 +72,32 @@ Chronicles is a comprehensive World of Warcraft addon that provides an interacti
 
 ### Architecture Patterns
 
-1. **Dependency Injection**: DependencyContainer for managing circular dependencies
-2. **Mixin Pattern**: UI components use mixins for shared functionality
-3. **Template System**: Reusable UI templates with inheritance and composition
-4. **State Synchronization**: Automatic UI updates through state change subscriptions
-5. **Modular Design**: Clear separation of concerns across Core, UI, and Data modules
+1. **Mixin Pattern**: UI components use mixins for shared functionality
+2. **Template System**: Reusable UI templates with inheritance and composition
+3. **State Synchronization**: Automatic UI updates through state change subscriptions
+4. **Modular Design**: Clear separation of concerns across Core, UI, and Data modules
 
 ### Project Structure
 
-```text
-Chronicles/
-├── Chronicles.toc                    # Addon metadata and interface version
-├── Chronicles.xml                    # Main include file defining load order
-├── Chronicles.lua                    # Main addon initialization and lifecycle
-├── Constants.lua                     # Global constants and configuration
-├── Core/                            # Core systems and business logic
-│   ├── Infrastructure/              # Foundational systems
-│   │   ├── EventManager.lua         # Event handling with schema validation
-│   │   ├── StateManager.lua         # Centralized state management
-│   │   ├── DependencyContainer.lua  # Dependency injection system
-│   │   └── Cache.lua                # Data caching and performance optimization
-│   ├── Domain/                      # Business domain logic
-│   │   ├── Timeline.lua             # Timeline navigation and display logic
-│   │   ├── Events.lua               # Event data handling and processing
-│   │   ├── Characters.lua           # Character data management
-│   │   ├── Factions.lua             # Faction data management
-│   │   └── Settings.lua             # User settings and configuration
-│   ├── Data/                        # Data access and processing
-│   │   ├── TimelineBusiness.lua     # Timeline calculation algorithms
-│   │   ├── SearchEngine.lua         # Multi-criteria search functionality
-│   │   ├── FilterEngine.lua         # Event filtering and categorization
-│   │   ├── DataRegistry.lua         # Data source registration and management
-│   │   └── Types.lua                # Data type definitions and validation
-│   ├── Business/                    # Business logic coordination
-│   │   ├── DateCalculator.lua       # Date calculations and formatting
-│   │   └── FilterEngine.lua         # Event filtering logic
-│   └── Utils/                       # Shared utilities
-│       ├── HelperUtils.lua          # General helper functions
-│       ├── StringUtils.lua          # String manipulation utilities
-│       ├── TableUtils.lua           # Table operation utilities
-│       ├── MathUtils.lua            # Mathematical calculations
-│       ├── ValidationUtils.lua      # Input validation utilities
-│       └── UIUtils.lua              # UI-specific helper functions
-├── UI/                              # User interface components
-│   ├── MainFrameUI.lua/xml          # Main interface frame (1200x850)
-│   ├── Events/                      # Events tab components
-│   │   ├── Timeline/                # Timeline visualization
-│   │   └── List/                    # Event list and pagination
-│   ├── Characters/                  # Characters tab components
-│   ├── Factions/                    # Factions tab components
-│   ├── Settings/                    # Settings and configuration UI
-│   └── Templates/                   # Reusable UI templates
-│       ├── VerticalListTemplate.*   # Shared list component
-│       ├── SharedBookTemplate.*     # Book-style content display
-│       ├── BookPages.xml            # Chapter and page templates
-│       └── Templates.lua            # Template registration and utilities
-├── DB/                              # Database and content
-│   ├── DB.lua                       # Database registration and initialization
-│   └── 01_Sample/                   # Sample data sets
-│       ├── SampleEventsDB.lua       # Sample event data
-│       ├── SampleCharactersDB.lua   # Sample character data
-│       └── SampleFactionsDB.lua     # Sample faction data
-├── Locales/                         # Localization files
-│   ├── enUS.lua                     # English (US) strings
-│   └── Locales.xml                  # Locale registration
-├── Libs/                            # Third-party libraries
-│   ├── AceAddon-3.0/               # Addon framework
-│   ├── AceDB-3.0/                  # Database management
-│   ├── AceEvent-3.0/               # Event handling
-│   ├── AceLocale-3.0/              # Localization
-│   ├── LibDataBroker-1.1/          # Data broker interface
-│   ├── LibDBIcon-1.0/              # Minimap icon support
-│   └── LibStub/                     # Library loading system
-└── Art/                             # Visual assets
-    ├── Images/                      # UI images and portraits
-    ├── Portrait/                    # Character portraits
-    └── Raw/                         # Source art files
+`Chronicles.toc` lists exactly one file, `Chronicles.xml`, which pulls in everything else through a
+chain of per-directory `_Includes.xml` files. There is no globbing: **a new file has to be registered
+in the `_Includes.xml` of its own directory**, and the order matters — locales load before the DB
+files that resolve `Locale[...]` at load time.
+
+```
+Chronicles.xml            Constants.lua -> Libs -> Locales + DB/Locales -> Chronicles.lua
+Core/_Includes.xml        Infrastructure (StateManager, EventManager, Cache) -> Utils -> Data
+                          -> Data.lua -> Domain
+DB/DB.xml                 DB.lua plus one NN_<Expansion>/ directory per expansion
+UI/_Includes.xml          ScrollFrameMixin -> Fonts -> VerticalListTemplate -> Book
+                          -> Events -> Settings -> PageTemplatesRegistration -> MainFrameUI
 ```
 
 ## Integration Features
 
-- **Optional dependencies** on roleplay addons (totalRP3, MyRolePlay)
 - **Minimap button** for quick access
 - **Saved variables** for persistent user data and preferences
-- **Plugin-compatible** architecture for custom content extensions
+- **Plugin-compatible** architecture for custom content extensions — see [PLUGINS.md](PLUGINS.md) to author a content pack
 
 ## Installation
 
@@ -176,7 +117,7 @@ Chronicles/
 ## Customization Options
 
 - **Minimap button visibility** toggle
-- **Event filtering by type** (war, battle, death, birth, era, other)
+- **Event filtering by type** (event, era, war, battle, death, birth, other)
 - **Collection management** for enabling/disabling content sets
 - **Timeline zoom preferences** and navigation settings
 
@@ -201,16 +142,18 @@ private.Core.StateManager.subscribe("ui.selectedEvent", callback, "ModuleName")
 
 The addon uses a hybrid event-driven + state-based architecture:
 
-- **Active Events**: AddonStartup, TimelineInit, UIRefresh, TabUITabSet, Settings changes
+- **Active Events**: AddonStartup, TimelineInit, UIRefresh, DisplayEventsForYear, the timeline's own
+  label/period/paging events, and the two Settings change events
 - **Legacy Events**: Selection events now handled via StateManager for better consistency
 - **Schema Validation**: All events include validation schemas for type safety
 
 ### Performance Optimizations
 
 - **Lazy Loading**: UI components and data are loaded on-demand
-- **State Persistence**: Automatic saving to AceDB with intelligent caching
+- **State Persistence**: Automatic saving to AceDB
 - **Event Consolidation**: Timeline periods are consolidated to reduce memory usage
-- **Search Indexing**: Pre-computed search indices for fast event lookup
+- **Derived-Result Cache**: Period filling, year bounds, search results and book content are cached
+  and invalidated as a set whenever the underlying data changes
 
 ---
 
@@ -226,6 +169,9 @@ ciaanh
 
 ## Version
 
-v2.0.0 (July 7, 2025)
+v2.3.0 (unreleased) — v2.2.0 was never released either, so both changelog sections ship together;
+the last released version was v2.1.0 (July 29, 2026). `CHANGELOG.md` has the
+full history; `./tools/harness.ps1 version -Addon Chronicles` checks that this line, the TOC and the
+changelog still agree.
 
-Compatible with World of Warcraft 11.2.0 (The War Within)
+Compatible with World of Warcraft Retail, interface 120100 (Midnight, Patch 12.1)
