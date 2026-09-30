@@ -94,7 +94,7 @@ failed much later, inside the asynchronous cache warm), and a duplicate collecti
    but it is still a real asymmetry between the two doors.
 3. **No backwards-compatibility shim.** The old events-only signature
    (`RegisterPluginDB(name, eventsTable)`) is rejected by the "requires events, characters, or
-   factions" guard. `CHANGELOG.txt` documents the break; nothing restores it.
+   factions" guard. `CHANGELOG.md` documents the break; nothing restores it.
 4. **`PLUGINS.md` does not yet mention the payload type check.** A manifest whose every payload is
    rejected registers nothing and fires no `TimelineInit`; the authoring guide's rules section
    should say so.

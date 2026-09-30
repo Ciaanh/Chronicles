@@ -13,7 +13,7 @@ it. Roughly a third of the specific findings below name files or symbols that no
 
 The report has been **annotated, not rewritten** -- the analysis is still good, and its reasoning is
 worth keeping next to each item. Every superseded finding is marked inline with what happened.
-`CHANGELOG.txt` is the authority on what changed; `WoW Addon Design Analysis/proposal/03-defect-list.md`
+`CHANGELOG.md` is the authority on what changed; `WoW Addon Design Analysis/proposal/03-defect-list.md`
 is the authority on the UI defects.
 
 **Deleted since this report was written.** Any finding whose subject is on this list is moot:
@@ -550,7 +550,7 @@ expected corner, at a frame level above the drag strip so the strip cannot swall
 | SavedVariables | `ChroniclesDB` | COMPLIANT -- Properly declared |
 | OptionalDeps | `totalRP3, MyRolePlay` | **NOW STALE** -- the RP integration was deleted after v2.1.0. The field still declares the dependency but nothing reads either addon. It should be removed from the TOC. |
 | DefaultState | `enabled` | COMPLIANT |
-| Version | `v2.1.0` | See `CHANGELOG.txt`: a v2.2.0 section is open and unreleased, so this field is due a bump. |
+| Version | `v2.1.0` | See `CHANGELOG.md`: a v2.2.0 section is open and unreleased, so this field is due a bump. |
 
 ### Modern Widget Usage
 
@@ -971,6 +971,6 @@ covering WoW's history from mythological origins through The War Within. Feature
 **WoW Patch**: Midnight (12.0.0)
 
 **Re-verified**: 2026-07-29 against `integration/2.0.1-hygiene` (v2.1.0 released, v2.2.0 open in
-`CHANGELOG.txt`). Annotations added throughout; nothing was deleted, so the April reasoning stays
+`CHANGELOG.md`). Annotations added throughout; nothing was deleted, so the April reasoning stays
 readable next to its outcome. Where an item is marked resolved, the evidence is the file and line
 cited beside it.

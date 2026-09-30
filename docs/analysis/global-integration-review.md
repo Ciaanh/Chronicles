@@ -129,5 +129,5 @@ Without synchronized changes, generated addons remain a migration bottleneck.
    with a hand-maintained wrapper. **Open.**
 2. ~~Whether long-term support for the legacy `ChroniclesPluginData` compatibility path should remain
    or be sunset after generator migration.~~ **Answered: sunset.** The global no longer exists on
-   either side, and `CHANGELOG.txt` v2.1.0 records the removal as a breaking change. No shim was
+   either side, and `CHANGELOG.md` v2.1.0 records the removal as a breaking change. No shim was
    added; a plugin still calling it loads no data and reports nothing.

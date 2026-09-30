@@ -170,7 +170,7 @@ ciaanh
 ## Version
 
 v2.3.0 (unreleased) — v2.2.0 was never released either, so both changelog sections ship together;
-the last released version was v2.1.0 (July 29, 2026). `CHANGELOG.txt` has the
+the last released version was v2.1.0 (July 29, 2026). `CHANGELOG.md` has the
 full history; `./tools/harness.ps1 version -Addon Chronicles` checks that this line, the TOC and the
 changelog still agree.
 

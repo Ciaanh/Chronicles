@@ -138,7 +138,7 @@ branch are recorded at the bottom; everything above is remaining work, in sugges
 
 ## Completed after this plan was written (2026-07-29 note)
 
-Recorded here so nobody re-derives it from the sections above. `CHANGELOG.txt` is the authority.
+Recorded here so nobody re-derives it from the sections above. `CHANGELOG.md` is the authority.
 
 - **v2.1.0** replaced the paged book layer with HTML rendering (`SharedBookTemplate`,
   `UI/Templates/BookPages.*` and `Core/Utils/BookUtils.lua` all deleted), made the main panel movable,
