@@ -1,0 +1,27 @@
+package-as: Chronicles
+enable-nolib-creation: no
+
+manual-changelog: CHANGELOG.md
+
+# Keep in sync with make-release.ps1's $includes: ship only the TOC, Chronicles.lua/.xml,
+# Constants.lua, LICENCE, Readme.md, PLUGINS.md, Core/, DB/, Images/, Libs/, Locales/, UI/ and
+# Art/ without Art/Raw.
+#
+# The two mechanisms are opposites -- this is a blacklist, $includes is a whitelist -- so a new
+# top-level file is shipped by this one by default and dropped by that one. Everything $includes
+# omits is listed here, including the dev files the 2.x work branches add (Tests, docs, the
+# analysis notes), so that merging them does not ship them. Dotfiles and dot-directories
+# (.github, .vscode, .copilot-instructions.md, ...) are skipped by the packager on its own.
+ignore:
+    - Art/Raw
+    - Tests
+    - docs
+    - refs
+    - TODO
+    - ANALYSIS.md
+    - BOOK_GENERATION_ANALYSIS.md
+    - BOOK_TEMPLATES.md
+    - WoW_SimpleHTML_Documentation.md
+    - CHANGELOG.md
+    - CLAUDE.md
+    - make-release.ps1
