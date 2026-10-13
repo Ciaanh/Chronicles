@@ -12,9 +12,6 @@
     <Include file="Data\_Includes.xml"/>
     <Script file="Data.lua"/>
 
-    <!-- Business Logic -->
-    <Include file="Business\_Includes.xml"/>
-
     <!-- Domain Modules -->
     <Include file="Domain\_Includes.xml"/>
 </Ui>

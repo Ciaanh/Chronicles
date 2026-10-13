@@ -171,16 +171,10 @@ function TimelineBusiness.getDateCurrentStepIndex(date)
         return dateProfile.mod1000 or 0
     elseif (currentStepValue == 500) then
         return dateProfile.mod500 or 0
-    elseif (currentStepValue == 250) then
-        return dateProfile.mod250 or 0
     elseif (currentStepValue == 100) then
         return dateProfile.mod100 or 0
-    elseif (currentStepValue == 50) then
-        return dateProfile.mod50 or 0
     elseif (currentStepValue == 10) then
         return dateProfile.mod10 or 0
-    elseif (currentStepValue == 1) then
-        return 0
     else
         return 0
     end
@@ -207,16 +201,10 @@ function TimelineBusiness.getCurrentStepPeriodsFilling()
         return eventDates.mod1000 or {}
     elseif (currentStepValue == 500) then
         return eventDates.mod500 or {}
-    elseif (currentStepValue == 250) then
-        return eventDates.mod250 or {}
     elseif (currentStepValue == 100) then
         return eventDates.mod100 or {}
-    elseif (currentStepValue == 50) then
-        return eventDates.mod50 or {}
     elseif (currentStepValue == 10) then
         return eventDates.mod10 or {}
-    elseif (currentStepValue == 1) then
-        return {}
     else
         return {}
     end
@@ -285,27 +273,25 @@ function TimelineBusiness.countEventsInPeriod(block)
             return eventCount
         end
 
+        local lastDateIndex = upperDateIndex
         if (lowerDateIndex < upperDateIndex) then
-            for i = lowerDateIndex, upperDateIndex - 1, 1 do
-                local periodEvents = periodsFilling[i]
-                if (periodEvents ~= nil) then
-                    -- Count hash-set entries (eventId as keys)
-                    local periodsCount = 0
-                    for _ in pairs(periodEvents) do
-                        periodsCount = periodsCount + 1
-                    end
-                    eventCount = eventCount + periodsCount
-                end
-            end
-        elseif lowerDateIndex == upperDateIndex then
-            local periodEvents = periodsFilling[lowerDateIndex]
+            lastDateIndex = upperDateIndex - 1
+        elseif (lowerDateIndex > upperDateIndex) then
+            return eventCount
+        end
+
+        -- An event spanning several buckets is listed in every one of them, so
+        -- the ids are collected into a set before being counted.
+        local countedEventIds = {}
+        for dateIndex = lowerDateIndex, lastDateIndex, 1 do
+            local periodEvents = periodsFilling[dateIndex]
             if (periodEvents ~= nil) then
-                -- Count hash-set entries (eventId as keys)
-                local periodsCount = 0
-                for _ in pairs(periodEvents) do
-                    periodsCount = periodsCount + 1
+                for _, eventId in ipairs(periodEvents) do
+                    if not countedEventIds[eventId] then
+                        countedEventIds[eventId] = true
+                        eventCount = eventCount + 1
+                    end
                 end
-                eventCount = periodsCount
             end
         end
     end
@@ -323,13 +309,15 @@ end
     @return [table] Array of timeline periods with bounds and event data
 ]]
 function TimelineBusiness.generateTimelinePeriods(stepValue)
-    local chronicles = private.Core.Utils.HelperUtils.getChronicles()
-    if not chronicles or not chronicles.Data or not chronicles.Data.MinEventYear or not chronicles.Data.MaxEventYear then
+    local cache = private.Core.Cache
+    if not cache or not cache.getMinEventYear or not cache.getMaxEventYear then
         return TimelineBusiness.generateDefaultPeriods(stepValue)
     end
 
-    local minYear = chronicles.Data:MinEventYear()
-    local maxYear = chronicles.Data:MaxEventYear()
+    -- Both bounds are nil when no enabled collection holds an event; the
+    -- default periods keep an empty timeline navigable.
+    local minYear = cache.getMinEventYear()
+    local maxYear = cache.getMaxEventYear()
 
     if not minYear or not maxYear or minYear > maxYear then
         return TimelineBusiness.generateDefaultPeriods(stepValue)
@@ -573,7 +561,9 @@ function TimelineBusiness.calculateTimelinePagination(periods, currentPage)
     end
 
     if ((firstIndex + pageSize - 1) >= numberOfCells) then
-        firstIndex = numberOfCells - (pageSize - 1)
+        -- Fewer periods than a full page would otherwise yield a negative index,
+        -- which the period and label distribution then reads past the array.
+        firstIndex = math.max(1, numberOfCells - (pageSize - 1))
         currentPage = maxPageValue
     end
 
@@ -699,6 +689,35 @@ function TimelineBusiness.getStepValueIndex(stepValue)
 end
 
 -- -------------------------
+-- Event density
+-- -------------------------
+
+--[[
+    Classify an event count against the density ladder.
+
+    The one place the ladder is walked. Both consumers go through it: the period mixin, to pick which
+    crystal to draw, and the legend, to say what each crystal means. A count below no tier's ceiling is
+    dense; a period with no events at all is a fourth, separate case the caller handles, because "empty"
+    is not a density.
+
+    @param eventCount [number|nil] Events in the period
+    @return [string] The texture name to draw, without the "-selected" suffix
+    @return [number|nil] The winning tier's ceiling, nil for the dense case
+]]
+function TimelineBusiness.getEventDensityTexture(eventCount)
+    local timelineConfig = private.constants.config.timeline
+    local count = eventCount or 0
+
+    for _, tier in ipairs(timelineConfig.densityTiers or {}) do
+        if count < tier.below then
+            return tier.texture, tier.below
+        end
+    end
+
+    return timelineConfig.denseTexture, nil
+end
+
+-- -------------------------
 -- Main Timeline Business Logic Interface
 -- -------------------------
 
@@ -708,7 +727,10 @@ end
 ]]
 function TimelineBusiness.computeTimelinePeriods()
     local stepValue = private.Core.StateManager.getState(private.Core.StateManager.buildTimelineKey("currentStep"))
-    if (stepValue == nil) then
+
+    -- A step saved before its value was retired from stepValues has no index,
+    -- which would leave the zoom buttons doing arithmetic on nil.
+    if (stepValue == nil or TimelineBusiness.getStepValueIndex(stepValue) == nil) then
         stepValue = private.constants.config.stepValues[1]
         private.Core.StateManager.setState(
             private.Core.StateManager.buildTimelineKey("currentStep"),
@@ -743,6 +765,135 @@ function TimelineBusiness.getYearPageIndex(year)
     end
 
     return TimelineBusiness.getYearPageIndexWithPeriods(year, periods)
+end
+
+-- -------------------------
+-- Navigation and Period Breakdown
+-- -------------------------
+
+local ERA_EVENT_TYPE = 2 -- constants.eventType[2] = "era"
+
+--[[
+    The entries of the Navigator's "jump to era" menu
+
+    Era events are the landmarks a reader navigates by: the Expansions collection holds one per
+    expansion, and story collections open their own chapters with one. Mythos and Futur sentinels are
+    skipped, a menu item that jumps to "year -999999" helps nobody.
+
+    @param events [table] Sequential array of event records (the SearchEngine projections)
+    @return [table] Sequential array of {year, label, source}, sorted by year, then order, then label
+]]
+function TimelineBusiness.buildEraEntries(events)
+    local config = private.constants and private.constants.config or {}
+    local entries = {}
+
+    for _, event in ipairs(events or {}) do
+        local year = event.yearStart
+        local isSentinel = year == config.mythos or year == config.futur
+
+        if event.eventType == ERA_EVENT_TYPE and type(year) == "number" and not isSentinel and event.label then
+            table.insert(entries, {year = year, label = event.label, source = event.source, order = event.order or 0})
+        end
+    end
+
+    table.sort(
+        entries,
+        function(a, b)
+            if a.year ~= b.year then
+                return a.year < b.year
+            end
+            if a.order ~= b.order then
+                return a.order < b.order
+            end
+            return a.label < b.label
+        end
+    )
+
+    return entries
+end
+
+--[[
+    Split a period into equal year buckets and count the events that start in each
+
+    Drives the bars above the event rail. An event is counted once, in the bucket holding its
+    yearStart clamped into the period: a period lists every event that overlaps it, so an event that
+    began earlier counts in the first bucket and the bars add up to the rail's count. A period whose
+    span does not divide evenly gives its last bucket the remainder.
+
+    @param events [table] Sequential array of event records
+    @param lower [number] First year of the period, inclusive
+    @param upper [number] Last year of the period, inclusive
+    @param bucketCount [number] How many buckets to produce (clamped to the number of years)
+    @return [table] Sequential array of {lower, upper, count}; empty when the period is unbounded
+]]
+function TimelineBusiness.buildYearBuckets(events, lower, upper, bucketCount)
+    local config = private.constants and private.constants.config or {}
+    if type(lower) ~= "number" or type(upper) ~= "number" or upper < lower then
+        return {}
+    end
+    if lower == config.mythos or upper == config.futur then
+        return {}
+    end
+
+    local span = upper - lower + 1
+    local count = math.max(1, math.min(bucketCount or 10, span))
+    local size = math.floor(span / count)
+
+    local buckets = {}
+    for index = 1, count do
+        local bucketLower = lower + (index - 1) * size
+        local bucketUpper = index == count and upper or (bucketLower + size - 1)
+        buckets[index] = {lower = bucketLower, upper = bucketUpper, count = 0}
+    end
+
+    for _, event in ipairs(events or {}) do
+        local year = event.yearStart
+        if type(year) == "number" then
+            local clamped = math.max(lower, math.min(upper, year))
+            local index = math.min(count, math.floor((clamped - lower) / size) + 1)
+            buckets[index].count = buckets[index].count + 1
+        end
+    end
+
+    return buckets
+end
+
+--[[
+    Whether an event falls in a bucket, by the same clamping rule buildYearBuckets counts with
+
+    @param event [table] Event record
+    @param bucket [table] {lower, upper} from buildYearBuckets
+    @param periodLower [number] First year of the period the bucket belongs to
+    @param periodUpper [number] Last year of that period
+    @return [boolean]
+]]
+function TimelineBusiness.isEventInBucket(event, bucket, periodLower, periodUpper)
+    local year = event and event.yearStart
+    if type(year) ~= "number" or not bucket then
+        return false
+    end
+
+    local clamped = math.max(periodLower, math.min(periodUpper, year))
+    return clamped >= bucket.lower and clamped <= bucket.upper
+end
+
+--[[
+    Count events per event type
+
+    @param events [table] Sequential array of event records
+    @return [table] Map of eventType id to count, and the total as a second value
+]]
+function TimelineBusiness.countEventsByType(events)
+    local counts = {}
+    local total = 0
+
+    for _, event in ipairs(events or {}) do
+        local eventType = event.eventType or 0
+        counts[eventType] = (counts[eventType] or 0) + 1
+        total = total + 1
+    end
+
+    return counts, total
 end
 
 return TimelineBusiness

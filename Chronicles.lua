@@ -12,8 +12,9 @@ local defaults = {
             selectedCharacter = nil,
             selectedFaction = nil,
             selectedPeriod = nil,
-            activeTab = nil,
-            isMainFrameOpen = false
+            settingsCategory = nil,
+            isMainFrameOpen = false,
+            windowPosition = nil
         },
         timelineState = {
             currentStep = nil,
@@ -22,8 +23,7 @@ local defaults = {
         },
         settingsState = {
             eventTypes = {},
-            collections = {},
-            debugMode = false
+            collections = {}
         },
         dataState = {
             lastRefreshTime = 0,
@@ -34,6 +34,92 @@ local defaults = {
 
 local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 local Icon = LibStub("LibDBIcon-1.0")
+local DataBroker = LibStub("LibDataBroker-1.1")
+
+local function getAddonVersion()
+    -- The global GetAddOnMetadata is gone in 12.x; C_AddOns is the only form the client still ships.
+    if C_AddOns and C_AddOns.GetAddOnMetadata then
+        return C_AddOns.GetAddOnMetadata(FOLDER_NAME, "Version") or ""
+    end
+    return ""
+end
+
+local function buildLifecyclePayload(source)
+    return {
+        version = getAddonVersion(),
+        timestamp = time(),
+        source = source
+    }
+end
+
+-- Keys this addon persisted in an earlier version and no longer reads. AceDB keeps whatever is in
+-- the file and StateManager.init() copies every timelineState/uiState key straight into memory, so a
+-- retired key is reloaded on every login unless it is dropped explicitly. `yearSpecificEvents` held
+-- whole event records -- labels and HTML chapters for every year the user had ever searched -- so
+-- upgrading without this would carry that payload in SavedVariables permanently.
+local retiredState = {
+    timelineState = {"yearSpecificEvents"},
+    uiState = {"activeTab"}
+}
+
+local function dropRetiredState(global)
+    for section, keys in pairs(retiredState) do
+        local stored = global[section]
+        if stored then
+            for _, key in ipairs(keys) do
+                stored[key] = nil
+            end
+        end
+    end
+end
+
+local function initializeSavedVariables(addonInstance)
+    local db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+    dropRetiredState(db.global)
+    private.Chronicles.db = db
+    addonInstance.db = db
+    return db.global.options.minimap
+end
+
+local function createLauncher(locale, toggleCallback, tooltipCallback)
+    return DataBroker:NewDataObject(
+        FOLDER_NAME,
+        {
+            type = "launcher",
+            text = locale["Chronicles"],
+            icon = private.constants.minimapIcon,
+            OnClick = function()
+                toggleCallback()
+            end,
+            OnTooltipShow = function(tt)
+                tooltipCallback(tt)
+            end
+        }
+    )
+end
+
+local function runReadyCallback(callback, context)
+    local success, err = pcall(callback)
+    if success then
+        return
+    end
+
+    local handler = geterrorhandler()
+    if handler then
+        handler(string.format("Chronicles:ExecuteWhenReady callback failed [%s]: %s", context or "unknown", err))
+    end
+end
+
+local function registerSlashCommand(addonInstance)
+    addonInstance:RegisterChatCommand(
+        "chronicles",
+        function()
+            addonInstance:ExecuteWhenReady(function()
+                addonInstance.UI:DisplayWindow()
+            end, "Chronicles/SlashCommand")
+        end
+    )
+end
 
 -- -------------------------
 -- Init
@@ -41,115 +127,216 @@ local Icon = LibStub("LibDBIcon-1.0")
 local Chronicles = private.Chronicles
 Chronicles.descName = Locale["Chronicles"]
 Chronicles.description = Locale["Description"]
+Chronicles.locale = Locale
 
-private.constants = private.constants
+Chronicles.lifecycle = {
+    pendingReadyCallbacks = {},
+    isBootstrapComplete = false
+}
 
 function Chronicles:OnInitialize()
-    private.Chronicles.db = LibStub("AceDB-3.0"):New("ChroniclesDB", defaults, true)
+    local minimapConfig = initializeSavedVariables(self)
 
     self.mapIcon =
-        LibStub("LibDataBroker-1.1"):NewDataObject(
-        FOLDER_NAME,
-        {
-            type = "launcher",
-            text = Locale["Chronicles"],
-            icon = "Interface\\ICONS\\Inv_scroll_04",
-            OnClick = function(self, button)
-                Chronicles.UI:DisplayWindow()
-            end,
-            OnTooltipShow = function(tt)
-                tt:AddLine(Locale["Chronicles"], 1, 1, 1)
-                local yearText = Locale["CurrentYear"] .. private.constants.config.currentYear .. Locale["AfterDP"]
-                tt:AddLine(yearText)
-                tt:AddLine(" ")
-                tt:AddLine(Locale["Icon tooltip"])
-            end
-        }
-    )
-    Icon:Register(FOLDER_NAME, self.mapIcon, self.db.global.options.minimap)
-    self:RegisterChatCommand(
-        "chronicles",
+        createLauncher(
+        Locale,
         function()
-            self.UI:DisplayWindow()
+            self:ExecuteWhenReady(function()
+                self.UI:DisplayWindow()
+            end, "Chronicles/MinimapToggle")
+        end,
+        function(tt)
+            self:PopulateLauncherTooltip(tt)
         end
     )
+
+    Icon:Register(FOLDER_NAME, self.mapIcon, minimapConfig)
+
+    registerSlashCommand(self)
+
+    self:CompleteBootstrap("Chronicles:OnInitialize")
+end
+
+--[[
+    Restore saved state at startup after core systems finish loading
+
+    This is the single startup restore path. Subscribers register during UI load, so
+    the values StateManager.init() read back from SavedVariables have to be re-emitted
+    for anything to react to them. rehydrate re-notifies without mutating or
+    re-persisting the value, and is a no-op for keys with no saved value.
+]]
+function Chronicles:RestoreStartupState()
+    local stateManager = private.Core.StateManager
+    if not stateManager then
+        return
+    end
+
+    private.Core.triggerEvent(
+        private.constants.events.TimelineInit,
+        {source = "Chronicles:RestoreStartupState"},
+        "Chronicles:RestoreStartupState"
+    )
+
+    stateManager.rehydrate(stateManager.buildUIStateKey("selectedPeriod"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("event"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("character"))
+    stateManager.rehydrate(stateManager.buildSelectionKey("faction"))
+    stateManager.rehydrate(stateManager.buildUIStateKey("settingsCategory"))
+end
+
+-- -------------------------
+
+function Chronicles:CompleteBootstrap(source)
+    if self.lifecycle.isBootstrapComplete then
+        return
+    end
+
+    self.lifecycle.isBootstrapComplete = true
 
     if private.Core.StateManager then
         private.Core.StateManager.init()
     end
 
-    Chronicles.Data:Load()
+    if Chronicles.Data and Chronicles.Data.Load then
+        Chronicles.Data:Load()
+    end
 
-    private.Core.registerCallback(private.constants.events.AddonStartup, self.OnAddonStartup, self)
     C_Timer.After(
         0.2,
         function()
-            local startupData = {}
-            private.Core.triggerEvent(private.constants.events.AddonStartup, startupData, "Chronicles:OnInitialize")
+            private.Core.triggerEvent(
+                private.constants.events.AddonStartup,
+                buildLifecyclePayload(source or "Chronicles:CompleteBootstrap"),
+                "Chronicles:CompleteBootstrap"
+            )
         end
     )
+
+    self:RestoreStartupState()
+
+    self:FlushReadyCallbacks()
 end
 
 --[[
-    AddonStartup event handler - checks for existing saved state and restores it
-    
-    This centralizes all state checking logic that was previously done in individual
-    UI component OnLoad methods. By handling this during AddonStartup, we ensure
-    all core systems are fully initialized before checking saved state.
+    Run a callback that needs Chronicles' core systems in place
+
+    Callbacks arriving before CompleteBootstrap are queued and flushed by it, in
+    arrival order; everything after it runs immediately.
+
+    @param callback [function] Work to run
+    @param context [string] Caller name, reported if the callback errors
 ]]
-function Chronicles:OnAddonStartup(eventData)
-    if not private.Core.StateManager then
+function Chronicles:ExecuteWhenReady(callback, context)
+    if type(callback) ~= "function" then
         return
     end
 
-    private.Core.triggerEvent(private.constants.events.TimelineInit, {}, "Chronicles:OnInitialize")
-    local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
-    local existingPeriod = private.Core.StateManager.getState(selectedPeriodKey)
-    if existingPeriod then
-        private.Core.StateManager.setState(selectedPeriodKey, existingPeriod, "AddonStartup state restoration")
+    if self.lifecycle.isBootstrapComplete then
+        runReadyCallback(callback, context)
+        return
     end
 
-    local eventSelectionKey = private.Core.StateManager.buildSelectionKey("event")
-    local existingEventSelection = private.Core.StateManager.getState(eventSelectionKey)
-    if existingEventSelection and type(existingEventSelection) == "table" then
-        private.Core.StateManager.setState(eventSelectionKey, existingEventSelection, "AddonStartup state restoration")
+    table.insert(self.lifecycle.pendingReadyCallbacks, {callback = callback, context = context})
+end
+
+function Chronicles:FlushReadyCallbacks()
+    local pending = self.lifecycle.pendingReadyCallbacks
+    if #pending == 0 then
+        return
     end
 
-    local characterSelectionKey = private.Core.StateManager.buildSelectionKey("character")
-    local existingCharacterSelection = private.Core.StateManager.getState(characterSelectionKey)
-    if existingCharacterSelection and type(existingCharacterSelection) == "table" then
-        private.Core.StateManager.setState(
-            characterSelectionKey,
-            existingCharacterSelection,
-            "AddonStartup state restoration"
+    for index = 1, #pending do
+        local entry = pending[index]
+        if entry and type(entry.callback) == "function" then
+            runReadyCallback(entry.callback, entry.context)
+        end
+    end
+
+    wipe(pending)
+end
+
+--[[
+    Register an external plugin's databases at runtime.
+
+    @param pluginName [string] Unique name for the plugin
+    @param pluginData [table] Manifest table: { events = {...}, characters = {...}, factions = {...} }
+]]
+function Chronicles:RegisterPluginDB(pluginName, pluginData)
+    if type(pluginName) ~= "string" or pluginName == "" then
+        print("|cffff0000Error:|r Chronicles:RegisterPluginDB called with invalid pluginName")
+        return
+    end
+
+    if type(pluginData) ~= "table" then
+        print(
+            "|cffff0000Error:|r Chronicles:RegisterPluginDB called with invalid pluginData for collection: " ..
+                tostring(pluginName)
         )
+        return
     end
 
-    local factionSelectionKey = private.Core.StateManager.buildSelectionKey("faction")
-    local existingFactionSelection = private.Core.StateManager.getState(factionSelectionKey)
-    if existingFactionSelection and type(existingFactionSelection) == "table" then
-        private.Core.StateManager.setState(
-            factionSelectionKey,
-            existingFactionSelection,
-            "AddonStartup state restoration"
+    if not (pluginData.events or pluginData.characters or pluginData.factions) then
+        print("|cffff0000Error:|r Chronicles:RegisterPluginDB requires events, characters, or factions key")
+        return
+    end
+
+    local hasNameConflict = (Chronicles.Data.Events[pluginName] ~= nil) or (Chronicles.Data.Factions[pluginName] ~= nil) or
+        (Chronicles.Data.Characters[pluginName] ~= nil)
+    if hasNameConflict then
+        print(
+            "|cffff9900Warning:|r Chronicles:RegisterPluginDB skipped duplicate collection name: " .. tostring(pluginName)
         )
+        return
     end
 
-    local activeTabKey = private.Core.StateManager.buildUIStateKey("activeTab")
-    local existingActiveTab = private.Core.StateManager.getState(activeTabKey)
-    if existingActiveTab then
-        private.Core.StateManager.setState(activeTabKey, existingActiveTab, "AddonStartup state restoration")
+    local registered = false
+
+    if pluginData.events then
+        if Chronicles.Data:RegisterEventDB(pluginName, pluginData.events) then
+            registered = true
+        end
     end
+    if pluginData.characters then
+        if Chronicles.Data:RegisterCharacterDB(pluginName, pluginData.characters) then
+            registered = true
+        end
+    end
+    if pluginData.factions then
+        if Chronicles.Data:RegisterFactionDB(pluginName, pluginData.factions) then
+            registered = true
+        end
+    end
+
+    if not registered then
+        print(
+            "|cffff9900Warning:|r Chronicles:RegisterPluginDB did not register data for collection: " ..
+            tostring(pluginName)
+        )
+        return
+    end
+
+    private.Core.triggerEvent(
+        private.constants.events.TimelineInit,
+        {source = "plugin", pluginName = pluginName},
+        "Chronicles:RegisterPluginDB"
+    )
 end
 
-function Chronicles:OnDisable()
-    private.Core.triggerEvent(private.constants.events.AddonShutdown, nil, "Chronicles:OnDisable")
+function Chronicles:PopulateLauncherTooltip(tt)
+    if not tt then
+        return
+    end
+
+    local locale = self.locale or Locale
+    tt:AddLine(locale["Chronicles"], 1, 1, 1)
+
+    local config = private.constants and private.constants.config
+    if config and config.currentYear then
+        local yearText = (locale["CurrentYear"] or "") .. tostring(config.currentYear) .. (locale["AfterDP"] or "")
+        tt:AddLine(yearText)
+    end
+
+    tt:AddLine(" ")
+    tt:AddLine(locale["Icon tooltip"] or "")
 end
 
-function Chronicles:RegisterPluginDB(pluginName, db)
-    Chronicles.Data:RegisterEventDB(pluginName, db)
-    -- Use safe event triggering
-    private.Core.triggerEvent(private.constants.events.TimelineInit, nil, "Chronicles:RegisterPluginDB")
-end
-
--- -------------------------
