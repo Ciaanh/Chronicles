@@ -6,22 +6,8 @@ if L then
     L["Description"] = "Display Azeroth history as a timeline"
     L["Icon tooltip"] = "Click to show the timeline."
     L["CurrentYear"] = "Current year is "
-    L["currentstep"] = "Step: "
-    L["year"] = " year"
     L["years"] = " years"
     L["AfterDP"] = " after the Dark Portal"
-    L["start"] = "Start"
-    L["end"] = "End"
-    L["year"] = "Year"
-    L[":My Characters"] = " : my characters"
-    L[":My Factions"] = " : my factions"
-    L[":My Events"] = " : my events"
-    L["AddPage"] = "Add page"
-    L["RemovePage"] = "Remove last page"
-    L["Save"] = "Save"
-    L["Add"] = "Add"
-    L["Delete"] = "Delete"
-    L["FactionsCharacters"] = "Factions/Characters"
 
     -- Date Search Localization
     L["Enter year..."] = "Enter year..."
@@ -29,48 +15,55 @@ if L then
     L["Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"] =
         "Invalid year format. Please enter a number (e.g., -10000, 25, 2024)"
     L["Year must be between %d and %d"] = "Year must be between %d and %d"
-    L["Found %d events for year %d (period %d-%d)"] = "Found %d events for year %d (period %d-%d)"
-    L["No events found for year %d (period %d-%d)"] = "No events found for year %d (period %d-%d)"
     L["Found %d events for year %d"] = "Found %d events for year %d"
     L["No events found for year %d"] = "No events found for year %d"
-    L["Displaying events for year %d"] = "Displaying events for year %d"
-    L["Could not find timeline period for year %d"] = "Could not find timeline period for year %d"
-    L["Successfully navigated to year %d"] = "Successfully navigated to year %d"
 
-    L["Id_Field"] = "Id"
-    L["Title_Field"] = "Title"
-    L["YearStart_Field"] = "Year start"
-    L["YearEnd_Field"] = "Year end"
-    L["Description_Field"] = "Description"
-    L["EventType_Field"] = "Event type"
-    L["Timeline_Field"] = "Timeline"
-    L["Name_Field"] = "Name"
-    L["Biography_Field"] = "Biography"
+    -- Navigator (the column above the event rail)
+    L["TimelineGoToYear"] = "Go to year"
+    L["TimelineZoom"] = "Zoom (years per period)"
+    L["TimelineJumpToEra"] = "Jump to era"
+    L["TimelineChooseEra"] = "Choose an era..."
+    L["TimelineNoEras"] = "No era in the enabled collections"
+    L["TimelineEraEntry"] = "Year %d  -  %s"
+    L["TimelineYearZeroNote"] = "Year 0 = the Dark Portal opens"
+    L["TimelineDensityLegendTitle"] = "Events per period"
+    L["TimelineDensityLegendRange"] = "%d-%d"
 
-    L["Factions_List"] = "Factions"
-    L["Characters_List"] = "Characters"
-
-    L["ErrorYearAsNumber"] = "A year must be a number"
-    L["ErrorYearOrder"] = "Event ends before it's started"
+    -- Period breakdown above the event rail
+    L["EventListTypeAll"] = "All"
+    L["EventListPeriodYear"] = "Year %s"
+    L["EventListPeriodYears"] = "Year %s to %s"
+    L["EventListPeriodSpan"] = "%s to %s"
+    L["EventListTypeChip"] = "%s %d"
+    L["EventListBucketYear"] = "Year %d"
+    L["EventListBucketYears"] = "Years %d to %d"
+    L["EventListBucketCount"] = "%d events"
 
     L["Mythos"] = "Mythos"
     L["Futur"] = "Futur"
 
-    L["mythos"] = "Mythos"
-    L["beforedarkportal"] = "Before the Dark Portal"
-    L["threewars"] = "The Three Great Wars"
-    L["vanilla"] = "Vanilla"
-    L["burningcrusade"] = "The Burning Crusade"
-    L["lichking"] = "Wrath of the Lich King"
-    L["cataclysm"] = "Cataclysm"
-    L["pandaria"] = "Mists of Pandaria"
-    L["warlords"] = "Warlords of Draenor"
-    L["legion"] = "Legion"
-    L["battleforazeroth"] = "Battle for Azeroth"
-    L["shadowlands"] = "Shadowlands"
+    -- Collection display names. Resolved dynamically as Locale[collectionName]
+    -- (UI/Settings/Settings.lua), so no literal lookup exists for these keys -- a
+    -- search for unreferenced strings will wrongly flag every one of them. Keys must
+    -- match the names registered in DB\DB.lua.
+    L["Expansions"] = "Expansions"
+    L["Origins"] = "Origins"
+    L["Greatwars"] = "The Great Wars"
+    L["Worldofwarcraft"] = "World of Warcraft"
+    L["Burningcrusade"] = "The Burning Crusade"
+    L["Lichking"] = "Wrath of the Lich King"
+    L["Cataclysm"] = "Cataclysm"
+    L["Mistsofpandaria"] = "Mists of Pandaria"
+    L["Warlords"] = "Warlords of Draenor"
+    L["Legion"] = "Legion"
+    L["Battleforazeroth"] = "Battle for Azeroth"
+    L["Shadowlands"] = "Shadowlands"
+    L["Dragonflight"] = "Dragonflight"
+    L["Future"] = "Future"
+    L["Warwithin"] = "The War Within"
 
-    L["Author"] = "by "
-
+    -- Event type display names, likewise resolved dynamically as Locale[eventTypeName]
+    -- from private.constants.eventType. Adding a type there needs a key here.
     L["event"] = "Event"
     L["era"] = "Era"
     L["war"] = "War"
@@ -87,27 +80,101 @@ if L then
     L["Event Types"] = "Event Types"
     L["Event Collections"] = "Event Collections"
 
-    -- Settings descriptions and content
-    L["SettingsHomeDescription"] =
-        "Welcome to Chronicles settings. Use the categories on the left to configure your preferences."
-    L["SettingsHomeOverviewSectionTitle"] = "Configuration Overview"
-    L["SettingsHomeOverviewEventTypesInfo"] = "• Event Types: Configure which event categories appear in your timeline"
-    L["SettingsHomeOverviewCollectionsInfo"] =
-        "• Collections: Enable or disable content collections from different expansions"
-
-    L["SettingsHomeQuickActionsSectionTitle"] = "Getting Started"
-    L["SettingsHomeQuickActionsTip1"] = "1. Start with Event Types to customize which events you want to see"
-    L["SettingsHomeQuickActionsTip2"] = "2. Use Collections to enable content from specific expansions or lore sources"
-    L["SettingsHomeVersionSectionTitle"] = "About Chronicles"
-    L["SettingsHomeVersionVersionInfo"] = "A comprehensive timeline addon for World of Warcraft lore and events."
-    L["SettingsHomeVersionConfigNote"] = "Settings are automatically saved and will persist between sessions."
+    -- Settings feedback. The Settings landing page and its overview, tips and version blocks are gone:
+    -- "Settings" is the panel's header now rather than a category, so the only two categories are the
+    -- two that configure something.
+    L["SettingsEventTypeCount"] = "%s — %d events"
+    L["SettingsTimelineNowEmpty"] = "No events left on the current timeline page."
 
     -- Search functionality
-    L["SearchCharactersPlaceholder"] = "Search..."
+    L["SearchPlaceholder"] = "Search..."
+    L["SearchCharactersPlaceholder"] = "Search Characters..."
+    L["SearchFactionsPlaceholder"] = "Search Factions..."
+    -- Scoped to the selected period, which is why it does not say "Search Events"
+    L["SearchEventsPlaceholder"] = "Search this period..."
 
-    -- Timeline zoom button text
+    -- Vertical list count labels. Pluralisation is not modelled: every collection large enough to
+    -- reach a rail has more than one entry.
+    L["ListCountItems"] = "%d items"
+    L["ListCountCharacters"] = "%d Characters"
+    L["ListCountFactions"] = "%d Factions"
+    L["ListCountEvents"] = "%d Events"
+
+    -- List item tooltips
+    L["TooltipDefaultItemName"] = "Item"
+    L["TooltipChapterCount"] = "Available Content: %d chapters"
+    L["TooltipCreatedBy"] = "Created by: %s"
+    L["TooltipAllegiance"] = "Allegiance: %s"
+    L["TooltipRace"] = "Race: %s"
+
+    -- Book view
+    L["NoContentAvailable"] = "No content available"
+    L["BookEmptyPromptEvent"] = "Select an event from the timeline or the list to read its chronicle."
+    L["BookEmptyPromptCharacter"] = "Select a character from the list to read their chronicle."
+    L["BookEmptyPromptFaction"] = "Select a faction from the list to read its chronicle."
+
+    -- Timeline toolbar button glyphs, and the separator in the visible-range readout
     L["Zoom Out"] = "-"
     L["Zoom In"] = "+"
+    L["Previous Page"] = "<"
+    L["Next Page"] = ">"
+    L["RangeSeparator"] = " to "
+    L["TimelineYearLabel"] = "Year %d"
+
+    -- Timeline density legend and period tooltips. The legend labels are format strings filled from
+    -- config.timeline.densityTiers: the thresholds must never be written out here, or the legend becomes
+    -- a second, drifting copy of the ladder the crystals actually use.
+    L["TimelineDensityLegendUnder"] = "< %d"
+    L["TimelineDensityLegendOver"] = "%d+"
+    L["TimelinePeriodTooltipSpan"] = "Years %d to %d"
+    L["TimelinePeriodTooltipCount"] = "%d events"
+    L["TimelinePeriodTooltipMore"] = "and %d more"
     L["EventTypesDescription"] = "Configure which types of events to display in the timeline and event lists."
     L["CollectionsDescription"] = "Enable or disable event collections to customize which content is available."
+
+    -- Book / HTMLBuilder localization
+    -- Title and structure
+    L["BOOK_CONTENTS_TITLE"] = "Contents"
+    L["BOOK_CHAPTER_N"] = "Chapter %d"
+    L["BOOK_CHAPTER_HEADER"] = "Chapter %d: %s"
+    L["BOOK_UNTITLED"] = "Untitled"
+    -- Errors
+    L["BOOK_ERROR_TITLE"] = "Error"
+    L["BOOK_ERROR_NO_ENTITY"] = "No entity data provided"
+    L["BOOK_ERROR_UNKNOWN"] = "Unknown error occurred"
+    L["BOOK_ERROR_NO_CONTENT_DATA"] = "No content data provided"
+    L["BOOK_ERROR_NO_HTML"] = "No HTML content provided"
+    L["BOOK_ERROR_NO_DISPLAY"] = "HTML display component not found"
+    L["BOOK_NO_CONTENT"] = "No content available."
+    -- Front matter: the left page of the spread, carrying the entity's identity and its cross-references
+    L["BOOK_FRONT_FACTIONS"] = "Factions"
+    L["BOOK_FRONT_CHARACTERS"] = "Characters"
+    -- Joins the metadata parts and the names in each reference list. Also the gap before a contents
+    -- row's page number.
+    L["BOOK_FRONT_META_SEPARATOR"] = " · "
+    L["BOOK_FRONT_MORE"] = "+ %d more"
+    -- Related events on the front matter. Previous/next wrap the "Year n . Label" text of the neighbour.
+    L["BOOK_FRONT_CHRONICLE"] = "In the chronicle"
+    L["BOOK_FRONT_PREVIOUS"] = "« %s"
+    L["BOOK_FRONT_NEXT"] = "%s »"
+    L["BOOK_FRONT_APPEARS_IN"] = "Appears in %d events"
+    L["BOOK_FRONT_APPEARS_IN_ONE"] = "Appears in 1 event"
+
+    -- Navigation bar, right of the tabs
+    L["NavigationBack"] = "Back"
+    L["NavigationForward"] = "Forward"
+    L["NavigationSeparator"] = "  »  "
+
+    -- Panel above the Characters and Factions rails
+    L["FindCharacterLabel"] = "Find a character"
+    L["FindFactionLabel"] = "Find a faction"
+    L["BOOK_CONTENTS_PAGE_N"] = "%d"
+    -- Empty book state, before the reader has selected anything
+    L["BOOK_EMPTY_COLLECTIONS"] = "%d collections"
+    L["BOOK_EMPTY_ENTITIES"] = "%d entries"
+    -- Dates
+    L["BOOK_DATE_YEAR"] = "Year %d"
+    L["BOOK_DATE_YEARS_RANGE"] = "Years %d - %d"
+    L["BOOK_DATE_FROM_YEAR"] = "From Year %d"
+    L["BOOK_DATE_UNTIL_YEAR"] = "Until Year %d"
 end

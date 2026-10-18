@@ -15,16 +15,15 @@ This module provides comprehensive data validation for Chronicles addon:
 - Input sanitization and bounds checking
 
 Key Features:
-- Null/empty value detection
 - Type-specific validation (numbers, strings, tables)
 - Chronicles entity validation (events, characters, factions)
 - Year and date validation for timeline system
 - Safe validation with no external dependencies
 
 Validation Categories:
-- Basic Types: IsValidNumber, IsValidString, IsValidTable
+- Basic Types: IsValidNumber, IsValidString, IsValidTable, ValidateTable
 - Chronicles Entities: IsValidEvent, IsValidCharacter, IsValidFaction
-- Timeline Data: IsValidYear, date range validation
+- Timeline Data: IsValidYear, IsValidPeriod
 - Special Cases: NaN detection, empty collection handling
 
 Usage Patterns:
@@ -40,27 +39,6 @@ private.Core.Utils = private.Core.Utils or {}
 private.Core.Utils.ValidationUtils = {}
 
 local ValidationUtils = private.Core.Utils.ValidationUtils
-
---[[
-    Check if a value is nil or empty
-    @param value [any] Value to check
-    @return [boolean] True if value is nil or empty
-]]
-function ValidationUtils.IsNilOrEmpty(value)
-    if value == nil then
-        return true
-    end
-
-    if type(value) == "string" then
-        return value == ""
-    end
-
-    if type(value) == "table" then
-        return next(value) == nil
-    end
-
-    return false
-end
 
 --[[
     Check if a value is a valid number
@@ -86,7 +64,32 @@ end
     @return [boolean] True if value is a valid non-empty table
 ]]
 function ValidationUtils.IsValidTable(value)
-    return type(value) == "table" and next(value) ~= nil
+    return ValidationUtils.ValidateTable(value, false)
+end
+
+--[[
+    Generic table validator with optional empty allowance
+    @param value [any] Value to check
+    @param allowEmpty [boolean|table] When true (or {allowEmpty=true}), consider empty tables valid
+    @return [boolean] True if value satisfies table requirements
+]]
+function ValidationUtils.ValidateTable(value, allowEmpty)
+    local allowEmptyTable = false
+    if type(allowEmpty) == "table" then
+        allowEmptyTable = allowEmpty.allowEmpty == true
+    else
+        allowEmptyTable = allowEmpty and true or false
+    end
+
+    if type(value) ~= "table" then
+        return false
+    end
+
+    if not allowEmptyTable and next(value) == nil then
+        return false
+    end
+
+    return true
 end
 
 --[[

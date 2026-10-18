@@ -1,6 +1,18 @@
 /BlizzardInterfaceCode
 /.vscode
+/.github/*
+!/.github/workflows
+/.claude
 
-# Build output and make-release.ps1 staging folder
-.build/
+refs
+
+# Build output
+.build
+
+# OS / editor artefacts
+*.bak
+.DS_Store
+.idea/
+
+# make-release.ps1 staging folder
 /Chronicles/

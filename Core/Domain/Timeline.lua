@@ -3,39 +3,16 @@ local Locale = LibStub("AceLocale-3.0"):GetLocale(private.addon_name)
 
 private.Core.Timeline = {}
 
--- Dependency injection container to eliminate circular dependencies
-local function getDependency(name)
-    if private.Core.DependencyContainer then
-        return private.Core.DependencyContainer.resolve(name)
-    end
-    return nil
-end
-
--- Safe dependency accessor with fallbacks
+-- Direct access helpers
 local function getTimelineBusiness()
-    local timelineBusiness = getDependency("TimelineBusiness")
-    if timelineBusiness then
-        return timelineBusiness
-    end
-    -- Fallback to direct access if container not available
     return private.Core.Data and private.Core.Data.TimelineBusiness
 end
 
 local function getStateManager()
-    local stateManager = getDependency("StateManager")
-    if stateManager then
-        return stateManager
-    end
-    -- Fallback to direct access if container not available
     return private.Core.StateManager
 end
 
 local function getChronicles()
-    local chronicles = getDependency("Chronicles")
-    if chronicles then
-        return chronicles
-    end
-    -- Fallback to direct access if container not available
     return private.Chronicles
 end
 
@@ -56,8 +33,6 @@ local function clearYearSpecificMode(description)
     )
 
     stateManager.setState(stateManager.buildTimelineKey("yearSpecificTarget"), nil, "Year-specific target cleared")
-
-    stateManager.setState(stateManager.buildTimelineKey("yearSpecificEvents"), nil, "Year-specific events cleared")
 end
 
 -- -------------------------
@@ -67,12 +42,40 @@ local Timeline = {}
 Timeline.MaxStepIndex = #private.constants.config.stepValues
 Timeline.Periods = {}
 
-local function getCurrentStepValue()
+local function isConfiguredStepValue(stepValue)
+    for _, value in ipairs(private.constants.config.stepValues) do
+        if value == stepValue then
+            return true
+        end
+    end
+    return false
+end
+
+local function setCurrentStepValue(value, description)
     local stateManager = getStateManager()
     if not stateManager then
-        return private.constants.config.stepValues[1] -- fallback default
+        return
     end
-    return stateManager.getState(stateManager.buildTimelineKey("currentStep"))
+    stateManager.setState(stateManager.buildTimelineKey("currentStep"), value, description or "Timeline step changed")
+end
+
+local function getCurrentStepValue()
+    local defaultStep = private.constants.config.stepValues[1]
+    local stateManager = getStateManager()
+    if not stateManager then
+        return defaultStep -- fallback default
+    end
+
+    local stepValue = stateManager.getState(stateManager.buildTimelineKey("currentStep"))
+
+    -- A step saved before its value was retired from stepValues has no index,
+    -- so every zoom computation on it would operate on nil.
+    if not isConfiguredStepValue(stepValue) then
+        setCurrentStepValue(defaultStep, "Timeline step reset to a configured value")
+        return defaultStep
+    end
+
+    return stepValue
 end
 
 local function getCurrentPage()
@@ -91,14 +94,6 @@ local function getSelectedYear()
     return stateManager.getState(stateManager.buildTimelineKey("selectedYear"))
 end
 
-local function setCurrentStepValue(value, description)
-    local stateManager = getStateManager()
-    if not stateManager then
-        return
-    end
-    stateManager.setState(stateManager.buildTimelineKey("currentStep"), value, description or "Timeline step changed")
-end
-
 local function setCurrentPage(value, description)
     local stateManager = getStateManager()
     if not stateManager then
@@ -115,28 +110,14 @@ local function setSelectedYear(value, description)
     stateManager.setState(stateManager.buildTimelineKey("selectedYear"), value, description or "Timeline year changed")
 end
 
-local function GetDateCurrentStepIndex(date)
-    return getTimelineBusiness().getDateCurrentStepIndex(date)
-end
-
-local function GetCurrentStepPeriodsFilling()
-    return getTimelineBusiness().getCurrentStepPeriodsFilling()
-end
-
-local function CountEvents(block)
-    return getTimelineBusiness().countEventsInPeriod(block)
-end
-
-local function GetTimelineConfig(minYear, maxYear, stepValue)
-    return getTimelineBusiness().calculateTimelineConfig(minYear, maxYear, stepValue)
-end
-
 local function GetStepValueIndex(stepValue)
     return getTimelineBusiness().getStepValueIndex(stepValue)
 end
 
+-- Resolves against the periods already held here, so the page index and the
+-- period selected from the same array cannot disagree.
 local function GetYearPageIndex(year)
-    return getTimelineBusiness().getYearPageIndex(year, Timeline.Periods)
+    return getTimelineBusiness().getYearPageIndexWithPeriods(year, Timeline.Periods)
 end
 
 function private.Core.Timeline.ChangePage(value)
@@ -271,6 +252,24 @@ function private.Core.Timeline.ChangeCurrentStepValue(direction)
     private.Core.Timeline.DisplayTimelineWindow()
 end
 
+--[[
+    Jump straight to a zoom step, for the Navigator's step buttons
+
+    @param stepValue [number] One of config.stepValues; anything else is ignored
+]]
+function private.Core.Timeline.SetStepValue(stepValue)
+    if not isConfiguredStepValue(stepValue) or stepValue == getCurrentStepValue() then
+        return
+    end
+
+    setCurrentStepValue(stepValue, "Timeline step chosen in the navigator")
+
+    private.Core.Timeline.ComputeTimelinePeriods()
+    private.Core.Timeline.MaintainSelectedYear()
+
+    private.Core.Timeline.DisplayTimelineWindow()
+end
+
 function private.Core.Timeline.MaintainSelectedYear()
     local selectedYear = getSelectedYear()
 
@@ -315,39 +314,11 @@ function private.Core.Timeline.MaintainSelectedYear()
     end
 end
 
--- -------------------------
--- Initialization
--- -------------------------
-
-local function onCurrentPageChanged(newPage, oldPage, description)
-    if newPage ~= oldPage and oldPage ~= nil then
-        private.Core.Timeline.DisplayTimelineWindow()
-    end
-end
-
-function private.Core.Timeline.Init()
-    local currentStep = getCurrentStepValue()
-    if not currentStep then
-        local defaultStep = private.constants.config.stepValues[1]
-        setCurrentStepValue(defaultStep, "Timeline step initialized to default")
-    end
-
-    local currentPage = getCurrentPage()
-    if not currentPage then
-        setCurrentPage(1, "Timeline page initialized to default")
-    end
-
-    private.Core.StateManager.subscribe(
-        private.Core.StateManager.buildTimelineKey("currentPage"),
-        onCurrentPageChanged,
-        "Timeline"
-    )
-
-    private.Core.Timeline.ComputeTimelinePeriods()
-    private.Core.Timeline.DisplayTimelineWindow()
-
-    SafeTriggerEvent(private.constants.events.TimelineInit, {}, "Timeline:Init")
-end
+-- There is deliberately no Timeline.Init(). Every piece of startup work it would do already has an
+-- owner: TimelineTemplate's OnTimelineInit computes periods and renders, TimelineBusiness defaults a
+-- missing page to 1 and sanitizes a retired step value, and TimelineInit is triggered by Core/Data
+-- and by RegisterPluginDB. Its currentPage subscription would also have double-rendered, because
+-- NavigatePage already calls DisplayTimelineWindow() itself right after setCurrentPage().
 
 --[[
     Navigate to a specific year and display associated events
@@ -403,55 +374,14 @@ function private.Core.Timeline.NavigateToYear(year)
         end
     end
 
-    -- Update selected period in state using dependency container
     if selectedPeriod then
-        local selectedPeriodKey = stateManager.buildUIStateKey("selectedPeriod")
-        stateManager.setState(selectedPeriodKey, selectedPeriod, "Timeline period selected via year navigation") -- Set a flag to indicate we're displaying year-specific events
-        stateManager.setState(
-            stateManager.buildTimelineKey("yearSpecificMode"),
-            true,
-            "Year-specific event display mode enabled"
+        local selectedPeriodKey = private.Core.StateManager.buildUIStateKey("selectedPeriod")
+        private.Core.StateManager.setState(
+            selectedPeriodKey,
+            selectedPeriod,
+            "Timeline period selected after year navigation"
         )
-
-        stateManager.setState(
-            stateManager.buildTimelineKey("yearSpecificTarget"),
-            year,
-            "Target year for year-specific display"
-        )
-
-        -- Search for events specifically for this year, not the entire period
-        local searchEngine = getDependency("SearchEngine")
-        if searchEngine and searchEngine.searchEvents then
-            -- Search for events only for the specific year (yearStart == yearEnd)
-            local events = searchEngine.searchEvents(year, year)
-            -- Store the year-specific events in state
-            stateManager.setState(
-                stateManager.buildTimelineKey("yearSpecificEvents"),
-                events,
-                "Events for year-specific display"
-            )
-        end
-    else
-        return false, "Period not found for year"
     end
-    -- Refresh the timeline display first
-    private.Core.Timeline.DisplayTimelineWindow()
 
-    -- After timeline refresh, trigger year-specific event display if in year-specific mode
-    local yearSpecificMode = stateManager.getState(stateManager.buildTimelineKey("yearSpecificMode"))
-    if yearSpecificMode then
-        local yearSpecificEvents = stateManager.getState(stateManager.buildTimelineKey("yearSpecificEvents"))
-        local yearSpecificTarget = stateManager.getState(stateManager.buildTimelineKey("yearSpecificTarget"))
-
-        if yearSpecificTarget and yearSpecificEvents then
-            -- Trigger event to display the filtered events for this specific year
-            SafeTriggerEvent(
-                private.constants.events.DisplayEventsForYear,
-                {year = yearSpecificTarget, events = yearSpecificEvents},
-                "Timeline:NavigateToYear"
-            )
-        end
-    end    local successMsg =
-        string.format(Locale["Successfully navigated to year %d"] or "Successfully navigated to year %d", year)
-    return true, successMsg
+    return true
 end
